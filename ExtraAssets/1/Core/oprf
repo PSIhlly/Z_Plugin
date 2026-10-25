@@ -1,77 +1,9 @@
 [
   {
-    "id": 47,
-    "name": "New0",
-    "icon": 210000,
-    "model": {
-      "id": 0,
-      "subPrefabUnitName": [
-        {
-          "v": 125049
-        }
-      ],
-      "subPrefabUnitPos": [
-        {
-          "v": "0|0.25|0"
-        }
-      ],
-      "subPrefabUnitScale": [
-        {
-          "v": "1|1.5|1"
-        }
-      ],
-      "subUnitTexsName": [
-        {
-          "v": [
-            {
-              "v": 1101
-            }
-          ]
-        }
-      ],
-      "animTimeInterval": 0.0,
-      "isObstacle": false,
-      "colliderScale": 0.0
-    },
-    "labId": 5,
-    "collision": false,
-    "events": [],
-    "paramDic": [],
-    "minimapIcon": 210000,
-    "faceType": 0,
-    "animClip": [
-      {
-        "k": 0,
-        "v": [
-          {
-            "v": 1101
-          }
-        ]
-      },
-      {
-        "k": 1,
-        "v": []
-      },
-      {
-        "k": 2,
-        "v": []
-      },
-      {
-        "k": 3,
-        "v": []
-      },
-      {
-        "k": 4,
-        "v": []
-      }
-    ],
-    "isWangTile": false,
-    "boundsCollision": false,
-    "centerCollider": true
-  },
-  {
-    "id": 27,
-    "name": "屋顶",
+    "uid": 57,
+    "name": "触发1-1-3",
+    "labId": 0,
+    "protoUid": 0,
     "icon": 210000,
     "model": {
       "id": 0,
@@ -87,93 +19,7 @@
       ],
       "subPrefabUnitScale": [
         {
-          "v": "1|1|1"
-        }
-      ],
-      "subUnitTexsName": [
-        {
-          "v": [
-            {
-              "v": 270
-            }
-          ]
-        }
-      ],
-      "animTimeInterval": 0.0,
-      "isObstacle": false,
-      "colliderScale": 1.0
-    },
-    "labId": 5,
-    "collision": true,
-    "events": [],
-    "paramDic": [],
-    "minimapIcon": 210000,
-    "faceType": 1,
-    "animClip": [
-      {
-        "k": 0,
-        "v": [
-          {
-            "v": 269
-          }
-        ]
-      },
-      {
-        "k": 1,
-        "v": [
-          {
-            "v": 270
-          }
-        ]
-      },
-      {
-        "k": 2,
-        "v": [
-          {
-            "v": 270
-          }
-        ]
-      },
-      {
-        "k": 3,
-        "v": [
-          {
-            "v": 269
-          }
-        ]
-      },
-      {
-        "k": 4,
-        "v": [
-          {
-            "v": 273
-          }
-        ]
-      }
-    ],
-    "isWangTile": false,
-    "boundsCollision": false,
-    "centerCollider": true
-  },
-  {
-    "id": 21,
-    "name": "空气墙",
-    "icon": 210000,
-    "model": {
-      "id": 0,
-      "subPrefabUnitName": [
-        {
-          "v": 125049
-        }
-      ],
-      "subPrefabUnitPos": [
-        {
-          "v": "0|0|0"
-        }
-      ],
-      "subPrefabUnitScale": [
-        {
-          "v": "2|1|2"
+          "v": "8|1|8"
         }
       ],
       "subUnitTexsName": [
@@ -189,8 +35,7 @@
       "isObstacle": false,
       "colliderScale": 1.0
     },
-    "labId": 0,
-    "collision": true,
+    "collision": false,
     "events": [
       {
         "k": "onCharacterTouchEvent",
@@ -199,7 +44,7 @@
           "name": "onCharacterTouchEvent",
           "evt": [
             {
-              "v": 21
+              "v": 29
             }
           ],
           "type": 0
@@ -240,8 +85,2043 @@
     "centerCollider": true
   },
   {
-    "id": 33,
-    "name": "草1",
+    "uid": 56,
+    "name": "森",
+    "labId": 14,
+    "protoUid": 0,
+    "icon": 210000,
+    "model": {
+      "id": 0,
+      "subPrefabUnitName": [
+        {
+          "v": 125049
+        }
+      ],
+      "subPrefabUnitPos": [
+        {
+          "v": "0|0.25|0"
+        }
+      ],
+      "subPrefabUnitScale": [
+        {
+          "v": "5|1.5|5"
+        }
+      ],
+      "subUnitTexsName": [
+        {
+          "v": [
+            {
+              "v": 2240
+            }
+          ]
+        }
+      ],
+      "animTimeInterval": 0.0,
+      "isObstacle": false,
+      "colliderScale": 1.0
+    },
+    "collision": true,
+    "events": [],
+    "paramDic": [],
+    "minimapIcon": 210000,
+    "faceType": 0,
+    "animClip": [
+      {
+        "k": 0,
+        "v": [
+          {
+            "v": 2240
+          }
+        ]
+      },
+      {
+        "k": 1,
+        "v": []
+      },
+      {
+        "k": 2,
+        "v": []
+      },
+      {
+        "k": 3,
+        "v": []
+      },
+      {
+        "k": 4,
+        "v": []
+      }
+    ],
+    "isWangTile": false,
+    "boundsCollision": false,
+    "centerCollider": true
+  },
+  {
+    "uid": 55,
+    "name": "林",
+    "labId": 14,
+    "protoUid": 0,
+    "icon": 210000,
+    "model": {
+      "id": 0,
+      "subPrefabUnitName": [
+        {
+          "v": 125049
+        }
+      ],
+      "subPrefabUnitPos": [
+        {
+          "v": "0|0.25|0"
+        }
+      ],
+      "subPrefabUnitScale": [
+        {
+          "v": "3|1.5|3"
+        }
+      ],
+      "subUnitTexsName": [
+        {
+          "v": [
+            {
+              "v": 123
+            }
+          ]
+        }
+      ],
+      "animTimeInterval": 0.0,
+      "isObstacle": false,
+      "colliderScale": 1.0
+    },
+    "collision": true,
+    "events": [],
+    "paramDic": [],
+    "minimapIcon": 210000,
+    "faceType": 0,
+    "animClip": [
+      {
+        "k": 0,
+        "v": [
+          {
+            "v": 123
+          }
+        ]
+      },
+      {
+        "k": 1,
+        "v": []
+      },
+      {
+        "k": 2,
+        "v": []
+      },
+      {
+        "k": 3,
+        "v": []
+      },
+      {
+        "k": 4,
+        "v": []
+      }
+    ],
+    "isWangTile": false,
+    "boundsCollision": false,
+    "centerCollider": true
+  },
+  {
+    "uid": 54,
+    "name": "小树",
+    "labId": 14,
+    "protoUid": 0,
+    "icon": 210000,
+    "model": {
+      "id": 0,
+      "subPrefabUnitName": [
+        {
+          "v": 125049
+        }
+      ],
+      "subPrefabUnitPos": [
+        {
+          "v": "0|0.25|0"
+        }
+      ],
+      "subPrefabUnitScale": [
+        {
+          "v": "1|1.5|1"
+        }
+      ],
+      "subUnitTexsName": [
+        {
+          "v": [
+            {
+              "v": 691
+            }
+          ]
+        }
+      ],
+      "animTimeInterval": 0.0,
+      "isObstacle": false,
+      "colliderScale": 0.8
+    },
+    "collision": true,
+    "events": [],
+    "paramDic": [],
+    "minimapIcon": 210000,
+    "faceType": 0,
+    "animClip": [
+      {
+        "k": 0,
+        "v": [
+          {
+            "v": 691
+          }
+        ]
+      },
+      {
+        "k": 1,
+        "v": []
+      },
+      {
+        "k": 2,
+        "v": []
+      },
+      {
+        "k": 3,
+        "v": []
+      },
+      {
+        "k": 4,
+        "v": []
+      }
+    ],
+    "isWangTile": false,
+    "boundsCollision": false,
+    "centerCollider": true
+  },
+  {
+    "uid": 53,
+    "name": "窗1",
+    "labId": 15,
+    "protoUid": 0,
+    "icon": 210000,
+    "model": {
+      "id": 0,
+      "subPrefabUnitName": [
+        {
+          "v": 125049
+        }
+      ],
+      "subPrefabUnitPos": [
+        {
+          "v": "-2.682209E-07|0.2|-0.2060958"
+        }
+      ],
+      "subPrefabUnitScale": [
+        {
+          "v": "1|1|0.1"
+        }
+      ],
+      "subUnitTexsName": [
+        {
+          "v": [
+            {
+              "v": 1304
+            }
+          ]
+        }
+      ],
+      "animTimeInterval": 0.0,
+      "isObstacle": false,
+      "colliderScale": 0.0
+    },
+    "collision": false,
+    "events": [],
+    "paramDic": [],
+    "minimapIcon": 210000,
+    "faceType": 0,
+    "animClip": [
+      {
+        "k": 0,
+        "v": [
+          {
+            "v": 1304
+          }
+        ]
+      },
+      {
+        "k": 1,
+        "v": []
+      },
+      {
+        "k": 2,
+        "v": []
+      },
+      {
+        "k": 3,
+        "v": []
+      },
+      {
+        "k": 4,
+        "v": []
+      }
+    ],
+    "isWangTile": false,
+    "boundsCollision": false,
+    "centerCollider": true
+  },
+  {
+    "uid": 52,
+    "name": "触发1-1-2",
+    "labId": 0,
+    "protoUid": 0,
+    "icon": 210000,
+    "model": {
+      "id": 0,
+      "subPrefabUnitName": [
+        {
+          "v": 125049
+        }
+      ],
+      "subPrefabUnitPos": [
+        {
+          "v": "0|0|0"
+        }
+      ],
+      "subPrefabUnitScale": [
+        {
+          "v": "1|1|5"
+        }
+      ],
+      "subUnitTexsName": [
+        {
+          "v": [
+            {
+              "v": 210000
+            }
+          ]
+        }
+      ],
+      "animTimeInterval": 0.0,
+      "isObstacle": false,
+      "colliderScale": 1.0
+    },
+    "collision": false,
+    "events": [
+      {
+        "k": "onCharacterTouchEvent",
+        "v": {
+          "uid": -1,
+          "name": "onCharacterTouchEvent",
+          "evt": [
+            {
+              "v": 24
+            }
+          ],
+          "type": 0
+        }
+      }
+    ],
+    "paramDic": [],
+    "minimapIcon": 210000,
+    "faceType": 0,
+    "animClip": [
+      {
+        "k": 0,
+        "v": [
+          {
+            "v": 210000
+          }
+        ]
+      },
+      {
+        "k": 1,
+        "v": []
+      },
+      {
+        "k": 2,
+        "v": []
+      },
+      {
+        "k": 3,
+        "v": []
+      },
+      {
+        "k": 4,
+        "v": []
+      }
+    ],
+    "isWangTile": false,
+    "boundsCollision": false,
+    "centerCollider": true
+  },
+  {
+    "uid": 51,
+    "name": "木墙",
+    "labId": 14,
+    "protoUid": 0,
+    "icon": 210000,
+    "model": {
+      "id": 0,
+      "subPrefabUnitName": [
+        {
+          "v": 125049
+        }
+      ],
+      "subPrefabUnitPos": [
+        {
+          "v": "0|0.3|0"
+        }
+      ],
+      "subPrefabUnitScale": [
+        {
+          "v": "1|2|1"
+        }
+      ],
+      "subUnitTexsName": [
+        {
+          "v": [
+            {
+              "v": 268
+            }
+          ]
+        }
+      ],
+      "animTimeInterval": 0.0,
+      "isObstacle": false,
+      "colliderScale": 1.0
+    },
+    "collision": true,
+    "events": [],
+    "paramDic": [],
+    "minimapIcon": 210000,
+    "faceType": 0,
+    "animClip": [
+      {
+        "k": 0,
+        "v": [
+          {
+            "v": 268
+          }
+        ]
+      },
+      {
+        "k": 1,
+        "v": [
+          {
+            "v": 108
+          }
+        ]
+      },
+      {
+        "k": 2,
+        "v": [
+          {
+            "v": 108
+          }
+        ]
+      },
+      {
+        "k": 3,
+        "v": [
+          {
+            "v": 108
+          }
+        ]
+      },
+      {
+        "k": 4,
+        "v": [
+          {
+            "v": 108
+          }
+        ]
+      }
+    ],
+    "isWangTile": true,
+    "boundsCollision": true,
+    "centerCollider": true
+  },
+  {
+    "uid": 50,
+    "name": "木墙桩",
+    "labId": 14,
+    "protoUid": 0,
+    "icon": 210000,
+    "model": {
+      "id": 0,
+      "subPrefabUnitName": [
+        {
+          "v": 125049
+        }
+      ],
+      "subPrefabUnitPos": [
+        {
+          "v": "0|0|0"
+        }
+      ],
+      "subPrefabUnitScale": [
+        {
+          "v": "1|1|1"
+        }
+      ],
+      "subUnitTexsName": [
+        {
+          "v": [
+            {
+              "v": 271
+            }
+          ]
+        }
+      ],
+      "animTimeInterval": 0.0,
+      "isObstacle": false,
+      "colliderScale": 1.0
+    },
+    "collision": true,
+    "events": [],
+    "paramDic": [],
+    "minimapIcon": 210000,
+    "faceType": 0,
+    "animClip": [
+      {
+        "k": 0,
+        "v": [
+          {
+            "v": 271
+          }
+        ]
+      },
+      {
+        "k": 1,
+        "v": []
+      },
+      {
+        "k": 2,
+        "v": []
+      },
+      {
+        "k": 3,
+        "v": []
+      },
+      {
+        "k": 4,
+        "v": []
+      }
+    ],
+    "isWangTile": false,
+    "boundsCollision": false,
+    "centerCollider": true
+  },
+  {
+    "uid": 49,
+    "name": "触发1-1-1",
+    "labId": 0,
+    "protoUid": 0,
+    "icon": 210000,
+    "model": {
+      "id": 0,
+      "subPrefabUnitName": [
+        {
+          "v": 125049
+        }
+      ],
+      "subPrefabUnitPos": [
+        {
+          "v": "0|0|0"
+        }
+      ],
+      "subPrefabUnitScale": [
+        {
+          "v": "8|1|1"
+        }
+      ],
+      "subUnitTexsName": [
+        {
+          "v": [
+            {
+              "v": 210000
+            }
+          ]
+        }
+      ],
+      "animTimeInterval": 0.0,
+      "isObstacle": false,
+      "colliderScale": 1.0
+    },
+    "collision": false,
+    "events": [
+      {
+        "k": "onCharacterTouchEvent",
+        "v": {
+          "uid": -1,
+          "name": "onCharacterTouchEvent",
+          "evt": [
+            {
+              "v": 22
+            }
+          ],
+          "type": 0
+        }
+      }
+    ],
+    "paramDic": [],
+    "minimapIcon": 210000,
+    "faceType": 0,
+    "animClip": [
+      {
+        "k": 0,
+        "v": [
+          {
+            "v": 210000
+          }
+        ]
+      },
+      {
+        "k": 1,
+        "v": []
+      },
+      {
+        "k": 2,
+        "v": []
+      },
+      {
+        "k": 3,
+        "v": []
+      },
+      {
+        "k": 4,
+        "v": []
+      }
+    ],
+    "isWangTile": false,
+    "boundsCollision": false,
+    "centerCollider": true
+  },
+  {
+    "uid": 48,
+    "name": "树桩",
+    "labId": 15,
+    "protoUid": 0,
+    "icon": 210000,
+    "model": {
+      "id": 0,
+      "subPrefabUnitName": [
+        {
+          "v": 125049
+        }
+      ],
+      "subPrefabUnitPos": [
+        {
+          "v": "0|-0.4|0"
+        }
+      ],
+      "subPrefabUnitScale": [
+        {
+          "v": "0.8|0.2|0.8"
+        }
+      ],
+      "subUnitTexsName": [
+        {
+          "v": [
+            {
+              "v": 217
+            }
+          ]
+        }
+      ],
+      "animTimeInterval": 0.0,
+      "isObstacle": false,
+      "colliderScale": 0.3
+    },
+    "collision": true,
+    "events": [],
+    "paramDic": [],
+    "minimapIcon": 210000,
+    "faceType": 0,
+    "animClip": [
+      {
+        "k": 0,
+        "v": [
+          {
+            "v": 217
+          }
+        ]
+      },
+      {
+        "k": 1,
+        "v": []
+      },
+      {
+        "k": 2,
+        "v": []
+      },
+      {
+        "k": 3,
+        "v": []
+      },
+      {
+        "k": 4,
+        "v": []
+      }
+    ],
+    "isWangTile": false,
+    "boundsCollision": false,
+    "centerCollider": true
+  },
+  {
+    "uid": 47,
+    "name": "柴堆",
+    "labId": 15,
+    "protoUid": 0,
+    "icon": 210000,
+    "model": {
+      "id": 0,
+      "subPrefabUnitName": [
+        {
+          "v": 125049
+        }
+      ],
+      "subPrefabUnitPos": [
+        {
+          "v": "0|-0.4|0"
+        }
+      ],
+      "subPrefabUnitScale": [
+        {
+          "v": "0.6|0.2|0.6"
+        }
+      ],
+      "subUnitTexsName": [
+        {
+          "v": [
+            {
+              "v": 799
+            }
+          ]
+        }
+      ],
+      "animTimeInterval": 0.0,
+      "isObstacle": false,
+      "colliderScale": 1.0
+    },
+    "collision": true,
+    "events": [],
+    "paramDic": [],
+    "minimapIcon": 210000,
+    "faceType": 0,
+    "animClip": [
+      {
+        "k": 0,
+        "v": [
+          {
+            "v": 799
+          }
+        ]
+      },
+      {
+        "k": 1,
+        "v": []
+      },
+      {
+        "k": 2,
+        "v": []
+      },
+      {
+        "k": 3,
+        "v": []
+      },
+      {
+        "k": 4,
+        "v": []
+      }
+    ],
+    "isWangTile": false,
+    "boundsCollision": false,
+    "centerCollider": true
+  },
+  {
+    "uid": 46,
+    "name": "石3",
+    "labId": 14,
+    "protoUid": 0,
+    "icon": 210000,
+    "model": {
+      "id": 0,
+      "subPrefabUnitName": [
+        {
+          "v": 125049
+        }
+      ],
+      "subPrefabUnitPos": [
+        {
+          "v": "0|0.5|0"
+        }
+      ],
+      "subPrefabUnitScale": [
+        {
+          "v": "0.5|2|0.5"
+        }
+      ],
+      "subUnitTexsName": [
+        {
+          "v": [
+            {
+              "v": 803
+            }
+          ]
+        }
+      ],
+      "animTimeInterval": 0.0,
+      "isObstacle": false,
+      "colliderScale": 1.0
+    },
+    "collision": true,
+    "events": [],
+    "paramDic": [],
+    "minimapIcon": 210000,
+    "faceType": 0,
+    "animClip": [
+      {
+        "k": 0,
+        "v": [
+          {
+            "v": 803
+          }
+        ]
+      },
+      {
+        "k": 1,
+        "v": []
+      },
+      {
+        "k": 2,
+        "v": []
+      },
+      {
+        "k": 3,
+        "v": []
+      },
+      {
+        "k": 4,
+        "v": []
+      }
+    ],
+    "isWangTile": false,
+    "boundsCollision": false,
+    "centerCollider": true
+  },
+  {
+    "uid": 45,
+    "name": "篱笆1",
+    "labId": 14,
+    "protoUid": 0,
+    "icon": 210000,
+    "model": {
+      "id": 0,
+      "subPrefabUnitName": [
+        {
+          "v": 125049
+        }
+      ],
+      "subPrefabUnitPos": [
+        {
+          "v": "0|-0.1|0"
+        }
+      ],
+      "subPrefabUnitScale": [
+        {
+          "v": "1|1|1"
+        }
+      ],
+      "subUnitTexsName": [
+        {
+          "v": [
+            {
+              "v": 798
+            }
+          ]
+        }
+      ],
+      "animTimeInterval": 0.0,
+      "isObstacle": false,
+      "colliderScale": 1.0
+    },
+    "collision": true,
+    "events": [],
+    "paramDic": [],
+    "minimapIcon": 210000,
+    "faceType": 0,
+    "animClip": [
+      {
+        "k": 0,
+        "v": [
+          {
+            "v": 798
+          }
+        ]
+      },
+      {
+        "k": 1,
+        "v": [
+          {
+            "v": 108
+          }
+        ]
+      },
+      {
+        "k": 2,
+        "v": [
+          {
+            "v": 108
+          }
+        ]
+      },
+      {
+        "k": 3,
+        "v": [
+          {
+            "v": 108
+          }
+        ]
+      },
+      {
+        "k": 4,
+        "v": [
+          {
+            "v": 108
+          }
+        ]
+      }
+    ],
+    "isWangTile": true,
+    "boundsCollision": true,
+    "centerCollider": true
+  },
+  {
+    "uid": 44,
+    "name": "枯木1",
+    "labId": 14,
+    "protoUid": 0,
+    "icon": 210000,
+    "model": {
+      "id": 0,
+      "subPrefabUnitName": [
+        {
+          "v": 125049
+        }
+      ],
+      "subPrefabUnitPos": [
+        {
+          "v": "0|-0.2|0"
+        }
+      ],
+      "subPrefabUnitScale": [
+        {
+          "v": "1.5|0.8|1.5"
+        }
+      ],
+      "subUnitTexsName": [
+        {
+          "v": [
+            {
+              "v": 800
+            }
+          ]
+        }
+      ],
+      "animTimeInterval": 0.0,
+      "isObstacle": false,
+      "colliderScale": 1.0
+    },
+    "collision": true,
+    "events": [],
+    "paramDic": [],
+    "minimapIcon": 210000,
+    "faceType": 0,
+    "animClip": [
+      {
+        "k": 0,
+        "v": [
+          {
+            "v": 800
+          }
+        ]
+      },
+      {
+        "k": 1,
+        "v": [
+          {
+            "v": 800
+          }
+        ]
+      },
+      {
+        "k": 2,
+        "v": [
+          {
+            "v": 800
+          }
+        ]
+      },
+      {
+        "k": 3,
+        "v": [
+          {
+            "v": 801
+          }
+        ]
+      },
+      {
+        "k": 4,
+        "v": [
+          {
+            "v": 801
+          }
+        ]
+      }
+    ],
+    "isWangTile": false,
+    "boundsCollision": true,
+    "centerCollider": true
+  },
+  {
+    "uid": 41,
+    "name": "石2",
+    "labId": 14,
+    "protoUid": 0,
+    "icon": 210000,
+    "model": {
+      "id": 0,
+      "subPrefabUnitName": [
+        {
+          "v": 125049
+        }
+      ],
+      "subPrefabUnitPos": [
+        {
+          "v": "0|-0.3|0"
+        }
+      ],
+      "subPrefabUnitScale": [
+        {
+          "v": "1|0.4|1"
+        }
+      ],
+      "subUnitTexsName": [
+        {
+          "v": [
+            {
+              "v": 802
+            }
+          ]
+        }
+      ],
+      "animTimeInterval": 0.0,
+      "isObstacle": false,
+      "colliderScale": 1.0
+    },
+    "collision": true,
+    "events": [],
+    "paramDic": [],
+    "minimapIcon": 210000,
+    "faceType": 0,
+    "animClip": [
+      {
+        "k": 0,
+        "v": [
+          {
+            "v": 802
+          }
+        ]
+      },
+      {
+        "k": 1,
+        "v": []
+      },
+      {
+        "k": 2,
+        "v": []
+      },
+      {
+        "k": 3,
+        "v": []
+      },
+      {
+        "k": 4,
+        "v": []
+      }
+    ],
+    "isWangTile": false,
+    "boundsCollision": false,
+    "centerCollider": true
+  },
+  {
+    "uid": 40,
+    "name": "草7",
+    "labId": 15,
+    "protoUid": 0,
+    "icon": 210000,
+    "model": {
+      "id": 0,
+      "subPrefabUnitName": [
+        {
+          "v": 125049
+        }
+      ],
+      "subPrefabUnitPos": [
+        {
+          "v": "0|-0.4|0"
+        }
+      ],
+      "subPrefabUnitScale": [
+        {
+          "v": "0.5|0.2|0.5"
+        }
+      ],
+      "subUnitTexsName": [
+        {
+          "v": [
+            {
+              "v": 58
+            }
+          ]
+        }
+      ],
+      "animTimeInterval": 0.0,
+      "isObstacle": false,
+      "colliderScale": 0.0
+    },
+    "collision": false,
+    "events": [],
+    "paramDic": [],
+    "minimapIcon": 210000,
+    "faceType": 0,
+    "animClip": [
+      {
+        "k": 0,
+        "v": [
+          {
+            "v": 58
+          }
+        ]
+      },
+      {
+        "k": 1,
+        "v": []
+      },
+      {
+        "k": 2,
+        "v": []
+      },
+      {
+        "k": 3,
+        "v": []
+      },
+      {
+        "k": 4,
+        "v": []
+      }
+    ],
+    "isWangTile": false,
+    "boundsCollision": false,
+    "centerCollider": true
+  },
+  {
+    "uid": 39,
+    "name": "空宝箱",
+    "labId": 17,
+    "protoUid": 0,
+    "icon": 210000,
+    "model": {
+      "id": 0,
+      "subPrefabUnitName": [
+        {
+          "v": 125049
+        }
+      ],
+      "subPrefabUnitPos": [
+        {
+          "v": "0|-0.2|0"
+        }
+      ],
+      "subPrefabUnitScale": [
+        {
+          "v": "0.8|0.8|0.8"
+        }
+      ],
+      "subUnitTexsName": [
+        {
+          "v": [
+            {
+              "v": 43
+            }
+          ]
+        }
+      ],
+      "animTimeInterval": 0.0,
+      "isObstacle": false,
+      "colliderScale": 0.5
+    },
+    "collision": true,
+    "events": [],
+    "paramDic": [],
+    "minimapIcon": 210000,
+    "faceType": 1,
+    "animClip": [
+      {
+        "k": 0,
+        "v": []
+      },
+      {
+        "k": 1,
+        "v": [
+          {
+            "v": 43
+          }
+        ]
+      },
+      {
+        "k": 2,
+        "v": [
+          {
+            "v": 37
+          }
+        ]
+      },
+      {
+        "k": 3,
+        "v": [
+          {
+            "v": 39
+          }
+        ]
+      },
+      {
+        "k": 4,
+        "v": [
+          {
+            "v": 41
+          }
+        ]
+      }
+    ],
+    "isWangTile": false,
+    "boundsCollision": false,
+    "centerCollider": true
+  },
+  {
+    "uid": 38,
+    "name": "宝箱",
+    "labId": 17,
+    "protoUid": 0,
+    "icon": 210000,
+    "model": {
+      "id": 0,
+      "subPrefabUnitName": [
+        {
+          "v": 125049
+        }
+      ],
+      "subPrefabUnitPos": [
+        {
+          "v": "0|-0.3|0"
+        }
+      ],
+      "subPrefabUnitScale": [
+        {
+          "v": "0.8|0.6|0.8"
+        }
+      ],
+      "subUnitTexsName": [
+        {
+          "v": [
+            {
+              "v": 44
+            }
+          ]
+        }
+      ],
+      "animTimeInterval": 0.0,
+      "isObstacle": false,
+      "colliderScale": 0.5
+    },
+    "collision": true,
+    "events": [
+      {
+        "k": "onInteractEvent",
+        "v": {
+          "uid": -1,
+          "name": "onInteractEvent",
+          "evt": [
+            {
+              "v": 12
+            }
+          ],
+          "type": 1
+        }
+      }
+    ],
+    "paramDic": [],
+    "minimapIcon": 210000,
+    "faceType": 1,
+    "animClip": [
+      {
+        "k": 0,
+        "v": []
+      },
+      {
+        "k": 1,
+        "v": [
+          {
+            "v": 44
+          }
+        ]
+      },
+      {
+        "k": 2,
+        "v": [
+          {
+            "v": 38
+          }
+        ]
+      },
+      {
+        "k": 3,
+        "v": [
+          {
+            "v": 42
+          }
+        ]
+      },
+      {
+        "k": 4,
+        "v": [
+          {
+            "v": 40
+          }
+        ]
+      }
+    ],
+    "isWangTile": false,
+    "boundsCollision": false,
+    "centerCollider": true
+  },
+  {
+    "uid": 37,
+    "name": "草8",
+    "labId": 15,
+    "protoUid": 0,
+    "icon": 210000,
+    "model": {
+      "id": 0,
+      "subPrefabUnitName": [
+        {
+          "v": 125049
+        }
+      ],
+      "subPrefabUnitPos": [
+        {
+          "v": "0|-0.25|0"
+        }
+      ],
+      "subPrefabUnitScale": [
+        {
+          "v": "0.5|0.5|0.5"
+        }
+      ],
+      "subUnitTexsName": [
+        {
+          "v": [
+            {
+              "v": 127
+            }
+          ]
+        }
+      ],
+      "animTimeInterval": 0.0,
+      "isObstacle": false,
+      "colliderScale": 0.0
+    },
+    "collision": false,
+    "events": [],
+    "paramDic": [],
+    "minimapIcon": 210000,
+    "faceType": 0,
+    "animClip": [
+      {
+        "k": 0,
+        "v": [
+          {
+            "v": 127
+          }
+        ]
+      },
+      {
+        "k": 1,
+        "v": [
+          {
+            "v": 56
+          }
+        ]
+      },
+      {
+        "k": 2,
+        "v": [
+          {
+            "v": 56
+          }
+        ]
+      },
+      {
+        "k": 3,
+        "v": [
+          {
+            "v": 56
+          }
+        ]
+      },
+      {
+        "k": 4,
+        "v": [
+          {
+            "v": 56
+          }
+        ]
+      }
+    ],
+    "isWangTile": false,
+    "boundsCollision": false,
+    "centerCollider": true
+  },
+  {
+    "uid": 36,
+    "name": "树1",
+    "labId": 14,
+    "protoUid": 0,
+    "icon": 210000,
+    "model": {
+      "id": 0,
+      "subPrefabUnitName": [
+        {
+          "v": 125049
+        }
+      ],
+      "subPrefabUnitPos": [
+        {
+          "v": "0|0.4|0"
+        }
+      ],
+      "subPrefabUnitScale": [
+        {
+          "v": "3|2|3"
+        }
+      ],
+      "subUnitTexsName": [
+        {
+          "v": [
+            {
+              "v": 108
+            }
+          ]
+        }
+      ],
+      "animTimeInterval": 0.0,
+      "isObstacle": false,
+      "colliderScale": 0.4
+    },
+    "collision": true,
+    "events": [],
+    "paramDic": [],
+    "minimapIcon": 210000,
+    "faceType": 0,
+    "animClip": [
+      {
+        "k": 0,
+        "v": [
+          {
+            "v": 108
+          }
+        ]
+      },
+      {
+        "k": 1,
+        "v": [
+          {
+            "v": 108
+          }
+        ]
+      },
+      {
+        "k": 2,
+        "v": [
+          {
+            "v": 108
+          }
+        ]
+      },
+      {
+        "k": 3,
+        "v": [
+          {
+            "v": 108
+          }
+        ]
+      },
+      {
+        "k": 4,
+        "v": [
+          {
+            "v": 108
+          }
+        ]
+      }
+    ],
+    "isWangTile": false,
+    "boundsCollision": true,
+    "centerCollider": false
+  },
+  {
+    "uid": 35,
+    "name": "树干1",
+    "labId": 14,
+    "protoUid": 0,
+    "icon": 210000,
+    "model": {
+      "id": 0,
+      "subPrefabUnitName": [
+        {
+          "v": 125049
+        }
+      ],
+      "subPrefabUnitPos": [
+        {
+          "v": "-2.682209E-07|0.3|-0.07894832"
+        }
+      ],
+      "subPrefabUnitScale": [
+        {
+          "v": "3|2|3"
+        }
+      ],
+      "subUnitTexsName": [
+        {
+          "v": [
+            {
+              "v": 109
+            }
+          ]
+        }
+      ],
+      "animTimeInterval": 0.0,
+      "isObstacle": false,
+      "colliderScale": 0.4
+    },
+    "collision": true,
+    "events": [],
+    "paramDic": [],
+    "minimapIcon": 210000,
+    "faceType": 0,
+    "animClip": [
+      {
+        "k": 0,
+        "v": [
+          {
+            "v": 109
+          }
+        ]
+      },
+      {
+        "k": 1,
+        "v": [
+          {
+            "v": 109
+          }
+        ]
+      },
+      {
+        "k": 2,
+        "v": [
+          {
+            "v": 109
+          }
+        ]
+      },
+      {
+        "k": 3,
+        "v": [
+          {
+            "v": 109
+          }
+        ]
+      },
+      {
+        "k": 4,
+        "v": [
+          {
+            "v": 109
+          }
+        ]
+      }
+    ],
+    "isWangTile": false,
+    "boundsCollision": false,
+    "centerCollider": false
+  },
+  {
+    "uid": 33,
+    "name": "玉弹",
+    "labId": 16,
+    "protoUid": 0,
+    "icon": 210000,
+    "model": {
+      "id": 0,
+      "subPrefabUnitName": [
+        {
+          "v": 125049
+        }
+      ],
+      "subPrefabUnitPos": [
+        {
+          "v": "0|0|0"
+        }
+      ],
+      "subPrefabUnitScale": [
+        {
+          "v": "0.4|0.2|0.4"
+        }
+      ],
+      "subUnitTexsName": [
+        {
+          "v": [
+            {
+              "v": 47
+            }
+          ]
+        }
+      ],
+      "animTimeInterval": 0.0,
+      "isObstacle": false,
+      "colliderScale": 0.2
+    },
+    "collision": false,
+    "events": [
+      {
+        "k": "onTileTouchEvent",
+        "v": {
+          "uid": -1,
+          "name": "onTileTouchEvent",
+          "evt": [
+            {
+              "v": 2
+            }
+          ],
+          "type": 0
+        }
+      }
+    ],
+    "paramDic": [],
+    "minimapIcon": 210000,
+    "faceType": 2,
+    "animClip": [
+      {
+        "k": 0,
+        "v": [
+          {
+            "v": 47
+          }
+        ]
+      },
+      {
+        "k": 1,
+        "v": [
+          {
+            "v": 47
+          }
+        ]
+      },
+      {
+        "k": 2,
+        "v": [
+          {
+            "v": 47
+          }
+        ]
+      },
+      {
+        "k": 3,
+        "v": [
+          {
+            "v": 47
+          }
+        ]
+      },
+      {
+        "k": 4,
+        "v": [
+          {
+            "v": 47
+          }
+        ]
+      }
+    ],
+    "isWangTile": false,
+    "boundsCollision": false,
+    "centerCollider": true
+  },
+  {
+    "uid": 32,
+    "name": "札弹",
+    "labId": 16,
+    "protoUid": 0,
+    "icon": 210000,
+    "model": {
+      "id": 0,
+      "subPrefabUnitName": [
+        {
+          "v": 125049
+        }
+      ],
+      "subPrefabUnitPos": [
+        {
+          "v": "0|0|0"
+        }
+      ],
+      "subPrefabUnitScale": [
+        {
+          "v": "0.4|0.2|0.4"
+        }
+      ],
+      "subUnitTexsName": [
+        {
+          "v": [
+            {
+              "v": 46
+            }
+          ]
+        }
+      ],
+      "animTimeInterval": 0.0,
+      "isObstacle": false,
+      "colliderScale": 0.2
+    },
+    "collision": false,
+    "events": [
+      {
+        "k": "onCharacterTouchEvent",
+        "v": {
+          "uid": -1,
+          "name": "onCharacterTouchEvent",
+          "evt": [
+            {
+              "v": 8
+            }
+          ],
+          "type": 0
+        }
+      },
+      {
+        "k": "onObjectTouchEvent",
+        "v": {
+          "uid": -1,
+          "name": "onObjectTouchEvent",
+          "evt": [
+            {
+              "v": 10
+            }
+          ],
+          "type": 0
+        }
+      },
+      {
+        "k": "onShowEvent",
+        "v": {
+          "uid": -1,
+          "name": "onShowEvent",
+          "evt": [
+            {
+              "v": 7
+            }
+          ],
+          "type": 0
+        }
+      },
+      {
+        "k": "onLeaveSceneEvent",
+        "v": {
+          "uid": -1,
+          "name": "onLeaveSceneEvent",
+          "evt": [
+            {
+              "v": 2
+            }
+          ],
+          "type": 0
+        }
+      },
+      {
+        "k": "onBoundaryTouchEvent",
+        "v": {
+          "uid": -1,
+          "name": "onBoundaryTouchEvent",
+          "evt": [
+            {
+              "v": 2
+            }
+          ],
+          "type": 0
+        }
+      },
+      {
+        "k": "onTileTouchEvent",
+        "v": {
+          "uid": -1,
+          "name": "onTileTouchEvent",
+          "evt": [
+            {
+              "v": 2
+            }
+          ],
+          "type": 0
+        }
+      }
+    ],
+    "paramDic": [],
+    "minimapIcon": 210000,
+    "faceType": 2,
+    "animClip": [
+      {
+        "k": 0,
+        "v": [
+          {
+            "v": 46
+          }
+        ]
+      },
+      {
+        "k": 1,
+        "v": [
+          {
+            "v": 46
+          }
+        ]
+      },
+      {
+        "k": 2,
+        "v": [
+          {
+            "v": 46
+          }
+        ]
+      },
+      {
+        "k": 3,
+        "v": [
+          {
+            "v": 46
+          }
+        ]
+      },
+      {
+        "k": 4,
+        "v": [
+          {
+            "v": 46
+          }
+        ]
+      }
+    ],
+    "isWangTile": false,
+    "boundsCollision": false,
+    "centerCollider": true
+  },
+  {
+    "uid": 31,
+    "name": "星弹",
+    "labId": 16,
+    "protoUid": 0,
+    "icon": 210000,
+    "model": {
+      "id": 0,
+      "subPrefabUnitName": [
+        {
+          "v": 125049
+        }
+      ],
+      "subPrefabUnitPos": [
+        {
+          "v": "0|0|0"
+        }
+      ],
+      "subPrefabUnitScale": [
+        {
+          "v": "0.4|0.2|0.4"
+        }
+      ],
+      "subUnitTexsName": [
+        {
+          "v": [
+            {
+              "v": 33
+            }
+          ]
+        }
+      ],
+      "animTimeInterval": 0.0,
+      "isObstacle": false,
+      "colliderScale": 0.2
+    },
+    "collision": false,
+    "events": [
+      {
+        "k": "onCharacterTouchEvent",
+        "v": {
+          "uid": -1,
+          "name": "onCharacterTouchEvent",
+          "evt": [
+            {
+              "v": 8
+            }
+          ],
+          "type": 0
+        }
+      },
+      {
+        "k": "onCharacterLeaveEvent",
+        "v": {
+          "uid": -1,
+          "name": "onCharacterLeaveEvent",
+          "evt": [],
+          "type": 0
+        }
+      },
+      {
+        "k": "onObjectTouchEvent",
+        "v": {
+          "uid": -1,
+          "name": "onObjectTouchEvent",
+          "evt": [
+            {
+              "v": 10
+            }
+          ],
+          "type": 0
+        }
+      },
+      {
+        "k": "onLeaveSceneEvent",
+        "v": {
+          "uid": -1,
+          "name": "onLeaveSceneEvent",
+          "evt": [
+            {
+              "v": 2
+            }
+          ],
+          "type": 0
+        }
+      },
+      {
+        "k": "onBoundaryTouchEvent",
+        "v": {
+          "uid": -1,
+          "name": "onBoundaryTouchEvent",
+          "evt": [
+            {
+              "v": 2
+            }
+          ],
+          "type": 0
+        }
+      },
+      {
+        "k": "onPerSecondEvent",
+        "v": {
+          "uid": -1,
+          "name": "onPerSecondEvent",
+          "evt": [],
+          "type": 0
+        }
+      },
+      {
+        "k": "onShowEvent",
+        "v": {
+          "uid": -1,
+          "name": "onShowEvent",
+          "evt": [
+            {
+              "v": 9
+            }
+          ],
+          "type": 0
+        }
+      },
+      {
+        "k": "onTileTouchEvent",
+        "v": {
+          "uid": -1,
+          "name": "onTileTouchEvent",
+          "evt": [
+            {
+              "v": 2
+            }
+          ],
+          "type": 0
+        }
+      }
+    ],
+    "paramDic": [],
+    "minimapIcon": 210000,
+    "faceType": 2,
+    "animClip": [
+      {
+        "k": 0,
+        "v": [
+          {
+            "v": 33
+          }
+        ]
+      },
+      {
+        "k": 1,
+        "v": [
+          {
+            "v": 33
+          }
+        ]
+      },
+      {
+        "k": 2,
+        "v": [
+          {
+            "v": 33
+          }
+        ]
+      },
+      {
+        "k": 3,
+        "v": [
+          {
+            "v": 33
+          }
+        ]
+      },
+      {
+        "k": 4,
+        "v": [
+          {
+            "v": 33
+          }
+        ]
+      }
+    ],
+    "isWangTile": false,
+    "boundsCollision": false,
+    "centerCollider": true
+  },
+  {
+    "uid": 30,
+    "name": "草2",
+    "labId": 15,
+    "protoUid": 0,
     "icon": 210000,
     "model": {
       "id": 0,
@@ -264,7 +2144,7 @@
         {
           "v": [
             {
-              "v": 172
+              "v": 173
             }
           ]
         }
@@ -273,7 +2153,6 @@
       "isObstacle": false,
       "colliderScale": 0.0
     },
-    "labId": 36,
     "collision": false,
     "events": [],
     "paramDic": [],
@@ -284,7 +2163,355 @@
         "k": 0,
         "v": [
           {
-            "v": 172
+            "v": 173
+          }
+        ]
+      },
+      {
+        "k": 1,
+        "v": [
+          {
+            "v": 56
+          }
+        ]
+      },
+      {
+        "k": 2,
+        "v": [
+          {
+            "v": 56
+          }
+        ]
+      },
+      {
+        "k": 3,
+        "v": [
+          {
+            "v": 56
+          }
+        ]
+      },
+      {
+        "k": 4,
+        "v": [
+          {
+            "v": 56
+          }
+        ]
+      }
+    ],
+    "isWangTile": false,
+    "boundsCollision": false,
+    "centerCollider": true
+  },
+  {
+    "uid": 29,
+    "name": "草3",
+    "labId": 15,
+    "protoUid": 0,
+    "icon": 210000,
+    "model": {
+      "id": 0,
+      "subPrefabUnitName": [
+        {
+          "v": 125049
+        }
+      ],
+      "subPrefabUnitPos": [
+        {
+          "v": "0|-0.35|0"
+        }
+      ],
+      "subPrefabUnitScale": [
+        {
+          "v": "0.5|0.3|0.5"
+        }
+      ],
+      "subUnitTexsName": [
+        {
+          "v": [
+            {
+              "v": 174
+            }
+          ]
+        }
+      ],
+      "animTimeInterval": 0.0,
+      "isObstacle": false,
+      "colliderScale": 0.0
+    },
+    "collision": false,
+    "events": [],
+    "paramDic": [],
+    "minimapIcon": 210000,
+    "faceType": 0,
+    "animClip": [
+      {
+        "k": 0,
+        "v": [
+          {
+            "v": 174
+          }
+        ]
+      },
+      {
+        "k": 1,
+        "v": [
+          {
+            "v": 56
+          }
+        ]
+      },
+      {
+        "k": 2,
+        "v": [
+          {
+            "v": 56
+          }
+        ]
+      },
+      {
+        "k": 3,
+        "v": [
+          {
+            "v": 56
+          }
+        ]
+      },
+      {
+        "k": 4,
+        "v": [
+          {
+            "v": 56
+          }
+        ]
+      }
+    ],
+    "isWangTile": false,
+    "boundsCollision": false,
+    "centerCollider": true
+  },
+  {
+    "uid": 28,
+    "name": "草4",
+    "labId": 15,
+    "protoUid": 0,
+    "icon": 210000,
+    "model": {
+      "id": 0,
+      "subPrefabUnitName": [
+        {
+          "v": 125049
+        }
+      ],
+      "subPrefabUnitPos": [
+        {
+          "v": "0|-0.35|0"
+        }
+      ],
+      "subPrefabUnitScale": [
+        {
+          "v": "0.5|0.3|0.5"
+        }
+      ],
+      "subUnitTexsName": [
+        {
+          "v": [
+            {
+              "v": 176
+            }
+          ]
+        }
+      ],
+      "animTimeInterval": 0.0,
+      "isObstacle": false,
+      "colliderScale": 0.0
+    },
+    "collision": false,
+    "events": [],
+    "paramDic": [],
+    "minimapIcon": 210000,
+    "faceType": 0,
+    "animClip": [
+      {
+        "k": 0,
+        "v": [
+          {
+            "v": 176
+          }
+        ]
+      },
+      {
+        "k": 1,
+        "v": [
+          {
+            "v": 56
+          }
+        ]
+      },
+      {
+        "k": 2,
+        "v": [
+          {
+            "v": 56
+          }
+        ]
+      },
+      {
+        "k": 3,
+        "v": [
+          {
+            "v": 56
+          }
+        ]
+      },
+      {
+        "k": 4,
+        "v": [
+          {
+            "v": 56
+          }
+        ]
+      }
+    ],
+    "isWangTile": false,
+    "boundsCollision": false,
+    "centerCollider": true
+  },
+  {
+    "uid": 25,
+    "name": "草5",
+    "labId": 15,
+    "protoUid": 0,
+    "icon": 210000,
+    "model": {
+      "id": 0,
+      "subPrefabUnitName": [
+        {
+          "v": 125049
+        }
+      ],
+      "subPrefabUnitPos": [
+        {
+          "v": "0|-0.35|0"
+        }
+      ],
+      "subPrefabUnitScale": [
+        {
+          "v": "0.5|0.3|0.5"
+        }
+      ],
+      "subUnitTexsName": [
+        {
+          "v": [
+            {
+              "v": 177
+            }
+          ]
+        }
+      ],
+      "animTimeInterval": 0.0,
+      "isObstacle": false,
+      "colliderScale": 0.0
+    },
+    "collision": false,
+    "events": [],
+    "paramDic": [],
+    "minimapIcon": 210000,
+    "faceType": 0,
+    "animClip": [
+      {
+        "k": 0,
+        "v": [
+          {
+            "v": 177
+          }
+        ]
+      },
+      {
+        "k": 1,
+        "v": [
+          {
+            "v": 56
+          }
+        ]
+      },
+      {
+        "k": 2,
+        "v": [
+          {
+            "v": 56
+          }
+        ]
+      },
+      {
+        "k": 3,
+        "v": [
+          {
+            "v": 56
+          }
+        ]
+      },
+      {
+        "k": 4,
+        "v": [
+          {
+            "v": 56
+          }
+        ]
+      }
+    ],
+    "isWangTile": false,
+    "boundsCollision": false,
+    "centerCollider": true
+  },
+  {
+    "uid": 24,
+    "name": "石1",
+    "labId": 14,
+    "protoUid": 0,
+    "icon": 210000,
+    "model": {
+      "id": 0,
+      "subPrefabUnitName": [
+        {
+          "v": 125049
+        }
+      ],
+      "subPrefabUnitPos": [
+        {
+          "v": "0|-0.4|0"
+        }
+      ],
+      "subPrefabUnitScale": [
+        {
+          "v": "0.5|0.2|0.5"
+        }
+      ],
+      "subUnitTexsName": [
+        {
+          "v": [
+            {
+              "v": 175
+            }
+          ]
+        }
+      ],
+      "animTimeInterval": 0.0,
+      "isObstacle": false,
+      "colliderScale": 0.0
+    },
+    "collision": false,
+    "events": [],
+    "paramDic": [],
+    "minimapIcon": 210000,
+    "faceType": 0,
+    "animClip": [
+      {
+        "k": 0,
+        "v": [
+          {
+            "v": 175
           }
         ]
       },
@@ -310,8 +2537,10 @@
     "centerCollider": true
   },
   {
-    "id": 25,
-    "name": "桥1",
+    "uid": 23,
+    "name": "树2",
+    "labId": 14,
+    "protoUid": 0,
     "icon": 210000,
     "model": {
       "id": 0,
@@ -322,39 +2551,38 @@
       ],
       "subPrefabUnitPos": [
         {
-          "v": "0|-0.3|0"
+          "v": "0|0.4|0"
         }
       ],
       "subPrefabUnitScale": [
         {
-          "v": "1|0.1|1"
+          "v": "3|2|3"
         }
       ],
       "subUnitTexsName": [
         {
           "v": [
             {
-              "v": 216
+              "v": 51
             }
           ]
         }
       ],
       "animTimeInterval": 0.0,
       "isObstacle": false,
-      "colliderScale": 1.0
+      "colliderScale": 0.4
     },
-    "labId": 5,
     "collision": true,
     "events": [],
     "paramDic": [],
     "minimapIcon": 210000,
-    "faceType": 1,
+    "faceType": 0,
     "animClip": [
       {
         "k": 0,
         "v": [
           {
-            "v": 216
+            "v": 51
           }
         ]
       },
@@ -362,7 +2590,7 @@
         "k": 1,
         "v": [
           {
-            "v": 216
+            "v": 108
           }
         ]
       },
@@ -370,7 +2598,7 @@
         "k": 2,
         "v": [
           {
-            "v": 216
+            "v": 108
           }
         ]
       },
@@ -378,7 +2606,7 @@
         "k": 3,
         "v": [
           {
-            "v": 157
+            "v": 108
           }
         ]
       },
@@ -386,18 +2614,20 @@
         "k": 4,
         "v": [
           {
-            "v": 157
+            "v": 108
           }
         ]
       }
     ],
     "isWangTile": false,
     "boundsCollision": true,
-    "centerCollider": true
+    "centerCollider": false
   },
   {
-    "id": 15,
-    "name": "草6",
+    "uid": 22,
+    "name": "树3",
+    "labId": 14,
+    "protoUid": 0,
     "icon": 210000,
     "model": {
       "id": 0,
@@ -408,29 +2638,28 @@
       ],
       "subPrefabUnitPos": [
         {
-          "v": "0|-0.2|0"
+          "v": "0|0.4|0"
         }
       ],
       "subPrefabUnitScale": [
         {
-          "v": "0.5|0.5|0.5"
+          "v": "3|2|3"
         }
       ],
       "subUnitTexsName": [
         {
           "v": [
             {
-              "v": 54
+              "v": 52
             }
           ]
         }
       ],
       "animTimeInterval": 0.0,
       "isObstacle": false,
-      "colliderScale": 0.0
+      "colliderScale": 0.4
     },
-    "labId": 36,
-    "collision": false,
+    "collision": true,
     "events": [],
     "paramDic": [],
     "minimapIcon": 210000,
@@ -440,34 +2669,52 @@
         "k": 0,
         "v": [
           {
-            "v": 54
+            "v": 52
           }
         ]
       },
       {
         "k": 1,
-        "v": []
+        "v": [
+          {
+            "v": 108
+          }
+        ]
       },
       {
         "k": 2,
-        "v": []
+        "v": [
+          {
+            "v": 108
+          }
+        ]
       },
       {
         "k": 3,
-        "v": []
+        "v": [
+          {
+            "v": 108
+          }
+        ]
       },
       {
         "k": 4,
-        "v": []
+        "v": [
+          {
+            "v": 108
+          }
+        ]
       }
     ],
     "isWangTile": false,
-    "boundsCollision": false,
-    "centerCollider": true
+    "boundsCollision": true,
+    "centerCollider": false
   },
   {
-    "id": 6,
+    "uid": 21,
     "name": "剑弹",
+    "labId": 16,
+    "protoUid": 0,
     "icon": 210000,
     "model": {
       "id": 0,
@@ -499,7 +2746,6 @@
       "isObstacle": false,
       "colliderScale": 0.2
     },
-    "labId": 6,
     "collision": false,
     "events": [
       {
@@ -649,8 +2895,10 @@
     "centerCollider": true
   },
   {
-    "id": 13,
-    "name": "树3",
+    "uid": 20,
+    "name": "草6",
+    "labId": 15,
+    "protoUid": 0,
     "icon": 210000,
     "model": {
       "id": 0,
@@ -661,1213 +2909,7 @@
       ],
       "subPrefabUnitPos": [
         {
-          "v": "0|0.4|0"
-        }
-      ],
-      "subPrefabUnitScale": [
-        {
-          "v": "3|2|3"
-        }
-      ],
-      "subUnitTexsName": [
-        {
-          "v": [
-            {
-              "v": 52
-            }
-          ]
-        }
-      ],
-      "animTimeInterval": 0.0,
-      "isObstacle": false,
-      "colliderScale": 0.4
-    },
-    "labId": 5,
-    "collision": true,
-    "events": [],
-    "paramDic": [],
-    "minimapIcon": 210000,
-    "faceType": 0,
-    "animClip": [
-      {
-        "k": 0,
-        "v": [
-          {
-            "v": 52
-          }
-        ]
-      },
-      {
-        "k": 1,
-        "v": [
-          {
-            "v": 108
-          }
-        ]
-      },
-      {
-        "k": 2,
-        "v": [
-          {
-            "v": 108
-          }
-        ]
-      },
-      {
-        "k": 3,
-        "v": [
-          {
-            "v": 108
-          }
-        ]
-      },
-      {
-        "k": 4,
-        "v": [
-          {
-            "v": 108
-          }
-        ]
-      }
-    ],
-    "isWangTile": false,
-    "boundsCollision": true,
-    "centerCollider": false
-  },
-  {
-    "id": 11,
-    "name": "树2",
-    "icon": 210000,
-    "model": {
-      "id": 0,
-      "subPrefabUnitName": [
-        {
-          "v": 125049
-        }
-      ],
-      "subPrefabUnitPos": [
-        {
-          "v": "0|0.4|0"
-        }
-      ],
-      "subPrefabUnitScale": [
-        {
-          "v": "3|2|3"
-        }
-      ],
-      "subUnitTexsName": [
-        {
-          "v": [
-            {
-              "v": 51
-            }
-          ]
-        }
-      ],
-      "animTimeInterval": 0.0,
-      "isObstacle": false,
-      "colliderScale": 0.4
-    },
-    "labId": 5,
-    "collision": true,
-    "events": [],
-    "paramDic": [],
-    "minimapIcon": 210000,
-    "faceType": 0,
-    "animClip": [
-      {
-        "k": 0,
-        "v": [
-          {
-            "v": 51
-          }
-        ]
-      },
-      {
-        "k": 1,
-        "v": [
-          {
-            "v": 108
-          }
-        ]
-      },
-      {
-        "k": 2,
-        "v": [
-          {
-            "v": 108
-          }
-        ]
-      },
-      {
-        "k": 3,
-        "v": [
-          {
-            "v": 108
-          }
-        ]
-      },
-      {
-        "k": 4,
-        "v": [
-          {
-            "v": 108
-          }
-        ]
-      }
-    ],
-    "isWangTile": false,
-    "boundsCollision": true,
-    "centerCollider": false
-  },
-  {
-    "id": 10,
-    "name": "石1",
-    "icon": 210000,
-    "model": {
-      "id": 0,
-      "subPrefabUnitName": [
-        {
-          "v": 125049
-        }
-      ],
-      "subPrefabUnitPos": [
-        {
-          "v": "0|-0.4|0"
-        }
-      ],
-      "subPrefabUnitScale": [
-        {
-          "v": "0.5|0.2|0.5"
-        }
-      ],
-      "subUnitTexsName": [
-        {
-          "v": [
-            {
-              "v": 175
-            }
-          ]
-        }
-      ],
-      "animTimeInterval": 0.0,
-      "isObstacle": false,
-      "colliderScale": 0.0
-    },
-    "labId": 5,
-    "collision": false,
-    "events": [],
-    "paramDic": [],
-    "minimapIcon": 210000,
-    "faceType": 0,
-    "animClip": [
-      {
-        "k": 0,
-        "v": [
-          {
-            "v": 175
-          }
-        ]
-      },
-      {
-        "k": 1,
-        "v": []
-      },
-      {
-        "k": 2,
-        "v": []
-      },
-      {
-        "k": 3,
-        "v": []
-      },
-      {
-        "k": 4,
-        "v": []
-      }
-    ],
-    "isWangTile": false,
-    "boundsCollision": false,
-    "centerCollider": true
-  },
-  {
-    "id": 9,
-    "name": "草5",
-    "icon": 210000,
-    "model": {
-      "id": 0,
-      "subPrefabUnitName": [
-        {
-          "v": 125049
-        }
-      ],
-      "subPrefabUnitPos": [
-        {
-          "v": "0|-0.35|0"
-        }
-      ],
-      "subPrefabUnitScale": [
-        {
-          "v": "0.5|0.3|0.5"
-        }
-      ],
-      "subUnitTexsName": [
-        {
-          "v": [
-            {
-              "v": 177
-            }
-          ]
-        }
-      ],
-      "animTimeInterval": 0.0,
-      "isObstacle": false,
-      "colliderScale": 0.0
-    },
-    "labId": 36,
-    "collision": false,
-    "events": [],
-    "paramDic": [],
-    "minimapIcon": 210000,
-    "faceType": 0,
-    "animClip": [
-      {
-        "k": 0,
-        "v": [
-          {
-            "v": 177
-          }
-        ]
-      },
-      {
-        "k": 1,
-        "v": [
-          {
-            "v": 56
-          }
-        ]
-      },
-      {
-        "k": 2,
-        "v": [
-          {
-            "v": 56
-          }
-        ]
-      },
-      {
-        "k": 3,
-        "v": [
-          {
-            "v": 56
-          }
-        ]
-      },
-      {
-        "k": 4,
-        "v": [
-          {
-            "v": 56
-          }
-        ]
-      }
-    ],
-    "isWangTile": false,
-    "boundsCollision": false,
-    "centerCollider": true
-  },
-  {
-    "id": 8,
-    "name": "草4",
-    "icon": 210000,
-    "model": {
-      "id": 0,
-      "subPrefabUnitName": [
-        {
-          "v": 125049
-        }
-      ],
-      "subPrefabUnitPos": [
-        {
-          "v": "0|-0.35|0"
-        }
-      ],
-      "subPrefabUnitScale": [
-        {
-          "v": "0.5|0.3|0.5"
-        }
-      ],
-      "subUnitTexsName": [
-        {
-          "v": [
-            {
-              "v": 176
-            }
-          ]
-        }
-      ],
-      "animTimeInterval": 0.0,
-      "isObstacle": false,
-      "colliderScale": 0.0
-    },
-    "labId": 36,
-    "collision": false,
-    "events": [],
-    "paramDic": [],
-    "minimapIcon": 210000,
-    "faceType": 0,
-    "animClip": [
-      {
-        "k": 0,
-        "v": [
-          {
-            "v": 176
-          }
-        ]
-      },
-      {
-        "k": 1,
-        "v": [
-          {
-            "v": 56
-          }
-        ]
-      },
-      {
-        "k": 2,
-        "v": [
-          {
-            "v": 56
-          }
-        ]
-      },
-      {
-        "k": 3,
-        "v": [
-          {
-            "v": 56
-          }
-        ]
-      },
-      {
-        "k": 4,
-        "v": [
-          {
-            "v": 56
-          }
-        ]
-      }
-    ],
-    "isWangTile": false,
-    "boundsCollision": false,
-    "centerCollider": true
-  },
-  {
-    "id": 3,
-    "name": "草3",
-    "icon": 210000,
-    "model": {
-      "id": 0,
-      "subPrefabUnitName": [
-        {
-          "v": 125049
-        }
-      ],
-      "subPrefabUnitPos": [
-        {
-          "v": "0|-0.35|0"
-        }
-      ],
-      "subPrefabUnitScale": [
-        {
-          "v": "0.5|0.3|0.5"
-        }
-      ],
-      "subUnitTexsName": [
-        {
-          "v": [
-            {
-              "v": 174
-            }
-          ]
-        }
-      ],
-      "animTimeInterval": 0.0,
-      "isObstacle": false,
-      "colliderScale": 0.0
-    },
-    "labId": 36,
-    "collision": false,
-    "events": [],
-    "paramDic": [],
-    "minimapIcon": 210000,
-    "faceType": 0,
-    "animClip": [
-      {
-        "k": 0,
-        "v": [
-          {
-            "v": 174
-          }
-        ]
-      },
-      {
-        "k": 1,
-        "v": [
-          {
-            "v": 56
-          }
-        ]
-      },
-      {
-        "k": 2,
-        "v": [
-          {
-            "v": 56
-          }
-        ]
-      },
-      {
-        "k": 3,
-        "v": [
-          {
-            "v": 56
-          }
-        ]
-      },
-      {
-        "k": 4,
-        "v": [
-          {
-            "v": 56
-          }
-        ]
-      }
-    ],
-    "isWangTile": false,
-    "boundsCollision": false,
-    "centerCollider": true
-  },
-  {
-    "id": 2,
-    "name": "草2",
-    "icon": 210000,
-    "model": {
-      "id": 0,
-      "subPrefabUnitName": [
-        {
-          "v": 125049
-        }
-      ],
-      "subPrefabUnitPos": [
-        {
-          "v": "0|-0.35|0"
-        }
-      ],
-      "subPrefabUnitScale": [
-        {
-          "v": "0.5|0.3|0.5"
-        }
-      ],
-      "subUnitTexsName": [
-        {
-          "v": [
-            {
-              "v": 173
-            }
-          ]
-        }
-      ],
-      "animTimeInterval": 0.0,
-      "isObstacle": false,
-      "colliderScale": 0.0
-    },
-    "labId": 36,
-    "collision": false,
-    "events": [],
-    "paramDic": [],
-    "minimapIcon": 210000,
-    "faceType": 0,
-    "animClip": [
-      {
-        "k": 0,
-        "v": [
-          {
-            "v": 173
-          }
-        ]
-      },
-      {
-        "k": 1,
-        "v": [
-          {
-            "v": 56
-          }
-        ]
-      },
-      {
-        "k": 2,
-        "v": [
-          {
-            "v": 56
-          }
-        ]
-      },
-      {
-        "k": 3,
-        "v": [
-          {
-            "v": 56
-          }
-        ]
-      },
-      {
-        "k": 4,
-        "v": [
-          {
-            "v": 56
-          }
-        ]
-      }
-    ],
-    "isWangTile": false,
-    "boundsCollision": false,
-    "centerCollider": true
-  },
-  {
-    "id": 17,
-    "name": "星弹",
-    "icon": 210000,
-    "model": {
-      "id": 0,
-      "subPrefabUnitName": [
-        {
-          "v": 125049
-        }
-      ],
-      "subPrefabUnitPos": [
-        {
-          "v": "0|0|0"
-        }
-      ],
-      "subPrefabUnitScale": [
-        {
-          "v": "0.4|0.2|0.4"
-        }
-      ],
-      "subUnitTexsName": [
-        {
-          "v": [
-            {
-              "v": 33
-            }
-          ]
-        }
-      ],
-      "animTimeInterval": 0.0,
-      "isObstacle": false,
-      "colliderScale": 0.2
-    },
-    "labId": 6,
-    "collision": false,
-    "events": [
-      {
-        "k": "onCharacterTouchEvent",
-        "v": {
-          "uid": -1,
-          "name": "onCharacterTouchEvent",
-          "evt": [
-            {
-              "v": 8
-            }
-          ],
-          "type": 0
-        }
-      },
-      {
-        "k": "onCharacterLeaveEvent",
-        "v": {
-          "uid": -1,
-          "name": "onCharacterLeaveEvent",
-          "evt": [],
-          "type": 0
-        }
-      },
-      {
-        "k": "onObjectTouchEvent",
-        "v": {
-          "uid": -1,
-          "name": "onObjectTouchEvent",
-          "evt": [
-            {
-              "v": 10
-            }
-          ],
-          "type": 0
-        }
-      },
-      {
-        "k": "onLeaveSceneEvent",
-        "v": {
-          "uid": -1,
-          "name": "onLeaveSceneEvent",
-          "evt": [
-            {
-              "v": 2
-            }
-          ],
-          "type": 0
-        }
-      },
-      {
-        "k": "onBoundaryTouchEvent",
-        "v": {
-          "uid": -1,
-          "name": "onBoundaryTouchEvent",
-          "evt": [
-            {
-              "v": 2
-            }
-          ],
-          "type": 0
-        }
-      },
-      {
-        "k": "onPerSecondEvent",
-        "v": {
-          "uid": -1,
-          "name": "onPerSecondEvent",
-          "evt": [],
-          "type": 0
-        }
-      },
-      {
-        "k": "onShowEvent",
-        "v": {
-          "uid": -1,
-          "name": "onShowEvent",
-          "evt": [
-            {
-              "v": 9
-            }
-          ],
-          "type": 0
-        }
-      },
-      {
-        "k": "onTileTouchEvent",
-        "v": {
-          "uid": -1,
-          "name": "onTileTouchEvent",
-          "evt": [
-            {
-              "v": 2
-            }
-          ],
-          "type": 0
-        }
-      }
-    ],
-    "paramDic": [],
-    "minimapIcon": 210000,
-    "faceType": 2,
-    "animClip": [
-      {
-        "k": 0,
-        "v": [
-          {
-            "v": 33
-          }
-        ]
-      },
-      {
-        "k": 1,
-        "v": [
-          {
-            "v": 33
-          }
-        ]
-      },
-      {
-        "k": 2,
-        "v": [
-          {
-            "v": 33
-          }
-        ]
-      },
-      {
-        "k": 3,
-        "v": [
-          {
-            "v": 33
-          }
-        ]
-      },
-      {
-        "k": 4,
-        "v": [
-          {
-            "v": 33
-          }
-        ]
-      }
-    ],
-    "isWangTile": false,
-    "boundsCollision": false,
-    "centerCollider": true
-  },
-  {
-    "id": 16,
-    "name": "札弹",
-    "icon": 210000,
-    "model": {
-      "id": 0,
-      "subPrefabUnitName": [
-        {
-          "v": 125049
-        }
-      ],
-      "subPrefabUnitPos": [
-        {
-          "v": "0|0|0"
-        }
-      ],
-      "subPrefabUnitScale": [
-        {
-          "v": "0.4|0.2|0.4"
-        }
-      ],
-      "subUnitTexsName": [
-        {
-          "v": [
-            {
-              "v": 46
-            }
-          ]
-        }
-      ],
-      "animTimeInterval": 0.0,
-      "isObstacle": false,
-      "colliderScale": 0.2
-    },
-    "labId": 6,
-    "collision": false,
-    "events": [
-      {
-        "k": "onCharacterTouchEvent",
-        "v": {
-          "uid": -1,
-          "name": "onCharacterTouchEvent",
-          "evt": [
-            {
-              "v": 8
-            }
-          ],
-          "type": 0
-        }
-      },
-      {
-        "k": "onObjectTouchEvent",
-        "v": {
-          "uid": -1,
-          "name": "onObjectTouchEvent",
-          "evt": [
-            {
-              "v": 10
-            }
-          ],
-          "type": 0
-        }
-      },
-      {
-        "k": "onShowEvent",
-        "v": {
-          "uid": -1,
-          "name": "onShowEvent",
-          "evt": [
-            {
-              "v": 7
-            }
-          ],
-          "type": 0
-        }
-      },
-      {
-        "k": "onLeaveSceneEvent",
-        "v": {
-          "uid": -1,
-          "name": "onLeaveSceneEvent",
-          "evt": [
-            {
-              "v": 2
-            }
-          ],
-          "type": 0
-        }
-      },
-      {
-        "k": "onBoundaryTouchEvent",
-        "v": {
-          "uid": -1,
-          "name": "onBoundaryTouchEvent",
-          "evt": [
-            {
-              "v": 2
-            }
-          ],
-          "type": 0
-        }
-      },
-      {
-        "k": "onTileTouchEvent",
-        "v": {
-          "uid": -1,
-          "name": "onTileTouchEvent",
-          "evt": [
-            {
-              "v": 2
-            }
-          ],
-          "type": 0
-        }
-      }
-    ],
-    "paramDic": [],
-    "minimapIcon": 210000,
-    "faceType": 2,
-    "animClip": [
-      {
-        "k": 0,
-        "v": [
-          {
-            "v": 46
-          }
-        ]
-      },
-      {
-        "k": 1,
-        "v": [
-          {
-            "v": 46
-          }
-        ]
-      },
-      {
-        "k": 2,
-        "v": [
-          {
-            "v": 46
-          }
-        ]
-      },
-      {
-        "k": 3,
-        "v": [
-          {
-            "v": 46
-          }
-        ]
-      },
-      {
-        "k": 4,
-        "v": [
-          {
-            "v": 46
-          }
-        ]
-      }
-    ],
-    "isWangTile": false,
-    "boundsCollision": false,
-    "centerCollider": true
-  },
-  {
-    "id": 18,
-    "name": "玉弹",
-    "icon": 210000,
-    "model": {
-      "id": 0,
-      "subPrefabUnitName": [
-        {
-          "v": 125049
-        }
-      ],
-      "subPrefabUnitPos": [
-        {
-          "v": "0|0|0"
-        }
-      ],
-      "subPrefabUnitScale": [
-        {
-          "v": "0.4|0.2|0.4"
-        }
-      ],
-      "subUnitTexsName": [
-        {
-          "v": [
-            {
-              "v": 47
-            }
-          ]
-        }
-      ],
-      "animTimeInterval": 0.0,
-      "isObstacle": false,
-      "colliderScale": 0.2
-    },
-    "labId": 6,
-    "collision": false,
-    "events": [
-      {
-        "k": "onTileTouchEvent",
-        "v": {
-          "uid": -1,
-          "name": "onTileTouchEvent",
-          "evt": [
-            {
-              "v": 2
-            }
-          ],
-          "type": 0
-        }
-      }
-    ],
-    "paramDic": [],
-    "minimapIcon": 210000,
-    "faceType": 2,
-    "animClip": [
-      {
-        "k": 0,
-        "v": [
-          {
-            "v": 47
-          }
-        ]
-      },
-      {
-        "k": 1,
-        "v": [
-          {
-            "v": 47
-          }
-        ]
-      },
-      {
-        "k": 2,
-        "v": [
-          {
-            "v": 47
-          }
-        ]
-      },
-      {
-        "k": 3,
-        "v": [
-          {
-            "v": 47
-          }
-        ]
-      },
-      {
-        "k": 4,
-        "v": [
-          {
-            "v": 47
-          }
-        ]
-      }
-    ],
-    "isWangTile": false,
-    "boundsCollision": false,
-    "centerCollider": true
-  },
-  {
-    "id": 19,
-    "name": "树干1",
-    "icon": 210000,
-    "model": {
-      "id": 0,
-      "subPrefabUnitName": [
-        {
-          "v": 125049
-        }
-      ],
-      "subPrefabUnitPos": [
-        {
-          "v": "-2.682209E-07|0.3|-0.07894832"
-        }
-      ],
-      "subPrefabUnitScale": [
-        {
-          "v": "3|2|3"
-        }
-      ],
-      "subUnitTexsName": [
-        {
-          "v": [
-            {
-              "v": 109
-            }
-          ]
-        }
-      ],
-      "animTimeInterval": 0.0,
-      "isObstacle": false,
-      "colliderScale": 0.4
-    },
-    "labId": 5,
-    "collision": true,
-    "events": [],
-    "paramDic": [],
-    "minimapIcon": 210000,
-    "faceType": 0,
-    "animClip": [
-      {
-        "k": 0,
-        "v": [
-          {
-            "v": 109
-          }
-        ]
-      },
-      {
-        "k": 1,
-        "v": [
-          {
-            "v": 109
-          }
-        ]
-      },
-      {
-        "k": 2,
-        "v": [
-          {
-            "v": 109
-          }
-        ]
-      },
-      {
-        "k": 3,
-        "v": [
-          {
-            "v": 109
-          }
-        ]
-      },
-      {
-        "k": 4,
-        "v": [
-          {
-            "v": 109
-          }
-        ]
-      }
-    ],
-    "isWangTile": false,
-    "boundsCollision": false,
-    "centerCollider": false
-  },
-  {
-    "id": 20,
-    "name": "树1",
-    "icon": 210000,
-    "model": {
-      "id": 0,
-      "subPrefabUnitName": [
-        {
-          "v": 125049
-        }
-      ],
-      "subPrefabUnitPos": [
-        {
-          "v": "0|0.4|0"
-        }
-      ],
-      "subPrefabUnitScale": [
-        {
-          "v": "3|2|3"
-        }
-      ],
-      "subUnitTexsName": [
-        {
-          "v": [
-            {
-              "v": 108
-            }
-          ]
-        }
-      ],
-      "animTimeInterval": 0.0,
-      "isObstacle": false,
-      "colliderScale": 0.4
-    },
-    "labId": 5,
-    "collision": true,
-    "events": [],
-    "paramDic": [],
-    "minimapIcon": 210000,
-    "faceType": 0,
-    "animClip": [
-      {
-        "k": 0,
-        "v": [
-          {
-            "v": 108
-          }
-        ]
-      },
-      {
-        "k": 1,
-        "v": [
-          {
-            "v": 108
-          }
-        ]
-      },
-      {
-        "k": 2,
-        "v": [
-          {
-            "v": 108
-          }
-        ]
-      },
-      {
-        "k": 3,
-        "v": [
-          {
-            "v": 108
-          }
-        ]
-      },
-      {
-        "k": 4,
-        "v": [
-          {
-            "v": 108
-          }
-        ]
-      }
-    ],
-    "isWangTile": false,
-    "boundsCollision": true,
-    "centerCollider": false
-  },
-  {
-    "id": 24,
-    "name": "草8",
-    "icon": 210000,
-    "model": {
-      "id": 0,
-      "subPrefabUnitName": [
-        {
-          "v": 125049
-        }
-      ],
-      "subPrefabUnitPos": [
-        {
-          "v": "0|-0.25|0"
+          "v": "0|-0.2|0"
         }
       ],
       "subPrefabUnitScale": [
@@ -1879,7 +2921,7 @@
         {
           "v": [
             {
-              "v": 127
+              "v": 54
             }
           ]
         }
@@ -1888,7 +2930,6 @@
       "isObstacle": false,
       "colliderScale": 0.0
     },
-    "labId": 36,
     "collision": false,
     "events": [],
     "paramDic": [],
@@ -1899,41 +2940,25 @@
         "k": 0,
         "v": [
           {
-            "v": 127
+            "v": 54
           }
         ]
       },
       {
         "k": 1,
-        "v": [
-          {
-            "v": 56
-          }
-        ]
+        "v": []
       },
       {
         "k": 2,
-        "v": [
-          {
-            "v": 56
-          }
-        ]
+        "v": []
       },
       {
         "k": 3,
-        "v": [
-          {
-            "v": 56
-          }
-        ]
+        "v": []
       },
       {
         "k": 4,
-        "v": [
-          {
-            "v": 56
-          }
-        ]
+        "v": []
       }
     ],
     "isWangTile": false,
@@ -1941,8 +2966,10 @@
     "centerCollider": true
   },
   {
-    "id": 4,
-    "name": "宝箱",
+    "uid": 19,
+    "name": "桥1",
+    "labId": 14,
+    "protoUid": 0,
     "icon": 210000,
     "model": {
       "id": 0,
@@ -1958,119 +2985,22 @@
       ],
       "subPrefabUnitScale": [
         {
-          "v": "0.8|0.6|0.8"
+          "v": "1|0.1|1"
         }
       ],
       "subUnitTexsName": [
         {
           "v": [
             {
-              "v": 44
+              "v": 216
             }
           ]
         }
       ],
       "animTimeInterval": 0.0,
       "isObstacle": false,
-      "colliderScale": 0.5
+      "colliderScale": 1.0
     },
-    "labId": 28,
-    "collision": true,
-    "events": [
-      {
-        "k": "onInteractEvent",
-        "v": {
-          "uid": -1,
-          "name": "onInteractEvent",
-          "evt": [
-            {
-              "v": 12
-            }
-          ],
-          "type": 1
-        }
-      }
-    ],
-    "paramDic": [],
-    "minimapIcon": 210000,
-    "faceType": 1,
-    "animClip": [
-      {
-        "k": 0,
-        "v": []
-      },
-      {
-        "k": 1,
-        "v": [
-          {
-            "v": 44
-          }
-        ]
-      },
-      {
-        "k": 2,
-        "v": [
-          {
-            "v": 38
-          }
-        ]
-      },
-      {
-        "k": 3,
-        "v": [
-          {
-            "v": 42
-          }
-        ]
-      },
-      {
-        "k": 4,
-        "v": [
-          {
-            "v": 40
-          }
-        ]
-      }
-    ],
-    "isWangTile": false,
-    "boundsCollision": false,
-    "centerCollider": true
-  },
-  {
-    "id": 5,
-    "name": "空宝箱",
-    "icon": 210000,
-    "model": {
-      "id": 0,
-      "subPrefabUnitName": [
-        {
-          "v": 125049
-        }
-      ],
-      "subPrefabUnitPos": [
-        {
-          "v": "0|-0.2|0"
-        }
-      ],
-      "subPrefabUnitScale": [
-        {
-          "v": "0.8|0.8|0.8"
-        }
-      ],
-      "subUnitTexsName": [
-        {
-          "v": [
-            {
-              "v": 43
-            }
-          ]
-        }
-      ],
-      "animTimeInterval": 0.0,
-      "isObstacle": false,
-      "colliderScale": 0.5
-    },
-    "labId": 28,
     "collision": true,
     "events": [],
     "paramDic": [],
@@ -2079,13 +3009,17 @@
     "animClip": [
       {
         "k": 0,
-        "v": []
+        "v": [
+          {
+            "v": 216
+          }
+        ]
       },
       {
         "k": 1,
         "v": [
           {
-            "v": 43
+            "v": 216
           }
         ]
       },
@@ -2093,7 +3027,7 @@
         "k": 2,
         "v": [
           {
-            "v": 37
+            "v": 216
           }
         ]
       },
@@ -2101,7 +3035,7 @@
         "k": 3,
         "v": [
           {
-            "v": 39
+            "v": 157
           }
         ]
       },
@@ -2109,18 +3043,20 @@
         "k": 4,
         "v": [
           {
-            "v": 41
+            "v": 157
           }
         ]
       }
     ],
     "isWangTile": false,
-    "boundsCollision": false,
+    "boundsCollision": true,
     "centerCollider": true
   },
   {
-    "id": 52,
-    "name": "草7",
+    "uid": 18,
+    "name": "草1",
+    "labId": 15,
+    "protoUid": 0,
     "icon": 210000,
     "model": {
       "id": 0,
@@ -2131,19 +3067,19 @@
       ],
       "subPrefabUnitPos": [
         {
-          "v": "0|-0.4|0"
+          "v": "0|-0.35|0"
         }
       ],
       "subPrefabUnitScale": [
         {
-          "v": "0.5|0.2|0.5"
+          "v": "0.5|0.3|0.5"
         }
       ],
       "subUnitTexsName": [
         {
           "v": [
             {
-              "v": 58
+              "v": 172
             }
           ]
         }
@@ -2152,7 +3088,6 @@
       "isObstacle": false,
       "colliderScale": 0.0
     },
-    "labId": 36,
     "collision": false,
     "events": [],
     "paramDic": [],
@@ -2163,7 +3098,7 @@
         "k": 0,
         "v": [
           {
-            "v": 58
+            "v": 172
           }
         ]
       },
@@ -2189,460 +3124,10 @@
     "centerCollider": true
   },
   {
-    "id": 53,
-    "name": "石2",
-    "icon": 210000,
-    "model": {
-      "id": 0,
-      "subPrefabUnitName": [
-        {
-          "v": 125049
-        }
-      ],
-      "subPrefabUnitPos": [
-        {
-          "v": "0|-0.3|0"
-        }
-      ],
-      "subPrefabUnitScale": [
-        {
-          "v": "1|0.4|1"
-        }
-      ],
-      "subUnitTexsName": [
-        {
-          "v": [
-            {
-              "v": 802
-            }
-          ]
-        }
-      ],
-      "animTimeInterval": 0.0,
-      "isObstacle": false,
-      "colliderScale": 1.0
-    },
-    "labId": 5,
-    "collision": true,
-    "events": [],
-    "paramDic": [],
-    "minimapIcon": 210000,
-    "faceType": 0,
-    "animClip": [
-      {
-        "k": 0,
-        "v": [
-          {
-            "v": 802
-          }
-        ]
-      },
-      {
-        "k": 1,
-        "v": []
-      },
-      {
-        "k": 2,
-        "v": []
-      },
-      {
-        "k": 3,
-        "v": []
-      },
-      {
-        "k": 4,
-        "v": []
-      }
-    ],
-    "isWangTile": false,
-    "boundsCollision": false,
-    "centerCollider": true
-  },
-  {
-    "id": 56,
-    "name": "枯木1",
-    "icon": 210000,
-    "model": {
-      "id": 0,
-      "subPrefabUnitName": [
-        {
-          "v": 125049
-        }
-      ],
-      "subPrefabUnitPos": [
-        {
-          "v": "0|-0.2|0"
-        }
-      ],
-      "subPrefabUnitScale": [
-        {
-          "v": "1.5|0.8|1.5"
-        }
-      ],
-      "subUnitTexsName": [
-        {
-          "v": [
-            {
-              "v": 800
-            }
-          ]
-        }
-      ],
-      "animTimeInterval": 0.0,
-      "isObstacle": false,
-      "colliderScale": 1.0
-    },
-    "labId": 5,
-    "collision": true,
-    "events": [],
-    "paramDic": [],
-    "minimapIcon": 210000,
-    "faceType": 0,
-    "animClip": [
-      {
-        "k": 0,
-        "v": [
-          {
-            "v": 800
-          }
-        ]
-      },
-      {
-        "k": 1,
-        "v": [
-          {
-            "v": 800
-          }
-        ]
-      },
-      {
-        "k": 2,
-        "v": [
-          {
-            "v": 800
-          }
-        ]
-      },
-      {
-        "k": 3,
-        "v": [
-          {
-            "v": 801
-          }
-        ]
-      },
-      {
-        "k": 4,
-        "v": [
-          {
-            "v": 801
-          }
-        ]
-      }
-    ],
-    "isWangTile": false,
-    "boundsCollision": true,
-    "centerCollider": true
-  },
-  {
-    "id": 58,
-    "name": "篱笆1",
-    "icon": 210000,
-    "model": {
-      "id": 0,
-      "subPrefabUnitName": [
-        {
-          "v": 125049
-        }
-      ],
-      "subPrefabUnitPos": [
-        {
-          "v": "0|-0.1|0"
-        }
-      ],
-      "subPrefabUnitScale": [
-        {
-          "v": "1|1|1"
-        }
-      ],
-      "subUnitTexsName": [
-        {
-          "v": [
-            {
-              "v": 798
-            }
-          ]
-        }
-      ],
-      "animTimeInterval": 0.0,
-      "isObstacle": false,
-      "colliderScale": 1.0
-    },
-    "labId": 5,
-    "collision": true,
-    "events": [],
-    "paramDic": [],
-    "minimapIcon": 210000,
-    "faceType": 0,
-    "animClip": [
-      {
-        "k": 0,
-        "v": [
-          {
-            "v": 798
-          }
-        ]
-      },
-      {
-        "k": 1,
-        "v": [
-          {
-            "v": 108
-          }
-        ]
-      },
-      {
-        "k": 2,
-        "v": [
-          {
-            "v": 108
-          }
-        ]
-      },
-      {
-        "k": 3,
-        "v": [
-          {
-            "v": 108
-          }
-        ]
-      },
-      {
-        "k": 4,
-        "v": [
-          {
-            "v": 108
-          }
-        ]
-      }
-    ],
-    "isWangTile": true,
-    "boundsCollision": true,
-    "centerCollider": true
-  },
-  {
-    "id": 87,
-    "name": "石3",
-    "icon": 210000,
-    "model": {
-      "id": 0,
-      "subPrefabUnitName": [
-        {
-          "v": 125049
-        }
-      ],
-      "subPrefabUnitPos": [
-        {
-          "v": "0|0.5|0"
-        }
-      ],
-      "subPrefabUnitScale": [
-        {
-          "v": "0.5|2|0.5"
-        }
-      ],
-      "subUnitTexsName": [
-        {
-          "v": [
-            {
-              "v": 803
-            }
-          ]
-        }
-      ],
-      "animTimeInterval": 0.0,
-      "isObstacle": false,
-      "colliderScale": 1.0
-    },
-    "labId": 5,
-    "collision": true,
-    "events": [],
-    "paramDic": [],
-    "minimapIcon": 210000,
-    "faceType": 0,
-    "animClip": [
-      {
-        "k": 0,
-        "v": [
-          {
-            "v": 803
-          }
-        ]
-      },
-      {
-        "k": 1,
-        "v": []
-      },
-      {
-        "k": 2,
-        "v": []
-      },
-      {
-        "k": 3,
-        "v": []
-      },
-      {
-        "k": 4,
-        "v": []
-      }
-    ],
-    "isWangTile": false,
-    "boundsCollision": false,
-    "centerCollider": true
-  },
-  {
-    "id": 88,
-    "name": "柴堆",
-    "icon": 210000,
-    "model": {
-      "id": 0,
-      "subPrefabUnitName": [
-        {
-          "v": 125049
-        }
-      ],
-      "subPrefabUnitPos": [
-        {
-          "v": "0|-0.4|0"
-        }
-      ],
-      "subPrefabUnitScale": [
-        {
-          "v": "0.6|0.2|0.6"
-        }
-      ],
-      "subUnitTexsName": [
-        {
-          "v": [
-            {
-              "v": 799
-            }
-          ]
-        }
-      ],
-      "animTimeInterval": 0.0,
-      "isObstacle": false,
-      "colliderScale": 1.0
-    },
-    "labId": 36,
-    "collision": true,
-    "events": [],
-    "paramDic": [],
-    "minimapIcon": 210000,
-    "faceType": 0,
-    "animClip": [
-      {
-        "k": 0,
-        "v": [
-          {
-            "v": 799
-          }
-        ]
-      },
-      {
-        "k": 1,
-        "v": []
-      },
-      {
-        "k": 2,
-        "v": []
-      },
-      {
-        "k": 3,
-        "v": []
-      },
-      {
-        "k": 4,
-        "v": []
-      }
-    ],
-    "isWangTile": false,
-    "boundsCollision": false,
-    "centerCollider": true
-  },
-  {
-    "id": 14,
-    "name": "树桩",
-    "icon": 210000,
-    "model": {
-      "id": 0,
-      "subPrefabUnitName": [
-        {
-          "v": 125049
-        }
-      ],
-      "subPrefabUnitPos": [
-        {
-          "v": "0|-0.4|0"
-        }
-      ],
-      "subPrefabUnitScale": [
-        {
-          "v": "0.8|0.2|0.8"
-        }
-      ],
-      "subUnitTexsName": [
-        {
-          "v": [
-            {
-              "v": 217
-            }
-          ]
-        }
-      ],
-      "animTimeInterval": 0.0,
-      "isObstacle": false,
-      "colliderScale": 0.3
-    },
-    "labId": 36,
-    "collision": true,
-    "events": [],
-    "paramDic": [],
-    "minimapIcon": 210000,
-    "faceType": 0,
-    "animClip": [
-      {
-        "k": 0,
-        "v": [
-          {
-            "v": 217
-          }
-        ]
-      },
-      {
-        "k": 1,
-        "v": []
-      },
-      {
-        "k": 2,
-        "v": []
-      },
-      {
-        "k": 3,
-        "v": []
-      },
-      {
-        "k": 4,
-        "v": []
-      }
-    ],
-    "isWangTile": false,
-    "boundsCollision": false,
-    "centerCollider": true
-  },
-  {
-    "id": 22,
-    "name": "触发1-1-1",
+    "uid": 16,
+    "name": "空气墙",
+    "labId": 0,
+    "protoUid": 0,
     "icon": 210000,
     "model": {
       "id": 0,
@@ -2658,7 +3143,7 @@
       ],
       "subPrefabUnitScale": [
         {
-          "v": "8|1|1"
+          "v": "2|1|2"
         }
       ],
       "subUnitTexsName": [
@@ -2674,8 +3159,7 @@
       "isObstacle": false,
       "colliderScale": 1.0
     },
-    "labId": 0,
-    "collision": false,
+    "collision": true,
     "events": [
       {
         "k": "onCharacterTouchEvent",
@@ -2684,7 +3168,7 @@
           "name": "onCharacterTouchEvent",
           "evt": [
             {
-              "v": 22
+              "v": 21
             }
           ],
           "type": 0
@@ -2725,8 +3209,10 @@
     "centerCollider": true
   },
   {
-    "id": 29,
-    "name": "木墙桩",
+    "uid": 15,
+    "name": "屋顶",
+    "labId": 14,
+    "protoUid": 0,
     "icon": 210000,
     "model": {
       "id": 0,
@@ -2749,7 +3235,7 @@
         {
           "v": [
             {
-              "v": 271
+              "v": 270
             }
           ]
         }
@@ -2758,36 +3244,51 @@
       "isObstacle": false,
       "colliderScale": 1.0
     },
-    "labId": 5,
     "collision": true,
     "events": [],
     "paramDic": [],
     "minimapIcon": 210000,
-    "faceType": 0,
+    "faceType": 1,
     "animClip": [
       {
         "k": 0,
         "v": [
           {
-            "v": 271
+            "v": 269
           }
         ]
       },
       {
         "k": 1,
-        "v": []
+        "v": [
+          {
+            "v": 270
+          }
+        ]
       },
       {
         "k": 2,
-        "v": []
+        "v": [
+          {
+            "v": 270
+          }
+        ]
       },
       {
         "k": 3,
-        "v": []
+        "v": [
+          {
+            "v": 269
+          }
+        ]
       },
       {
         "k": 4,
-        "v": []
+        "v": [
+          {
+            "v": 273
+          }
+        ]
       }
     ],
     "isWangTile": false,
@@ -2795,248 +3296,10 @@
     "centerCollider": true
   },
   {
-    "id": 30,
-    "name": "木墙",
-    "icon": 210000,
-    "model": {
-      "id": 0,
-      "subPrefabUnitName": [
-        {
-          "v": 125049
-        }
-      ],
-      "subPrefabUnitPos": [
-        {
-          "v": "0|0.3|0"
-        }
-      ],
-      "subPrefabUnitScale": [
-        {
-          "v": "1|2|1"
-        }
-      ],
-      "subUnitTexsName": [
-        {
-          "v": [
-            {
-              "v": 268
-            }
-          ]
-        }
-      ],
-      "animTimeInterval": 0.0,
-      "isObstacle": false,
-      "colliderScale": 1.0
-    },
-    "labId": 5,
-    "collision": true,
-    "events": [],
-    "paramDic": [],
-    "minimapIcon": 210000,
-    "faceType": 0,
-    "animClip": [
-      {
-        "k": 0,
-        "v": [
-          {
-            "v": 268
-          }
-        ]
-      },
-      {
-        "k": 1,
-        "v": [
-          {
-            "v": 108
-          }
-        ]
-      },
-      {
-        "k": 2,
-        "v": [
-          {
-            "v": 108
-          }
-        ]
-      },
-      {
-        "k": 3,
-        "v": [
-          {
-            "v": 108
-          }
-        ]
-      },
-      {
-        "k": 4,
-        "v": [
-          {
-            "v": 108
-          }
-        ]
-      }
-    ],
-    "isWangTile": true,
-    "boundsCollision": true,
-    "centerCollider": true
-  },
-  {
-    "id": 23,
-    "name": "触发1-1-2",
-    "icon": 210000,
-    "model": {
-      "id": 0,
-      "subPrefabUnitName": [
-        {
-          "v": 125049
-        }
-      ],
-      "subPrefabUnitPos": [
-        {
-          "v": "0|0|0"
-        }
-      ],
-      "subPrefabUnitScale": [
-        {
-          "v": "1|1|5"
-        }
-      ],
-      "subUnitTexsName": [
-        {
-          "v": [
-            {
-              "v": 210000
-            }
-          ]
-        }
-      ],
-      "animTimeInterval": 0.0,
-      "isObstacle": false,
-      "colliderScale": 1.0
-    },
-    "labId": 0,
-    "collision": false,
-    "events": [
-      {
-        "k": "onCharacterTouchEvent",
-        "v": {
-          "uid": -1,
-          "name": "onCharacterTouchEvent",
-          "evt": [
-            {
-              "v": 24
-            }
-          ],
-          "type": 0
-        }
-      }
-    ],
-    "paramDic": [],
-    "minimapIcon": 210000,
-    "faceType": 0,
-    "animClip": [
-      {
-        "k": 0,
-        "v": [
-          {
-            "v": 210000
-          }
-        ]
-      },
-      {
-        "k": 1,
-        "v": []
-      },
-      {
-        "k": 2,
-        "v": []
-      },
-      {
-        "k": 3,
-        "v": []
-      },
-      {
-        "k": 4,
-        "v": []
-      }
-    ],
-    "isWangTile": false,
-    "boundsCollision": false,
-    "centerCollider": true
-  },
-  {
-    "id": 63,
-    "name": "窗1",
-    "icon": 210000,
-    "model": {
-      "id": 0,
-      "subPrefabUnitName": [
-        {
-          "v": 125049
-        }
-      ],
-      "subPrefabUnitPos": [
-        {
-          "v": "-2.682209E-07|0.2|-0.2060958"
-        }
-      ],
-      "subPrefabUnitScale": [
-        {
-          "v": "1|1|0.1"
-        }
-      ],
-      "subUnitTexsName": [
-        {
-          "v": [
-            {
-              "v": 1304
-            }
-          ]
-        }
-      ],
-      "animTimeInterval": 0.0,
-      "isObstacle": false,
-      "colliderScale": 0.0
-    },
-    "labId": 36,
-    "collision": false,
-    "events": [],
-    "paramDic": [],
-    "minimapIcon": 210000,
-    "faceType": 0,
-    "animClip": [
-      {
-        "k": 0,
-        "v": [
-          {
-            "v": 1304
-          }
-        ]
-      },
-      {
-        "k": 1,
-        "v": []
-      },
-      {
-        "k": 2,
-        "v": []
-      },
-      {
-        "k": 3,
-        "v": []
-      },
-      {
-        "k": 4,
-        "v": []
-      }
-    ],
-    "isWangTile": false,
-    "boundsCollision": false,
-    "centerCollider": true
-  },
-  {
-    "id": 44,
-    "name": "小树",
+    "uid": 14,
+    "name": "New0",
+    "labId": 14,
+    "protoUid": 0,
     "icon": 210000,
     "model": {
       "id": 0,
@@ -3059,242 +3322,17 @@
         {
           "v": [
             {
-              "v": 691
+              "v": 1101
             }
           ]
         }
       ],
       "animTimeInterval": 0.0,
       "isObstacle": false,
-      "colliderScale": 0.8
+      "colliderScale": 0.0
     },
-    "labId": 5,
-    "collision": true,
-    "events": [],
-    "paramDic": [],
-    "minimapIcon": 210000,
-    "faceType": 0,
-    "animClip": [
-      {
-        "k": 0,
-        "v": [
-          {
-            "v": 691
-          }
-        ]
-      },
-      {
-        "k": 1,
-        "v": []
-      },
-      {
-        "k": 2,
-        "v": []
-      },
-      {
-        "k": 3,
-        "v": []
-      },
-      {
-        "k": 4,
-        "v": []
-      }
-    ],
-    "isWangTile": false,
-    "boundsCollision": false,
-    "centerCollider": true
-  },
-  {
-    "id": 35,
-    "name": "林",
-    "icon": 210000,
-    "model": {
-      "id": 0,
-      "subPrefabUnitName": [
-        {
-          "v": 125049
-        }
-      ],
-      "subPrefabUnitPos": [
-        {
-          "v": "0|0.25|0"
-        }
-      ],
-      "subPrefabUnitScale": [
-        {
-          "v": "3|1.5|3"
-        }
-      ],
-      "subUnitTexsName": [
-        {
-          "v": [
-            {
-              "v": 123
-            }
-          ]
-        }
-      ],
-      "animTimeInterval": 0.0,
-      "isObstacle": false,
-      "colliderScale": 1.0
-    },
-    "labId": 5,
-    "collision": true,
-    "events": [],
-    "paramDic": [],
-    "minimapIcon": 210000,
-    "faceType": 0,
-    "animClip": [
-      {
-        "k": 0,
-        "v": [
-          {
-            "v": 123
-          }
-        ]
-      },
-      {
-        "k": 1,
-        "v": []
-      },
-      {
-        "k": 2,
-        "v": []
-      },
-      {
-        "k": 3,
-        "v": []
-      },
-      {
-        "k": 4,
-        "v": []
-      }
-    ],
-    "isWangTile": false,
-    "boundsCollision": false,
-    "centerCollider": true
-  },
-  {
-    "id": 109,
-    "name": "森",
-    "icon": 210000,
-    "model": {
-      "id": 0,
-      "subPrefabUnitName": [
-        {
-          "v": 125049
-        }
-      ],
-      "subPrefabUnitPos": [
-        {
-          "v": "0|0.25|0"
-        }
-      ],
-      "subPrefabUnitScale": [
-        {
-          "v": "5|1.5|5"
-        }
-      ],
-      "subUnitTexsName": [
-        {
-          "v": [
-            {
-              "v": 2240
-            }
-          ]
-        }
-      ],
-      "animTimeInterval": 0.0,
-      "isObstacle": false,
-      "colliderScale": 1.0
-    },
-    "labId": 5,
-    "collision": true,
-    "events": [],
-    "paramDic": [],
-    "minimapIcon": 210000,
-    "faceType": 0,
-    "animClip": [
-      {
-        "k": 0,
-        "v": [
-          {
-            "v": 2240
-          }
-        ]
-      },
-      {
-        "k": 1,
-        "v": []
-      },
-      {
-        "k": 2,
-        "v": []
-      },
-      {
-        "k": 3,
-        "v": []
-      },
-      {
-        "k": 4,
-        "v": []
-      }
-    ],
-    "isWangTile": false,
-    "boundsCollision": false,
-    "centerCollider": true
-  },
-  {
-    "id": 59,
-    "name": "触发1-1-3",
-    "icon": 210000,
-    "model": {
-      "id": 0,
-      "subPrefabUnitName": [
-        {
-          "v": 125049
-        }
-      ],
-      "subPrefabUnitPos": [
-        {
-          "v": "0|0|0"
-        }
-      ],
-      "subPrefabUnitScale": [
-        {
-          "v": "8|1|8"
-        }
-      ],
-      "subUnitTexsName": [
-        {
-          "v": [
-            {
-              "v": 210000
-            }
-          ]
-        }
-      ],
-      "animTimeInterval": 0.0,
-      "isObstacle": false,
-      "colliderScale": 1.0
-    },
-    "labId": 0,
     "collision": false,
-    "events": [
-      {
-        "k": "onCharacterTouchEvent",
-        "v": {
-          "uid": -1,
-          "name": "onCharacterTouchEvent",
-          "evt": [
-            {
-              "v": 29
-            }
-          ],
-          "type": 0
-        }
-      }
-    ],
+    "events": [],
     "paramDic": [],
     "minimapIcon": 210000,
     "faceType": 0,
@@ -3303,7 +3341,7 @@
         "k": 0,
         "v": [
           {
-            "v": 210000
+            "v": 1101
           }
         ]
       },

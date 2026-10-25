@@ -7,6 +7,7 @@ using Newtonsoft.Json.Linq;
 using UnityEditor;
 using UnityEngine;
 using Z_Code;
+using Z_Code.Form;
 using Z_DataSystem.Form;
 using Z_DesignStyle;
 using Z_Map;
@@ -27,8 +28,22 @@ public static class CharacterReferenceRegression
             var play = CreateManager<PlayManager>();
             var scene = new PlaySceneController(play);
             play.sceneCtrl = scene;
-            foreach (var form in new[] { typeof(CharacterProductForm), typeof(SkillProductForm) })
+            foreach (var form in new[] { typeof(CharacterProductForm), typeof(SkillProductForm),
+                typeof(GameCmdDataForm), typeof(GameCmdTypeDataForm) })
                 form.GetMethod("Register", BindingFlags.Static | BindingFlags.NonPublic).Invoke(null, null);
+            typeof(CharacterCmd).GetMethod("Init", BindingFlags.Static | BindingFlags.NonPublic).Invoke(null, null);
+            Check(CmdBase.TryGetForm("Character", out var characterConstant)
+                && BaseData.cmdDic["Character"] is CharacterCmd
+                && characterConstant.retTypes.SequenceEqual(new[] { "character" })
+                && (characterConstant.prmTypes == null || characterConstant.prmTypes.Count == 0)
+                && ((GameCmdDataForm.Data)characterConstant).labId == 10001,
+                "Story Character constant is registered with typed chooser metadata in the basic category");
+            Check(new Compiler().TryCompile(characterConstant.defaultCode + ";", out _, out var constantSyntax,
+                    out _, out _, out _, out var constantErrors)
+                && constantSyntax.Count == 1 && constantSyntax[0].desc.type == CodeType.Str
+                && CharacterProductForm.TryGetReferenceUid(Handle(97101), out int selectedUid) && selectedUid == 97101,
+                "Character chooser defaults compile as string literals and selected references retain Product UIDs: "
+                + string.Join("; ", constantErrors));
             CharacterProductForm.InitInternal();
             CharacterUnitForm.InitInternal();
             UnitForm.InitInternal();

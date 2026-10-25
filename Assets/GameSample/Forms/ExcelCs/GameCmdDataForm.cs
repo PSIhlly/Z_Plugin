@@ -475,6 +475,8 @@ namespace Form
 
                 {100116,new Data(100116,"SetCurrentCharacter",new List<string>(){"character",},new List<string>(){"character",},null,new List<string>(){"void",},"Set Character {0} as current character","SetCurrentCharacter(param1);",10007,EditorStyle.Rpg,"")},
 
+                {100117,new Data(100117,"Character",null,null,null,new List<string>(){"character",},"","\"$ch$0$ch$\"",10001,EditorStyle.AvgAdvanced,"")},
+
                 };
                 _DatasHashSet=new HashSet<Data>();
                 
@@ -701,6 +703,8 @@ namespace Form
                         {"UndeployCharacter",_DataByUid[100115]},
     
                         {"SetCurrentCharacter",_DataByUid[100116]},
+    
+                        {"Character",_DataByUid[100117]},
     
                     
                     };
@@ -952,6 +956,8 @@ namespace Form
                     _DatasByLabid[10007].Add(_DataByUid[100115]);
 
                     _DatasByLabid[10007].Add(_DataByUid[100116]);
+
+                    _DatasByLabid[10001].Add(_DataByUid[100117]);
 
 
             childInitAction?.Invoke();

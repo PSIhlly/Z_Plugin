@@ -1,7 +1,7 @@
 param(
     [string]$ProjectRoot = (Resolve-Path (Join-Path $PSScriptRoot "../..")).Path,
     [string]$UnityEditor = "D:/WorkSoftWare/Unity/2022.3.61t4/Editor/Tuanjie.exe",
-    [ValidateSet('MapRuntimeRegression', 'MissionRuntimeRegression', 'MinimapRuntimeRegression', 'MapTextureRuntimeRegression', 'TileFrontVisibilityRegression', 'DisFadeRoutingRegression', 'DisFadeBatchingRegression', 'InstancePoolNameRegression', 'ModSceneHistoryRuntimeRegression', 'MapFadeShaderRegression', 'MapShadowBiasRegression', 'MapShadowReceiverRegression', 'MapEdgeTransitionRegression', 'StoryPackageImportRegression', 'CodeInterpreterRuntimeRegression', 'CharacterReferenceRegression', 'CharacterPartyRegression', 'ObjectProductRuntimeRegression', 'SceneObjectReferenceRegression', 'SceneProductCommandRegression', 'ObjectProductEditorRegression')]
+    [ValidateSet('MapRuntimeRegression', 'MissionRuntimeRegression', 'MinimapRuntimeRegression', 'MapTextureRuntimeRegression', 'TileFrontVisibilityRegression', 'DisFadeRoutingRegression', 'DisFadeBatchingRegression', 'InstancePoolNameRegression', 'ModSceneHistoryRuntimeRegression', 'MapFadeShaderRegression', 'MapShadowBiasRegression', 'MapShadowReceiverRegression', 'MapEdgeTransitionRegression', 'StoryPackageImportRegression', 'CodeInterpreterRuntimeRegression', 'CharacterReferenceRegression', 'CharacterPartyRegression', 'ObjectProductRuntimeRegression', 'SceneObjectReferenceRegression', 'SceneProductCommandRegression', 'ObjectProductEditorRegression', 'StoryTargetSelectionRegression')]
     [string]$Fixture = 'MapRuntimeRegression',
     [switch]$CharacterPlayLifecycle,
     [switch]$SceneCommands,
@@ -30,6 +30,7 @@ $missingSources = @(@($bindingRelative,
     'Assets/GameSample/Forms/ExcelCs/ObjectProductForm.cs',
     'Assets/GameSample/MyScripts/Main/ObjectProductForm.Runtime.cs',
     'Assets/GameSample/MyScripts/Main/CharacterProductForm.Reference.cs',
+    'Assets/GameSample/MyScripts/Main/Event/Cmd/CharacterCmd.cs',
     'Assets/GameSample/MyScripts/Main/Event/Cmd/CharacterPartyCmd.cs',
     'Assets/GameSample/MyScripts/Play/PlayInfoController.Party.cs',
     'Assets/GameSample/MyScripts/Main/Event/SceneObjectReference.cs') |
@@ -65,6 +66,10 @@ New-Item -ItemType Directory -Path "$testProject/Assets/Plugins", "$testProject/
 Copy-Item -LiteralPath (Join-Path $PSScriptRoot "$Fixture.cs") -Destination "$testProject/Assets/Editor/$Fixture.cs"
 Copy-Item -LiteralPath (Join-Path $PSScriptRoot "map-regression-manifest.json") -Destination "$testProject/Packages/manifest.json"
 Copy-Item -LiteralPath (Join-Path $ProjectRoot "ProjectSettings/ProjectVersion.txt") -Destination "$testProject/ProjectSettings/ProjectVersion.txt"
+if ($Fixture -eq 'StoryTargetSelectionRegression') {
+    New-Item -ItemType Directory -Path "$testProject/ExtraAssets/1/Core" -Force | Out-Null
+    Copy-Item -LiteralPath (Join-Path $ProjectRoot 'ExtraAssets/1/Core/ef') -Destination "$testProject/ExtraAssets/1/Core/ef"
+}
 if ($Fixture -eq 'CodeInterpreterRuntimeRegression') {
     Copy-Item -LiteralPath (Join-Path $ProjectRoot 'Temp/bin/Debug/Z_Code.Tests.Editor.dll') -Destination "$testProject/Assets/Plugins"
     $nunitPackage = Get-ChildItem -LiteralPath (Join-Path $ProjectRoot 'Library/PackageCache') -Directory -Filter 'com.unity.ext.nunit@*' | Select-Object -First 1
@@ -194,6 +199,7 @@ $successMarker = switch ($Fixture) {
     'ObjectProductRuntimeRegression' { 'OBJECT_PRODUCT_RUNTIME_REGRESSION_PASS' }
     'SceneObjectReferenceRegression' { 'SCENE_OBJECT_REFERENCE_REGRESSION_PASS' }
     'SceneProductCommandRegression' { 'SCENE_PRODUCT_COMMAND_REGRESSION_PASS' }
+    'StoryTargetSelectionRegression' { 'STORY_TARGET_SELECTION_REGRESSION_PASS' }
     'ObjectProductEditorRegression' { 'OBJECT_PRODUCT_EDITOR_REGRESSION_PASS' }
     'CodeInterpreterRuntimeRegression' { 'CODE_INTERPRETER_RUNTIME_REGRESSION_PASS' }
     'MissionRuntimeRegression' { 'MISSION_RUNTIME_REGRESSION_PASS' }

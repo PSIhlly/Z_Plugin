@@ -757,9 +757,11 @@ public class GameEventController : Z_Controller<GameManager>
             {
                 res.Add(category);
             }
-            // Mission is a constant command; reuse the existing localized type
-            // label while retaining its canonical command name/UID in metadata.
-            string name = TextManager.instance.GetTxt(data.name == "Mission" ? "mission" : data.name);
+            // Constant choosers can reuse localized type labels while keeping
+            // their canonical command names/UIDs in metadata.
+            string textKey = data.name == "Mission" ? "mission"
+                : data.name == "Character" ? "character" : data.name;
+            string name = TextManager.instance.GetTxt(textKey);
             if (res.subs[category].subs.ContainsKey(name))
                 name = $"{name} ({data.uid})";
             res.subs[category].Add(name, null, data.uid);

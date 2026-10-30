@@ -131,11 +131,13 @@ namespace Z_Map
         {
             var refreshed = new HashSet<Vector3Int>();
             foreach (var pos in positions)
+                // Upper Tiles may use a lower slope; lower slopes may connect uphill to this Tile.
+                for (int dy = -1; dy <= 1; dy++)
                 for (int x = pos.x - 1; x <= pos.x + 1; x++)
                 for (int z = pos.z - 1; z <= pos.z + 1; z++)
                 {
-                    var p = new Vector3Int(x, pos.y, z);
-                    if (!refreshed.Add(p) || !_super.data.maps.TryGetValue((x, pos.y, z), out var tile))
+                    var p = new Vector3Int(x, pos.y + dy, z);
+                    if (!refreshed.Add(p) || !_super.data.maps.TryGetValue((x, p.y, z), out var tile))
                         continue;
                     var bounds = GetLayerView(lastView, p.y, DynamicGlobalSettings.cameraMode == CameraMode.Isometric);
                     bool inView = hasView && p.y >= lastView.Item3 && p.y < lastView.Item4

@@ -1,0 +1,38 @@
+[
+  {
+    "Index": 22,
+    "Width": 768,
+    "Height": 768,
+    "ChangedPixels": 65536,
+    "OutsideDifference": 0,
+    "RemainingPurple": 0,
+    "Sha256": "8DD7318358B850817F2E35334F7CD8E4CCCCF374EAE711FBD1D902EC1ADAA8C4"
+  },
+  {
+    "Index": 23,
+    "Width": 768,
+    "Height": 768,
+    "ChangedPixels": 65536,
+    "OutsideDifference": 0,
+    "RemainingPurple": 0,
+    "Sha256": "5D81F016E0B969A29656BA176558828CC9488F4ACD4E76E0211FB4E4F826D9F5"
+  },
+  {
+    "Index": 24,
+    "Width": 768,
+    "Height": 768,
+    "ChangedPixels": 65536,
+    "OutsideDifference": 0,
+    "RemainingPurple": 0,
+    "Sha256": "F9492F5319F73C9FCD870EF44EFDE0A0BA846339795D448A0E7E430D086DF9B7"
+  },
+  {
+    "Index": 25,
+    "Width": 768,
+    "Height": 768,
+    "ChangedPixels": 65536,
+    "OutsideDifference": 0,
+    "RemainingPurple": 0,
+    "Sha256": "28FE8105FF0AD52AACBDB12402B061E377824A76B7BEA86515C85E12313154E2"
+  }
+]

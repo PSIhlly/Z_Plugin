@@ -694,18 +694,39 @@ public class GameMapController : Z_Controller<GameManager>, IZ_Listener<TileEven
     {
         int mask = 0;
         Vector3Int mapPos = tileData.mapPos;
+        var maps = MapManager.instance.data.maps;
+        Vector2Int uphill = Vector2Int.zero;
+        if (tileData.prefabName == "MapPrefab$mapslope")
+        {
+            switch (Z_Math.Graph.GetFourDirByEuler(tileData.euler.y))
+            {
+                case Z_Math.Graph.FourDir.Up: uphill = Vector2Int.up; break;
+                case Z_Math.Graph.FourDir.Right: uphill = Vector2Int.right; break;
+                case Z_Math.Graph.FourDir.Down: uphill = Vector2Int.down; break;
+                case Z_Math.Graph.FourDir.Left: uphill = Vector2Int.left; break;
+            }
+        }
         foreach (var neighbour in wangTileNeighbours)
         {
             var pos = (mapPos.x + neighbour.x, mapPos.y, mapPos.z + neighbour.z);
-            if (MapManager.instance.data.maps.TryGetValue(pos, out TileUnitForm.Data neighbourData)
-                && neighbourData.texDic != null
-                && neighbourData.texDic.TryGetValue(layer, out int neighbourTextureId)
-                && neighbourTextureId == mapTextureId)
-            {
+            if (!maps.TryGetValue(pos, out TileUnitForm.Data neighbourData)
+                && (!maps.TryGetValue((pos.Item1, mapPos.y - 1, pos.Item3), out neighbourData)
+                    || neighbourData.prefabName != "MapPrefab$mapslope"))
+                neighbourData = null;
+            bool connected = MatchesWangTileTexture(neighbourData, layer, mapTextureId);
+            if (!connected && uphill.x * neighbour.x + uphill.y * neighbour.z > 0
+                && maps.TryGetValue((pos.Item1, mapPos.y + 1, pos.Item3), out var upperNeighbour))
+                connected = MatchesWangTileTexture(upperNeighbour, layer, mapTextureId);
+            if (connected)
                 mask |= 1 << neighbour.bit;
-            }
         }
         return mask;
+    }
+
+    private static bool MatchesWangTileTexture(TileUnitForm.Data tile, int layer, int mapTextureId)
+    {
+        return tile?.texDic != null && tile.texDic.TryGetValue(layer, out int textureId)
+            && textureId == mapTextureId;
     }
 
     private static (TextureFrames textures, float interval) GetTileLayerTextures(TileUnitForm.Data tileData,

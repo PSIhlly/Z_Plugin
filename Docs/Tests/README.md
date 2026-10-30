@@ -36,6 +36,20 @@ disabled/empty/restored front configuration and a new owner on the same instance
 hierarchy. This is an isolated Editor check;
 native pool callbacks and final scene rendering still need Play-mode verification.
 
+`Run-MapRuntimeRegression.ps1 -Fixture WangTileSlopeNeighbourRegression` checks
+the production Tile WangTile mask without opening a scene or save. It covers all
+eight directions and 256 lower-slope combinations, exact next-layer lookup,
+logical texture layers/IDs, missing/null texture dictionaries, same-layer
+priority, non-slope rejection, arbitrary lower-slope rotation and negative/zero
+coordinates. A slope itself also sees the uphill cardinal and two diagonals one
+layer above for all four facings, including wrapped yaws; this additional path
+cannot suppress a matching same-height Tile. Base, front and minimap samplers
+must select the same mixed upper/lower mask. Local
+edit refresh probes cover the neighbouring 3-by-3 on the same/adjacent heights,
+overlapping-batch deduplication, removal, unchanged distant Tiles and view bounds.
+Success is `WANG_TILE_SLOPE_NEIGHBOUR_REGRESSION_PASS`; actual Mod/Play slope-edge
+rendering still needs a visual smoke check.
+
 `Run-MapRuntimeRegression.ps1 -Fixture CodeInterpreterRuntimeRegression` runs the
 event-language NUnit assertions on isolated Unity Mono, including compilation of
 the stored ef sources. Scalar allocation checks cover lazy dictionaries, member

@@ -1,0 +1,362 @@
+[
+  {
+    "Name": "01_鸟居64x64.png",
+    "Relative": "01_鸟居64x64.png",
+    "Source": "D:\\Works\\Unity's\\Personal\\Z_Plugin\\Z_Plugin\\ExtraAssets\\使用中\\景物\\日式\\独立素材\\像素画\\01_鸟居64x64.png",
+    "Width": 64,
+    "Height": 64,
+    "OriginalWidth": 423,
+    "OriginalHeight": 316,
+    "Sha256": "4FB834FA76A309ABFE2F0F2D1411292D82E734D20711E232010CC3340C777D04"
+  },
+  {
+    "Name": "02_朱红立柱_左32x64.png",
+    "Relative": "02_朱红立柱_左32x64.png",
+    "Source": "D:\\Works\\Unity's\\Personal\\Z_Plugin\\Z_Plugin\\ExtraAssets\\使用中\\景物\\日式\\独立素材\\像素画\\02_朱红立柱_左32x64.png",
+    "Width": 32,
+    "Height": 64,
+    "OriginalWidth": 60,
+    "OriginalHeight": 166,
+    "Sha256": "A36DC81464BE0C34F0FDDC521F7DED619853ECA81BB5DCFE6BD4590DE2E3C7B1"
+  },
+  {
+    "Name": "05_神社铃绳32x64.png",
+    "Relative": "05_神社铃绳32x64.png",
+    "Source": "D:\\Works\\Unity's\\Personal\\Z_Plugin\\Z_Plugin\\ExtraAssets\\使用中\\景物\\日式\\独立素材\\像素画\\05_神社铃绳32x64.png",
+    "Width": 32,
+    "Height": 64,
+    "OriginalWidth": 117,
+    "OriginalHeight": 302,
+    "Sha256": "032CD13EF4FD53516ECEC8B2425E58BED959BC9E5176894DDB2F6B9115D08CB4"
+  },
+  {
+    "Name": "06_石灯笼32x64.png",
+    "Relative": "06_石灯笼32x64.png",
+    "Source": "D:\\Works\\Unity's\\Personal\\Z_Plugin\\Z_Plugin\\ExtraAssets\\使用中\\景物\\日式\\独立素材\\像素画\\06_石灯笼32x64.png",
+    "Width": 32,
+    "Height": 64,
+    "OriginalWidth": 137,
+    "OriginalHeight": 284,
+    "Sha256": "F08434071A17CD788ECC60557EA38CD42CA332F9813F4E82DA9E07D6A77DE4AE"
+  },
+  {
+    "Name": "07_赛钱箱32x32.png",
+    "Relative": "07_赛钱箱32x32.png",
+    "Source": "D:\\Works\\Unity's\\Personal\\Z_Plugin\\Z_Plugin\\ExtraAssets\\使用中\\景物\\日式\\独立素材\\像素画\\07_赛钱箱32x32.png",
+    "Width": 32,
+    "Height": 32,
+    "OriginalWidth": 194,
+    "OriginalHeight": 164,
+    "Sha256": "7297DC17371FFFD2A49EA2006E6F7FBF7551949CFD1A6BAE860EDB2DE3A527A7"
+  },
+  {
+    "Name": "10_花鸟挂轴32x64.png",
+    "Relative": "10_花鸟挂轴32x64.png",
+    "Source": "D:\\Works\\Unity's\\Personal\\Z_Plugin\\Z_Plugin\\ExtraAssets\\使用中\\景物\\日式\\独立素材\\像素画\\10_花鸟挂轴32x64.png",
+    "Width": 32,
+    "Height": 64,
+    "OriginalWidth": 75,
+    "OriginalHeight": 182,
+    "Sha256": "83C2931449FC56AEC164A999FAE8999FD9D1F7EC451ED1BF5477CE00EC0BECF6"
+  },
+  {
+    "Name": "11_金属吊灯32x64.png",
+    "Relative": "11_金属吊灯32x64.png",
+    "Source": "D:\\Works\\Unity's\\Personal\\Z_Plugin\\Z_Plugin\\ExtraAssets\\使用中\\景物\\日式\\独立素材\\像素画\\11_金属吊灯32x64.png",
+    "Width": 32,
+    "Height": 64,
+    "OriginalWidth": 66,
+    "OriginalHeight": 177,
+    "Sha256": "BA0AF90331AE7B96D57193615EF8F3A8F20DB013DBEED6EECB5377FCC53C8C39"
+  },
+  {
+    "Name": "12_大型纸灯笼32x64.png",
+    "Relative": "12_大型纸灯笼32x64.png",
+    "Source": "D:\\Works\\Unity's\\Personal\\Z_Plugin\\Z_Plugin\\ExtraAssets\\使用中\\景物\\日式\\独立素材\\像素画\\12_大型纸灯笼32x64.png",
+    "Width": 32,
+    "Height": 64,
+    "OriginalWidth": 85,
+    "OriginalHeight": 197,
+    "Sha256": "EB655C252BD66A28508DBAEEEC9F1A66571050D8B0B2F3ADBAB49B4199E274DA"
+  },
+  {
+    "Name": "18_方形落地灯32x64.png",
+    "Relative": "18_方形落地灯32x64.png",
+    "Source": "D:\\Works\\Unity's\\Personal\\Z_Plugin\\Z_Plugin\\ExtraAssets\\使用中\\景物\\日式\\独立素材\\像素画\\18_方形落地灯32x64.png",
+    "Width": 32,
+    "Height": 64,
+    "OriginalWidth": 80,
+    "OriginalHeight": 137,
+    "Sha256": "83C4050C5B131BF5CC0E397CEA50DEDDAA6FC19A562C767F442F9B8BF4CBDCC9"
+  },
+  {
+    "Name": "19_屋檐木灯16x24.png",
+    "Relative": "19_屋檐木灯16x24.png",
+    "Source": "D:\\Works\\Unity's\\Personal\\Z_Plugin\\Z_Plugin\\ExtraAssets\\使用中\\景物\\日式\\独立素材\\像素画\\19_屋檐木灯16x24.png",
+    "Width": 16,
+    "Height": 24,
+    "OriginalWidth": 88,
+    "OriginalHeight": 129,
+    "Sha256": "AEDD2BFA030D626786D1BDBAAD3DB051A747FBE5D88AA4D7CF7B19F314EC2DD5"
+  },
+  {
+    "Name": "20_神龛供桌64x32.png",
+    "Relative": "20_神龛供桌64x32.png",
+    "Source": "D:\\Works\\Unity's\\Personal\\Z_Plugin\\Z_Plugin\\ExtraAssets\\使用中\\景物\\日式\\独立素材\\像素画\\20_神龛供桌64x32.png",
+    "Width": 64,
+    "Height": 32,
+    "OriginalWidth": 221,
+    "OriginalHeight": 157,
+    "Sha256": "B604247862BC5FD0F3A401799457E36B74ED39317474D95A7F99B6EC1C23B50B"
+  },
+  {
+    "Name": "21_靠背椅16x32.png",
+    "Relative": "21_靠背椅16x32.png",
+    "Source": "D:\\Works\\Unity's\\Personal\\Z_Plugin\\Z_Plugin\\ExtraAssets\\使用中\\景物\\日式\\独立素材\\像素画\\21_靠背椅16x32.png",
+    "Width": 16,
+    "Height": 32,
+    "OriginalWidth": 73,
+    "OriginalHeight": 136,
+    "Sha256": "559732C30BC3C7F7EFD4CBF313889A4E66C259F4BB192D8C2747DA3F205A8395"
+  },
+  {
+    "Name": "23_木桌64x32.png",
+    "Relative": "23_木桌64x32.png",
+    "Source": "D:\\Works\\Unity's\\Personal\\Z_Plugin\\Z_Plugin\\ExtraAssets\\使用中\\景物\\日式\\独立素材\\像素画\\23_木桌64x32.png",
+    "Width": 64,
+    "Height": 32,
+    "OriginalWidth": 221,
+    "OriginalHeight": 130,
+    "Sha256": "87EB5535C8E213DE6FF980AEACC93957EB282CD21E082A6D1607CBFAA5EE69E8"
+  },
+  {
+    "Name": "24_软垫凳16x16.png",
+    "Relative": "24_软垫凳16x16.png",
+    "Source": "D:\\Works\\Unity's\\Personal\\Z_Plugin\\Z_Plugin\\ExtraAssets\\使用中\\景物\\日式\\独立素材\\像素画\\24_软垫凳16x16.png",
+    "Width": 16,
+    "Height": 16,
+    "OriginalWidth": 88,
+    "OriginalHeight": 94,
+    "Sha256": "818D36BF7C3DD1306BA0A227FBA4956B004DB6A40799C28353449A875ECA590D"
+  },
+  {
+    "Name": "25_小木凳16x16.png",
+    "Relative": "25_小木凳16x16.png",
+    "Source": "D:\\Works\\Unity's\\Personal\\Z_Plugin\\Z_Plugin\\ExtraAssets\\使用中\\景物\\日式\\独立素材\\像素画\\25_小木凳16x16.png",
+    "Width": 16,
+    "Height": 16,
+    "OriginalWidth": 90,
+    "OriginalHeight": 91,
+    "Sha256": "5BC1A05801422219FDC3DB2A55859E6EAB75DB87B45848C772F221BC3CBD6EBD"
+  },
+  {
+    "Name": "26_长木凳64x16.png",
+    "Relative": "26_长木凳64x16.png",
+    "Source": "D:\\Works\\Unity's\\Personal\\Z_Plugin\\Z_Plugin\\ExtraAssets\\使用中\\景物\\日式\\独立素材\\像素画\\26_长木凳64x16.png",
+    "Width": 64,
+    "Height": 16,
+    "OriginalWidth": 223,
+    "OriginalHeight": 94,
+    "Sha256": "531BFD9961B39BA0AE873BC23DAA41220B602F6CB9D052EEA2E075C2BC2DAD51"
+  },
+  {
+    "Name": "27_多抽屉柜32x32.png",
+    "Relative": "27_多抽屉柜32x32.png",
+    "Source": "D:\\Works\\Unity's\\Personal\\Z_Plugin\\Z_Plugin\\ExtraAssets\\使用中\\景物\\日式\\独立素材\\像素画\\27_多抽屉柜32x32.png",
+    "Width": 32,
+    "Height": 32,
+    "OriginalWidth": 181,
+    "OriginalHeight": 161,
+    "Sha256": "9203DCDB5AB1F30F5D0E2081702A3FC8F378EE596E0D9F9C5BD22677A3A188A3"
+  },
+  {
+    "Name": "28_杂货置物柜32x32.png",
+    "Relative": "28_杂货置物柜32x32.png",
+    "Source": "D:\\Works\\Unity's\\Personal\\Z_Plugin\\Z_Plugin\\ExtraAssets\\使用中\\景物\\日式\\独立素材\\像素画\\28_杂货置物柜32x32.png",
+    "Width": 32,
+    "Height": 32,
+    "OriginalWidth": 187,
+    "OriginalHeight": 158,
+    "Sha256": "69A687B9049C53CA9483CCFC939A51557DBF34ADF97BB724C6A567F8D47C9686"
+  },
+  {
+    "Name": "31_陶罐32x32.png",
+    "Relative": "31_陶罐32x32.png",
+    "Source": "D:\\Works\\Unity's\\Personal\\Z_Plugin\\Z_Plugin\\ExtraAssets\\使用中\\景物\\日式\\独立素材\\像素画\\31_陶罐32x32.png",
+    "Width": 32,
+    "Height": 32,
+    "OriginalWidth": 91,
+    "OriginalHeight": 109,
+    "Sha256": "7B9F4530FA66724EFA6EE18CBE721BA039DF5E04EF11B0268BDCC05C0FD2A138"
+  },
+  {
+    "Name": "32_木箱_大32x32.png",
+    "Relative": "32_木箱_大32x32.png",
+    "Source": "D:\\Works\\Unity's\\Personal\\Z_Plugin\\Z_Plugin\\ExtraAssets\\使用中\\景物\\日式\\独立素材\\像素画\\32_木箱_大32x32.png",
+    "Width": 32,
+    "Height": 32,
+    "OriginalWidth": 104,
+    "OriginalHeight": 106,
+    "Sha256": "D37684BFB829ED6036CB2CE07307D79D7FF4393790444B7B33C87AC43BAB6F10"
+  },
+  {
+    "Name": "32x54.png",
+    "Relative": "32x54.png",
+    "Source": "D:\\Works\\Unity's\\Personal\\Z_Plugin\\Z_Plugin\\ExtraAssets\\使用中\\景物\\日式\\独立素材\\像素画\\32x54.png",
+    "Width": 32,
+    "Height": 54,
+    "OriginalWidth": 105,
+    "OriginalHeight": 132,
+    "Sha256": "0449FF408E06F4CA2B89406E2D0845264685E02C2A6DF1D85ECE805F895CFF6E"
+  },
+  {
+    "Name": "33_立式木桶32x56.png",
+    "Relative": "33_立式木桶32x56.png",
+    "Source": "D:\\Works\\Unity's\\Personal\\Z_Plugin\\Z_Plugin\\ExtraAssets\\使用中\\景物\\日式\\独立素材\\像素画\\33_立式木桶32x56.png",
+    "Width": 32,
+    "Height": 56,
+    "OriginalWidth": 89,
+    "OriginalHeight": 106,
+    "Sha256": "565BA71AD142CE55CD35A360FCBE24FE4C5D172D0FCA634B162EC6A53A7471B7"
+  },
+  {
+    "Name": "34_朱红碗16x16.png",
+    "Relative": "34_朱红碗16x16.png",
+    "Source": "D:\\Works\\Unity's\\Personal\\Z_Plugin\\Z_Plugin\\ExtraAssets\\使用中\\景物\\日式\\独立素材\\像素画\\34_朱红碗16x16.png",
+    "Width": 16,
+    "Height": 16,
+    "OriginalWidth": 78,
+    "OriginalHeight": 55,
+    "Sha256": "4C2D3F905E94FA464781D23C91A7EE5FFEA3CEAC35B0F244DEB23F075EF3169B"
+  },
+  {
+    "Name": "35_矮门柜64x32.png",
+    "Relative": "35_矮门柜64x32.png",
+    "Source": "D:\\Works\\Unity's\\Personal\\Z_Plugin\\Z_Plugin\\ExtraAssets\\使用中\\景物\\日式\\独立素材\\像素画\\35_矮门柜64x32.png",
+    "Width": 64,
+    "Height": 32,
+    "OriginalWidth": 148,
+    "OriginalHeight": 98,
+    "Sha256": "7348D4142DB09B5A6D3C18AD1D08A4D4D88CC3C9CFB2905080077DC8FA168F9A"
+  },
+  {
+    "Name": "36_木箱_小32x32.png",
+    "Relative": "36_木箱_小32x32.png",
+    "Source": "D:\\Works\\Unity's\\Personal\\Z_Plugin\\Z_Plugin\\ExtraAssets\\使用中\\景物\\日式\\独立素材\\像素画\\36_木箱_小32x32.png",
+    "Width": 32,
+    "Height": 32,
+    "OriginalWidth": 120,
+    "OriginalHeight": 97,
+    "Sha256": "6672EB07732EE99BCEE6B2065D2D344FD10E892A142892358872C21E427BE223"
+  },
+  {
+    "Name": "37_青瓷碗16x16.png",
+    "Relative": "37_青瓷碗16x16.png",
+    "Source": "D:\\Works\\Unity's\\Personal\\Z_Plugin\\Z_Plugin\\ExtraAssets\\使用中\\景物\\日式\\独立素材\\像素画\\37_青瓷碗16x16.png",
+    "Width": 16,
+    "Height": 16,
+    "OriginalWidth": 77,
+    "OriginalHeight": 55,
+    "Sha256": "85427ADBF5117BF65AD8E7ABCC26626687ED6EB8CBAC21B8C22681199089B739"
+  },
+  {
+    "Name": "40_枝叶花瓶16x32.png",
+    "Relative": "40_枝叶花瓶16x32.png",
+    "Source": "D:\\Works\\Unity's\\Personal\\Z_Plugin\\Z_Plugin\\ExtraAssets\\使用中\\景物\\日式\\独立素材\\像素画\\40_枝叶花瓶16x32.png",
+    "Width": 16,
+    "Height": 32,
+    "OriginalWidth": 93,
+    "OriginalHeight": 153,
+    "Sha256": "35349BA0498FD362021E68D13FA425FE1E0AB772A2B38A0473BAA85B1AAA89CE"
+  },
+  {
+    "Name": "43_香炉32x32.png",
+    "Relative": "43_香炉32x32.png",
+    "Source": "D:\\Works\\Unity's\\Personal\\Z_Plugin\\Z_Plugin\\ExtraAssets\\使用中\\景物\\日式\\独立素材\\像素画\\43_香炉32x32.png",
+    "Width": 32,
+    "Height": 32,
+    "OriginalWidth": 94,
+    "OriginalHeight": 120,
+    "Sha256": "ED923AC94BCD24378FE70100C4C6C1A0F433C408646B9367224FA086C09427C6"
+  },
+  {
+    "Name": "45_木水桶_大64x64.png",
+    "Relative": "45_木水桶_大64x64.png",
+    "Source": "D:\\Works\\Unity's\\Personal\\Z_Plugin\\Z_Plugin\\ExtraAssets\\使用中\\景物\\日式\\独立素材\\像素画\\45_木水桶_大64x64.png",
+    "Width": 64,
+    "Height": 64,
+    "OriginalWidth": 98,
+    "OriginalHeight": 104,
+    "Sha256": "FDDCA852E03D413BD52625894CA691DAD9B1D72317DCD0FB45001E8A117519E0"
+  },
+  {
+    "Name": "47_木水桶_小32x56.png",
+    "Relative": "47_木水桶_小32x56.png",
+    "Source": "D:\\Works\\Unity's\\Personal\\Z_Plugin\\Z_Plugin\\ExtraAssets\\使用中\\景物\\日式\\独立素材\\像素画\\47_木水桶_小32x56.png",
+    "Width": 32,
+    "Height": 56,
+    "OriginalWidth": 67,
+    "OriginalHeight": 84,
+    "Sha256": "F83CA03E1B2882F40EF33BCEB2E8C0AFC9E82E35E210CBEB76E08496580A71DD"
+  },
+  {
+    "Name": "48_朱红灯柱32x64.png",
+    "Relative": "48_朱红灯柱32x64.png",
+    "Source": "D:\\Works\\Unity's\\Personal\\Z_Plugin\\Z_Plugin\\ExtraAssets\\使用中\\景物\\日式\\独立素材\\像素画\\48_朱红灯柱32x64.png",
+    "Width": 32,
+    "Height": 64,
+    "OriginalWidth": 73,
+    "OriginalHeight": 164,
+    "Sha256": "B7EDC3D5B3A2C7B0464BF8B2BC024E2A150E3E71CF86610C386C07912C8C7502"
+  },
+  {
+    "Name": "49_告示牌32x56.png",
+    "Relative": "49_告示牌32x56.png",
+    "Source": "D:\\Works\\Unity's\\Personal\\Z_Plugin\\Z_Plugin\\ExtraAssets\\使用中\\景物\\日式\\独立素材\\像素画\\49_告示牌32x56.png",
+    "Width": 32,
+    "Height": 56,
+    "OriginalWidth": 127,
+    "OriginalHeight": 164,
+    "Sha256": "7931BB863BC42574327150EE9D285E43CB1ED97BCD078A4072661A538DE53C9F"
+  },
+  {
+    "Name": "50_狛犬石像32x64.png",
+    "Relative": "50_狛犬石像32x64.png",
+    "Source": "D:\\Works\\Unity's\\Personal\\Z_Plugin\\Z_Plugin\\ExtraAssets\\使用中\\景物\\日式\\独立素材\\像素画\\50_狛犬石像32x64.png",
+    "Width": 32,
+    "Height": 64,
+    "OriginalWidth": 108,
+    "OriginalHeight": 162,
+    "Sha256": "69134D84E9CACC18808157590752B23E23DD27EFAFC05AC11F4A26C6BC642616"
+  },
+  {
+    "Name": "茶具_45度俯视32x32.png",
+    "Relative": "茶具_45度俯视32x32.png",
+    "Source": "D:\\Works\\Unity's\\Personal\\Z_Plugin\\Z_Plugin\\ExtraAssets\\使用中\\景物\\日式\\独立素材\\像素画\\茶具_45度俯视32x32.png",
+    "Width": 32,
+    "Height": 32,
+    "OriginalWidth": 62,
+    "OriginalHeight": 57,
+    "Sha256": "7ECA546C53389D0749ABF6A7EFD9D427E2C0C95261569E9DA37CB39955CA6039"
+  },
+  {
+    "Name": "茶桌_45度俯视32x32.png",
+    "Relative": "茶桌_45度俯视32x32.png",
+    "Source": "D:\\Works\\Unity's\\Personal\\Z_Plugin\\Z_Plugin\\ExtraAssets\\使用中\\景物\\日式\\独立素材\\像素画\\茶桌_45度俯视32x32.png",
+    "Width": 32,
+    "Height": 32,
+    "OriginalWidth": 166,
+    "OriginalHeight": 141,
+    "Sha256": "B858F327BBA8EEAC6744BFAB76CD8A0BF8FCABC8DBF12BD06535843340FD59D2"
+  },
+  {
+    "Name": "坐垫_左_45度俯视16x16.png",
+    "Relative": "坐垫_左_45度俯视16x16.png",
+    "Source": "D:\\Works\\Unity's\\Personal\\Z_Plugin\\Z_Plugin\\ExtraAssets\\使用中\\景物\\日式\\独立素材\\像素画\\坐垫_左_45度俯视16x16.png",
+    "Width": 16,
+    "Height": 16,
+    "OriginalWidth": 86,
+    "OriginalHeight": 62,
+    "Sha256": "E598FD11763A6C2B45331AB4A08246F6CE0B6DCF6DCE8C13703245F2B1789A62"
+  }
+]

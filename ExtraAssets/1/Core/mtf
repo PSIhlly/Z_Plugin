@@ -101,72 +101,18 @@
     "frontIsWangTile": false
   },
   {
-    "id": 45,
-    "name": "New0",
-    "icon": 692,
+    "id": 64,
+    "name": "石",
+    "icon": 719,
     "animTimeInterval": 1.0,
     "texs": [
       {
-        "v": 692
+        "v": 719
       }
     ],
     "labId": 0,
     "events": [],
-    "isWangTile": false,
-    "passType": 0,
-    "enableFrontPart": false,
-    "frontPartTexs": [],
-    "frontIsWangTile": false
-  },
-  {
-    "id": 46,
-    "name": "New1",
-    "icon": 689,
-    "animTimeInterval": 1.0,
-    "texs": [
-      {
-        "v": 689
-      }
-    ],
-    "labId": 0,
-    "events": [],
-    "isWangTile": false,
-    "passType": 0,
-    "enableFrontPart": false,
-    "frontPartTexs": [],
-    "frontIsWangTile": false
-  },
-  {
-    "id": 48,
-    "name": "New2",
-    "icon": 693,
-    "animTimeInterval": 1.0,
-    "texs": [
-      {
-        "v": 693
-      }
-    ],
-    "labId": 0,
-    "events": [],
-    "isWangTile": false,
-    "passType": 0,
-    "enableFrontPart": false,
-    "frontPartTexs": [],
-    "frontIsWangTile": false
-  },
-  {
-    "id": 49,
-    "name": "New3",
-    "icon": 698,
-    "animTimeInterval": 1.0,
-    "texs": [
-      {
-        "v": 698
-      }
-    ],
-    "labId": 0,
-    "events": [],
-    "isWangTile": false,
+    "isWangTile": true,
     "passType": 0,
     "enableFrontPart": false,
     "frontPartTexs": [],

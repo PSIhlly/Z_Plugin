@@ -1680,15 +1680,15 @@
     "labId": 31
   },
   {
-    "id": 687,
-    "name": "002_floor_01_02",
-    "hash": "7588058287a4a96a6ce044b2b80f21f2406bb968",
+    "id": 1597,
+    "name": "02_朱红立柱_左32x64",
+    "hash": "67343c57132af72da53ab2a0cf122b2ef7554105",
     "labId": 27
   },
   {
-    "id": 689,
-    "name": "001_floor_01_01",
-    "hash": "364fd248fe1355af6f9003fd380f504aedfef977",
+    "id": 1596,
+    "name": "01_鸟居64x64",
+    "hash": "9b959fb1c894dbea0ac428c4ad860462c2a5e818",
     "labId": 27
   },
   {
@@ -1767,6 +1767,216 @@
     "id": 122,
     "name": "050_floor_grass_03",
     "hash": "ed853ed341d42996ac3d48e2e3c3535b41d02691",
+    "labId": 27
+  },
+  {
+    "id": 719,
+    "name": "rock",
+    "hash": "9550956b75ac2dcbfd141c0f5da10ef4a0f04f1c",
+    "labId": 27
+  },
+  {
+    "id": 1598,
+    "name": "05_神社铃绳32x64",
+    "hash": "bdc3d4a9f0c117aa23b1460b0ab21602e07c3863",
+    "labId": 27
+  },
+  {
+    "id": 1599,
+    "name": "06_石灯笼32x64",
+    "hash": "8147cac7e16abc31f0f8e896200e7bdfaf40cd25",
+    "labId": 27
+  },
+  {
+    "id": 1600,
+    "name": "07_赛钱箱32x32",
+    "hash": "55a509ac869a2262491d7997aa7ad15ef60aa13f",
+    "labId": 27
+  },
+  {
+    "id": 1601,
+    "name": "10_花鸟挂轴32x64",
+    "hash": "aefcc091d16820ef0d6e58f730ee411d35607458",
+    "labId": 27
+  },
+  {
+    "id": 1602,
+    "name": "11_金属吊灯32x64",
+    "hash": "5403308c479341f1f4eb5c562170093a676279a7",
+    "labId": 27
+  },
+  {
+    "id": 1603,
+    "name": "12_大型纸灯笼32x64",
+    "hash": "340c6f94baf3357f11aa5df1640730595977f1a0",
+    "labId": 27
+  },
+  {
+    "id": 1604,
+    "name": "18_方形落地灯32x64",
+    "hash": "7087754c31b3102164becd0193f6dd31cae2d825",
+    "labId": 27
+  },
+  {
+    "id": 1605,
+    "name": "19_屋檐木灯16x24",
+    "hash": "42152db2940b110a1787e3874bb8da16cc0d0010",
+    "labId": 27
+  },
+  {
+    "id": 1606,
+    "name": "20_神龛供桌64x32",
+    "hash": "893419aa9932cf4d8ef6fc084430f12e2ecb0a1e",
+    "labId": 27
+  },
+  {
+    "id": 1607,
+    "name": "21_靠背椅16x32",
+    "hash": "d6adf868e9cf6bab193818a5c580b8efe915ac65",
+    "labId": 27
+  },
+  {
+    "id": 1608,
+    "name": "23_木桌64x32",
+    "hash": "6a793a0a90d8243c6fa42a2098a1159cfdd6bd29",
+    "labId": 27
+  },
+  {
+    "id": 1609,
+    "name": "24_软垫凳16x16",
+    "hash": "8376f0ebb6d7217992742aa62b03fc6abaa9f9ca",
+    "labId": 27
+  },
+  {
+    "id": 1610,
+    "name": "25_小木凳16x16",
+    "hash": "b6a77f25a73e9900df8305de5ed07f8794914573",
+    "labId": 27
+  },
+  {
+    "id": 1611,
+    "name": "26_长木凳64x16",
+    "hash": "8751805c89d6c43834ebf8a2aede543e43b8d223",
+    "labId": 27
+  },
+  {
+    "id": 1612,
+    "name": "27_多抽屉柜32x32",
+    "hash": "b43e0cd4e57a53eb4ef5a36839d6fb9da342fd67",
+    "labId": 27
+  },
+  {
+    "id": 1613,
+    "name": "28_杂货置物柜32x32",
+    "hash": "38225f9a3b2317ca48bc4a36ef006b1df92a2a7f",
+    "labId": 27
+  },
+  {
+    "id": 1614,
+    "name": "31_陶罐32x32",
+    "hash": "b9ffd4dcd8b4e60188751a22bef5865cd7375981",
+    "labId": 27
+  },
+  {
+    "id": 1615,
+    "name": "32_木箱_大32x32",
+    "hash": "e5cdade6cdc5070b01600c2932beb76453c4439e",
+    "labId": 27
+  },
+  {
+    "id": 1616,
+    "name": "32x54",
+    "hash": "3f42184986a84feb71e9b478a331c3dc5bb47042",
+    "labId": 27
+  },
+  {
+    "id": 1617,
+    "name": "33_立式木桶32x56",
+    "hash": "a47e3fb54ba0820ebac58f1133ce630a28a50ae5",
+    "labId": 27
+  },
+  {
+    "id": 1618,
+    "name": "34_朱红碗16x16",
+    "hash": "3705de642a7d392b85095af0c2c44f0fb121bee7",
+    "labId": 27
+  },
+  {
+    "id": 1619,
+    "name": "35_矮门柜64x32",
+    "hash": "086a3bafb85696e6c14df12315d2b50b013aa480",
+    "labId": 27
+  },
+  {
+    "id": 1620,
+    "name": "36_木箱_小32x32",
+    "hash": "7796b134da36fdd2ad91c93a89cdc22921bdc4da",
+    "labId": 27
+  },
+  {
+    "id": 1621,
+    "name": "37_青瓷碗16x16",
+    "hash": "ce789a438127b1e5db4dc43445b384a25e43fdea",
+    "labId": 27
+  },
+  {
+    "id": 1622,
+    "name": "40_枝叶花瓶16x32",
+    "hash": "025a67e19dffdab2946b8e797aab85af1b75a194",
+    "labId": 27
+  },
+  {
+    "id": 1623,
+    "name": "43_香炉32x32",
+    "hash": "4d00f782df29b92a3684f48ae0f191367c7c3e73",
+    "labId": 27
+  },
+  {
+    "id": 1624,
+    "name": "45_木水桶_大64x64",
+    "hash": "b65e3a2a2e6db06de160db17babdbc0b7f346e07",
+    "labId": 27
+  },
+  {
+    "id": 1625,
+    "name": "47_木水桶_小32x56",
+    "hash": "28255c10c0330bf5b4d176dbe9f23712203f317d",
+    "labId": 27
+  },
+  {
+    "id": 1626,
+    "name": "48_朱红灯柱32x64",
+    "hash": "37ce08d32ed56c2c75e097ae8a50f7795e3b8b3c",
+    "labId": 27
+  },
+  {
+    "id": 1627,
+    "name": "49_告示牌32x56",
+    "hash": "1588559c72302142550b7c561d44b3388834008d",
+    "labId": 27
+  },
+  {
+    "id": 1628,
+    "name": "50_狛犬石像32x64",
+    "hash": "77cb150be17215ca52cf705098a4bb9512c1e934",
+    "labId": 27
+  },
+  {
+    "id": 1629,
+    "name": "茶具_45度俯视32x32",
+    "hash": "7f186cc75399932966ed03426dda34869f2313aa",
+    "labId": 27
+  },
+  {
+    "id": 1630,
+    "name": "茶桌_45度俯视32x32",
+    "hash": "ed58824d79138ed27ed830121bcc952c458743ed",
+    "labId": 27
+  },
+  {
+    "id": 1631,
+    "name": "坐垫_左_45度俯视16x16",
+    "hash": "62e708a383ac653e3555915a5b8d662e8606a037",
     "labId": 27
   }
 ]

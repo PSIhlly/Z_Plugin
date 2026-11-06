@@ -257,6 +257,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: go_skill
       objectReference: {fileID: 0}
+    - target: {fileID: 3813816209618267910, guid: 9e979da3173688348a20ca7750a33eaa, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: -0.0000076293945
+      objectReference: {fileID: 0}
     - target: {fileID: 3909852805191878622, guid: 9e979da3173688348a20ca7750a33eaa, type: 3}
       propertyPath: m_Layer
       value: 5

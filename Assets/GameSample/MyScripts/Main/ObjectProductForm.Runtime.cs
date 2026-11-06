@@ -36,6 +36,8 @@ namespace Form
                 model = owned.model;
                 events = owned.events;
                 animClip = owned.animClip;
+                modelSizes = owned.modelSizes;
+                modelPositions = owned.modelPositions;
                 paramDic = owned.paramDic;
                 base.ToProduct(protoUid);
             }
@@ -163,6 +165,7 @@ namespace Form
             product.labId = LabForm.GetOrCreateForBelong(product.labId, nameof(ObjectProductForm));
             product.EnsureDirectionData();
             product.SyncLegacyAnimClip(product.GetDefaultAnimDirection());
+            product.SyncLegacyModelTransform(product.GetDefaultAnimDirection());
         }
 
         public static void ResetReferences()

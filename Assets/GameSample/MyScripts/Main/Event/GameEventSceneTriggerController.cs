@@ -219,6 +219,9 @@ public class GameEventSceneTriggerController : Z_Controller<GameEventController>
         if (unit is CharacterUnit character)
             return !CharacterUnitForm.DataByUid.TryGetValue(character.data.uid, out var registeredCharacter)
                 || !ReferenceEquals(registeredCharacter, character.data);
+        if (unit is ItemUnit item)
+            return !ItemUnitForm.DataByUid.TryGetValue(item.data.uid, out var registeredItem)
+                || !ReferenceEquals(registeredItem, item.data);
         return unit is ObjectUnit obj &&
                (!ObjectUnitForm.DataByUid.TryGetValue(obj.data.uid, out var registered) ||
                 !ReferenceEquals(registered, obj.data));
@@ -300,6 +303,11 @@ public class GameEventSceneTriggerController : Z_Controller<GameEventController>
 
     public void OnEvent(ItemEvent evt)
     {
+        if (evt.type == MapEventType.Remove)
+        {
+            HandleUnitRemoval(evt.unit);
+            return;
+        }
         QueueUnitEvent(evt.unit, evt.type);
     }
 

@@ -36,6 +36,7 @@ public class PlayManager : Z_MonoManager<PlayManager>
 
     public bool enable;
     private const string ScenePresentationLoadItem = "playSceneStart";
+    private static readonly string[] ScenePresentationPhases = { "Initialize Play scene", "Initialize Play info", "Build minimap", "Initialize effects", "Dispatch entry events", "First event update" };
     private bool scenePresentationPending;
 
 #if UNITY_EDITOR
@@ -144,6 +145,7 @@ public class PlayManager : Z_MonoManager<PlayManager>
                     GameManager.instance.curProgress.pos = (MapManager.instance.utilCtrl.MapPos2RealPos(GameManager.PlayerPosToMapPos(GameManager.instance.curProgress.targetScene.Item2)));
                 });
                 GameManager.instance.curProgress.eventState = EventState.Normal;
+                return;
             }
         }
 
@@ -157,11 +159,13 @@ public class PlayManager : Z_MonoManager<PlayManager>
         {
             return;
         }
+        if (scenePresentationPending)
+            LoadingManager.instance.SetPhase(ScenePresentationLoadItem, "First event update");
         GameManager.instance.evtCtrl.LateUpdate();
         mapCtrl.FlushUnlockTextures();
         // Entry scripts have now had their normal first pass (including ShowDialog).
         // Keep loading above the HUD until this point even if BeginScene ran after Update.
-        CompleteScenePresentation();
+        CompleteScenePresentation(true);
     }
     public async void BeginStory(int id, bool boxPlay)
     {
@@ -170,45 +174,57 @@ public class PlayManager : Z_MonoManager<PlayManager>
         this._folderName = Main2StoryManager.GetStoryFolderNameById(id);
         this.boxPlay = boxPlay;
 
-        LoadingManager.instance.AddLoadItem("playData");
-        LoadingManager.instance.SetProgress("playData", 0.1f);
+        var loading = LoadingManager.instance;
+        var steps = new List<(string phase, System.Action action)>();
         if (!boxPlay)
         {
             if (!SaveAndLoad.Exist(GetStorySaveFolder()))
             {
-                GameManager.instance.saveCtrl.LoadCoreStory(id);
-                FirstPlayInit();
-                ObjectProductForm.PreparePlayStory(GetStoryCacheFolder());
-                GameManager.instance.saveCtrl.SaveSaveStory(id);
+                steps.Add(("Load authored Story", () => GameManager.instance.saveCtrl.LoadCoreStory(id)));
+                steps.Add(("Initialize first Play", FirstPlayInit));
+                steps.Add(("Prepare initial Object products", () => ObjectProductForm.PreparePlayStory(GetStoryCacheFolder())));
+                steps.Add(("Save initial Story", () => GameManager.instance.saveCtrl.SaveSaveStory(id)));
             }
-            LoadingManager.instance.SetProgress("playData", 0.6f);
-            GameManager.instance.saveCtrl.LoadSaveStory(id);
-            ObjectProductForm.PreparePlayStory(GetStoryCacheFolder());
+            steps.Add(("Load saved Story", () => GameManager.instance.saveCtrl.LoadSaveStory(id)));
+            steps.Add(("Prepare saved Object products", () => ObjectProductForm.PreparePlayStory(GetStoryCacheFolder())));
         }
         else
         {
-            GameManager.instance.saveCtrl.LoadCoreStory(id);
-            FirstPlayInit();
-            ObjectProductForm.PreparePlayStory(GetStoryCacheFolder());
+            steps.Add(("Load authored Story", () => GameManager.instance.saveCtrl.LoadCoreStory(id)));
+            steps.Add(("Initialize first Play", FirstPlayInit));
+            steps.Add(("Prepare Object products", () => ObjectProductForm.PreparePlayStory(GetStoryCacheFolder())));
         }
 
-        LoadingManager.instance.SetProgress("playData", 1f);
-        LoadingManager.instance.RemoveLoadItem("playData");
-
-        var firstEnter = GameManager.instance.curProgress.sceneId == 0;
-        Main2StoryManager.instance.StartLoadScenePlay(GameManager.instance.curProgress.targetScene.Item1, () =>
+        loading.AddLoadItem("playData", steps.Count);
+        // Reserve the known follow-up stages before the first frame, so finishing
+        // Story data cannot advertise completion while the map is still pending.
+        loading.AddLoadItem("scene", Main2StoryManager.SceneLoadingWorkCount);
+        loading.AddLoadItem(ScenePresentationLoadItem, ScenePresentationPhases.Length);
+        bool sceneStarted = false;
+        try
         {
-            if (firstEnter)
+            loading.SetPhase("playData", "Preparing Story");
+            await loading.WaitForRenderAsync();
+            foreach (var step in steps)
+                loading.RunStep("playData", step.phase, step.action);
+            var firstEnter = GameManager.instance.curProgress.sceneId == 0;
+            _assetCtrl.Begin();
+            await Main2StoryManager.instance.LoadScenePlayAsync(GameManager.instance.curProgress.targetScene.Item1, () =>
             {
-                GameManager.instance.curProgress.pos = MapManager.instance.utilCtrl.MapPos2RealPos(GameManager.PlayerPosToMapPos(GameManager.instance.curProgress.targetScene.Item2));
+                if (firstEnter)
+                    GameManager.instance.curProgress.pos = MapManager.instance.utilCtrl.MapPos2RealPos(GameManager.PlayerPosToMapPos(GameManager.instance.curProgress.targetScene.Item2));
+            });
+            sceneStarted = true;
+        }
+        finally
+        {
+            if (!sceneStarted)
+            {
+                loading.RemoveLoadItem("scene");
+                loading.RemoveLoadItem(ScenePresentationLoadItem);
             }
-        });
-
-
-        _assetCtrl.Begin();
-
-
-
+            loading.RemoveLoadItem("playData");
+        }
     }
 
 
@@ -223,22 +239,18 @@ public class PlayManager : Z_MonoManager<PlayManager>
     public void BeginScene(int id)
     {
         scenePresentationPending = true;
-        LoadingManager.instance.AddLoadItem(ScenePresentationLoadItem);
-        LoadingManager.instance.SetProgress(ScenePresentationLoadItem, 0f);
+        var loading = LoadingManager.instance;
+        var phases = ScenePresentationPhases;
+        loading.AddLoadItem(ScenePresentationLoadItem, phases.Length);
         try
         {
-            _sceneCtrl.Begin(id);
-            LoadingManager.instance.SetProgress(ScenePresentationLoadItem, 0.3f);
-            _infoCtrl.Begin();
-            LoadingManager.instance.SetProgress(ScenePresentationLoadItem, 0.5f);
-            mapCtrl.Begin();
-            LoadingManager.instance.SetProgress(ScenePresentationLoadItem, 0.75f);
-            effectCtrl.Begin();
-            LoadingManager.instance.SetProgress(ScenePresentationLoadItem, 0.9f);
+            loading.RunStep(ScenePresentationLoadItem, phases[0], () => _sceneCtrl.Begin(id));
+            loading.RunStep(ScenePresentationLoadItem, phases[1], _infoCtrl.Begin);
+            loading.RunStep(ScenePresentationLoadItem, phases[2], mapCtrl.Begin);
+            loading.RunStep(ScenePresentationLoadItem, phases[3], effectCtrl.Begin);
             // Position and player creation must finish before lifecycle events/updates run.
             enable = true;
-            NotifySceneEntered();
-            LoadingManager.instance.SetProgress(ScenePresentationLoadItem, 1f);
+            loading.RunStep(ScenePresentationLoadItem, phases[4], NotifySceneEntered);
         }
         catch
         {
@@ -248,11 +260,12 @@ public class PlayManager : Z_MonoManager<PlayManager>
         }
     }
 
-    private void CompleteScenePresentation()
+    private void CompleteScenePresentation(bool presented = false)
     {
         if (!scenePresentationPending)
             return;
         scenePresentationPending = false;
+        if (presented) LoadingManager.instance.Advance(ScenePresentationLoadItem);
         LoadingManager.instance.RemoveLoadItem(ScenePresentationLoadItem);
     }
 

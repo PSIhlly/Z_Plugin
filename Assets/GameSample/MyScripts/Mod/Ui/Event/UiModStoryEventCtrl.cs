@@ -32,24 +32,24 @@ namespace Ui.ModStory.ModStoryEvent
                 Refresh();
 
             });
+            view.btn_globalVar.onClick.AddListener(() => SelPage(1));
         }
         public override void OnShow()
         {
-            model.selPage = 0;
-            if (param != null)
-                model.selPage = param.selPage;
-            Refresh();
+            SelPage(param?.selPage ?? 0);
         }
   
         public void SelPage(int id)
         {
-            model.selPage = id;
+            model.selPage = id == 1 ? 1 : 0;
             Refresh();
         }
         public void Refresh()
         {
             view.page_ModStoryEventCustom.SetShow(model.selPage == 0);
             view.sta_customEvent.ChangeState(model.selPage == 0 ? 1 : 0);
+            view.page_ModStoryGlobalVar.SetShow(model.selPage == 1);
+            view.sta_globalVar.ChangeState(model.selPage == 1 ? 1 : 0);
         }
     }
 

@@ -106,7 +106,7 @@ public class SaveFixture {
     public byte[] PackageBytes = { 137, 80, 78, 71, 0, 255, 13, 10, 123, 2, 1 };
     public TaskCompletionSource<bool> ImportGate, PackageGate;
     public bool ImportFails, PackageFails;
-    public async Task<StoryFixture> ImportPackageAsync(string path, CancellationToken cancellationToken) {
+    public async Task<StoryFixture> ImportPackageAsync(string path, CancellationToken cancellationToken, Action<string, long, long> report = null) {
         ImportStarts++;
         cancellationToken.ThrowIfCancellationRequested();
         if (ImportGate != null) {
@@ -116,7 +116,7 @@ public class SaveFixture {
         if (ImportFails) throw new IOException("Invalid package fixture.");
         Bytes = File.ReadAllBytes(path); Imports++; return new StoryFixture();
     }
-    public async Task<byte[]> PackageAsync(int storyId, CancellationToken cancellationToken) {
+    public async Task<byte[]> PackageAsync(int storyId, CancellationToken cancellationToken, Action<string, long, long> report = null) {
         PackageStarts++;
         cancellationToken.ThrowIfCancellationRequested();
         if (PackageGate != null) {
@@ -369,7 +369,7 @@ public static class AsyncPackageRegression {
         Reset(); ui = new UiImportFixture(); ui.Click(); Draw(); Action<string> stale = NativeGallery.PickCallback;
         ui.active = false; ui.OnHide(); ui.active = true; ui.Click(); Draw(); Action<string> current = NativeGallery.PickCallback;
         stale(file);
-        Check(GameManager.instance.saveCtrl.ImportStarts == 0 && ui.model.importing && Items() == 1 && UiManager.instance.Visible,
+        Check(GameManager.instance.saveCtrl.ImportStarts == 0 && ui.model.importing && Items() == 2 && UiManager.instance.Visible,
             "Stale callback after reopen must not affect the new import or loading.");
         current(file);
         Check(GameManager.instance.saveCtrl.Imports == 1 && !ui.model.importing && NotifyManager.instance.Errors == 0, "Reopened import must still succeed.");
@@ -377,7 +377,7 @@ public static class AsyncPackageRegression {
 
         Reset(); ui = new UiImportFixture(); var save = GameManager.instance.saveCtrl; save.ImportGate = new TaskCompletionSource<bool>();
         ui.Click(); Draw(); NativeGallery.PickCallback(file); ui.Click();
-        Check(save.ImportStarts == 1 && save.Imports == 0 && ui.model.importing && Items() == 1 && NativeGallery.PickCalls == 1,
+        Check(save.ImportStarts == 1 && save.Imports == 0 && ui.model.importing && Items() == 2 && NativeGallery.PickCalls == 1,
             "Import busy/loading must span asynchronous file preparation, not end at picker callback.");
         ui.active = false; ui.OnHide();
         Check(save.Imports == 0 && !ui.model.importing && NotifyManager.instance.Errors == 0, "Hide during preparation must not publish a canceled story."); Closed("UI import prepare cancel");
@@ -401,7 +401,7 @@ public static class AsyncPackageRegression {
         Check(ui.model.exporting && GameManager.instance.saveCtrl.PackageStarts == 0 && Items() == 1, "Repeated export clicks must keep one loading request before rendering.");
         TimeManager.instance.EndFrame(); Check(GameManager.instance.saveCtrl.PackageStarts == 0, "Export generation must wait beyond EndFrame.");
         TimeManager.instance.NextUpdate();
-        Check(GameManager.instance.saveCtrl.PackageStarts == 1 && NativeGallery.SaveCalls == 1 && ui.model.exporting && Items() == 1,
+        Check(GameManager.instance.saveCtrl.PackageStarts == 1 && NativeGallery.SaveCalls == 1 && ui.model.exporting && Items() == 2,
             "Export busy/loading must span package generation through gallery completion.");
         Action<bool,string> first = NativeGallery.SaveCallback; first(true, "/gallery/export.png");
         Check(!ui.model.exporting && NotifyManager.instance.Tips == 1 && NotifyManager.instance.Errors == 0, "Successful async export must notify and release busy state.");
@@ -417,7 +417,7 @@ public static class AsyncPackageRegression {
         Reset(); ui = new UiExportFixture(); ui.Click(); Draw(); Action<bool,string> stale = NativeGallery.SaveCallback;
         ui.active = false; ui.OnHide(); ui.active = true; ui.Click(); Draw(); Action<bool,string> current = NativeGallery.SaveCallback;
         stale(true, "/gallery/stale.png");
-        Check(ui.model.exporting && NotifyManager.instance.Tips == 0 && Items() == 1 && UiManager.instance.Visible,
+        Check(ui.model.exporting && NotifyManager.instance.Tips == 0 && Items() == 2 && UiManager.instance.Visible,
             "Stale export after reopen must not release or notify the new request.");
         stale(false, null); Check(NotifyManager.instance.Errors == 0, "Stale gallery failure must not show an error on reopened UI.");
         current(true, "/gallery/current.png");
@@ -426,7 +426,7 @@ public static class AsyncPackageRegression {
 
         Reset(); ui = new UiExportFixture(); var save = GameManager.instance.saveCtrl; save.PackageGate = new TaskCompletionSource<bool>();
         ui.Click(); Draw(); ui.Click();
-        Check(save.PackageStarts == 1 && NativeGallery.SaveCalls == 0 && ui.model.exporting && Items() == 1, "Export must remain busy while byte generation is asynchronous.");
+        Check(save.PackageStarts == 1 && NativeGallery.SaveCalls == 0 && ui.model.exporting && Items() == 2, "Export must remain busy while byte generation is asynchronous.");
         ui.active = false; ui.OnHide();
         Check(NativeGallery.SaveCalls == 0 && !ui.model.exporting && NotifyManager.instance.Errors == 0, "Hide during generation must not call native gallery with canceled bytes."); Closed("UI export generation cancel");
         foreach (int failure in new[] { 0, 1, 2 }) {
@@ -523,7 +523,7 @@ if ($IsWindows) {
 Assert-Export (-not $pickerSource.Contains('ModPackageFileBridge')) 'The removed file-management bridge is still referenced.'
 Assert-Export ($pickerSource.Contains('}, title, "image/png", onError);')) 'Mod import must reuse the shared PNG image picker.'
 Assert-Export ($pickerSource.Contains('mime == "image/png" ? "PNG image files\0*.png\0\0"')) 'Windows shared image picker must restrict package selection to PNG.'
-Assert-Export ($uiMethods.Contains('await GameManager.instance.saveCtrl.ImportPackageAsync(path, cancellation.Token)')) 'Import UI must await path-based package preparation with its lifetime token.'
+Assert-Export ($uiMethods.Contains('await loading.RunStepAsync(work, phases[0], report => GameManager.instance.saveCtrl.ImportPackageAsync(path, cancellation.Token, report))')) 'Import UI must await tracked path-based package preparation with its lifetime token and incremental reporter.'
 Assert-Export ($uiMethods.Contains('await LoadingManager.instance.RunAsync("modImport"') -and $exportUiMethods.Contains('await LoadingManager.instance.RunAsync("modExport"')) 'Import/export UI must both own asynchronous loading operations.'
 $saveSource = Get-Content -LiteralPath (Join-Path $ProjectRoot 'Assets/GameSample/MyScripts/Main/GameSaveController.cs') -Raw
 Assert-Export ($saveSource.Contains('137, 80, 78, 71, 13, 10, 26, 10') -and $saveSource.Contains('!signature.SequenceEqual(content.Take(8))')) 'Package import must identify PNG by its byte signature, not a gallery cache extension.'

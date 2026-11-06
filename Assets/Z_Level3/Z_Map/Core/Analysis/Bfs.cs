@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace Z_Map.Analysis
 {
-    /// <summary>Per-agent, frame-budgeted BFS. Only complete rounds replace the published waypoint.</summary>
+    /// <summary>Per-agent, frame-budgeted BFS with an independently consumed completed route.</summary>
     public class Bfs : NaviComponent
     {
         public const int CellsPerFrame = 10;
@@ -19,8 +19,14 @@ namespace Z_Map.Analysis
             internal readonly Dictionary<NavUnit, int> steps = new Dictionary<NavUnit, int>();
             internal readonly Dictionary<NavUnit, NavUnit> pre = new Dictionary<NavUnit, NavUnit>();
             internal readonly Queue<NavUnit> queue = new Queue<NavUnit>();
-            internal readonly List<NavUnit> path = new List<NavUnit>();
-            internal readonly Dictionary<NavUnit, int> pathIndices = new Dictionary<NavUnit, int>();
+            internal List<NavUnit> path = new List<NavUnit>();
+            // Both lists run end-to-start. Swap them on publication, never copy
+            // a whole route synchronously or clear it when a new search starts.
+            internal List<NavUnit> route = new List<NavUnit>();
+            internal int routeIndex = -1;
+            internal bool routeReachesTarget, routeFinalApproach;
+            internal Dictionary<NavUnit, int> pathIndices = new Dictionary<NavUnit, int>();
+            internal Dictionary<NavUnit, int> routeIndices = new Dictionary<NavUnit, int>();
             internal readonly List<NavUnit> fromFootprint = new List<NavUnit>();
             internal Dictionary<(int, int, int), NavUnit> graph;
             internal IEnumerator routine;
@@ -38,9 +44,18 @@ namespace Z_Map.Analysis
             internal void Reset()
             {
                 Cancel();
+                ClearRoute();
                 graph = null;
                 // A reset/target change in the same frame must not grant another
                 // ten cells. The next real frame refreshes the work allowance.
+            }
+
+            internal void ClearRoute()
+            {
+                route.Clear();
+                routeIndices.Clear();
+                routeIndex = -1;
+                routeReachesTarget = routeFinalApproach = false;
             }
         }
 
@@ -61,6 +76,7 @@ namespace Z_Map.Analysis
             if (nc.navUnits == null || nc.navUnits.Count == 0)
             {
                 search.Cancel();
+                search.ClearRoute();
                 state.isSearching = false;
                 state.hasResult = false;
                 state.moveTarget = cur;
@@ -75,6 +91,8 @@ namespace Z_Map.Analysis
                 || search.graphCount != nc.navUnits.Count || search.maxStep != maxStep)
             {
                 search.Cancel();
+                search.ClearRoute();
+                state.hasResult = false;
                 search.graph = nc.navUnits;
                 search.layoutVersion = nc.LayoutVersion;
                 search.graphCount = nc.navUnits.Count;
@@ -109,10 +127,114 @@ namespace Z_Map.Analysis
 
         private Vector3 ReadResult(Vector3 cur, Vector3 tar, NavigationEndpointState state, SearchState search)
         {
+            if (state.hasResult && search.routeIndex >= 0)
+            {
+                // Reaching a waypoint consumes the completed route immediately;
+                // the background round is not involved in this transition.
+                while (search.routeIndex > 0 && AtRoutePoint(cur, search.route[search.routeIndex].realPos))
+                    search.routeIndex--;
+
+                var node = search.route[search.routeIndex];
+                var offsets = nc.GetClearanceOffsets(state.radius);
+                Vector3 routeTarget = search.routeIndex == 0 && search.routeReachesTarget
+                    ? (SameCell(search.resultDestination, tar) ? tar : search.resultDestination) : node.realPos;
+                bool valid = CanFollowRoute(cur, node, routeTarget, offsets, state.passTypes);
+                if (!valid && nc.TryGetGroundUnit(cur, out var current)
+                    && search.routeIndices.TryGetValue(current, out int rawIndex) && rawIndex > search.routeIndex)
+                {
+                    // A shortcut may no longer be safe while the completed raw
+                    // route still goes around it. Resume that route locally,
+                    // rather than repeating the same rejected shortcut forever.
+                    int nextIndex = AtRoutePoint(cur, current.realPos) ? rawIndex - 1 : rawIndex;
+                    var next = search.route[nextIndex];
+                    Vector3 nextTarget = nextIndex == 0 && search.routeReachesTarget
+                        ? (SameCell(search.resultDestination, tar) ? tar : search.resultDestination) : next.realPos;
+                    if (CanFollowRoute(cur, next, nextTarget, offsets, state.passTypes))
+                    {
+                        search.routeIndex = nextIndex;
+                        node = next;
+                        valid = true;
+                    }
+                }
+                if (!valid)
+                {
+                    search.ClearRoute();
+                    state.hasResult = false;
+                }
+                else if (search.routeIndex == 0 && search.routeFinalApproach
+                    && SameCell(search.resultDestination, tar) && IsAtAnchor(cur, node)
+                    && (!nc.TryGetGroundUnit(tar, out var target) || !IsWalkable(target, offsets, state.passTypes)))
+                {
+                    // This end was proven closest-reachable by a completed
+                    // search, not by an exhausted frame/depth allowance.
+                    search.ClearRoute();
+                    // A round captured before entering this final phase must
+                    // not later publish its old anchor and pull the actor back.
+                    search.Cancel();
+                    search.resultTarget = tar;
+                    search.resultDirect = search.resultFollowsTarget = true;
+                    state.finalApproach = true;
+                    state.isSearching = false;
+                }
+                else
+                {
+                    search.resultTarget = search.routeIndex == 0 && search.routeReachesTarget
+                        ? search.resultDestination : node.realPos;
+                    search.resultFollowsTarget = search.routeIndex == 0 && search.routeReachesTarget;
+                }
+            }
             state.moveTarget = !state.hasResult || search.resultStationary ? cur
                 : search.resultFollowsTarget && SameCell(search.resultDestination, tar) ? tar : search.resultTarget;
             state.directEndpoint = state.hasResult && search.resultDirect && !search.resultStationary;
             return nc.GetNormalWithoutY(state.moveTarget - cur);
+        }
+
+        private static bool AtRoutePoint(Vector3 current, Vector3 target)
+        {
+            current.y = target.y;
+            return (current - target).sqrMagnitude <= 1e-8f;
+        }
+
+        private bool CanFollowRoute(Vector3 position, NavUnit target, Vector3 worldTarget, IReadOnlyList<Vector2Int> offsets,
+            IReadOnlyCollection<int> passTypes)
+        {
+            if (!IsRegistered(target) || !IsWalkable(target, offsets, passTypes)
+                || !nc.TryGetGroundUnit(position, out var current) || !IsWalkable(current, offsets, passTypes))
+                return false;
+            if (current == target) return true;
+            if (Mathf.Abs(target.pos.x - current.pos.x) + Mathf.Abs(target.pos.z - current.pos.z) <= 1)
+                return CanPass(current, target, offsets, passTypes);
+
+            // The first leg may be a previously smoothed shortcut. Recheck only
+            // its local next-cell transitions, not the entire distant rectangle.
+            // Character navigation subdivides large frame moves at half a cell.
+            int dx = System.Math.Sign(target.pos.x - current.pos.x);
+            int dz = System.Math.Sign(target.pos.z - current.pos.z);
+            NavUnit nextX = null, nextZ = null;
+            if (dx != 0 && (!nc.TryGetOffsetUnit(current, new Vector2Int(dx, 0), out nextX)
+                || !CanPass(current, nextX, offsets, nextX.passTypes))) return false;
+            if (dz != 0 && (!nc.TryGetOffsetUnit(current, new Vector2Int(0, dz), out nextZ)
+                || !CanPass(current, nextZ, offsets, nextZ.passTypes))) return false;
+            if (dx != 0 && dz != 0
+                && (!nc.TryGetOffsetUnit(current, new Vector2Int(dx, dz), out var corner)
+                    || !CanPass(nextX, corner, offsets, corner.passTypes)
+                    || !CanPass(nextZ, corner, offsets, corner.passTypes))) return false;
+
+            // Neighbouring footprint cells only constrain physical clearance;
+            // actor pass types constrain the actual center-line cells instead.
+            Vector3 delta = worldTarget - position;
+            delta.y = 0f;
+            Vector3 step = delta.normalized * Mathf.Min(nc.MaxRouteMoveStep, delta.magnitude);
+            if (!nc.TryGetGroundUnit(position + step, out var entered) || !IsWalkable(entered, offsets, passTypes))
+                return false;
+            if (entered.pos.x != current.pos.x && entered.pos.z != current.pos.z)
+            {
+                float tx = (current.realPos.x + (nextX.realPos.x - current.realPos.x) * 0.5f - position.x) / step.x;
+                float tz = (current.realPos.z + (nextZ.realPos.z - current.realPos.z) * 0.5f - position.z) / step.z;
+                if (tx < tz - 0.0001f && !HasAllPassTypes(nextX, passTypes)) return false;
+                if (tz < tx - 0.0001f && !HasAllPassTypes(nextZ, passTypes)) return false;
+            }
+            return true;
         }
 
         private bool SameCell(Vector3 first, Vector3 second) =>
@@ -120,11 +242,26 @@ namespace Z_Map.Analysis
 
         private void Publish(NavigationEndpointState state, SearchState search, Vector3 target,
             bool direct = false, bool followsTarget = false, bool stationary = false,
-            NavUnit escape = null, bool finalApproach = false)
+            NavUnit escape = null, bool finalApproach = false, int routeIndex = -1,
+            bool routeReachesTarget = false, bool routeFinalApproach = false)
         {
             // A completed ordinary route to the snapshot is still useful, but
             // an obsolete blocked-target direct leg must never become active.
             if (finalApproach && !SameCell(search.roundDestination, state.destination)) return;
+            if (routeIndex >= 0)
+            {
+                var previous = search.route;
+                search.route = search.path;
+                search.path = previous;
+                var previousIndices = search.routeIndices;
+                search.routeIndices = search.pathIndices;
+                search.pathIndices = previousIndices;
+                search.routeIndex = routeIndex;
+                search.routeReachesTarget = routeReachesTarget;
+                search.routeFinalApproach = routeFinalApproach;
+            }
+            else
+                search.ClearRoute();
             search.resultTarget = target;
             search.resultDestination = search.roundDestination;
             search.resultDirect = direct;
@@ -266,7 +403,7 @@ namespace Z_Map.Analysis
                 cursor = parent;
             }
 
-            // Movement continues on the previous completed waypoint. Rebase the
+            // Movement continues on the previous completed route. Rebase the
             // new route to the actor's current cell, never back to its old start.
             if (!nc.TryGetGroundUnit(search.current, out var current)
                 || !search.pathIndices.TryGetValue(current, out int startIndex)) yield break;
@@ -342,8 +479,34 @@ namespace Z_Map.Analysis
             if (waypointIndex >= latestIndex) waypointIndex = latestIndex - 1;
             if (!CanPass(current, search.path[latestIndex - 1], offsets, passTypes)) yield break;
             bool toRequestedTarget = reachedTarget && waypointIndex == 0 && smoothedToEnd;
-            Publish(state, search, toRequestedTarget ? tar : search.path[waypointIndex].realPos,
-                followsTarget: toRequestedTarget);
+            Vector3 nextTarget = toRequestedTarget ? tar : search.path[waypointIndex].realPos;
+            if (state.hasResult && search.routeIndex >= 0 && !AtRoutePoint(search.current, state.moveTarget))
+            {
+                // Entering a rounded cell does not mean its turn-center was
+                // reached. Retain that center instead of cutting its corner.
+                Vector3 oldDirection = state.moveTarget - search.current;
+                Vector3 newDirection = nextTarget - search.current;
+                oldDirection.y = newDirection.y = 0f;
+                if (Vector3.Dot(oldDirection.normalized, newDirection.normalized) < 0.9999f)
+                {
+                    if (AtRoutePoint(state.moveTarget, current.realPos))
+                    {
+                        waypointIndex = latestIndex;
+                        nextTarget = current.realPos;
+                        toRequestedTarget = false;
+                    }
+                    else if (SameCell(search.resultDestination, tar)
+                        && CanFollowRoute(search.current, search.route[search.routeIndex], state.moveTarget, offsets, passTypes))
+                    {
+                        // A same-target refresh must not reverse a still-valid
+                        // smoothed leg. New targets or a blocked leg may reroute.
+                        yield break;
+                    }
+                }
+            }
+            Publish(state, search, nextTarget,
+                followsTarget: toRequestedTarget, routeIndex: waypointIndex, routeReachesTarget: reachedTarget,
+                routeFinalApproach: !targetWalkable && !searchLimited);
         }
 
         private static bool IsAtAnchor(Vector3 cur, NavUnit unit)

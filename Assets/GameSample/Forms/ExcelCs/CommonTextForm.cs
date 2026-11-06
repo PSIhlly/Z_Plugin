@@ -289,6 +289,92 @@ namespace Form
 
                 {20059,new Data(20059,"edgeTransition","Edge transition","边界过渡")},
 
+                {20060,new Data(20060,"loading","Loading…","正在加载…")},
+
+                {20061,new Data(20061,"Wait for Loading render","Preparing to load…","正在准备加载…")},
+
+                {20062,new Data(20062,"Run action","Processing…","正在处理…")},
+
+                {20063,new Data(20063,"Preparing Story","Preparing story…","正在准备故事…")},
+
+                {20064,new Data(20064,"Preparing scene","Preparing scene…","正在准备场景…")},
+
+                {20065,new Data(20065,"Load authored Story","Loading story data…","正在读取故事数据…")},
+
+                {20066,new Data(20066,"Initialize first Play","Initializing game…","正在初始化游戏…")},
+
+                {20067,new Data(20067,"Prepare initial Object products","Preparing objects…","正在准备物体数据…")},
+
+                {20068,new Data(20068,"Save initial Story","Creating initial save…","正在创建初始存档…")},
+
+                {20069,new Data(20069,"Load saved Story","Loading save…","正在读取存档…")},
+
+                {20070,new Data(20070,"Prepare saved Object products","Preparing objects…","正在准备物体数据…")},
+
+                {20071,new Data(20071,"Prepare Object products","Preparing objects…","正在准备物体数据…")},
+
+                {20072,new Data(20072,"Save authored Story","Saving story…","正在保存故事…")},
+
+                {20073,new Data(20073,"Unload Mod Story","Closing story editor…","正在关闭故事编辑器…")},
+
+                {20074,new Data(20074,"Start Play Story","Starting game…","正在启动游戏…")},
+
+                {20075,new Data(20075,"Save/unload previous scene","Saving previous scene…","正在保存上一场景…")},
+
+                {20076,new Data(20076,"Prepare prefab pool","Preparing scene resources…","正在准备场景资源…")},
+
+                {20077,new Data(20077,"Prepare WangTile cache","Generating tile textures…","正在生成拼接贴图…")},
+
+                {20078,new Data(20078,"Read/deserialize map","Loading map data…","正在读取地图数据…")},
+
+                {20079,new Data(20079,"Initialize map","Building map…","正在创建地图…")},
+
+                {20080,new Data(20080,"Refresh Object appearances","Updating object appearance…","正在更新物体外观…")},
+
+                {20081,new Data(20081,"Apply map callback","Preparing scene entry…","正在准备进入场景…")},
+
+                {20082,new Data(20082,"Initialize Play scene","Initializing scene…","正在初始化场景…")},
+
+                {20083,new Data(20083,"Initialize Play info","Preparing game data…","正在准备游戏数据…")},
+
+                {20084,new Data(20084,"Build minimap","Building minimap…","正在生成小地图…")},
+
+                {20085,new Data(20085,"Initialize effects","Preparing effects…","正在准备特效…")},
+
+                {20086,new Data(20086,"Dispatch entry events","Preparing opening events…","正在准备入场事件…")},
+
+                {20087,new Data(20087,"First event update","Entering scene…","正在进入场景…")},
+
+                {20088,new Data(20088,"Select import package","Waiting for a package…","正在等待选择导入文件…")},
+
+                {20089,new Data(20089,"Select export destination","Waiting for a save location…","正在等待选择导出位置…")},
+
+                {20090,new Data(20090,"Decode/extract/register package","Importing story…","正在导入故事…")},
+
+                {20091,new Data(20091,"Refresh Story list","Updating story list…","正在刷新故事列表…")},
+
+                {20092,new Data(20092,"Build package","Building story package…","正在打包故事…")},
+
+                {20093,new Data(20093,"Write package file","Saving package…","正在保存导出文件…")},
+
+                {20094,new Data(20094,"Package source bytes","Compressing story files…","正在压缩故事文件…")},
+
+                {20095,new Data(20095,"Encode PNG rows","Creating package image…","正在生成导出图片…")},
+
+                {20096,new Data(20096,"Read package file","Reading package…","正在读取导入文件…")},
+
+                {20097,new Data(20097,"Decode PNG rows","Reading package image…","正在解析导入图片…")},
+
+                {20098,new Data(20098,"Verify package bytes","Verifying package…","正在校验导入文件…")},
+
+                {20099,new Data(20099,"Expand package bytes","Decompressing story data…","正在解压故事数据…")},
+
+                {20100,new Data(20100,"Validate package files","Checking story files…","正在检查故事文件…")},
+
+                {20101,new Data(20101,"Extract package files","Extracting story files…","正在解包故事文件…")},
+
+                {20102,new Data(20102,"Register Story","Adding imported story…","正在登记导入的故事…")},
+
                 };
                 _DatasHashSet=new HashSet<Data>();
                 
@@ -429,6 +515,92 @@ namespace Form
                         {"nonOverlapping",_DataById[20058]},
     
                         {"edgeTransition",_DataById[20059]},
+    
+                        {"loading",_DataById[20060]},
+    
+                        {"Wait for Loading render",_DataById[20061]},
+    
+                        {"Run action",_DataById[20062]},
+    
+                        {"Preparing Story",_DataById[20063]},
+    
+                        {"Preparing scene",_DataById[20064]},
+    
+                        {"Load authored Story",_DataById[20065]},
+    
+                        {"Initialize first Play",_DataById[20066]},
+    
+                        {"Prepare initial Object products",_DataById[20067]},
+    
+                        {"Save initial Story",_DataById[20068]},
+    
+                        {"Load saved Story",_DataById[20069]},
+    
+                        {"Prepare saved Object products",_DataById[20070]},
+    
+                        {"Prepare Object products",_DataById[20071]},
+    
+                        {"Save authored Story",_DataById[20072]},
+    
+                        {"Unload Mod Story",_DataById[20073]},
+    
+                        {"Start Play Story",_DataById[20074]},
+    
+                        {"Save/unload previous scene",_DataById[20075]},
+    
+                        {"Prepare prefab pool",_DataById[20076]},
+    
+                        {"Prepare WangTile cache",_DataById[20077]},
+    
+                        {"Read/deserialize map",_DataById[20078]},
+    
+                        {"Initialize map",_DataById[20079]},
+    
+                        {"Refresh Object appearances",_DataById[20080]},
+    
+                        {"Apply map callback",_DataById[20081]},
+    
+                        {"Initialize Play scene",_DataById[20082]},
+    
+                        {"Initialize Play info",_DataById[20083]},
+    
+                        {"Build minimap",_DataById[20084]},
+    
+                        {"Initialize effects",_DataById[20085]},
+    
+                        {"Dispatch entry events",_DataById[20086]},
+    
+                        {"First event update",_DataById[20087]},
+    
+                        {"Select import package",_DataById[20088]},
+    
+                        {"Select export destination",_DataById[20089]},
+    
+                        {"Decode/extract/register package",_DataById[20090]},
+    
+                        {"Refresh Story list",_DataById[20091]},
+    
+                        {"Build package",_DataById[20092]},
+    
+                        {"Write package file",_DataById[20093]},
+    
+                        {"Package source bytes",_DataById[20094]},
+    
+                        {"Encode PNG rows",_DataById[20095]},
+    
+                        {"Read package file",_DataById[20096]},
+    
+                        {"Decode PNG rows",_DataById[20097]},
+    
+                        {"Verify package bytes",_DataById[20098]},
+    
+                        {"Expand package bytes",_DataById[20099]},
+    
+                        {"Validate package files",_DataById[20100]},
+    
+                        {"Extract package files",_DataById[20101]},
+    
+                        {"Register Story",_DataById[20102]},
     
                     
                     };

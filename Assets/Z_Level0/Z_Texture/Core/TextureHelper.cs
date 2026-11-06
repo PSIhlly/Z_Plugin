@@ -222,14 +222,22 @@ namespace Z_Texture
     // New packages live in lossless RGB image pixels, not PNG text metadata.
     return PngPixelPackage.Encode(tex, info);
 }
-        public static byte[] GetExtraInfoByPNG(byte[] texByte)
+        public static byte[] GetExtraInfoByPNG(byte[] texByte, Action<string, long, long> report = null,
+            System.Threading.CancellationToken cancellationToken = default)
 {
     // Read old exports without passing their non-standard chunk order through
     // a native image decoder. New exports never write this legacy text chunk.
     string infoBase64 = ExtractTextChunk(texByte, "ZEXTRA");
     if (!string.IsNullOrEmpty(infoBase64))
-        return Convert.FromBase64String(infoBase64);
-    return PngPixelPackage.Decode(texByte);
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+        var bytes = Convert.FromBase64String(infoBase64);
+        report?.Invoke("Decode PNG rows", 1, 1);
+        report?.Invoke("Verify package bytes", 1, 1);
+        report?.Invoke("Expand package bytes", bytes.Length, bytes.Length);
+        return bytes;
+    }
+    return PngPixelPackage.Decode(texByte, report, cancellationToken);
 }
 
         private static byte[] InsertTextChunk(byte[] pngData, string keyword, string text)

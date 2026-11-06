@@ -54,6 +54,9 @@ public class ModAssetCtrl : Z_Controller<ModManager>
     }
     public int modId;
 
+    private static T GetEntryOrDefault<T>(IReadOnlyList<T> entries, int index) =>
+        entries != null && index >= 0 && index < entries.Count ? entries[index] : default;
+
     #region story
     public void ImportStoryTex()
     {
@@ -104,6 +107,39 @@ public class ModAssetCtrl : Z_Controller<ModManager>
     }
     #endregion
     #region param
+
+    public EventGlobalVariableForm.Data CreateGlobalVar(string name = null)
+    {
+        if (string.IsNullOrWhiteSpace(name))
+            name = StringHelper.GetUniqueName(EventGlobalVariableForm.DataByName.Keys);
+        if (EventGlobalVariableForm.DataByName.ContainsKey(name))
+            return null;
+
+        var data = new EventGlobalVariableForm.Data(-1, name, Z_Code.CodeHelper.CreateBoxByNum(0));
+        return EventGlobalVariableForm.AddData(data) < 0 ? null : data;
+    }
+
+    public bool RenameGlobalVar(int uid, string name)
+    {
+        if (string.IsNullOrWhiteSpace(name)
+            || !EventGlobalVariableForm.DataByUid.TryGetValue(uid, out var data)
+            || (EventGlobalVariableForm.DataByName.TryGetValue(name, out var existing)
+                && !ReferenceEquals(existing, data)))
+            return false;
+
+        data.name = name;
+        return true;
+    }
+
+    public void DeleteGlobalVar(int uid)
+    {
+        if (!EventGlobalVariableForm.DataByUid.ContainsKey(uid))
+            return;
+        // Retire bindings before returning this UID to the Form's reusable pool.
+        foreach (var scene in SceneForm.DataByUid.Values)
+            scene.events?.Remove($"onGlobalVarChangeEvent${uid}");
+        EventGlobalVariableForm.RemoveData(uid);
+    }
 
     public void CreateCharacterArg(string name)
     {
@@ -324,6 +360,7 @@ public class ModAssetCtrl : Z_Controller<ModManager>
     {
         UiManager.instance.ShowUi<UiModAssetSelectWindowCtrl>(new UiModAssetSelectTexWindowParam()
         {
+            selectedAssetId = GetEntryOrDefault(MapTextureForm.DataById.GetDv(texId, null)?.texs, id),
             onComplete = (data) =>
             {
                 if (id != -1 && MapTextureForm.DataById[texId].texs.Count > id)
@@ -343,6 +380,7 @@ public class ModAssetCtrl : Z_Controller<ModManager>
     {
         UiManager.instance.ShowUi<UiModAssetSelectWindowCtrl>(new UiModAssetSelectTexWindowParam()
         {
+            selectedAssetId = GetEntryOrDefault(MapTextureForm.DataById.GetDv(texId, null)?.frontPartTexs, id),
             onComplete = (data) =>
             {
                 var frontPartTexs = MapTextureForm.DataById[texId].frontPartTexs;
@@ -383,6 +421,7 @@ public class ModAssetCtrl : Z_Controller<ModManager>
     {
         UiManager.instance.ShowUi<UiModAssetSelectWindowCtrl>(new UiModAssetSelectTexWindowParam()
         {
+            selectedAssetId = GetEntryOrDefault(MapMaskForm.DataById.GetDv(maskId, null)?.texsName, id),
             onComplete = (data) =>
             {
                 if (MapMaskForm.DataById[maskId].texsName.Count > id)
@@ -468,6 +507,7 @@ public class ModAssetCtrl : Z_Controller<ModManager>
             paramDic[prm.name] = prm.Copy();
         }
         var modelData = MapModelForm.defaultData.Copy();
+        modelData.colliderScale = 1f;
         modelData.subUnitTexsName = new List<List<int>>() { new List<int>() };
         var objectData = new ObjectProductForm.Data(-1, name, labId, 0, GlobalDefaultHelper.DefaultTexId, modelData, false,
             new Dictionary<string, EventTriggerForm.Data>(), paramDic, GlobalDefaultHelper.DefaultTexId,
@@ -496,6 +536,7 @@ public class ModAssetCtrl : Z_Controller<ModManager>
     {
         UiManager.instance.ShowUi<UiModAssetSelectWindowCtrl>(new UiModAssetSelectTexWindowParam()
         {
+            selectedAssetId = GetEntryOrDefault(ObjectProductForm.DataByUid.GetDv(uid, null)?.GetAnimClip(direction), texId),
             onComplete = (assetData) =>
             {
                 var objectData = ObjectProductForm.DataByUid[uid];
@@ -538,6 +579,7 @@ public class ModAssetCtrl : Z_Controller<ModManager>
     {
         UiManager.instance.ShowUi<UiModAssetSelectWindowCtrl>(new UiModAssetSelectTexWindowParam()
         {
+            selectedAssetId = ObjectProductForm.DataByUid.GetDv(uid, null)?.minimapIcon,
             onComplete = (data) =>
             {
                 ObjectProductForm.DataByUid[uid].minimapIcon = data.id;
@@ -644,6 +686,7 @@ public class ModAssetCtrl : Z_Controller<ModManager>
     {
         UiManager.instance.ShowUi<UiModAssetSelectWindowCtrl>(new UiModAssetSelectTexWindowParam()
         {
+            selectedAssetId = CharacterProductForm.DataByUid.GetDv(uid, null)?.avatarTex,
             onComplete = (data) =>
             {
                 CharacterProductForm.DataByUid[uid].avatarTex = data.id;
@@ -654,6 +697,7 @@ public class ModAssetCtrl : Z_Controller<ModManager>
     {
         UiManager.instance.ShowUi<UiModAssetSelectWindowCtrl>(new UiModAssetSelectTexWindowParam()
         {
+            selectedAssetId = CharacterProductForm.DataByUid.GetDv(characterUid, null)?.illustration,
             onComplete = (data) =>
             {
                 CharacterProductForm.DataByUid[characterUid].illustration = data.id;
@@ -741,6 +785,8 @@ public class ModAssetCtrl : Z_Controller<ModManager>
     {
         UiManager.instance.ShowUi<UiModAssetSelectWindowCtrl>(new UiModAssetSelectTexWindowParam()
         {
+            selectedAssetId = GetEntryOrDefault(CharacterProductForm.DataByUid.GetDv(characterUid, null)
+                ?.animDic?.GetDv(animNm, null)?.animClip?.GetDv(dir, null), id)?.partTex?.GetDv(part, 0),
             onComplete = (data) =>
             {
                 var chracterData = CharacterProductForm.DataByUid[characterUid];
@@ -778,6 +824,7 @@ public class ModAssetCtrl : Z_Controller<ModManager>
     {
         UiManager.instance.ShowUi<UiModAssetSelectWindowCtrl>(new UiModAssetSelectTexWindowParam()
         {
+            selectedAssetId = CharacterProductForm.DataByUid.GetDv(uid, null)?.minimapIcon,
             onComplete = (data) =>
             {
                 CharacterProductForm.DataByUid[uid].minimapIcon = data.id;
@@ -820,6 +867,7 @@ public class ModAssetCtrl : Z_Controller<ModManager>
     {
         UiManager.instance.ShowUi<UiModAssetSelectWindowCtrl>(new UiModAssetSelectTexWindowParam()
         {
+            selectedAssetId = GetEntryOrDefault(EffectForm.DataByUid.GetDv(effectUid, null)?.clips, clipId)?.FirstOrDefault()?.tex,
             onComplete = (data) =>
             {
                 var effectData = EffectForm.DataByUid[effectUid];
@@ -868,6 +916,7 @@ public class ModAssetCtrl : Z_Controller<ModManager>
     {
         UiManager.instance.ShowUi<UiModAssetSelectWindowCtrl>(new UiModAssetSelectTexWindowParam()
         {
+            selectedAssetId = SkillProductForm.DataByUid.GetDv(skillUid, null)?.icon,
             onComplete = (data) =>
             {
                 var skillData = SkillProductForm.DataByUid[skillUid];
@@ -912,10 +961,11 @@ public class ModAssetCtrl : Z_Controller<ModManager>
 
 
     #region event
-    public void ImportImage(Action<TexAssetForm.Data> act)
+    public void ImportImage(Action<TexAssetForm.Data> act, int? selectedAssetId = null)
     {
         UiManager.instance.ShowUi<UiModAssetSelectWindowCtrl>(new UiModAssetSelectTexWindowParam()
         {
+            selectedAssetId = selectedAssetId,
             onComplete = (data) =>
             {
                 act?.Invoke(data);
@@ -976,6 +1026,9 @@ public class ModAssetCtrl : Z_Controller<ModManager>
     }
     public void ChooseBasicCmd(BoxDataForm.Data box, Action onComplete)
     {
+        if (box == null)
+            return;
+
         var items = new EntryItem();
         items.Add(TextManager.instance.GetTxt("Num"), null, 1);
         items.Add(TextManager.instance.GetTxt("Text"), null, 2);
@@ -986,11 +1039,12 @@ public class ModAssetCtrl : Z_Controller<ModManager>
                 case 1:
                     NotifyManager.instance.AddInputArea(TextManager.instance.GetTxt("input value"), true, (res) =>
                     {
-                        if (float.TryParse(res, out float val))
-                        {
-                            box.str = null;
-                            box.num = val;
-                        }
+                        if (!float.TryParse(res, out float val))
+                            return false;
+                        box.str = null;
+                        box.num = val;
+                        box.valName = null;
+                        box.dic = null;
                         onComplete?.Invoke();
                         return true;
                     }, box.num.ToString());
@@ -1000,8 +1054,12 @@ public class ModAssetCtrl : Z_Controller<ModManager>
                     NotifyManager.instance.AddInputArea(TextManager.instance.GetTxt("input value"), true, (res) =>
                     {
                         box.str = res;
+                        box.num = 0;
+                        box.valName = null;
+                        box.dic = null;
+                        onComplete?.Invoke();
                         return true;
-                    }, box.num.ToString());
+                    }, box.str ?? string.Empty);
                     break;
             }
             return true;
@@ -1069,6 +1127,7 @@ public class ModAssetCtrl : Z_Controller<ModManager>
     {
         UiManager.instance.ShowUi<UiModAssetSelectWindowCtrl>(new UiModAssetSelectTexWindowParam()
         {
+            selectedAssetId = ItemProductForm.DataByUid.GetDv(itemUid, null)?.iconTexName,
             onComplete = (data) =>
             {
                 ItemProductForm.DataByUid[itemUid].iconTexName = data.id;
@@ -1119,6 +1178,8 @@ public class ModAssetCtrl : Z_Controller<ModManager>
     {
         UiManager.instance.ShowUi<UiModAssetSelectWindowCtrl>(new UiModAssetSelectTexWindowParam()
         {
+            selectedAssetId = GetEntryOrDefault(GetEntryOrDefault(ItemProductForm.DataByUid.GetDv(itemUid, null)
+                ?.model?.subUnitTexsName, 0), texId),
             onComplete = (data) =>
             {
                 var itemData = ItemProductForm.DataByUid[itemUid];
@@ -1139,6 +1200,7 @@ public class ModAssetCtrl : Z_Controller<ModManager>
     {
         UiManager.instance.ShowUi<UiModAssetSelectWindowCtrl>(new UiModAssetSelectTexWindowParam()
         {
+            selectedAssetId = ItemProductForm.DataByUid.GetDv(itemUid, null)?.styleTex?.GetDv(style, 0),
             onComplete = (data) =>
             {
                 var itemData = ItemProductForm.DataByUid[itemUid];
@@ -1218,6 +1280,7 @@ public class ModAssetCtrl : Z_Controller<ModManager>
     {
         UiManager.instance.ShowUi<UiModAssetSelectWindowCtrl>(new UiModAssetSelectTexWindowParam()
         {
+            selectedAssetId = ItemProductForm.DataByUid.GetDv(uid, null)?.minimapIcon,
             onComplete = (data) =>
             {
                 ItemProductForm.DataByUid[uid].minimapIcon = data.id;
@@ -1291,7 +1354,7 @@ public class ModAssetCtrl : Z_Controller<ModManager>
         }
         // 非重叠：同 prefab 的物体视觉包围盒相交时不再生成。
         if (_super.sceneCtrl != null && _super.sceneCtrl.nonOverlapping
-            && HasSameObjectOverlap(prefabName, position, angle))
+            && HasSameObjectOverlap(prefabName, position, angle, data))
         {
             return null;
         }
@@ -1321,7 +1384,7 @@ public class ModAssetCtrl : Z_Controller<ModManager>
     /// 尺寸和位置都用运行时 prefab 直接子节点（MapModel 的 pos/scale）换算，和 Play 里看到的实际大小一致；
     /// 与碰撞体、物理形状无关。
     /// </summary>
-    private bool HasSameObjectOverlap(string prefabName, Vector3 position, float angle)
+    private bool HasSameObjectOverlap(string prefabName, Vector3 position, float angle, ObjectProductForm.Data product)
     {
         var mapManager = MapManager.instance;
         var utilCtrl = mapManager != null ? mapManager.utilCtrl : null;
@@ -1335,7 +1398,9 @@ public class ModAssetCtrl : Z_Controller<ModManager>
 
         Vector3 euler = new Vector3(0f, angle, 0f);
         // 放置后 Unit 的 scale 就是 GetNewObject 的 Vector3.one。
-        utilCtrl.TryGetVisionBounds(prefab, position, euler, Vector3.one, out Bounds candidate);
+        var direction = product.GetAnimDirection(angle);
+        utilCtrl.TryGetVisionBounds(prefab, position, euler, Vector3.one, out Bounds candidate,
+            firstPartPosition: product.GetModelPosition(direction), firstPartScale: product.GetModelSize(direction));
 
         foreach (var other in ObjectUnitForm.DataByUid.Values)
         {
@@ -1461,6 +1526,7 @@ public class ModAssetCtrl : Z_Controller<ModManager>
     {
         UiManager.instance.ShowUi<UiModAssetSelectWindowCtrl>(new UiModAssetSelectTexWindowParam()
         {
+            selectedAssetId = GameManager.instance.curProgress?.largeMap,
             onComplete = (data) =>
             {
                 GameManager.instance.curProgress.largeMap = data.id;
@@ -1482,6 +1548,7 @@ public class ModAssetCtrl : Z_Controller<ModManager>
     {
         UiManager.instance.ShowUi<UiModAssetSelectWindowCtrl>(new UiModAssetSelectTexWindowParam()
         {
+            selectedAssetId = SceneForm.DataByName.GetDv(name, null)?.miniMap,
             onComplete = (data) =>
             {
                 SceneForm.DataByName[name].miniMap = data.id;

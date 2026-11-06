@@ -106,7 +106,7 @@ namespace Ui.ModStoryEventEditWindow
                         }
                         break;
                     case CodeType.Str:
-                        view.txt_.text = string.IsNullOrEmpty(model.node.desc.code) ? "\"\"" : model.node.desc.code;
+                        view.txt_.text = $"\"{model.node.desc.code}\"";
                         break;
                     default:
                         view.txt_.text = model.node.desc.code;

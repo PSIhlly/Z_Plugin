@@ -93,7 +93,7 @@ namespace Z_Texture
         /// finish synchronously and leave its output stream open.
         /// </summary>
         public static byte[] EncodeStreamWithCover(CoverSnapshot cover, Action<Stream> writePayload,
-            CancellationToken cancellationToken = default)
+            CancellationToken cancellationToken = default, Action<string, long, long> report = null)
         {
             if (writePayload == null) throw new ArgumentNullException(nameof(writePayload));
             cancellationToken.ThrowIfCancellationRequested();
@@ -134,6 +134,7 @@ namespace Z_Texture
                 int rowBytes = width * 3;
                 int dataRows = Math.Max(1, (packedLength + rowBytes - 1) / rowBytes);
                 int height = 1 + coverRows + dataRows;
+                report?.Invoke("Encode PNG rows", 0, height);
                 var header = new byte[HeaderBytes];
                 Buffer.BlockCopy(Magic, 0, header, 0, Magic.Length);
                 WriteUInt32(header, 8, 1); // Protocol version.
@@ -190,6 +191,8 @@ namespace Z_Texture
                                 }
                                 adler.Update(row, 0, row.Length);
                                 deflate.Write(row, 0, row.Length);
+                                if ((y & 31) == 31 || y + 1 == height)
+                                    report?.Invoke("Encode PNG rows", y + 1, height);
                             }
                         }
                         var checksum = new byte[4];
@@ -208,9 +211,11 @@ namespace Z_Texture
         /// damaged packages throw InvalidDataException before callers write files.
         /// RGB8/RGBA8 PNG filters 0..4 are supported for lossless re-encoding.
         /// </summary>
-        public static byte[] Decode(byte[] png)
+        public static byte[] Decode(byte[] png, Action<string, long, long> report = null,
+            CancellationToken cancellationToken = default)
         {
             if (png == null) throw new ArgumentNullException(nameof(png));
+            cancellationToken.ThrowIfCancellationRequested();
             PngInfo info = ParsePng(png);
             if (info.BitDepth != 8 || (info.ColorType != 2 && info.ColorType != 6) || info.Interlace != 0)
                 return null;
@@ -255,10 +260,14 @@ namespace Z_Texture
                     if (packedLength > Math.Max(16L * 1024 * 1024, png.Length * 64L))
                         throw Invalid("Pixel package compressed-image expansion exceeds the safety limit.");
                     var packed = new byte[(int)packedLength];
+                    report?.Invoke("Decode PNG rows", 1, info.Height);
                     int copied = 0;
                     for (int y = 1; y < info.Height; y++)
                     {
                         ReadRow(inflate, row, previous, channels, adler);
+                        cancellationToken.ThrowIfCancellationRequested();
+                        if ((y & 31) == 31 || y + 1 == info.Height)
+                            report?.Invoke("Decode PNG rows", y + 1, info.Height);
                         if (y > coverRows && copied < packed.Length)
                         {
                             int count = Math.Min(info.Width * 3, packed.Length - copied);
@@ -282,20 +291,24 @@ namespace Z_Texture
                     {
                         var buffer = new byte[65536];
                         long expanded = 0;
+                        report?.Invoke("Verify package bytes", 0, Math.Max(1L, rawLength));
                         uint rawCrcState = 0xffffffffu;
                         int read;
                         while ((read = gzip.Read(buffer, 0, (int)Math.Min(buffer.Length, rawLength - expanded + 1))) > 0)
                         {
                             expanded += read;
+                            cancellationToken.ThrowIfCancellationRequested();
                             if (expanded > rawLength) throw Invalid("Pixel package expands beyond its declared length.");
                             sha.TransformBlock(buffer, 0, read, buffer, 0);
                             rawCrcState = Crc(buffer, 0, read, rawCrcState) ^ 0xffffffffu;
+                            report?.Invoke("Verify package bytes", expanded, Math.Max(1L, rawLength));
                         }
                         if (expanded != rawLength) throw Invalid("Pixel package expands to a different length.");
                         if ((rawCrcState ^ 0xffffffffu) != ReadLittleUInt32(packed, packed.Length - 8))
                             throw Invalid("Pixel package GZip checksum does not match.");
                         sha.TransformFinalBlock(Array.Empty<byte>(), 0, 0);
                         actualHash = sha.Hash;
+                        report?.Invoke("Verify package bytes", Math.Max(1L, rawLength), Math.Max(1L, rawLength));
                     }
                     int mismatch = 0;
                     for (int i = 0; i < actualHash.Length; i++)
@@ -304,7 +317,19 @@ namespace Z_Texture
                     var payload = new byte[(int)rawLength];
                     using (var bytes = new MemoryStream(packed, false))
                     using (var gzip = new GZipStream(bytes, CompressionMode.Decompress))
-                        ReadExactly(gzip, payload, 0, payload.Length);
+                    {
+                        int offset = 0;
+                        report?.Invoke("Expand package bytes", 0, Math.Max(1, payload.Length));
+                        while (offset < payload.Length)
+                        {
+                            cancellationToken.ThrowIfCancellationRequested();
+                            int count = Math.Min(65536, payload.Length - offset);
+                            ReadExactly(gzip, payload, offset, count);
+                            offset += count;
+                            report?.Invoke("Expand package bytes", offset, Math.Max(1, payload.Length));
+                        }
+                        report?.Invoke("Expand package bytes", Math.Max(1, payload.Length), Math.Max(1, payload.Length));
+                    }
                     return payload;
                 }
             }

@@ -189,21 +189,34 @@ public static class StoryPackageImportRegression
         {
             StoryForm.addAction += row => Check(Thread.CurrentThread.ManagedThreadId == mainThread,
                 "Async import registers Forms only on the Unity thread");
-            var story = await ctrl.ImportPackageAsync(selected);
+            var importProgress = new System.Collections.Generic.Dictionary<string, (long done, long total)>();
+            var story = await ctrl.ImportPackageAsync(selected, default, (phase, done, total) => importProgress[phase] = (done, total));
+            Check(importProgress.Count == 7 && importProgress.Values.All(value => value.total > 0 && value.done == value.total),
+                "Every actual import substage reports its complete byte/row/file count");
             Check(story.id == 7 && StoryForm.DataById[7] == story, "Async import publishes a new overview");
             Check(File.ReadAllBytes(Path.Combine(root, "7/Core/ast/nested/42")).SequenceEqual(new byte[] { 0, 255, 10, 13, 128 }),
                 "Async import preserves nested binary assets and gallery cache paths");
             Check(JObject.Parse(File.ReadAllText(Path.Combine(root, "7/Core/sf"))).Value<int>("id") == 7,
                 "Async import writes the allocated ID before publishing Core");
 
+            var largeAsset = new byte[150001]; new System.Random(17).NextBytes(largeAsset);
+            File.WriteAllBytes(Path.Combine(root, "7/Core/ast/progress-fixture"), largeAsset);
             var expected = SaveAndLoad.Package("7/Core/");
             using (var output = new MemoryStream())
             {
-                SaveAndLoad.WritePackage("7/Core/", output);
+                int intermediateChunks = 0;
+                SaveAndLoad.WritePackage("7/Core/", output, default, (phase, done, total) =>
+                {
+                    if (done > 0 && done < total) intermediateChunks++;
+                });
                 Check(output.CanWrite && Encoding.UTF8.GetString(output.ToArray()) == expected,
                     "Streaming package preserves exact legacy JSON, Base64, indentation and stream ownership");
+                Check(intermediateChunks >= 3, "A large single file reports compressed input incrementally, including an unaligned Base64 tail");
             }
-            var exported = await ctrl.PackageAsync(7);
+            var exportProgress = new System.Collections.Generic.Dictionary<string, (long done, long total)>();
+            var exported = await ctrl.PackageAsync(7, default, (phase, done, total) => exportProgress[phase] = (done, total));
+            Check(exportProgress.Count == 2 && exportProgress.Values.All(value => value.total > 0 && value.done == value.total),
+                "Export reports real source-byte and PNG-row counts through completion");
             Check(Encoding.UTF8.GetString(TextureHelper.GetExtraInfoByPNG(exported)) == expected,
                 "Async export preserves the production filesystem payload");
             var textureCount = Resources.FindObjectsOfTypeAll<Texture2D>().Length;

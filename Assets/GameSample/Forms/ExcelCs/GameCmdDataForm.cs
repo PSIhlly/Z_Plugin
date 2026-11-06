@@ -323,7 +323,7 @@ namespace Form
 
                 {100035,new Data(100035,"Load",null,null,null,new List<string>(){"void",},"Load","Load();",10001,EditorStyle.Avg,"")},
 
-                {100036,new Data(100036,"DestroyObject",new List<string>(){"object",},new List<string>(){"sceneObject",},null,new List<string>(){"void",},"object {0}: Destroy","DestroyObject(param1);",10016,EditorStyle.Rpg,"")},
+                {100036,new Data(100036,"Destroy",new List<string>(){"target",},new List<string>(){"var",},null,new List<string>(){"void",},"unit {0}: Destroy","Destroy(param1);",10026,EditorStyle.Rpg,"")},
 
                 {100037,new Data(100037,"GenerateObject",new List<string>(){"sceneObject","pos",},new List<string>(){"sceneObject","vector",},new List<string>(){"new Object",},new List<string>(){"sceneObject",},"object {0}: Generate at coordinates({1}):","GenerateObject(\"empty\",NewVector(0,0,0))",10016,EditorStyle.Rpg,"newObject = ")},
 
@@ -431,8 +431,6 @@ namespace Form
 
                 {100094,new Data(100094,"GetVectorByRotation",new List<string>(){"rotation",},new List<string>(){"num",},new List<string>(){"vector",},new List<string>(){"vector",},"Get Vector By Rotation {0}","GetVectorByRotation(0)",10001,EditorStyle.Rpg,"")},
 
-                {100095,new Data(100095,"DestroyCharacter",new List<string>(){"character",},new List<string>(){"character",},null,new List<string>(){"void",},"character {0}: Destroy","DestroyCharacter(param1);",10007,EditorStyle.Rpg,"")},
-
                 {100096,new Data(100096,"MakeChoice",new List<string>(){"options",},new List<string>(){"var",},new List<string>(){"resault",},new List<string>(){"var",},"Make choice from {0}","MakeChoice(options)",10022,EditorStyle.AvgAdvanced,"res=")},
 
                 {100097,new Data(100097,"ShowDialogWithChoice",new List<string>(){"background","avatar","title","content","audio","options",},new List<string>(){"img","img","string","string","audio","var",},new List<string>(){"resault",},new List<string>(){"var",},"Show Dialog{1}{2}:{3} bg:{0} (audio:{4}),with choice{5}","ShowDialogWithChoice(\"$i$$i$\",\"$i$$i$\",\"empty\",\"empty\",options);",10022,EditorStyle.AvgAdvanced,"")},
@@ -476,6 +474,16 @@ namespace Form
                 {100116,new Data(100116,"SetCurrentCharacter",new List<string>(){"character",},new List<string>(){"character",},null,new List<string>(){"void",},"Set Character {0} as current character","SetCurrentCharacter(param1);",10007,EditorStyle.Rpg,"")},
 
                 {100117,new Data(100117,"Character",null,null,null,new List<string>(){"character",},"","\"$ch$0$ch$\"",10001,EditorStyle.AvgAdvanced,"")},
+
+                {100118,new Data(100118,"IsSameObject",new List<string>(){"sceneObject1","sceneObject2",},new List<string>(){"sceneObject","sceneObject",},new List<string>(){"same",},new List<string>(){"num",},"scene Object {0} shares the prototype of {1}?","IsSameObject(param1,\"$so$p:0$so$\")",10016,EditorStyle.Rpg,"")},
+
+                {100119,new Data(100119,"FadeIn",null,null,null,new List<string>(){"void",},"Fade to black (1 second)","FadeIn();",10013,EditorStyle.Avg,"")},
+
+                {100120,new Data(100120,"FadeOut",null,null,null,new List<string>(){"void",},"Fade from black (1 second)","FadeOut();",10013,EditorStyle.Avg,"")},
+
+                {100121,new Data(100121,"GetGlobalVar",new List<string>(){"name",},new List<string>(){"string",},new List<string>(){"value",},new List<string>(){"var",},"Get global variable {0}","GetGlobalVar(\"name\")",10001,EditorStyle.AvgAdvanced,"")},
+
+                {100122,new Data(100122,"SetGlobalVar",new List<string>(){"name","value",},new List<string>(){"string","var",},null,new List<string>(){"void",},"Set global variable {0} to {1}","SetGlobalVar(\"name\",0);",10001,EditorStyle.AvgAdvanced,"")},
 
                 };
                 _DatasHashSet=new HashSet<Data>();
@@ -552,7 +560,7 @@ namespace Form
     
                         {"Load",_DataByUid[100035]},
     
-                        {"DestroyObject",_DataByUid[100036]},
+                        {"Destroy",_DataByUid[100036]},
     
                         {"GenerateObject",_DataByUid[100037]},
     
@@ -660,8 +668,6 @@ namespace Form
     
                         {"GetVectorByRotation",_DataByUid[100094]},
     
-                        {"DestroyCharacter",_DataByUid[100095]},
-    
                         {"MakeChoice",_DataByUid[100096]},
     
                         {"ShowDialogWithChoice",_DataByUid[100097]},
@@ -706,6 +712,16 @@ namespace Form
     
                         {"Character",_DataByUid[100117]},
     
+                        {"IsSameObject",_DataByUid[100118]},
+    
+                        {"FadeIn",_DataByUid[100119]},
+    
+                        {"FadeOut",_DataByUid[100120]},
+    
+                        {"GetGlobalVar",_DataByUid[100121]},
+    
+                        {"SetGlobalVar",_DataByUid[100122]},
+    
                     
                     };
                     foreach(var v in _DataByUid.Values)
@@ -721,9 +737,9 @@ namespace Form
         
                             {10013,new List<Data>()},
         
-                            {10016,new List<Data>()},
-        
                             {10026,new List<Data>()},
+        
+                            {10016,new List<Data>()},
         
                             {10014,new List<Data>()},
         
@@ -805,7 +821,7 @@ namespace Form
 
                     _DatasByLabid[10001].Add(_DataByUid[100035]);
 
-                    _DatasByLabid[10016].Add(_DataByUid[100036]);
+                    _DatasByLabid[10026].Add(_DataByUid[100036]);
 
                     _DatasByLabid[10016].Add(_DataByUid[100037]);
 
@@ -913,8 +929,6 @@ namespace Form
 
                     _DatasByLabid[10001].Add(_DataByUid[100094]);
 
-                    _DatasByLabid[10007].Add(_DataByUid[100095]);
-
                     _DatasByLabid[10022].Add(_DataByUid[100096]);
 
                     _DatasByLabid[10022].Add(_DataByUid[100097]);
@@ -958,6 +972,16 @@ namespace Form
                     _DatasByLabid[10007].Add(_DataByUid[100116]);
 
                     _DatasByLabid[10001].Add(_DataByUid[100117]);
+
+                    _DatasByLabid[10016].Add(_DataByUid[100118]);
+
+                    _DatasByLabid[10013].Add(_DataByUid[100119]);
+
+                    _DatasByLabid[10013].Add(_DataByUid[100120]);
+
+                    _DatasByLabid[10001].Add(_DataByUid[100121]);
+
+                    _DatasByLabid[10001].Add(_DataByUid[100122]);
 
 
             childInitAction?.Invoke();

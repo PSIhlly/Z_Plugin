@@ -6,6 +6,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text.RegularExpressions;
 using System.Xml.Linq;
 using Ui;
@@ -187,6 +188,11 @@ public class GameManager : Z_MonoManager<GameManager>
 
     public override void Init()
     {
+        List<int> GG = new List<int>() { 2,3 };
+        var p = GG.Where(x => x > 2);
+
+
+
         innerAssetDic = new Dictionary<string, AssetForm.Data>();
         base.Init();
         TimeManager.animationTimeGetter = () =>

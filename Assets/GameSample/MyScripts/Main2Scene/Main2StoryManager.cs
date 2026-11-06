@@ -128,23 +128,129 @@ public class Main2StoryManager : Z_MonoManager<Main2StoryManager>
 
     private readonly List<int> wangTileGameTexIds = new List<int>();
     private readonly Dictionary<int, List<int>> objectWangTileGameTexIds = new Dictionary<int, List<int>>();
+    private List<WangTileSource> wangTileSources;
+    private bool changingScene;
+
+    private IEnumerable<(object owner, int slot, List<int> textures)> GetWangTileInputs()
+    {
+        foreach (var texture in MapTextureForm.DataById.Values)
+        {
+            if (texture.isWangTile)
+                yield return (texture, 0, texture.texs);
+            if (texture.enableFrontPart && texture.frontIsWangTile)
+                yield return (texture, 1, texture.frontPartTexs);
+        }
+        foreach (var product in ObjectProductForm.DataByUid.Values)
+        {
+            if (product.protoUid != 0 || !product.isWangTile) continue;
+            product.EnsureDirectionData();
+            if (product.faceType == FaceType.FourDirection)
+            {
+                foreach (AnimDirecton direction in new[]
+                         { AnimDirecton.Up, AnimDirecton.Down, AnimDirecton.Left, AnimDirecton.Right })
+                    yield return (product, (int)direction, product.GetAnimClip(direction));
+            }
+            else
+                yield return (product, (int)AnimDirecton.Fixed, product.GetAnimClip(AnimDirecton.Fixed));
+        }
+    }
+
+    private bool CanReuseWangTileTextures()
+    {
+        if (wangTileSources == null) return false;
+        int index = 0;
+        foreach (var input in GetWangTileInputs())
+            if (index >= wangTileSources.Count || !wangTileSources[index++].Matches(input))
+                return false;
+        if (index != wangTileSources.Count) return false;
+        foreach (int id in wangTileGameTexIds)
+            if (!GameTexAssetForm.DataById.TryGetValue(id, out var texture)
+                || !(texture.asset is Texture asset) || asset == null)
+                return false;
+        return true;
+    }
+
+    private void EnsureWangTileTextures()
+    {
+        if (CanReuseWangTileTextures())
+            return;
+        CreateWangTileTextures();
+        // Capture after generation, which resolves the source assets/animation frames.
+        wangTileSources = GetWangTileInputs().Select(input => new WangTileSource(input)).ToList();
+    }
+
+    private sealed class WangTileSource
+    {
+        private readonly object owner;
+        private readonly int slot;
+        private readonly (int id, TexAssetForm.Data data, object asset, IReadOnlyList<AnimatedFrameData> animation)[] frames;
+
+        internal WangTileSource((object owner, int slot, List<int> textures) input)
+        {
+            owner = input.owner;
+            slot = input.slot;
+            frames = new (int, TexAssetForm.Data, object, IReadOnlyList<AnimatedFrameData>)[input.textures?.Count ?? 0];
+            for (int i = 0; i < frames.Length; i++)
+            {
+                int id = input.textures[i];
+                TexAssetForm.DataById.TryGetValue(id, out var data);
+                frames[i] = (id, data, data?.asset, data?.GetAnimationFrames());
+            }
+        }
+
+        internal bool Matches((object owner, int slot, List<int> textures) input)
+        {
+            if (!ReferenceEquals(owner, input.owner) || slot != input.slot
+                || frames.Length != (input.textures?.Count ?? 0)) return false;
+            for (int i = 0; i < frames.Length; i++)
+            {
+                var frame = frames[i];
+                if (frame.id != input.textures[i]) return false;
+                TexAssetForm.DataById.TryGetValue(frame.id, out var data);
+                if (!ReferenceEquals(frame.data, data) || !ReferenceEquals(frame.asset, data?.asset)
+                    || !ReferenceEquals(frame.animation, data?.GetAnimationFrames())
+                    || data?.asset is Texture asset && asset == null)
+                    return false;
+            }
+            return true;
+        }
+    }
 
     private void CreateWangTileTextures()
     {
-        DestroyWangTileTextures();
+        foreach (var step in GetWangTileTextureSteps()) step();
+    }
 
+    private IEnumerable<Action> GetWangTileTextureSteps()
+    {
+        yield return DestroyWangTileTextures;
         foreach (MapTextureForm.Data mapTexture in MapTextureForm.DataById.Values)
         {
-            mapTexture.WangTileDic = new Dictionary<int, int>();
-            mapTexture.FrontWangTileDic = new Dictionary<int, int>();
+            yield return () =>
+            {
+                mapTexture.WangTileDic = new Dictionary<int, int>();
+                mapTexture.FrontWangTileDic = new Dictionary<int, int>();
+            };
             if (mapTexture.isWangTile)
-                CreateWangTileTextureVariants(mapTexture, mapTexture.texs, mapTexture.WangTileDic, false);
+                yield return () => CreateWangTileTextureVariants(mapTexture, mapTexture.texs, mapTexture.WangTileDic, false);
             if (mapTexture.enableFrontPart && mapTexture.frontIsWangTile)
-                CreateWangTileTextureVariants(mapTexture, mapTexture.frontPartTexs, mapTexture.FrontWangTileDic, true);
+                yield return () => CreateWangTileTextureVariants(mapTexture, mapTexture.frontPartTexs, mapTexture.FrontWangTileDic, true);
         }
 
         foreach (ObjectProductForm.Data mapObject in ObjectProductForm.DataByUid.Values.Where(data => data.protoUid == 0))
-            CreateObjectWangTileTextures(mapObject);
+            yield return () => CreateObjectWangTileTextures(mapObject);
+    }
+
+    private async Task EnsureWangTileTexturesAsync(LoadingManager loading, string item, string phase)
+    {
+        if (CanReuseWangTileTextures())
+        {
+            loading.RunStep(item, phase, () => { });
+            return;
+        }
+        await loading.RunStepsAsync(item, phase, GetWangTileTextureSteps());
+        // Only publish a complete cache after all variants have been generated.
+        wangTileSources = GetWangTileInputs().Select(input => new WangTileSource(input)).ToList();
     }
 
     private void CreateObjectWangTileTextures(ObjectProductForm.Data mapObject)
@@ -358,8 +464,9 @@ public class Main2StoryManager : Z_MonoManager<Main2StoryManager>
         }
     }
 
-    private void DestroyWangTileTextures()
+    internal void DestroyWangTileTextures()
     {
+        wangTileSources = null;
         GameMapController.ClearWangTileAnimationTextures();
         DestroyGeneratedWangTileTextures(wangTileGameTexIds);
         wangTileGameTexIds.Clear();
@@ -397,6 +504,8 @@ public class Main2StoryManager : Z_MonoManager<Main2StoryManager>
     #endregion
 
     #region scene
+    private static readonly string[] SceneLoadingPhases = { "Prepare prefab pool", "Prepare WangTile cache", "Read/deserialize map", "Initialize map", "Apply map callback" };
+    internal static int SceneLoadingWorkCount => SceneLoadingPhases.Length;
     public async Task StartLoadSceneUgc(int sceneId)
     {
         DynamicGlobalSettings.playing = false;
@@ -421,14 +530,13 @@ public class Main2StoryManager : Z_MonoManager<Main2StoryManager>
     }
     public async void StartLoadScenePlay(int sceneId, Action onMapComplete = null)
     {
+        await LoadingManager.instance.RunAsync("sceneEntry", () => LoadScenePlayAsync(sceneId, onMapComplete));
+    }
+
+    internal async Task LoadScenePlayAsync(int sceneId, Action onMapComplete)
+    {
         DynamicGlobalSettings.playing = true;
-        bool ok = await StartLoadScene(PlayManager.instance.GetStoryCacheFolder(), sceneId, onMapComplete);
-
-
-        foreach (var textureData in MapTextureForm.DataById.Values)
-        {
-
-        }
+        await StartLoadScene(PlayManager.instance.GetStoryCacheFolder(), sceneId, onMapComplete);
         PlayManager.instance.BeginScene(sceneId);
     }
 
@@ -438,40 +546,35 @@ public class Main2StoryManager : Z_MonoManager<Main2StoryManager>
         {
             Debug.LogError(storyFolder + "/" + GetSceneFileNameById(id) + " scene file not exist");
         }
-        GameManager.instance.curScene = SceneForm.DataByUid[id];
-
-        GameManager.instance.saveCtrl.ResetPrefabPool();
-
-        CreateWangTileTextures();
-        LoadingManager.instance.AddLoadItem("scene");
+        var loading = LoadingManager.instance;
+        var phases = SceneLoadingPhases;
+        var wangTileProducts = ObjectProductForm.DataByUid.Values
+            .Where(product => product.protoUid == 0 && (product.boundsCollision || !product.centerCollider))
+            .ToList();
+        loading.AddLoadItem("scene", phases.Length);
+        loading.AddWork("scene", wangTileProducts.Count);
         try
         {
-            LoadingManager.instance.SetProgress("scene", 0.05f);
-            MapInfo data = await Task.Run(() =>
-            {
-                return GameManager.instance.saveCtrl.LoadSceneMap(storyFolder + "/" + GetSceneFileNameById(id));
-            });
-            LoadingManager.instance.SetProgress("scene", 0.4f);
+            loading.SetPhase("scene", "Preparing scene");
+            GameManager.instance.curScene = SceneForm.DataByUid[id];
+            await loading.RunStepsAsync("scene", phases[0], GameManager.instance.saveCtrl.GetPrefabPoolSteps());
+            await EnsureWangTileTexturesAsync(loading, "scene", phases[1]);
+            MapInfo data = await loading.RunStepAsync("scene", phases[2], () => Task.Run(() =>
+                GameManager.instance.saveCtrl.LoadSceneMap(storyFolder + "/" + GetSceneFileNameById(id))));
 
             data.mainData.viewSize = new Vector3Int((int)(InputManager.instance.screenWorldSize.x / 2) + 4 + 1, 5, (int)(InputManager.instance.screenWorldSize.y / 2) + 4 + 1);
 
-            MapManager.instance.Begin(data);
-            LoadingManager.instance.SetProgress("scene", 0.6f);
+            loading.RunStep("scene", phases[3], () => MapManager.instance.Begin(data));
+            await loading.WaitForRenderAsync();
             // All visual candidate columns must exist before resolving WangTile
             // collision masks, including off-screen Objects loaded from the save.
-            // 这一段按 Object 数量推进 0.6 -> 0.95 的进度。
-            var wangTileProducts = ObjectProductForm.DataByUid.Values
-                .Where(product => product.protoUid == 0 && (product.boundsCollision || !product.centerCollider))
-                .ToList();
+            loading.SetPhase("scene", "Refresh Object appearances");
             for (int i = 0; i < wangTileProducts.Count; i++)
             {
                 GameManager.instance.mapCtrl.RefreshObjectWangTileAppearances(wangTileProducts[i].uid);
-                if ((i & 7) == 0 || i == wangTileProducts.Count - 1)
-                    LoadingManager.instance.SetProgress("scene", 0.6f + 0.35f * (i + 1) / wangTileProducts.Count);
+                loading.Advance("scene");
             }
-            LoadingManager.instance.SetProgress("scene", 0.95f);
-            onMapComplete?.Invoke();
-            LoadingManager.instance.SetProgress("scene", 1f);
+            loading.RunStep("scene", phases[4], () => onMapComplete?.Invoke());
 
             return true;
         }
@@ -487,7 +590,6 @@ public class Main2StoryManager : Z_MonoManager<Main2StoryManager>
     }
     public void UnloadScenePlay()
     {
-
         GameManager.instance.saveCtrl.SaveSceneMap(PlayManager.instance.GetSceneCacheFileName());
         UnloadScene();
         PlayManager.instance.EndScene();
@@ -497,13 +599,31 @@ public class Main2StoryManager : Z_MonoManager<Main2StoryManager>
         GameManager.instance.mapCtrl.Reset();
         GameManager.instance.characterCtrl.Reset();
         GameManager.instance.curScene = null;
-        DestroyWangTileTextures();
     }
-    public void ChangeScene(int sceneId, Action oncomplete = null)
+    public async void ChangeScene(int sceneId, Action oncomplete = null)
     {
-        UnloadScenePlay();
+        await ChangeSceneAsync(sceneId, oncomplete);
+    }
 
-        StartLoadScenePlay(sceneId, oncomplete);
+    private async Task ChangeSceneAsync(int sceneId, Action oncomplete)
+    {
+        if (changingScene) return;
+        changingScene = true;
+        PlayManager.instance.enable = false;
+        LoadingManager.instance.AddLoadItem("sceneExit", 1);
+        try
+        {
+            await LoadingManager.instance.RunAsync("sceneTransition", async () =>
+            {
+                LoadingManager.instance.RunStep("sceneExit", "Save/unload previous scene", UnloadScenePlay);
+                await LoadScenePlayAsync(sceneId, oncomplete);
+            });
+        }
+        finally
+        {
+            LoadingManager.instance.RemoveLoadItem("sceneExit");
+            changingScene = false;
+        }
     }
     #endregion
 

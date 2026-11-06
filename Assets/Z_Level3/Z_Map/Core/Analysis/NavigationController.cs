@@ -42,7 +42,7 @@ namespace Z_Map.Analysis
             IReadOnlyCollection<int> passTypes, NavigationEndpointState endpointState = null);
     }
 
-    /// <summary>每个角色独立保存搜索进度、已完成路点与端点直线段。</summary>
+    /// <summary>每个角色独立保存搜索进度、完整已完成路线与端点直线段。</summary>
     public sealed class NavigationEndpointState
     {
         internal NavigationController controller;
@@ -139,6 +139,8 @@ namespace Z_Map.Analysis
 
         public NavigationController(MapManager super) : base(super)
         { }
+        internal float MaxRouteMoveStep => Mathf.Max(0.0001f,
+            Mathf.Min(Mathf.Abs(_super.data.mainData.mapUnitSize.x), Mathf.Abs(_super.data.mainData.mapUnitSize.z)) * 0.5f);
         NaviComponent bfs;
         public Dictionary<(int, int, int), NavUnit> navUnits;
         // Membership edits retire cross-frame enumerators. Unchanged periodic

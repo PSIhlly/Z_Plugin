@@ -15,6 +15,10 @@ using Z_Ui.Notify;
 
 namespace Ui.ModAssetSelectWindow
 {
+    public partial class UiModAssetSelectWindowParam
+    {
+        public int? selectedAssetId;
+    }
     public partial class UiModAssetSelectAudioWindowParam : UiModAssetSelectWindowParam
     {
         public Action<AudioAssetForm.Data> onComplete;
@@ -34,6 +38,8 @@ namespace Ui.ModAssetSelectWindow
         public AssetForm.Data sel;
         public int? curLabId;
         public bool labTabInitialized;
+        public int? pendingFocusAssetId;
+        public bool retryInitialFocus;
     }
     public partial class UiModAssetSelectWindowCtrl : IZ_Listener<AssetEvent>
     {
@@ -110,10 +116,16 @@ namespace Ui.ModAssetSelectWindow
         public override void OnShow()
         {
             StopPreviewAudio();
+            InitializeSelection(param);
+            Refresh();
+        }
+
+        void InitializeSelection(UiModAssetSelectWindowParam nextParam)
+        {
             var previousPrm = model.prm;
             var preserveLabTab = model.labTabInitialized &&
-                                  GetLabScope(previousPrm) == GetLabScope(param);
-            model.prm = param;
+                                  GetLabScope(previousPrm) == GetLabScope(nextParam);
+            model.prm = nextParam;
             if (!preserveLabTab)
             {
                 model.curLabId = HasVisibleUnclassified() ? LabForm.NoneId : (int?)null;
@@ -124,12 +136,52 @@ namespace Ui.ModAssetSelectWindow
                 model.curLabId = NormalizeLabSelection(model.curLabId);
             }
 
-            model.sel = null;
+            model.sel = ResolveInitialSelection(nextParam);
+            if (model.sel != null)
+            {
+                // Keep a valid concrete tab, but do not leave an invisible tab
+                // selected for orphaned/hidden legacy Lab IDs. All still retains
+                // the explicit asset selection and can bring it straight into view.
+                model.curLabId = model.sel.labId == LabForm.NoneId || GetVisibleLabIds().Contains(model.sel.labId)
+                    ? model.sel.labId : (int?)null;
+            }
+            model.pendingFocusAssetId = model.sel?.id;
+            model.retryInitialFocus = model.sel != null;
+        }
+
+        static AssetForm.Data ResolveInitialSelection(UiModAssetSelectWindowParam prm)
+        {
+            if (prm?.selectedAssetId is not int id || id <= 0)
+                return null;
+            if (prm is UiModAssetSelectTexWindowParam)
+                return StoryTexAssetForm.DataById.TryGetValue(id, out var texture) ? texture : null;
+            if (prm is UiModAssetSelectAudioWindowParam)
+                return AudioAssetForm.DataById.TryGetValue(id, out var audio) ? audio : null;
+            if (prm is UiModAssetSelectVideoWindowParam)
+                return VideoAssetForm.DataById.TryGetValue(id, out var video) ? video : null;
+            return null;
+        }
+
+        public override void OnUpdate()
+        {
+            // A first-show layout may not have a usable viewport yet. Retry once
+            // after activation; normal refreshes and manual scrolling never focus.
+            if (!model.retryInitialFocus || !model.pendingFocusAssetId.HasValue)
+                return;
+            model.retryInitialFocus = false;
             Refresh();
+            ClearPendingInitialFocus();
+        }
+
+        public void ClearPendingInitialFocus()
+        {
+            model.pendingFocusAssetId = null;
+            model.retryInitialFocus = false;
         }
 
         public override void OnHide()
         {
+            ClearPendingInitialFocus();
             StopPreviewAudio();
         }
 
@@ -165,8 +217,8 @@ namespace Ui.ModAssetSelectWindow
         }
         public void Refresh()
         {
-            RefreshLabs();
-            RefreshItems();
+            bool labsFocused = RefreshLabs();
+            bool itemsFocused = RefreshItems();
             view.sta_selected.ChangeState(model.sel != null ? 1 : 0);
             view.sta_setLabel.ChangeState(0);
             view.ipt_name.Set(model.sel!=null ? model.sel.name : "");
@@ -174,6 +226,13 @@ namespace Ui.ModAssetSelectWindow
             view.ipt_labelName.gameObject.SetActive(canEditLab);
             view.btn_labelDelete.gameObject.SetActive(canEditLab);
             view.ipt_labelName.Set(canEditLab ? LabForm.GetDisplayName(model.curLabId.Value) : "");
+            CompleteInitialFocus(labsFocused, itemsFocused);
+        }
+
+        void CompleteInitialFocus(bool labsFocused, bool itemsFocused)
+        {
+            if (labsFocused && itemsFocused)
+                ClearPendingInitialFocus();
         }
 
         bool TryGetCurrentLab(out LabForm.Data lab)
@@ -252,22 +311,29 @@ namespace Ui.ModAssetSelectWindow
             Refresh();
         }
 
-        void RefreshLabs()
+        bool RefreshLabs()
         {
             labCon.Clear();
             var labIds = GetVisibleLabIds();
             var hasUnclassified = HasVisibleUnclassified();
             if (model.curLabId == LabForm.NoneId && !hasUnclassified)
                 model.curLabId = null;
+            int focusIndex = model.curLabId.HasValue ? -1 : 0;
             labCon.Add(new UiLabParam() { labId = null });
             if (hasUnclassified)
+            {
+                if (model.curLabId == LabForm.NoneId) focusIndex = labCon.paramLst.Count;
                 labCon.Add(new UiLabParam() { labId = LabForm.NoneId });
+            }
             foreach (var labId in labIds.OrderBy(id => id))
             {
+                if (model.curLabId == labId) focusIndex = labCon.paramLst.Count;
                 labCon.Add(new UiLabParam() { labId = labId });
             }
             labCon.Add(new UiLabParam() { isNew = true });
             labCon.Refresh();
+            return !model.pendingFocusAssetId.HasValue ||
+                (focusIndex >= 0 && view.scr_labs.ScrollToIndex(focusIndex));
         }
 
         HashSet<int> GetVisibleLabIds()
@@ -299,15 +365,17 @@ namespace Ui.ModAssetSelectWindow
                 return VideoAssetForm.DataById.Values.Any(data => data.labId == LabForm.NoneId);
             return false;
         }
-        void RefreshItems()
+        bool RefreshItems()
         {
             itemCon.Clear();
+            int focusIndex = -1;
             if (model.prm is UiModAssetSelectTexWindowParam)
             {
                 foreach (var data in StoryTexAssetForm.DataById.Values.OrderBy(d => d.id))
                 {
                     if (!model.curLabId.HasValue || data.labId == model.curLabId.Value)
                     {
+                        if (model.pendingFocusAssetId == data.id) focusIndex = itemCon.paramLst.Count;
                         itemCon.Add(new UiItemParam()
                         {
                             data = data
@@ -321,6 +389,7 @@ namespace Ui.ModAssetSelectWindow
                 {
                     if (!model.curLabId.HasValue || data.labId == model.curLabId.Value)
                     {
+                        if (model.pendingFocusAssetId == data.id) focusIndex = itemCon.paramLst.Count;
                         itemCon.Add(new UiItemParam()
                         {
                             data = data
@@ -334,6 +403,7 @@ namespace Ui.ModAssetSelectWindow
                 {
                     if (!model.curLabId.HasValue || data.labId == model.curLabId.Value)
                     {
+                        if (model.pendingFocusAssetId == data.id) focusIndex = itemCon.paramLst.Count;
                         itemCon.Add(new UiItemParam()
                         {
                             data = data
@@ -346,9 +416,11 @@ namespace Ui.ModAssetSelectWindow
                 data = null
             });
             itemCon.Refresh();
+            return !model.pendingFocusAssetId.HasValue || focusIndex < 0 || view.scr_items.ScrollToIndex(focusIndex);
         }
         public void SetCurLab(int? labId)
         {
+            ClearPendingInitialFocus();
             model.curLabId = labId;
             model.labTabInitialized = true;
             model.sel = null;
@@ -573,6 +645,7 @@ namespace Ui.ModAssetSelectWindow
             });
             view.btn_.onClick.AddListener(() =>
             {
+                parent.ClearPendingInitialFocus();
                 if (parent.model.sel == model.prm.data)
                 {
                     parent.model.sel = null;

@@ -154,6 +154,51 @@ namespace Z_Ui.Base
             UpdateInfo(normalizedPosition);
         }
 
+        /// <summary>Bring one virtualized row/cell into view without creating offscreen items.</summary>
+        public bool ScrollToIndex(int index)
+        {
+            if (!inited || index < 0 || index >= cnt || content == null || viewport == null || cell == null)
+                return false;
+            Rect viewportRect = GetViewportRectInContentSpace();
+            Vector2 cellSize = GetCellSizeInContentSpace();
+            if (viewportRect.width <= 0 || viewportRect.height <= 0 || cellSize.x <= 0 || cellSize.y <= 0)
+                return false;
+
+            int rows = GetRowCount(viewportRect.height, cellSize.y);
+            int columns = GetColumnCount(viewportRect.width, cellSize.x);
+            Rect contentRect = content.rect;
+            Vector3 offset = offsets != null && index < offsets.Count ? offsets[index] : Vector3.zero;
+            StopMovement();
+            if (dir == Direction.Vertical)
+            {
+                int row = index / columns;
+                float cellTop = contentRect.yMax - top - row * (cellSize.y + ySpacing) + offset.y;
+                float cellBottom = cellTop - cellSize.y;
+                float delta = cellSize.y > viewportRect.height || cellTop > viewportRect.yMax
+                    ? cellTop - viewportRect.yMax
+                    : cellBottom < viewportRect.yMin ? cellBottom - viewportRect.yMin : 0f;
+                float hidden = contentRect.height - viewportRect.height;
+                if (hidden > .0001f && delta != 0f)
+                    verticalNormalizedPosition = Mathf.Clamp01(verticalNormalizedPosition + delta / hidden);
+            }
+            else
+            {
+                int column = index / rows;
+                float cellLeft = contentRect.xMin + left + column * (cellSize.x + xSpacing) + offset.x;
+                float cellRight = cellLeft + cellSize.x;
+                float delta = cellSize.x > viewportRect.width || cellLeft < viewportRect.xMin
+                    ? cellLeft - viewportRect.xMin
+                    : cellRight > viewportRect.xMax ? cellRight - viewportRect.xMax : 0f;
+                float hidden = contentRect.width - viewportRect.width;
+                if (hidden > .0001f && delta != 0f)
+                    horizontalNormalizedPosition = Mathf.Clamp01(horizontalNormalizedPosition + delta / hidden);
+            }
+            // ScrollRect may dispatch onValueChanged only in LateUpdate. Materialize
+            // the target immediately, including calls before its first Start.
+            UpdateInfo(normalizedPosition);
+            return true;
+        }
+
         void UpdateInfo(Vector2 pos)
         {
             if (!inited)

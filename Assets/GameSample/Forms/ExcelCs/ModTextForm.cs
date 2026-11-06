@@ -893,6 +893,8 @@ namespace Form
 
                 {1000381,new Data(1000381,"SetCurrentCharacter","Set current character","切换为当前角色")},
 
+                {1000382,new Data(1000382,"onGlobalVarChangeEvent","On global variable change event","全局变量变化事件")},
+
                 };
                 _DatasHashSet=new HashSet<Data>();
                 
@@ -1637,6 +1639,8 @@ namespace Form
                         {"UndeployCharacter",_DataById[1000380]},
     
                         {"SetCurrentCharacter",_DataById[1000381]},
+    
+                        {"onGlobalVarChangeEvent",_DataById[1000382]},
     
                     
                     };

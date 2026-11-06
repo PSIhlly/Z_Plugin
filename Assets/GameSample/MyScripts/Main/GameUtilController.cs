@@ -54,8 +54,9 @@ public class GameUtilController : Z_Controller<GameManager>
     public GameObject CombineNewObjectByPrefabs(string name, ObjectProductForm.Data product, bool forGame,
         AnimDirecton? previewDirection = null)
     {
+        var direction = previewDirection ?? product.GetDefaultAnimDirection();
         var boundsTextures = product.boundsCollision && !forGame
-            ? product.GetAnimClip(previewDirection ?? product.GetDefaultAnimDirection()) : null;
+            ? product.GetAnimClip(direction) : null;
         // Pool first parts retain a full baseline. Each unit fits only its active
         // facing (and assembled WangTile mask), never the union of other facings.
         Rect? firstPartBounds = product.boundsCollision
@@ -65,12 +66,13 @@ public class GameUtilController : Z_Controller<GameManager>
             : (Rect?)null;
         return CombineNewObjectByPrefabs(name, product.model, forGame,
             boundsCollision: product.boundsCollision, firstPartBoundsTextures: boundsTextures,
-            firstPartBounds: firstPartBounds, centerCollider: product.centerCollider);
+            firstPartBounds: firstPartBounds, centerCollider: product.centerCollider,
+            firstPartPosition: product.GetModelPosition(direction), firstPartScale: product.GetModelSize(direction));
     }
 
     public GameObject CombineNewObjectByPrefabs(string name, MapModelForm.Data model, bool forGame, bool isItem = false,
         bool boundsCollision = false, List<int> firstPartBoundsTextures = null, Rect? firstPartBounds = null,
-        bool centerCollider = true)
+        bool centerCollider = true, Vector3? firstPartPosition = null, Vector3? firstPartScale = null)
     {
         if (model == null)
             return new GameObject(name);
@@ -87,21 +89,27 @@ public class GameUtilController : Z_Controller<GameManager>
                           model.subUnitTexsName[i] != null && model.subUnitTexsName[i].Count > 0
                 ? model.subUnitTexsName[i][0]
                 : GlobalDefaultHelper.DefaultTexId);
-            poss.Add(model.subPrefabUnitPos != null && i < model.subPrefabUnitPos.Count
+            poss.Add(i == 0 && firstPartPosition.HasValue ? firstPartPosition.Value
+                : model.subPrefabUnitPos != null && i < model.subPrefabUnitPos.Count
                 ? model.subPrefabUnitPos[i]
                 : Vector3.zero);
-            scales.Add(model.subPrefabUnitScale != null && i < model.subPrefabUnitScale.Count
+            scales.Add(i == 0 && firstPartScale.HasValue ? firstPartScale.Value
+                : model.subPrefabUnitScale != null && i < model.subPrefabUnitScale.Count
                 ? model.subPrefabUnitScale[i]
                 : Vector3.one);
         }
-        var res = CombineNewGoByPrefabs(name, prefabKeys, texRealId, poss, scales, showShadow);
+        var res = CombineNewGoByPrefabs(name, prefabKeys, texRealId, poss, scales, showShadow,
+            firstPartScale.HasValue);
+        // Mod clicks use the model's Trigger colliders. Item gameplay collision
+        // often has scale zero, so restore the picking footprint before pooling.
+        float colliderScale = forGame && isItem && !DynamicGlobalSettings.playing ? 1f : model.colliderScale;
         foreach (var col in res.GetComponentsInChildren<BoxCollider>())
         {
-            col.transform.localScale = new Vector3(model.colliderScale, 1, model.colliderScale);
+            col.transform.localScale = new Vector3(colliderScale, 1, colliderScale);
         }
         foreach (var col in res.GetComponentsInChildren<SphereCollider>())
         {
-            col.transform.localScale = new Vector3(model.colliderScale, model.colliderScale, model.colliderScale);
+            col.transform.localScale = new Vector3(colliderScale, colliderScale, colliderScale);
         }
         if (boundsCollision)
         {
@@ -206,7 +214,7 @@ public class GameUtilController : Z_Controller<GameManager>
     }
 
     internal static void ApplyFirstPartCollisionBounds(GameObject instance, GameObject prefab, Rect bounds, float colliderScale,
-        bool centerCollider = true)
+        bool centerCollider = true, Vector3? firstPartPosition = null, Vector3? firstPartScale = null)
     {
         if (instance.transform.childCount == 0 || prefab.transform.childCount == 0)
             return;
@@ -220,19 +228,42 @@ public class GameUtilController : Z_Controller<GameManager>
             targetColliders[i].transform.localPosition = sourceColliders[i].transform.localPosition;
             targetColliders[i].transform.localScale = sourceColliders[i].transform.localScale;
         }
+        Transform firstPart = instance.transform.GetChild(0);
+        if (firstPartPosition.HasValue) firstPart.localPosition = firstPartPosition.Value + Vector3.up * .5f;
+        if (firstPartScale.HasValue) firstPart.localScale = firstPartScale.Value;
         var sources = prefab.transform.GetChild(0).GetComponentsInChildren<BoxCollider>(true).Where(c => c.enabled).ToArray();
         var targets = instance.transform.GetChild(0).GetComponentsInChildren<BoxCollider>(true).Where(c => c.enabled).ToArray();
         for (int i = 0; i < sources.Length && i < targets.Length; i++)
         {
-            MapUtilController.GetHorizontalBoundsBox(sources[i], bounds, colliderScale, out var size, out var center);
+            Vector3? ratio = firstPartScale.HasValue
+                ? MapUtilController.GetFirstPartScaleRatio(prefab, sources[i], firstPartScale.Value) : (Vector3?)null;
+            MapUtilController.GetHorizontalBoundsBox(sources[i], bounds, colliderScale, out var size, out var center, ratio,
+                firstPartScale);
             targets[i].transform.localScale = sources[i].transform.localScale;
+            if (targets[i].transform == firstPart && firstPartScale.HasValue)
+                firstPart.localScale = firstPartScale.Value;
             targets[i].size = size;
             targets[i].center = center;
+        }
+        var sourceSpheres = prefab.transform.GetChild(0).GetComponentsInChildren<SphereCollider>(true).Where(c => c.enabled).ToArray();
+        var targetSpheres = firstPart.GetComponentsInChildren<SphereCollider>(true).Where(c => c.enabled).ToArray();
+        for (int i = 0; i < sourceSpheres.Length && i < targetSpheres.Length; i++)
+        {
+            targetSpheres[i].radius = sourceSpheres[i].radius;
+            targetSpheres[i].center = sourceSpheres[i].center;
+            var recipe = firstPartScale.HasValue ? sourceSpheres[i].GetComponent<MapModelColliderGeometry>() : null;
+            if (recipe != null && recipe.TryGet(sourceSpheres[i],
+                    MapUtilController.GetFirstPartScaleRatio(prefab, sourceSpheres[i], firstPartScale.Value),
+                    out _, out var size, out var center, firstPartScale))
+            {
+                targetSpheres[i].radius = size.x * .5f;
+                targetSpheres[i].center = center;
+            }
         }
         if (!centerCollider)
         {
             Vector3 offset = MapManager.instance.utilCtrl.GetObjectBackColliderOffset(prefab, bounds, colliderScale,
-                instance.transform.lossyScale);
+                instance.transform.lossyScale, firstPartPosition, firstPartScale);
             var shifted = new HashSet<Transform>();
             foreach (var collider in targetColliders)
                 shifted.Add(collider.transform);
@@ -336,6 +367,7 @@ public class GameUtilController : Z_Controller<GameManager>
                 fitted.isTrigger = sphere.isTrigger;
                 fitted.sharedMaterial = sphere.sharedMaterial;
                 fitted.contactOffset = sphere.contactOffset;
+                sphere.GetComponent<MapModelColliderGeometry>()?.Replace(sphere, fitted);
                 sphere.enabled = false;
                 if (Application.isPlaying)
                     UnityEngine.Object.Destroy(sphere);
@@ -345,7 +377,8 @@ public class GameUtilController : Z_Controller<GameManager>
         }
     }
 
-    private GameObject CombineNewGoByPrefabs(string name, List<int> prefabKeys, List<int> texRealId, List<Vector3> poss, List<Vector3> scales, List<bool> showShadow)
+    private GameObject CombineNewGoByPrefabs(string name, List<int> prefabKeys, List<int> texRealId, List<Vector3> poss,
+        List<Vector3> scales, List<bool> showShadow, bool directionGeometry = false)
     {
         var res = new GameObject(name);
         for (int i = 0; i < prefabKeys.Count; i++)
@@ -390,9 +423,15 @@ public class GameUtilController : Z_Controller<GameManager>
                 if (com is BoxCollider box)
                 {
                     var trigger = com.gameObject.AddComponent<BoxCollider>();
-                    trigger.size = box.size + Graph.ElementwiseDivide(Vector3.one * 0.1f, scale);
+                    trigger.size = box.size + (directionGeometry && i == 0
+                        ? new Vector3(MapModelColliderGeometry.Padding(scale.x), MapModelColliderGeometry.Padding(scale.y),
+                            MapModelColliderGeometry.Padding(scale.z))
+                        : Graph.ElementwiseDivide(Vector3.one * 0.1f, scale));
                     trigger.center = box.center;
                     trigger.isTrigger = true;
+                    var geometry = com.GetComponent<MapModelColliderGeometry>()
+                        ?? com.gameObject.AddComponent<MapModelColliderGeometry>();
+                    geometry.Add(box, trigger, scale, go.transform);
                 }
                 else if (com is SphereCollider sphere)
                 {
@@ -400,6 +439,9 @@ public class GameUtilController : Z_Controller<GameManager>
                     trigger.radius = sphere.radius + 0.1f * Mathf.Max(scale.x, scale.y, scale.z);
                     trigger.center = sphere.center;
                     trigger.isTrigger = true;
+                    var geometry = com.GetComponent<MapModelColliderGeometry>()
+                        ?? com.gameObject.AddComponent<MapModelColliderGeometry>();
+                    geometry.Add(sphere, trigger, scale, go.transform);
                 }
             }
         }

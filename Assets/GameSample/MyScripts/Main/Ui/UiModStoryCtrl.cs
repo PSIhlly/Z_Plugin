@@ -49,7 +49,8 @@ namespace Ui.ModStory
 
                 int curId = GameManager.instance.curStory.id;
                 model.startingTest = true;
-                LoadingManager.instance.AddLoadItem(TestLoadingItem);
+                string[] testPhases = { "Save authored Story", "Unload Mod Story", "Start Play Story" };
+                LoadingManager.instance.AddLoadItem(TestLoadingItem, testPhases.Length);
 
                 // Let the loading UI finish one render before starting the
                 // synchronous save/unload work that can stall the main thread.
@@ -59,14 +60,10 @@ namespace Ui.ModStory
                     {
                         try
                         {
-                            LoadingManager.instance.SetProgress(TestLoadingItem, 0.1f);
-                            GameManager.instance.saveCtrl.SaveCoreStory(curId);
-                            LoadingManager.instance.SetProgress(TestLoadingItem, 0.4f);
+                            LoadingManager.instance.RunStep(TestLoadingItem, testPhases[0], () => GameManager.instance.saveCtrl.SaveCoreStory(curId));
                             Close();
-                            Main2StoryManager.instance.UnloadStoryUgc();
-                            LoadingManager.instance.SetProgress(TestLoadingItem, 0.6f);
-                            Main2StoryManager.instance.StartLoadStoryPlay(curId, true);
-                            LoadingManager.instance.SetProgress(TestLoadingItem, 1f);
+                            LoadingManager.instance.RunStep(TestLoadingItem, testPhases[1], Main2StoryManager.instance.UnloadStoryUgc);
+                            LoadingManager.instance.RunStep(TestLoadingItem, testPhases[2], () => Main2StoryManager.instance.StartLoadStoryPlay(curId, true));
                         }
                         finally
                         {
@@ -204,13 +201,28 @@ namespace Ui.ModStory
             {
                 await LoadingManager.instance.RunAsync("modExport", async () =>
                 {
-                    var success = await AssetFilePicker.ExportModPackageAsync(
-                        () => GameManager.instance.saveCtrl.PackageAsync(story.id, cancellation.Token),
-                        story.name, TextManager.instance.GetTxt("outPut"), cancellation.Token);
-                    if (success && active && version == model.exportVersion)
+                    var loading = LoadingManager.instance;
+                    string work = "modExportWork:" + Guid.NewGuid().ToString("N");
+                    string[] phases = { "Build package", "Write package file" };
+                    loading.AddLoadItem(work, phases.Length);
+                    loading.SetPhase(work, "Select export destination");
+                    try
                     {
-                        NotifyManager.instance.AddTip(TextManager.instance.GetTxt("save success"));
+                        var success = await AssetFilePicker.ExportModPackageAsync(
+                            async () =>
+                            {
+                                var bytes = await loading.RunStepAsync(work, phases[0], report => GameManager.instance.saveCtrl.PackageAsync(story.id, cancellation.Token, report));
+                                loading.SetPhase(work, phases[1]);
+                                return bytes;
+                            },
+                            story.name, TextManager.instance.GetTxt("outPut"), cancellation.Token);
+                        if (success) loading.Advance(work);
+                        if (success && active && version == model.exportVersion)
+                        {
+                            NotifyManager.instance.AddTip(TextManager.instance.GetTxt("save success"));
+                        }
                     }
+                    finally { loading.RemoveLoadItem(work); }
                 }, cancellation.Token);
             }
             catch (OperationCanceledException)

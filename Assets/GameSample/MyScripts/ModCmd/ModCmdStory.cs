@@ -52,6 +52,13 @@ public partial class ModCmd
         form.key.SetValue(data, -1);
         form.name.SetValue(data, name);
         form.protoUid?.SetValue(data, 0);
+        if (data is ObjectProductForm.Data sceneObject)
+        {
+            // New Objects use a full-size Collider without changing the shared
+            // MapModel default, existing Products, Copy or Set behavior.
+            sceneObject.model = sceneObject.model?.Copy() ?? MapModelForm.defaultData;
+            sceneObject.model.colliderScale = 1f;
+        }
         if (data is EffectForm.Data effect)
         {
             // The generated default has null clips, while the Effect editor

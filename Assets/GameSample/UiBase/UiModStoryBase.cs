@@ -103,8 +103,9 @@ namespace ModStoryCharacterParameter
             public Btn btn_new;
             public Btn btn_delete;
             public Ipt ipt_name;
-            public Ipt ipt_value;
+            public Btn btn_value;
             public Dp dp_;
+            public Txt txt_value;
         public UiArgView(UiHolder uiHolder):base(uiHolder)
         {
 
@@ -113,8 +114,9 @@ namespace ModStoryCharacterParameter
             btn_new = uiHolder.elementTrsLst[2].GetComponent<Btn>();
             btn_delete = uiHolder.elementTrsLst[3].GetComponent<Btn>();
             ipt_name = uiHolder.elementTrsLst[4].GetComponent<Ipt>();
-            ipt_value = uiHolder.elementTrsLst[5].GetComponent<Ipt>();
+            btn_value = uiHolder.elementTrsLst[5].GetComponent<Btn>();
             dp_ = uiHolder.elementTrsLst[6].GetComponent<Dp>();
+            txt_value = uiHolder.elementTrsLst[7].GetComponent<Txt>();
         }
 
     }
@@ -219,8 +221,9 @@ namespace ModStoryItemParameter
             public Btn btn_new;
             public Btn btn_delete;
             public Ipt ipt_name;
-            public Ipt ipt_value;
+            public Btn btn_value;
             public Dp dp_;
+            public Txt txt_value;
         public UiArgView(UiHolder uiHolder):base(uiHolder)
         {
 
@@ -229,8 +232,9 @@ namespace ModStoryItemParameter
             btn_new = uiHolder.elementTrsLst[2].GetComponent<Btn>();
             btn_delete = uiHolder.elementTrsLst[3].GetComponent<Btn>();
             ipt_name = uiHolder.elementTrsLst[4].GetComponent<Ipt>();
-            ipt_value = uiHolder.elementTrsLst[5].GetComponent<Ipt>();
+            btn_value = uiHolder.elementTrsLst[5].GetComponent<Btn>();
             dp_ = uiHolder.elementTrsLst[6].GetComponent<Dp>();
+            txt_value = uiHolder.elementTrsLst[7].GetComponent<Txt>();
         }
 
     }
@@ -335,8 +339,9 @@ namespace ModStorySceneObjectParameter
             public Btn btn_new;
             public Btn btn_delete;
             public Ipt ipt_name;
-            public Ipt ipt_value;
+            public Btn btn_value;
             public Dp dp_;
+            public Txt txt_value;
         public UiArgView(UiHolder uiHolder):base(uiHolder)
         {
 
@@ -345,8 +350,9 @@ namespace ModStorySceneObjectParameter
             btn_new = uiHolder.elementTrsLst[2].GetComponent<Btn>();
             btn_delete = uiHolder.elementTrsLst[3].GetComponent<Btn>();
             ipt_name = uiHolder.elementTrsLst[4].GetComponent<Ipt>();
-            ipt_value = uiHolder.elementTrsLst[5].GetComponent<Ipt>();
+            btn_value = uiHolder.elementTrsLst[5].GetComponent<Btn>();
             dp_ = uiHolder.elementTrsLst[6].GetComponent<Dp>();
+            txt_value = uiHolder.elementTrsLst[7].GetComponent<Txt>();
         }
 
     }
@@ -451,8 +457,9 @@ namespace ModStorySkillParameter
             public Btn btn_new;
             public Btn btn_delete;
             public Ipt ipt_name;
-            public Ipt ipt_value;
+            public Btn btn_value;
             public Dp dp_;
+            public Txt txt_value;
         public UiArgView(UiHolder uiHolder):base(uiHolder)
         {
 
@@ -461,8 +468,9 @@ namespace ModStorySkillParameter
             btn_new = uiHolder.elementTrsLst[2].GetComponent<Btn>();
             btn_delete = uiHolder.elementTrsLst[3].GetComponent<Btn>();
             ipt_name = uiHolder.elementTrsLst[4].GetComponent<Ipt>();
-            ipt_value = uiHolder.elementTrsLst[5].GetComponent<Ipt>();
+            btn_value = uiHolder.elementTrsLst[5].GetComponent<Btn>();
             dp_ = uiHolder.elementTrsLst[6].GetComponent<Dp>();
+            txt_value = uiHolder.elementTrsLst[7].GetComponent<Txt>();
         }
 
     }
@@ -6081,6 +6089,122 @@ namespace ModStoryEventCustom
     }
 }
 
+namespace ModStoryGlobalVar
+
+{
+
+
+
+
+
+
+
+    public partial class UiArgParam:UiParam
+    {
+    }
+
+    public partial class UiArgView:UiView
+    {
+
+            public GameObject go_arg;
+            public Sta sta_exist;
+            public Btn btn_new;
+            public Btn btn_delete;
+            public Ipt ipt_name;
+            public Btn btn_value;
+            public Txt txt_value;
+        public UiArgView(UiHolder uiHolder):base(uiHolder)
+        {
+
+            go_arg = uiHolder.elementTrsLst[0].gameObject;
+            sta_exist = uiHolder.elementTrsLst[1].GetComponent<Sta>();
+            btn_new = uiHolder.elementTrsLst[2].GetComponent<Btn>();
+            btn_delete = uiHolder.elementTrsLst[3].GetComponent<Btn>();
+            ipt_name = uiHolder.elementTrsLst[4].GetComponent<Ipt>();
+            btn_value = uiHolder.elementTrsLst[5].GetComponent<Btn>();
+            txt_value = uiHolder.elementTrsLst[6].GetComponent<Txt>();
+        }
+
+    }
+    public partial class UiArgCtrl:UiCtrl
+    {
+        public UiArgView view;
+        public UiArgModel model;
+        public UiArgParam param;
+        public UiModStoryGlobalVarCtrl parent=>(UiModStoryGlobalVarCtrl)uiHolder.parent.ctrl;
+
+        public override void SetParam(UiParam param)
+        {
+            this.param = (UiArgParam)param;
+        }
+
+        public override void BindHolderRecursively(UiHolder uiHolder)
+        {
+
+            base.BindHolderRecursively(uiHolder);
+
+            view = new UiArgView(uiHolder);
+            model=new UiArgModel();
+
+
+        }
+
+    }
+    public partial class UiArgModel:UiModel
+    {
+        
+    }
+    public partial class UiModStoryGlobalVarParam:UiParam
+    {
+    }
+
+    public partial class UiModStoryGlobalVarView:UiView
+    {
+
+            public ScrView scr_args;
+            public GameObject go_arg;
+            public UiArgCtrl sub_arg;
+        public UiModStoryGlobalVarView(UiHolder uiHolder):base(uiHolder)
+        {
+
+            scr_args = uiHolder.elementTrsLst[0].GetComponent<ScrView>();
+            go_arg = uiHolder.elementTrsLst[1].gameObject;
+            sub_arg = (UiArgCtrl) uiHolder.elementTrsLst[2].GetComponent<UiHolder>().ctrl;
+        }
+
+    }
+    public partial class UiModStoryGlobalVarCtrl:UiCtrl
+    {
+        public UiModStoryGlobalVarView view;
+        public UiModStoryGlobalVarModel model;
+        public UiModStoryGlobalVarParam param;
+        public UiModStoryEventCtrl parent=>(UiModStoryEventCtrl)uiHolder.parent.ctrl;
+
+        public override void SetParam(UiParam param)
+        {
+            this.param = (UiModStoryGlobalVarParam)param;
+        }
+
+        public override void BindHolderRecursively(UiHolder uiHolder)
+        {
+
+            base.BindHolderRecursively(uiHolder);
+
+            view = new UiModStoryGlobalVarView(uiHolder);
+            model=new UiModStoryGlobalVarModel();
+
+
+            view.sub_arg = new UiArgCtrl();
+            view.sub_arg.BindHolderRecursively(uiHolder.subUiHolderLst[0]);
+        }
+
+    }
+    public partial class UiModStoryGlobalVarModel:UiModel
+    {
+        
+    }
+}
+
     public partial class UiModStoryEventParam:UiParam
     {
     }
@@ -6090,15 +6214,21 @@ namespace ModStoryEventCustom
 
             public ScrView scr_labsFixed;
             public ModStoryEventCustom.UiModStoryEventCustomCtrl page_ModStoryEventCustom;
+            public ModStoryGlobalVar.UiModStoryGlobalVarCtrl page_ModStoryGlobalVar;
             public Btn btn_customEvent;
             public Sta sta_customEvent;
+            public Btn btn_globalVar;
+            public Sta sta_globalVar;
         public UiModStoryEventView(UiHolder uiHolder):base(uiHolder)
         {
 
             scr_labsFixed = uiHolder.elementTrsLst[0].GetComponent<ScrView>();
             page_ModStoryEventCustom = (ModStoryEventCustom.UiModStoryEventCustomCtrl) uiHolder.elementTrsLst[1].GetComponent<UiHolder>().ctrl;
-            btn_customEvent = uiHolder.elementTrsLst[2].GetComponent<Btn>();
-            sta_customEvent = uiHolder.elementTrsLst[3].GetComponent<Sta>();
+            page_ModStoryGlobalVar = (ModStoryGlobalVar.UiModStoryGlobalVarCtrl) uiHolder.elementTrsLst[2].GetComponent<UiHolder>().ctrl;
+            btn_customEvent = uiHolder.elementTrsLst[3].GetComponent<Btn>();
+            sta_customEvent = uiHolder.elementTrsLst[4].GetComponent<Sta>();
+            btn_globalVar = uiHolder.elementTrsLst[5].GetComponent<Btn>();
+            sta_globalVar = uiHolder.elementTrsLst[6].GetComponent<Sta>();
         }
 
     }
@@ -6125,6 +6255,8 @@ namespace ModStoryEventCustom
 
             view.page_ModStoryEventCustom = new ModStoryEventCustom.UiModStoryEventCustomCtrl();
             view.page_ModStoryEventCustom.BindHolderRecursively(uiHolder.subUiHolderLst[0]);
+            view.page_ModStoryGlobalVar = new ModStoryGlobalVar.UiModStoryGlobalVarCtrl();
+            view.page_ModStoryGlobalVar.BindHolderRecursively(uiHolder.subUiHolderLst[1]);
         }
 
     }
@@ -6412,6 +6544,7 @@ namespace ModStoryMapSceneUnit
             public UiEventChooseCtrl model_EventChooseLeave;
             public UiEventChooseCtrl model_EventChooseCharacterParamChange;
             public UiEventCustomTriggerCtrl model_EventCustomTriggerCharacterParam;
+            public UiEventCustomTriggerCtrl model_EventCustomTriggerGlobalVar;
             public UiEventChooseCtrl model_EventChooseLostItem;
             public UiEventCustomTriggerCtrl model_EventCustomTriggerLostItem;
             public UiEventChooseCtrl model_EventChooseGainItem;
@@ -6431,10 +6564,11 @@ namespace ModStoryMapSceneUnit
             model_EventChooseLeave = (UiEventChooseCtrl) uiHolder.elementTrsLst[9].GetComponent<UiHolder>().ctrl;
             model_EventChooseCharacterParamChange = (UiEventChooseCtrl) uiHolder.elementTrsLst[10].GetComponent<UiHolder>().ctrl;
             model_EventCustomTriggerCharacterParam = (UiEventCustomTriggerCtrl) uiHolder.elementTrsLst[11].GetComponent<UiHolder>().ctrl;
-            model_EventChooseLostItem = (UiEventChooseCtrl) uiHolder.elementTrsLst[12].GetComponent<UiHolder>().ctrl;
-            model_EventCustomTriggerLostItem = (UiEventCustomTriggerCtrl) uiHolder.elementTrsLst[13].GetComponent<UiHolder>().ctrl;
-            model_EventChooseGainItem = (UiEventChooseCtrl) uiHolder.elementTrsLst[14].GetComponent<UiHolder>().ctrl;
-            model_EventCustomTriggerGainItem = (UiEventCustomTriggerCtrl) uiHolder.elementTrsLst[15].GetComponent<UiHolder>().ctrl;
+            model_EventCustomTriggerGlobalVar = (UiEventCustomTriggerCtrl) uiHolder.elementTrsLst[12].GetComponent<UiHolder>().ctrl;
+            model_EventChooseLostItem = (UiEventChooseCtrl) uiHolder.elementTrsLst[13].GetComponent<UiHolder>().ctrl;
+            model_EventCustomTriggerLostItem = (UiEventCustomTriggerCtrl) uiHolder.elementTrsLst[14].GetComponent<UiHolder>().ctrl;
+            model_EventChooseGainItem = (UiEventChooseCtrl) uiHolder.elementTrsLst[15].GetComponent<UiHolder>().ctrl;
+            model_EventCustomTriggerGainItem = (UiEventCustomTriggerCtrl) uiHolder.elementTrsLst[16].GetComponent<UiHolder>().ctrl;
         }
 
     }
@@ -6469,14 +6603,16 @@ namespace ModStoryMapSceneUnit
             view.model_EventChooseCharacterParamChange.BindHolderRecursively(uiHolder.subUiHolderLst[3]);
             view.model_EventCustomTriggerCharacterParam = new UiEventCustomTriggerCtrl();
             view.model_EventCustomTriggerCharacterParam.BindHolderRecursively(uiHolder.subUiHolderLst[4]);
+            view.model_EventCustomTriggerGlobalVar = new UiEventCustomTriggerCtrl();
+            view.model_EventCustomTriggerGlobalVar.BindHolderRecursively(uiHolder.subUiHolderLst[5]);
             view.model_EventChooseLostItem = new UiEventChooseCtrl();
-            view.model_EventChooseLostItem.BindHolderRecursively(uiHolder.subUiHolderLst[5]);
+            view.model_EventChooseLostItem.BindHolderRecursively(uiHolder.subUiHolderLst[6]);
             view.model_EventCustomTriggerLostItem = new UiEventCustomTriggerCtrl();
-            view.model_EventCustomTriggerLostItem.BindHolderRecursively(uiHolder.subUiHolderLst[6]);
+            view.model_EventCustomTriggerLostItem.BindHolderRecursively(uiHolder.subUiHolderLst[7]);
             view.model_EventChooseGainItem = new UiEventChooseCtrl();
-            view.model_EventChooseGainItem.BindHolderRecursively(uiHolder.subUiHolderLst[7]);
+            view.model_EventChooseGainItem.BindHolderRecursively(uiHolder.subUiHolderLst[8]);
             view.model_EventCustomTriggerGainItem = new UiEventCustomTriggerCtrl();
-            view.model_EventCustomTriggerGainItem.BindHolderRecursively(uiHolder.subUiHolderLst[8]);
+            view.model_EventCustomTriggerGainItem.BindHolderRecursively(uiHolder.subUiHolderLst[9]);
         }
 
     }

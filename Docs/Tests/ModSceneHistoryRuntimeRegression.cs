@@ -45,6 +45,30 @@ public static class ModSceneHistoryRuntimeRegression
     private static ModSceneHistory history;
     private static readonly HashSet<Type> registered = new HashSet<Type>();
 
+    public static void RunItemPicking()
+    {
+        try
+        {
+            Initialize();
+            var camera = CreateManager<CameraInstance>();
+            var cameraGo = new GameObject("item-picking-camera");
+            cameraGo.transform.SetParent(camera.transform, false);
+            var component = cameraGo.AddComponent<Camera>();
+            component.orthographic = true;
+            component.orthographicSize = 5.2f;
+            typeof(CameraInstance).GetField("_cam", PrivateInstance).SetValue(camera, component);
+            CreateManager<InputManager>().screenSize = new Vector2(800, 600);
+            ObjectSelectionRespectsColliderHeight(onlyItemPicking: true);
+            Debug.Log("MOD_SCENE_ITEM_PICKING_REGRESSION_PASS checks=" + checks);
+            EditorApplication.Exit(0);
+        }
+        catch (Exception exception)
+        {
+            Debug.LogException(exception);
+            EditorApplication.Exit(1);
+        }
+    }
+
     public static void Run()
     {
         try
@@ -277,7 +301,7 @@ public static class ModSceneHistoryRuntimeRegression
         }
     }
 
-    private static void ObjectSelectionRespectsColliderHeight()
+    private static void ObjectSelectionRespectsColliderHeight(bool onlyItemPicking = false)
     {
         var mod = ModManager.instance;
         var previousController = mod.sceneCtrl;
@@ -358,6 +382,16 @@ public static class ModSceneHistoryRuntimeRegression
         {
             Check(elevated.unit.belongTile == Tile(10, 10).unit && elevated.pos.y == 0,
                 "selection fixture has a current-layer root/owner but an elevated physical body");
+            if (onlyItemPicking)
+            {
+                foreach (var mode in new[] { DesignType.MapObject, DesignType.Event })
+                    Check(Click(0, mode) == lower, "Object selection retains current-height priority: " + mode);
+                elevated.unit.ins.gameObject.SetActive(false);
+                lower.unit.ins.gameObject.SetActive(false);
+                ItemSelectionWithGameplayColliderScale((mode, pitch) => Click(0, mode, pitch));
+                Check(history.undoCount == 0 && history.redoCount == 0, "Item selection does not create history operations");
+                return;
+            }
             foreach (var mode in new[] { DesignType.MapObject, DesignType.Event })
             {
                 Check(Click(0, mode) == lower, "raised physical body is skipped despite padded Trigger reaching current layer: " + mode + "; " + HitDetails());
@@ -473,6 +507,9 @@ public static class ModSceneHistoryRuntimeRegression
             Check(Click(0, DesignType.MapObject) == elevated, "higher owner remains selectable as an empty-click fallback");
             lower.unit.ins.gameObject.SetActive(true);
             Check(Click(2, DesignType.Event) == elevated, "higher Object is selectable after switching editing height");
+            elevated.unit.ins.gameObject.SetActive(false);
+            lower.unit.ins.gameObject.SetActive(false);
+            ItemSelectionWithGameplayColliderScale((mode, pitch) => Click(0, mode, pitch));
             Check(history.undoCount == 0 && history.redoCount == 0, "selection does not create history operations");
         }
         finally
@@ -501,6 +538,88 @@ public static class ModSceneHistoryRuntimeRegression
             camera.tarTrs.position = previousTarget;
             cam.transform.SetPositionAndRotation(previousCameraPosition, previousCameraRotation);
             mod.sceneCtrl = previousController;
+        }
+    }
+
+    private static void ItemSelectionWithGameplayColliderScale(Func<DesignType, float, UnitForm.Data> click)
+    {
+        RegisterForm(typeof(GameObjectAssetForm));
+        float originalDefault = MapModelForm.defaultData.colliderScale;
+        var util = new GameUtilController(game);
+        foreach (bool sphere in new[] { false, true })
+        foreach (float scale in new[] { 0f, .35f })
+        {
+            int sourceId = sphere ? 61982 : 61981;
+            var source = new GameObject("item-picking-source");
+            source.AddComponent<MeshRenderer>();
+            var body = new GameObject("nested-picking-body");
+            body.transform.SetParent(source.transform, false);
+            if (sphere) body.AddComponent<SphereCollider>();
+            else body.AddComponent<BoxCollider>();
+            GameObjectAssetForm.DataById[sourceId] = new GameObjectAssetForm.Data(sourceId, source.name, null, null, null, source, 0);
+            var model = MapModelForm.defaultData.Copy();
+            model.subPrefabUnitName = new List<int> { sourceId };
+            model.subPrefabUnitPos = new List<Vector3> { Vector3.zero };
+            model.subPrefabUnitScale = new List<Vector3> { Vector3.one };
+            model.subUnitTexsName = new List<List<int>> { new List<int> { 0 } };
+            model.colliderScale = scale;
+            var product = ItemProductForm.GetDataByJo(new JObject());
+            product.uid = -1;
+            product.name = "pickable item";
+            product.model = model;
+            ItemProductForm.AddData(product);
+            string name = GlobalDefaultHelper.GetRuntimeMapItemPrefabName(product.uid);
+            GameObject play = null, preview = null, modPrefab = null, live = null;
+            ItemUnitForm.Data item = null;
+            try
+            {
+                DynamicGlobalSettings.playing = true;
+                play = util.CombineNewObjectByPrefabs(name + "-play", model, true, true);
+                Vector3 expected = sphere ? Vector3.one * scale : new Vector3(scale, 1, scale);
+                Check(play.GetComponentsInChildren<Collider>(true).All(c => c.transform.localScale == expected),
+                    "Play Item keeps authored Box/Sphere Collider and Trigger scale: " + sphere + "/" + scale);
+                DynamicGlobalSettings.playing = false;
+                preview = util.CombineNewObjectByPrefabs(name + "-preview", model, false, true);
+                Check(preview.GetComponentsInChildren<Collider>(true).All(c => c.transform.localScale == expected),
+                    "appearance previews retain authored collision scale");
+                modPrefab = util.CombineNewObjectByPrefabs(name, model, true, true);
+                modPrefab.SetActive(false);
+                Check(modPrefab.GetComponentsInChildren<Collider>(true).All(c => c.transform.localScale == Vector3.one),
+                    "Mod Item restores nested Box/Sphere body and picking Trigger before pooling");
+                pool.AddPool(modPrefab);
+                item = map.AddItem(product.name, new Vector3(10, 0, 10), name);
+                Check(item != null, "item picking fixture uses a supported scene Item");
+                item.unit.productInfo = (product.uid, 0);
+                for (int reuse = 0; reuse < 2; reuse++)
+                {
+                    item.unit.Show();
+                    live = item.unit.ins.gameObject;
+                    live.transform.SetParent(map.mainGo.transform, true);
+                    foreach (var mode in new[] { DesignType.MapObject, DesignType.Event })
+                    foreach (float pitch in new[] { 90f, 45f })
+                        Check(ReferenceEquals(click(mode, pitch), item),
+                            "mouse down/up selects Item in normal/Event mode and overhead/side view after pool reuse: "
+                            + sphere + "/" + scale + "/" + mode + "/" + pitch + "/" + reuse);
+                    item.unit.Hide();
+                }
+                Check(model.colliderScale == scale && MapModelForm.defaultData.colliderScale == originalDefault,
+                    "Mod picking leaves authored Item data and shared defaults unchanged");
+                Check(source.GetComponentsInChildren<Collider>(true).All(c => c.transform.localScale == Vector3.one),
+                    "composition does not mutate source prefab Colliders");
+            }
+            finally
+            {
+                DynamicGlobalSettings.playing = false;
+                if (item != null) map.RemoveItem(item);
+                pool.pools.Remove(name);
+                if (live != null) Object.DestroyImmediate(live);
+                if (play != null) Object.DestroyImmediate(play);
+                if (preview != null) Object.DestroyImmediate(preview);
+                if (modPrefab != null) Object.DestroyImmediate(modPrefab);
+                ItemProductForm.RemoveData(product.uid);
+                GameObjectAssetForm.DataById.Remove(sourceId);
+                Object.DestroyImmediate(source);
+            }
         }
     }
 
@@ -1175,7 +1294,7 @@ public static class ModSceneHistoryRuntimeRegression
     private static Texture ShownTexture(MapInstance instance)
     {
         var block = new MaterialPropertyBlock();
-        instance.viewRefreshBindings[0].Target.GetPropertyBlock(block);
+        instance.renderers[0].GetPropertyBlock(block);
         return block.GetTexture("_Tex");
     }
 

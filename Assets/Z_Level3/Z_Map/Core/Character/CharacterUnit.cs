@@ -145,23 +145,14 @@ namespace Z_Map
                         lastNavMoveTime = Time.time;
                     Vector3 dir = manager.updateCtrl.GetNavDir(data.pos, data.destination, (int)data.pathDis,
                         GetNavigationRadius(), passTypes, navigationEndpointState);
-                    bool waitingForSearch = navigationEndpointState.isSearching && dir.sqrMagnitude <= 1e-8f;
                     bool movedThisFrame = false;
                     if (avoidPos <= 0 && dir.sqrMagnitude > 1e-8f)
                     {
                         if ((data.destination - data.pos).sqrMagnitude < data.alertDis * data.alertDis)
-                    {
-                        Vector3 posBefore = data.pos;
-                        Vector3 targetDelta = navigationEndpointState.moveTarget - data.pos;
-                        targetDelta.y = 0f;
-                        MoveForNavigation(dir * Mathf.Min(deltaTime * data.speed, targetDelta.magnitude),
-                            navigationEndpointState.directEndpoint);
-                    //检测本次nav是否实际产生了位移，排除零位移与碰撞阻断。
-                       if ((data.pos - posBefore).sqrMagnitude > 1e-6f)
-                            movedThisFrame = true;
-                    }                
+                            movedThisFrame = MoveAlongNavigation(deltaTime * data.speed, ref dir);
                     }
 
+                    bool waitingForSearch = navigationEndpointState.isSearching && dir.sqrMagnitude <= 1e-8f;
                     if (waitingForSearch)
                     {
                         // Waiting for the first/next search result is not a
@@ -276,6 +267,35 @@ namespace Z_Map
             {
                 isNavEndpointMove = previousEndpointMove;
             }
+        }
+
+        private bool MoveAlongNavigation(float distance, ref Vector3 direction)
+        {
+            bool moved = false;
+            float maxStep = manager.navigationCtrl.MaxRouteMoveStep;
+            while (distance > 0.000001f && direction.sqrMagnitude > 1e-8f
+                && data.navEnabled && !DynamicGlobalSettings.pauseNav)
+            {
+                Vector3 target = navigationEndpointState.moveTarget;
+                Vector3 delta = target - data.pos;
+                delta.y = 0f;
+                float step = Mathf.Min(Mathf.Min(distance, delta.magnitude), maxStep);
+                if (step <= 0.000001f) break;
+                Vector3 before = data.pos;
+                MoveForNavigation(direction * step, navigationEndpointState.directEndpoint);
+                moved |= (data.pos - before).sqrMagnitude > 1e-12f;
+                distance -= step;
+
+                // Do not spend the remainder pushing through collision. Only
+                // continue after completing this substep, using the latest route
+                // and local edge checks; same-frame queries cannot add BFS work.
+                Vector3 remaining = target - data.pos;
+                remaining.y = 0f;
+                if (remaining.magnitude > delta.magnitude - step + 0.0001f) break;
+                direction = manager.updateCtrl.GetNavDir(data.pos, data.destination, (int)data.pathDis,
+                    GetNavigationRadius(), passTypes, navigationEndpointState);
+            }
+            return moved;
         }
 
         internal void ResetNavigationEndpoint()

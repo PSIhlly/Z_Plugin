@@ -33,6 +33,7 @@ public static class ObjectProductEditorRegression
             var parameter = new MapObjectParamForm.Data(-1, "EditorHp", ValType.Float, "0", "12", "100");
             MapObjectParamForm.AddData(parameter);
             int authoredLab = LabForm.GetOrCreate("editor-regression", "objects", "initial", nameof(ObjectProductForm));
+            float sharedDefaultColliderScale = MapModelForm.defaultData.colliderScale;
             assets.CreateObject(authoredLab, "editor-tree");
             var product = ObjectProductForm.DataByNameProtouid[("editor-tree", 0)];
             Check(product.uid > 0 && product.protoUid == 0, "New creates an authored Object Product");
@@ -44,6 +45,8 @@ public static class ObjectProductEditorRegression
                 && product.model.subPrefabUnitPos.Count > 0 && product.model.subPrefabUnitScale.Count > 0
                 && product.events != null && product.animClip != null && product.GetAnimClip(AnimDirecton.Fixed) != null,
                 "New Product initializes model, animation and event configuration");
+            Check(product.model.colliderScale == 1f && MapModelForm.defaultData.colliderScale == sharedDefaultColliderScale,
+                "New Object starts with full-size Collider without changing the shared MapModel default");
             Check(product.paramDic[parameter.name].v == "12" && !ReferenceEquals(product.paramDic[parameter.name], parameter),
                 "Object parameters copy defaults rather than sharing the parameter declaration");
             product.paramDic[parameter.name].v = "31";
@@ -126,6 +129,31 @@ public static class ObjectProductEditorRegression
             ObjectProductForm.Clear();
             assets.RefreshObjectList();
             Check(MapObjectForm.DataById.Count == 0, "Rebuilding an empty story clears every old row");
+
+            assets.CreateObject(0, "existing-scale-object");
+            var existingScale = ObjectProductForm.DataByNameProtouid[("existing-scale-object", 0)];
+            existingScale.model.colliderScale = .27f;
+            assets.CreateObject(0, "new-scale-object");
+            assets.RefreshObjectList();
+            Check(existingScale.model.colliderScale == .27f
+                && ObjectProductForm.DataByNameProtouid[("new-scale-object", 0)].model.colliderScale == 1f,
+                "Creating another Object and rebuilding rows preserve existing authored Collider scales");
+            Check(MapModelForm.defaultData.colliderScale == sharedDefaultColliderScale,
+                "Object New never changes defaults for Items or legacy model loads");
+
+            Check(ModCmd.TryExecute("AddStorySceneObject \"command-scale-object\"", ModCmdScope.Story, out string commandResult),
+                "AddStorySceneObject accepts an Object New request: " + commandResult);
+            var commandObject = ObjectProductForm.DataByNameProtouid[("command-scale-object", 0)];
+            Check(commandObject.model.colliderScale == 1f && MapModelForm.defaultData.colliderScale == sharedDefaultColliderScale,
+                "Story command New uses Collider scale one without modifying the shared default");
+            commandObject.model.colliderScale = .38f;
+            var originalProducts = new HashSet<int>(ObjectProductForm.DataByUid.Keys);
+            Check(ModCmd.TryExecute("CopyStorySceneObject \"command-scale-object\"", ModCmdScope.Story, out commandResult),
+                "CopyStorySceneObject preserves an existing Object: " + commandResult);
+            var copied = ObjectProductForm.DataByUid.Values.Single(data => !originalProducts.Contains(data.uid));
+            Check(copied.model.colliderScale == .38f && commandObject.model.colliderScale == .38f
+                && !ReferenceEquals(copied.model, commandObject.model),
+                "Copy keeps an authored Collider scale rather than applying New defaults");
 
             Debug.Log("OBJECT_PRODUCT_EDITOR_REGRESSION_PASS checks=" + checks);
             EditorApplication.Exit(0);

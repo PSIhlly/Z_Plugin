@@ -284,7 +284,11 @@ public class GameMapController : Z_Controller<GameManager>, IZ_Listener<TileEven
         = new Dictionary<(int, AnimDirecton, int), Rect>();
     private static readonly Dictionary<Texture2D, Rect> objectWangTileTextureBounds = new Dictionary<Texture2D, Rect>();
     private readonly HashSet<ObjectUnit> objectCollisionBoundsUnits = new HashSet<ObjectUnit>();
-    private readonly Dictionary<ObjectUnit, Bounds> objectWangTileBounds = new Dictionary<ObjectUnit, Bounds>();
+    private readonly Dictionary<ObjectUnit, (Bounds bounds, int templateUid, bool notified)> objectWangTileBounds
+        = new Dictionary<ObjectUnit, (Bounds, int, bool)>();
+    private readonly Dictionary<ObjectUnit, (Bounds bounds, int templateUid, int mask)> objectWangTileMasks
+        = new Dictionary<ObjectUnit, (Bounds, int, int)>();
+    private readonly HashSet<int> objectWangTileTemplates = new HashSet<int>();
     private readonly HashSet<MapUnit> objectWangTileNeighbourCandidates = new HashSet<MapUnit>();
     private static readonly HashSet<MapUnit> objectWangTileMaskCandidates = new HashSet<MapUnit>();
     private const float ObjectWangTileContactTolerance = 0.001f;
@@ -297,7 +301,9 @@ public class GameMapController : Z_Controller<GameManager>, IZ_Listener<TileEven
     public void Reset()
     {
         ResetSceneUnitCaches();
-        ClearWangTileAnimationTextures();
+        // Generated WangTile frames belong to the Story, not an individual scene.
+        validatedTextureFrames.Clear();
+        objectWangTileCollisionBounds.Clear();
     }
 
     public void ResetSceneUnitCaches()
@@ -307,6 +313,8 @@ public class GameMapController : Z_Controller<GameManager>, IZ_Listener<TileEven
             unit.SetFirstPartCollisionBounds(null, 1f);
         objectCollisionBoundsUnits.Clear();
         objectWangTileBounds.Clear();
+        objectWangTileMasks.Clear();
+        objectWangTileTemplates.Clear();
         objectWangTileNeighbourCandidates.Clear();
         objectWangTileMaskCandidates.Clear();
     }
@@ -317,6 +325,7 @@ public class GameMapController : Z_Controller<GameManager>, IZ_Listener<TileEven
         if (data.unit is ObjectUnit unit)
         {
             objectWangTileBounds.Remove(unit);
+            objectWangTileMasks.Remove(unit);
             objectCollisionBoundsUnits.Remove(unit);
             unit.SetFirstPartCollisionBounds(null, 1f);
         }
@@ -397,8 +406,10 @@ public class GameMapController : Z_Controller<GameManager>, IZ_Listener<TileEven
             if (data == null || ObjectProductForm.GetTemplateUid(data) != templateUid)
                 continue;
 
-            if (data.isWangTile && TryGetObjectWangTileBounds(unit, out Bounds bounds))
-                objectWangTileBounds[unit] = bounds;
+            objectWangTileMasks.Remove(unit);
+            if ((data.isWangTile || objectWangTileTemplates.Contains(templateUid))
+                && TryGetObjectWangTileBounds(unit, out Bounds bounds))
+                objectWangTileBounds[unit] = (bounds, templateUid, true);
             else
                 objectWangTileBounds.Remove(unit);
 
@@ -542,12 +553,8 @@ public class GameMapController : Z_Controller<GameManager>, IZ_Listener<TileEven
             objectData = ObjectProductForm.BindUnit(newObjectData) ?? objectData;
 
         newObjectData.isObstacle = objectData.collision;
-        if (objectData.isWangTile)
-        {
-            UpdateObjectWangTileNeighbours(newObjectData.unit, objectData);
-        }
-        if (objectData.isWangTile || objectData.boundsCollision || !objectData.centerCollider)
-            RefreshObjectAppearance(newObjectData.unit, objectData);
+        UpdateObjectWangTileNeighbours(newObjectData.unit, objectData);
+        RefreshObjectAppearance(newObjectData.unit, objectData);
     }
 
     // Bits match TileHelper's 3x3 mask: NW,N,NE,W,E,SW,S,SE.
@@ -599,8 +606,12 @@ public class GameMapController : Z_Controller<GameManager>, IZ_Listener<TileEven
             map.updateCtrl.CollectHistoryColumn(new Vector3Int(x, 0, z), candidates);
     }
 
-    private static int GetObjectWangTileMask(ObjectUnit unit, int templateUid, Bounds bounds)
+    private int GetObjectWangTileMask(ObjectUnit unit, int templateUid, Bounds bounds)
     {
+        if (objectWangTileMasks.TryGetValue(unit, out var cached)
+            && cached.templateUid == templateUid && cached.bounds.Equals(bounds))
+            return cached.mask;
+        objectWangTileTemplates.Add(templateUid);
         objectWangTileMaskCandidates.Clear();
         CollectObjectWangTileCandidates(bounds, objectWangTileMaskCandidates);
         try
@@ -612,7 +623,12 @@ public class GameMapController : Z_Controller<GameManager>, IZ_Listener<TileEven
                     || !TryGetObjectWangTileBounds(other, out Bounds otherBounds))
                     continue;
                 mask |= GetObjectNeighbourBits(bounds, otherBounds);
+                // Ordinary instances of this same template also connect. Keep
+                // their old footprint for later movement/removal invalidation.
+                if (!objectWangTileBounds.ContainsKey(other))
+                    objectWangTileBounds[other] = (otherBounds, templateUid, false);
             }
+            objectWangTileMasks[unit] = (bounds, templateUid, mask);
             return mask;
         }
         finally
@@ -629,32 +645,46 @@ public class GameMapController : Z_Controller<GameManager>, IZ_Listener<TileEven
 
     private void UpdateObjectWangTileNeighbours(ObjectUnit unit, ObjectProductForm.Data data)
     {
-        if (!data.isWangTile)
+        if (!data.isWangTile && objectWangTileTemplates.Count == 0)
             return;
 
-        bool hadOldBounds = objectWangTileBounds.TryGetValue(unit, out Bounds oldBounds);
+        int templateUid = ObjectProductForm.GetTemplateUid(data);
+        bool hadOldBounds = objectWangTileBounds.TryGetValue(unit, out var oldState);
+        if (!data.isWangTile && !hadOldBounds && !objectWangTileTemplates.Contains(templateUid)) return;
+        Bounds oldBounds = oldState.bounds;
         bool hasNewBounds = TryGetObjectWangTileBounds(unit, out Bounds newBounds);
+        // Show, boundary touches and repeated Refresh notifications do not
+        // change adjacency when the exact visual footprint/product is unchanged.
+        bool sameBounds = hadOldBounds && hasNewBounds && oldBounds.Equals(newBounds);
+        if (sameBounds && oldState.templateUid == templateUid && oldState.notified)
+            return;
+        objectWangTileMasks.Remove(unit);
         if (hasNewBounds)
-            objectWangTileBounds[unit] = newBounds;
+            objectWangTileBounds[unit] = (newBounds, templateUid, true);
         else
             objectWangTileBounds.Remove(unit);
 
         objectWangTileNeighbourCandidates.Clear();
         if (hadOldBounds)
             CollectObjectWangTileCandidates(oldBounds, objectWangTileNeighbourCandidates);
-        if (hasNewBounds)
+        if (hasNewBounds && !sameBounds)
             CollectObjectWangTileCandidates(newBounds, objectWangTileNeighbourCandidates);
         try
         {
             foreach (MapUnit candidate in objectWangTileNeighbourCandidates)
             {
-                if (!(candidate is ObjectUnit other) || other == unit || !HasObjectTemplate(other, ObjectProductForm.GetTemplateUid(data))
-                    || (!other.isShowing && !data.boundsCollision)
-                    || !TryGetObjectWangTileBounds(other, out Bounds otherBounds))
+                if (!(candidate is ObjectUnit other) || other == unit)
                     continue;
-                if ((hadOldBounds && GetObjectNeighbourBits(otherBounds, oldBounds) != 0)
-                    || (hasNewBounds && GetObjectNeighbourBits(otherBounds, newBounds) != 0))
-                    RefreshObjectAppearance(other, ObjectProductForm.GetProduct(other.data));
+                var otherData = ObjectProductForm.GetProduct(other.data);
+                if (otherData == null) continue;
+                int otherTemplate = ObjectProductForm.GetTemplateUid(otherData);
+                bool oldProduct = hadOldBounds && otherTemplate == oldState.templateUid;
+                bool newProduct = otherTemplate == templateUid;
+                if ((!oldProduct && !newProduct) || !TryGetObjectWangTileBounds(other, out Bounds otherBounds))
+                    continue;
+                if ((oldProduct && GetObjectNeighbourBits(otherBounds, oldBounds) != 0)
+                    || (newProduct && hasNewBounds && GetObjectNeighbourBits(otherBounds, newBounds) != 0))
+                    RefreshChangedObjectWangTileNeighbour(other, otherData, otherBounds, data.boundsCollision);
             }
         }
         finally
@@ -666,10 +696,18 @@ public class GameMapController : Z_Controller<GameManager>, IZ_Listener<TileEven
 
     private void RemoveObjectWangTileNeighbours(ObjectUnit unit, ObjectProductForm.Data data)
     {
-        bool hadBounds = objectWangTileBounds.TryGetValue(unit, out Bounds oldBounds)
-            || TryGetObjectWangTileBounds(unit, out oldBounds);
+        bool cached = objectWangTileBounds.TryGetValue(unit, out var oldState);
+        if (!cached && (data == null || !data.isWangTile))
+        {
+            objectWangTileMasks.Remove(unit);
+            return;
+        }
+        Bounds oldBounds = oldState.bounds;
+        bool hadBounds = cached || TryGetObjectWangTileBounds(unit, out oldBounds);
+        int templateUid = cached ? oldState.templateUid : data == null ? 0 : ObjectProductForm.GetTemplateUid(data);
         objectWangTileBounds.Remove(unit);
-        if (!data.isWangTile || !hadBounds)
+        objectWangTileMasks.Remove(unit);
+        if (!hadBounds)
             return;
 
         objectWangTileNeighbourCandidates.Clear();
@@ -678,17 +716,33 @@ public class GameMapController : Z_Controller<GameManager>, IZ_Listener<TileEven
         {
             foreach (MapUnit candidate in objectWangTileNeighbourCandidates)
             {
-                if (candidate is ObjectUnit other && other != unit && HasObjectTemplate(other, ObjectProductForm.GetTemplateUid(data))
-                    && (other.isShowing || data.boundsCollision)
+                if (!(candidate is ObjectUnit other) || other == unit) continue;
+                var otherData = ObjectProductForm.GetProduct(other.data);
+                if (otherData != null && ObjectProductForm.GetTemplateUid(otherData) == templateUid
                     && TryGetObjectWangTileBounds(other, out Bounds otherBounds)
                     && GetObjectNeighbourBits(otherBounds, oldBounds) != 0)
-                    RefreshObjectAppearance(other, ObjectProductForm.GetProduct(other.data));
+                    RefreshChangedObjectWangTileNeighbour(other, otherData, otherBounds, data != null && data.boundsCollision);
             }
         }
         finally
         {
             objectWangTileNeighbourCandidates.Clear();
         }
+    }
+
+    private void RefreshChangedObjectWangTileNeighbour(ObjectUnit unit, ObjectProductForm.Data data, Bounds bounds,
+        bool refreshHidden)
+    {
+        int templateUid = ObjectProductForm.GetTemplateUid(data);
+        bool hadMask = objectWangTileMasks.TryGetValue(unit, out var cached)
+            && cached.templateUid == templateUid && cached.bounds.Equals(bounds);
+        // Hidden neighbours must lose their old mask too, so their next Show
+        // cannot reuse connectivity from before an off-screen add/move/remove.
+        objectWangTileMasks.Remove(unit);
+        if (!unit.isShowing && !refreshHidden && !data.boundsCollision) return;
+        int mask = GetObjectWangTileMask(unit, templateUid, bounds);
+        if (!hadMask || cached.mask != mask)
+            RefreshObjectAppearance(unit, data);
     }
     private static int GetWangTileMask(TileUnitForm.Data tileData, int layer, int mapTextureId)
     {
@@ -809,9 +863,8 @@ public class GameMapController : Z_Controller<GameManager>, IZ_Listener<TileEven
                     {
                         data.EnsureDirectionData();
                         ConfigureObjectKeepers(evt.unit, data);
+                        UpdateObjectWangTileNeighbours(evt.unit, data);
                         RefreshObjectAppearance(evt.unit, data, restoreCollisionBaseline: true);
-                        if (data.isWangTile)
-                            UpdateObjectWangTileNeighbours(evt.unit, data);
                     }
                     break;
                 }
@@ -822,8 +875,7 @@ public class GameMapController : Z_Controller<GameManager>, IZ_Listener<TileEven
                     var data = ObjectProductForm.GetProduct(evt.unit.data);
                     if (data != null)
                     {
-                        if (data.isWangTile)
-                            UpdateObjectWangTileNeighbours(evt.unit, data);
+                        UpdateObjectWangTileNeighbours(evt.unit, data);
                         RefreshObjectAppearance(evt.unit, data, restoreCollisionBaseline: evt.type == MapEventType.Refresh);
                     }
                     break;
@@ -831,15 +883,13 @@ public class GameMapController : Z_Controller<GameManager>, IZ_Listener<TileEven
             case MapEventType.Remove:
                 {
                     var data = ObjectProductForm.GetProduct(evt.unit.data);
+                    RemoveObjectWangTileNeighbours(evt.unit, data);
                     if (data != null)
                     {
-                        RemoveObjectWangTileNeighbours(evt.unit, data);
                         if (data.protoUid != 0)
                             foreach (var key in objectWangTileCollisionBounds.Keys.Where(key => key.productUid == data.uid).ToList())
                                 objectWangTileCollisionBounds.Remove(key);
                     }
-                    else
-                        objectWangTileBounds.Remove(evt.unit);
                     objectCollisionBoundsUnits.Remove(evt.unit);
                     evt.unit.SetFirstPartCollisionBounds(null, 1f);
                     if (DynamicGlobalSettings.playing)
@@ -865,6 +915,11 @@ public class GameMapController : Z_Controller<GameManager>, IZ_Listener<TileEven
         bool restoreCollisionBaseline = false)
     {
         var direction = data.GetAnimDirection(unit.data.euler.y);
+        Vector3 partPosition = data.GetModelPosition(direction);
+        Vector3 partScale = data.GetModelSize(direction);
+        bool geometryChanged = unit.ins != null && unit.ins.transform.childCount > 0
+            && (unit.ins.transform.GetChild(0).localPosition != partPosition + Vector3.up * .5f
+                || unit.ins.transform.GetChild(0).localScale != partScale);
         int mask = data.isWangTile && TryGetObjectWangTileBounds(unit, out Bounds bounds)
             ? GetObjectWangTileMask(unit, ObjectProductForm.GetTemplateUid(data), bounds) : 0;
         bool fit = data.boundsCollision;
@@ -876,7 +931,7 @@ public class GameMapController : Z_Controller<GameManager>, IZ_Listener<TileEven
         // ModScene intentionally resets all pool Collider scales to one.
         float colliderScale = fit && DynamicGlobalSettings.playing ? data.model.colliderScale : 1f;
         bool changed = unit.SetFirstPartCollisionBounds(collisionBounds, colliderScale, data.centerCollider);
-        if (changed || (fit && forceCollisionRefresh))
+        if (changed || geometryChanged || forceCollisionRefresh)
         {
             unit.InvalidateCollisionGeometry();
             MapManager.instance.updateCtrl.RefreshObjectOverlap(unit);
@@ -886,9 +941,9 @@ public class GameMapController : Z_Controller<GameManager>, IZ_Listener<TileEven
             return;
         // Always restore from the pool baseline on Show, even when this Unit's
         // facing/mask is unchanged: a reused Instance may have different bounds.
-        if (fit || changed || restoreCollisionBaseline)
+        if (fit || changed || geometryChanged || restoreCollisionBaseline)
             GameUtilController.ApplyFirstPartCollisionBounds(unit.ins.gameObject, unit.prefab,
-                collisionBounds ?? new Rect(0, 0, 1, 1), colliderScale, data.centerCollider);
+                collisionBounds ?? new Rect(0, 0, 1, 1), colliderScale, data.centerCollider, partPosition, partScale);
 
         // Keep this independent from renderer availability: pooled/custom
         // prefabs may start with their renderer GameObject disabled, while the

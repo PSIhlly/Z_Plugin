@@ -463,8 +463,16 @@ namespace Z_Map
         // Read the original pool body every time; never shrink an already fitted
         // live Collider when a WangTile mask changes or a pooled Instance returns.
         public static void GetHorizontalBoundsBox(BoxCollider box, Rect bounds, float colliderScale,
-            out Vector3 size, out Vector3 center)
+            out Vector3 size, out Vector3 center, Vector3? modelScaleRatio = null, Vector3? modelScale = null)
         {
+            var recipe = box.GetComponent<MapModelColliderGeometry>();
+            if (modelScaleRatio.HasValue && recipe != null
+                && recipe.TryGet(box, modelScaleRatio.Value, out var bodySize, out var originalSize, out var originalCenter, modelScale))
+            {
+                GetTextureBoundsBox(bodySize, originalSize, originalCenter, bounds, colliderScale,
+                    box.transform.localScale.y, out size, out center);
+                return;
+            }
             var basis = box;
             if (box.isTrigger)
                 foreach (var body in box.GetComponents<BoxCollider>())
@@ -502,7 +510,7 @@ namespace Z_Map
 
         public List<MeshInfo> GetCollidersMesh(GameObject root, Vector3 rootPos, Vector3 rootEuler, Vector3 rootScale,
             CollideType type = CollideType.All, Rect? firstPartBounds = null, float boundsColliderScale = 1f,
-            bool centerCollider = true)
+            bool centerCollider = true, Vector3? firstPartPosition = null, Vector3? firstPartScale = null)
         {
             // Runtime combined prefab roots are inactive pool templates. Ignore
             // that root state, but retain authored inactive-child exclusions.
@@ -515,7 +523,8 @@ namespace Z_Map
             //避免与rootScale相乘时重复计入prefab根的缩放
             Vector3 rootLossyScale = root.transform.lossyScale;
             Vector3 rearOffset = centerCollider ? Vector3.zero
-                : rootRotFinal * GetObjectBackColliderOffset(root, firstPartBounds, boundsColliderScale, rootScale);
+                : rootRotFinal * GetObjectBackColliderOffset(root, firstPartBounds, boundsColliderScale, rootScale,
+                    firstPartPosition, firstPartScale);
             foreach (var c in cs)
             {
                 // Bounds-fitted Sphere components can await deferred destruction.
@@ -546,40 +555,88 @@ namespace Z_Map
                 //scale变换：collider的lossyScale已包含prefab根的scale，需先除掉根scale再用rootScale重新缩放，
                 //否则prefab根scale非1时会与rootScale重复相乘
                 Vector3 finalScale = Graph.ElementwiseMultiply(Graph.ElementwiseDivide(c.transform.lossyScale, rootLossyScale), rootScale);
+                Vector3? modelScaleRatio = null;
+                if (root.transform.childCount > 0 && (firstPartPosition.HasValue || firstPartScale.HasValue)
+                    && c.transform.IsChildOf(root.transform.GetChild(0)))
+                {
+                    var part = root.transform.GetChild(0);
+                    Matrix4x4 partToRoot = Matrix4x4.TRS(
+                        firstPartPosition.HasValue ? firstPartPosition.Value + Vector3.up * .5f : part.localPosition,
+                        part.localRotation, firstPartScale ?? part.localScale);
+                    Matrix4x4 colliderToRoot = partToRoot * GetLocalToAncestor(c.transform, part);
+                    finalPos = rootPos + rootRotFinal * Vector3.Scale(colliderToRoot.GetColumn(3), rootScale) + rearOffset;
+                    // Only position/size change. Keep the authored quaternion
+                    // instead of extracting a rotation from a zero-thickness TRS.
+                    finalScale = Vector3.Scale(colliderToRoot.lossyScale, rootScale);
+                    modelScaleRatio = GetFirstPartScaleRatio(root, c, firstPartScale ?? part.localScale);
+                }
                 if (c is BoxCollider box)
                 {
+                    Vector3 size = box.size, center = box.center;
                     if (firstPartBounds.HasValue && root.transform.childCount > 0 &&
                         box.transform.IsChildOf(root.transform.GetChild(0)))
                     {
-                        GetHorizontalBoundsBox(box, firstPartBounds.Value, boundsColliderScale, out var size, out var center);
-                        res.Add(Mesh.GetMesh(finalPos + Quaternion.Euler(finalEuler) *
-                            Graph.ElementwiseMultiply(center, finalScale), finalEuler,
-                            Graph.ElementwiseMultiply(size, finalScale)));
+                        GetHorizontalBoundsBox(box, firstPartBounds.Value, boundsColliderScale, out size, out center,
+                            modelScaleRatio, firstPartScale);
                     }
-                    else
-                        res.Add(Mesh.GetMesh(box, finalPos, finalEuler, finalScale));
+                    else if (modelScaleRatio.HasValue && box.GetComponent<MapModelColliderGeometry>() is var recipe
+                        && recipe != null && recipe.TryGet(box, modelScaleRatio.Value, out _,
+                            out var adjustedSize, out var adjustedCenter, firstPartScale))
+                    {
+                        size = adjustedSize;
+                        center = adjustedCenter;
+                    }
+                    res.Add(Mesh.GetMesh(finalPos + Quaternion.Euler(finalEuler) * Vector3.Scale(center, finalScale),
+                        finalEuler, Vector3.Scale(size, finalScale)));
                 }
                 else if (c is SphereCollider sp)
                 {
-                    res.Add(Mesh.GetMesh(sp, finalPos, finalEuler, finalScale));
+                    var recipe = modelScaleRatio.HasValue ? sp.GetComponent<MapModelColliderGeometry>() : null;
+                    if (recipe != null && recipe.TryGet(sp, modelScaleRatio.Value, out _, out var size, out var center, firstPartScale))
+                        res.Add(Mesh.GetMesh(finalPos + Quaternion.Euler(finalEuler) * Vector3.Scale(center, finalScale),
+                            size.x * .5f, finalEuler, finalScale));
+                    else
+                        res.Add(Mesh.GetMesh(sp, finalPos, finalEuler, finalScale));
                 }
             }
             return res;
         }
 
+        public static Vector3 GetFirstPartScaleRatio(GameObject root, Collider collider, Vector3 scale)
+        {
+            Transform part = root.transform.GetChild(0);
+            var oldScale = GetLocalToAncestor(collider.transform, root.transform).lossyScale;
+            var newScale = (Matrix4x4.TRS(Vector3.zero, part.localRotation, scale)
+                * GetLocalToAncestor(collider.transform, part)).lossyScale;
+            return new Vector3(GeometryRatio(newScale.x, oldScale.x), GeometryRatio(newScale.y, oldScale.y),
+                GeometryRatio(newScale.z, oldScale.z));
+        }
+
+        private static float GeometryRatio(float value, float original) => Mathf.Abs(original) > .000001f
+            ? Mathf.Abs(value / original) : 1f;
+
+        private static Matrix4x4 GetLocalToAncestor(Transform child, Transform ancestor)
+        {
+            var matrix = Matrix4x4.identity;
+            for (var current = child; current != ancestor && current != null; current = current.parent)
+                matrix = Matrix4x4.TRS(current.localPosition, current.localRotation, current.localScale) * matrix;
+            return matrix;
+        }
+
         /// <summary>将最终本体的局部 -Z 边界贴合组合模型的后边界；Trigger 共用本体偏移。</summary>
         public Vector3 GetObjectBackColliderOffset(GameObject root, Rect? firstPartBounds = null,
-            float boundsColliderScale = 1f, Vector3? rootScale = null)
+            float boundsColliderScale = 1f, Vector3? rootScale = null,
+            Vector3? firstPartPosition = null, Vector3? firstPartScale = null)
         {
             if (root.transform.childCount == 0)
                 return Vector3.zero;
             var scale = rootScale ?? Vector3.one;
             float zSign = scale.z < 0f ? -1f : 1f;
             var bodies = GetCollidersMesh(root, Vector3.zero, Vector3.zero, scale,
-                CollideType.CollideOnly, firstPartBounds, boundsColliderScale);
+                CollideType.CollideOnly, firstPartBounds, boundsColliderScale, true, firstPartPosition, firstPartScale);
             if (bodies.Count == 0)
                 bodies = GetCollidersMesh(root, Vector3.zero, Vector3.zero, scale,
-                    CollideType.TriggerOnly, firstPartBounds, boundsColliderScale);
+                    CollideType.TriggerOnly, firstPartBounds, boundsColliderScale, true, firstPartPosition, firstPartScale);
             if (bodies.Count == 0)
                 return Vector3.zero;
 
@@ -597,16 +654,19 @@ namespace Z_Map
                         colliderBack = Mathf.Min(colliderBack, point.z * zSign);
             }
             float modelBack = float.PositiveInfinity;
-            foreach (Transform part in root.transform)
+            for (int partIndex = 0; partIndex < root.transform.childCount; partIndex++)
             {
+                Transform part = root.transform.GetChild(partIndex);
                 // Combined parts use the same unit-cube footprint as the visual
                 // ownership/WangTile index, independently of the Collider scale.
-                var half = part.localScale * .5f;
+                var half = (partIndex == 0 ? firstPartScale ?? part.localScale : part.localScale) * .5f;
                 var rotation = part.localRotation;
                 float depth = Mathf.Abs((rotation * new Vector3(half.x, 0, 0)).z)
                     + Mathf.Abs((rotation * new Vector3(0, half.y, 0)).z)
                     + Mathf.Abs((rotation * new Vector3(0, 0, half.z)).z);
-                modelBack = Mathf.Min(modelBack, part.localPosition.z - depth);
+                float positionZ = partIndex == 0 && firstPartPosition.HasValue
+                    ? firstPartPosition.Value.z : part.localPosition.z;
+                modelBack = Mathf.Min(modelBack, positionZ - depth);
             }
             // Translate by the difference of the two rear EDGES, not by the
             // difference of their centers. For a unit Box with scale s this
@@ -914,13 +974,17 @@ namespace Z_Map
             {
                 if (root.GetComponent<ObjectInstance>() != null && root.transform.childCount > 0)
                 {
+                    bool hasTransform = oData.unit.TryGetFirstPartTransform(out var partPosition, out var partScale);
                     for (int i = 0; i < root.transform.childCount; i++)
                     {
                         Transform child = root.transform.GetChild(i);
+                        Vector3 localScale = i == 0 && hasTransform ? partScale : child.localScale;
+                        Vector3 localPosition = i == 0 && hasTransform
+                            ? partPosition + Vector3.up * .5f : child.localPosition;
                         Vector3 visualScale = new Vector3(
-                            Mathf.Abs(child.localScale.x), Mathf.Abs(child.localScale.y), Mathf.Abs(child.localScale.z));
+                            Mathf.Abs(localScale.x), Mathf.Abs(localScale.y), Mathf.Abs(localScale.z));
                         Matrix4x4 visualToRuntime = rootToRuntime
-                            * Matrix4x4.TRS(child.localPosition, child.localRotation, visualScale);
+                            * Matrix4x4.TRS(localPosition, child.localRotation, visualScale);
                         if (DoesTileProbeIntersectBox(visualToRuntime,
                             new Bounds(Vector3.zero, Vector3.one), center))
                             return true;
@@ -1081,20 +1145,24 @@ namespace Z_Map
         /// 用于还没有生成 Unit 的放置判定（例如笔刷的非重叠检查）。
         /// </summary>
         public bool TryGetVisionBounds(GameObject root, Vector3 pos, Vector3 euler, Vector3 scale,
-            out Bounds visionBounds)
+            out Bounds visionBounds, Vector3? firstPartPosition = null, Vector3? firstPartScale = null)
         {
-            return TryGetRuntimeBounds(root, pos, euler, scale, false, out visionBounds, out _);
+            return TryGetRuntimeBounds(root, pos, euler, scale, false, out visionBounds, out _,
+                firstPartPosition, firstPartScale);
         }
 
         private bool TryGetObjectBounds(
             ObjectUnitForm.Data oData, out Bounds visionBounds, bool useBodyCenter, out Vector2 projectedZ)
         {
+            bool hasTransform = oData.unit.TryGetFirstPartTransform(out var position, out var scale);
             return TryGetRuntimeBounds(oData.unit.prefab, oData.pos, oData.euler, oData.scale,
-                useBodyCenter, out visionBounds, out projectedZ);
+                useBodyCenter, out visionBounds, out projectedZ,
+                hasTransform ? position : (Vector3?)null, hasTransform ? scale : (Vector3?)null);
         }
 
         private bool TryGetRuntimeBounds(GameObject root, Vector3 pos, Vector3 euler, Vector3 scale,
-            bool useBodyCenter, out Bounds visionBounds, out Vector2 projectedZ)
+            bool useBodyCenter, out Bounds visionBounds, out Vector2 projectedZ,
+            Vector3? firstPartPosition = null, Vector3? firstPartScale = null)
         {
             visionBounds = default;
             projectedZ = default;
@@ -1114,14 +1182,15 @@ namespace Z_Map
                     for (int i = 0; i < root.transform.childCount; i++)
                     {
                         Transform child = root.transform.GetChild(i);
+                        Vector3 localScale = i == 0 ? firstPartScale ?? child.localScale : child.localScale;
+                        Vector3 localPosition = i == 0 && firstPartPosition.HasValue
+                            ? firstPartPosition.Value + Vector3.up * .5f : child.localPosition;
                         Vector3 visualScale = new Vector3(
-                            Mathf.Abs(child.localScale.x),
-                            Mathf.Abs(child.localScale.y),
-                            Mathf.Abs(child.localScale.z));
-                        Vector3 visualBase = child.localPosition - Vector3.up * 0.5f;
+                            Mathf.Abs(localScale.x), Mathf.Abs(localScale.y), Mathf.Abs(localScale.z));
+                        Vector3 visualBase = localPosition - Vector3.up * 0.5f;
                         // Pass-type probes use the actual centered primitive/model body.
                         // The display footprint keeps its existing base/height convention.
-                        Vector3 visualCenter = useBodyCenter ? child.localPosition
+                        Vector3 visualCenter = useBodyCenter ? localPosition
                             : visualBase + Vector3.up * (visualScale.y * 0.5f);
                         Matrix4x4 visualToRuntime = rootToRuntime
                             * Matrix4x4.TRS(visualCenter, child.localRotation, visualScale);

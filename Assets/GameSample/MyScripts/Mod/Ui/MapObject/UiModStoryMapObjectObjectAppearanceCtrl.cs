@@ -32,13 +32,25 @@ namespace Ui.ModStory.ModStoryMapObject.ModStoryMapObjectObject.ModStoryMapObjec
         public AnimDirecton dir;
         public int id;
 
+        public Vector3 size
+        {
+            get => data.GetModelSize(dir);
+            set => data.SetModelSize(dir, value);
+        }
+
+        public Vector3 position
+        {
+            get => data.GetModelPosition(dir);
+            set => data.SetModelPosition(dir, value);
+        }
+
         public float height
         {
-            get => data.model.subPrefabUnitScale[0].y;
+            get => size.y;
             set
             {
                 float bottomHeight = posHeight;
-                data.model.subPrefabUnitScale[0] = data.model.subPrefabUnitScale[0].NewSetY(value);
+                size = size.NewSetY(value);
                 posHeight = bottomHeight;
             }
         }
@@ -47,15 +59,14 @@ namespace Ui.ModStory.ModStoryMapObject.ModStoryMapObjectObject.ModStoryMapObjec
         // pivot. Only the editor converts that offset to a bottom-relative height.
         public float posHeight
         {
-            get => data.model.subPrefabUnitPos[0].y - (Mathf.Abs(height) - 1) / 2;
-            set => data.model.subPrefabUnitPos[0] = data.model.subPrefabUnitPos[0]
+            get => position.y - (Mathf.Abs(height) - 1) / 2;
+            set => position = position
                 .NewSetY(value + (Mathf.Abs(height) - 1) / 2);
         }
 
         public void SetHorizontalPosition(Vector2 position)
         {
-            data.model.subPrefabUnitPos[0] = new Vector3(position.x,
-                data.model.subPrefabUnitPos[0].y, position.y);
+            this.position = new Vector3(position.x, this.position.y, position.y);
         }
     }
     public partial class UiModStoryMapObjectObjectAppearanceCtrl:IZ_Listener<AssetEvent>
@@ -69,8 +80,8 @@ namespace Ui.ModStory.ModStoryMapObject.ModStoryMapObjectObject.ModStoryMapObjec
             dirCon = new UiContainer<UiDirCtrl>(this, view.go_dir);
             view.btn_reset.onClick.AddListener(() =>
             {
-                model.data.model.subPrefabUnitScale[0] = Vector3.one;
-                model.data.model.subPrefabUnitPos[0] = Vector3.zero;
+                model.size = Vector3.one;
+                model.position = Vector3.zero;
                 Refresh();
             });
             view.btn_model.onClick.AddListener(() =>
@@ -122,12 +133,12 @@ namespace Ui.ModStory.ModStoryMapObject.ModStoryMapObjectObject.ModStoryMapObjec
             };
             view.ipt_length.onFinishInput += (s) =>
             {
-                model.data.model.subPrefabUnitScale[0]= model.data.model.subPrefabUnitScale[0].NewSetZ(StringHelper.ToFloat(s, 1, true));
+                model.size = model.size.NewSetZ(StringHelper.ToFloat(s, 1, true));
                 Refresh();
             };
             view.ipt_width.onFinishInput += (s) =>
             {
-                model.data.model.subPrefabUnitScale[0]= model.data.model.subPrefabUnitScale[0].NewSetX(StringHelper.ToFloat(s, 1, true));
+                model.size = model.size.NewSetX(StringHelper.ToFloat(s, 1, true));
                 Refresh();
             };
             view.btn_image.onClick.AddListener(() =>
@@ -178,7 +189,7 @@ namespace Ui.ModStory.ModStoryMapObject.ModStoryMapObjectObject.ModStoryMapObjec
             float rate = DisplayCameraAreaManager.instance.normalized2scene;
             view.model_axis.SetShow(true, new UiAxisParam()
             {
-                pos = new Vector2((model.data.model.subPrefabUnitPos[0].x + rate / 2) / rate, (model.data.model.subPrefabUnitPos[0].z + rate / 2) / rate),
+                pos = new Vector2((model.position.x + rate / 2) / rate, (model.position.z + rate / 2) / rate),
                 limitRtf = view.rtf_image,
                 onTrsChange = (tp) => {
                     model.SetHorizontalPosition(new Vector2((tp.Item1.x * 2 - 1) * rate / 2,
@@ -188,13 +199,10 @@ namespace Ui.ModStory.ModStoryMapObject.ModStoryMapObjectObject.ModStoryMapObjec
             });
             RefreshView();
 
-            if (model.id != -1)
-            {
-                view.ipt_posHeight.Set(model.posHeight.ToString("0.##"));
-                view.ipt_height.Set(model.height.ToString("0.##"));
-                view.ipt_length.Set(model.data.model.subPrefabUnitScale[0].z.ToString("0.##"));
-                view.ipt_width.Set(model.data.model.subPrefabUnitScale[0].x.ToString("0.##"));
-            }
+            view.ipt_posHeight.Set(model.posHeight.ToString("0.##"));
+            view.ipt_height.Set(model.height.ToString("0.##"));
+            view.ipt_length.Set(model.size.z.ToString("0.##"));
+            view.ipt_width.Set(model.size.x.ToString("0.##"));
             view.ipt_interval.Set(model.data.model.animTimeInterval.ToString("0.##"));
 
             dirCon.Clear();

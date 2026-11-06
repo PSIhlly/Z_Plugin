@@ -25,6 +25,7 @@ namespace Ui.EventCustomTrigger
     public partial class UiEventCustomTriggerParam
     {
         public string defaultKey;
+        public Func<string> newKeyFunc;
         public Dictionary<string, EventTriggerForm.Data> dic;
         public List<TriggerConfig> configs;
     }
@@ -104,7 +105,11 @@ namespace Ui.EventCustomTrigger
                 }
                 else
                 {
-                    parent.model.prm.dic.Add(parent.model.prm.defaultKey, GameEventController.CreateTrigger(parent.model.prm.defaultKey));
+                    var settings = parent.model.prm;
+                    var key = settings.newKeyFunc == null ? settings.defaultKey : settings.newKeyFunc();
+                    if (string.IsNullOrEmpty(key) || settings.dic.ContainsKey(key))
+                        return;
+                    settings.dic.Add(key, GameEventController.CreateTrigger(key));
                     parent.Refresh();
                 }
             });

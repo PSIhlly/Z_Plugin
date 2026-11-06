@@ -56,6 +56,11 @@ namespace Z_Map
         {
             ItemUnitForm.RemoveData(data.uid);
             base.Remove();
+            Z_EventHelper.Invoke(new ItemEvent()
+            {
+                type = MapEventType.Remove,
+                unit = this
+            });
         }
 
     }

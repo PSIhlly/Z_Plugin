@@ -25,7 +25,7 @@ if (-not $mainSource.Contains('public async Task StartLoadSceneUgc(int sceneId)'
     throw 'UGC scene entry must return an awaitable Task through BeginScene.'
 }
 $sharedLoad = Get-BracedBody $mainSource 'private async Task<bool> StartLoadScene('
-if ($sharedLoad -notmatch '(?s)finally\s*\{\s*LoadingManager\.instance\.RemoveLoadItem\("scene"\);' -or
+if ($sharedLoad -notmatch '(?s)finally\s*\{.*?LoadingManager\.instance\.RemoveLoadItem\("scene"\);' -or
     $sharedLoad.IndexOf('onMapComplete?.Invoke();') -gt $sharedLoad.IndexOf('RemoveLoadItem("scene")')) {
     throw 'The shared scene load must retain its item through map setup and release it in finally.'
 }
@@ -72,7 +72,7 @@ public class SceneEntryRegression
         TimeManager.instance.EndFrame();
         Check(string.Join(",", Trace) == "loading:show", "Frame end alone must not start blocking save work.");
         TimeManager.instance.NextUpdate(); task.GetAwaiter().GetResult();
-        Check(string.Join(",", Trace) == "loading:show,save:1,load:2,loading:show,begin:2,story:close,loading:close",
+        Check(string.Join(",", Trace) == "loading:show,loading:show,save:1,load:2,loading:show,begin:2,story:close,loading:close",
             "Capture IDs at click and retain loading through save, load, BeginScene and Story closure.");
         Check(!entry.model.startingScene && !UiManager.instance.LoadingVisible, "Success releases the guard and loading item.");
 
@@ -152,6 +152,7 @@ public class UiManager
 }
 public static class Debug { public static int Errors; public static void LogException(Exception exception) { Errors++; } }
 public class Z_Event { }
+public static class Mathf { public static float Clamp01(float value) { return Math.Max(0, Math.Min(1, value)); } }
 public class Z_Manager<T> where T : new() { public static T instance = new T(); public virtual void Init() { } }
 public class TimeManager
 {

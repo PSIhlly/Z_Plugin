@@ -241,7 +241,7 @@ public class PlaySceneController : Z_Controller<PlayManager>, InternalPlaySceneC
     {
         GameManager.instance.evtCtrl.ClearSceneEvent();
 
-        GameManager.instance.saveCtrl.SaveSceneMap(PlayManager.instance.GetSceneCacheFileName());
+        // UnloadScenePlay saves once, before resetting the old scene controllers.
         enable = false;
 
         NotifyManager.instance.ClearAll();

@@ -92,6 +92,22 @@ PrefabInstance:
       propertyPath: m_Name
       value: Loading Variant
       objectReference: {fileID: 0}
+    - target: {fileID: 6939673428930027626, guid: 9684a91e5734922438a98f1e4fcfbe8a, type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 1420.9076
+      objectReference: {fileID: 0}
+    - target: {fileID: 6939673428930027626, guid: 9684a91e5734922438a98f1e4fcfbe8a, type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 176.7828
+      objectReference: {fileID: 0}
+    - target: {fileID: 6939673428930027626, guid: 9684a91e5734922438a98f1e4fcfbe8a, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6939673428930027626, guid: 9684a91e5734922438a98f1e4fcfbe8a, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: -0.00002861
+      objectReference: {fileID: 0}
     - target: {fileID: 8857016060710973673, guid: 9684a91e5734922438a98f1e4fcfbe8a, type: 3}
       propertyPath: preloadConfig
       value: 

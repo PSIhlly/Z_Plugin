@@ -111,6 +111,7 @@
     <Compile Include="Assets\Z_Level3\Z_UI\Core\Basic\Addition\FixedRate.cs" />
     <Compile Include="Assets\Z_Level3\Z_Map\Core\Misc\CanvasHolder.cs" />
     <Compile Include="Assets\GameSample\UiBase\UiPlaySceneMainBase.cs" />
+    <Compile Include="Assets\GameSample\MyScripts\Main\Event\Cmd\GlobalVarCmd.cs" />
     <Compile Include="Assets\GameSample\MyScripts\Mod\Ui\MapObject\UiModStoryMapObjectPassTypeCtrl.cs" />
     <Compile Include="Assets\GameSample\MyScripts\Main\Ui\UiModCtrl.cs" />
     <Compile Include="Assets\GameSample\MyScripts\Mod\Ui\Event\UiModStoryEventCustomCtrl.cs" />
@@ -150,6 +151,7 @@
     <Compile Include="Assets\Z_Level3\Z_UI\Core\Basic\Element\Btn.cs" />
     <Compile Include="Assets\GameSample\MyScripts\Main\Event\Cmd\Character\GetCharacterRightVectorCmd.cs" />
     <Compile Include="Assets\GameSample\MyScripts\Play\PlayAssetController.cs" />
+    <Compile Include="Assets\GameSample\MyScripts\Play\Ui\UiPlayEffectCtrl.cs" />
     <Compile Include="Assets\GameSample\UiBase\UiCmdInputAreaBase.cs" />
     <Compile Include="Assets\Z_Level3\Z_Map\Core\Item\ItemInstance.cs" />
     <Compile Include="Assets\GameSample\MyScripts\Main\CharacterProductForm.Reference.cs" />
@@ -209,6 +211,7 @@
     <Compile Include="Assets\Z_Level3\Z_Fight\Core\Form\ExcelCs\FightUnitForm.cs" />
     <Compile Include="Assets\GameSample\MyScripts\Main\Event\Cmd\Math\MultiplyCmd.cs" />
     <Compile Include="Assets\GameSample\MyScripts\Main\Event\Cmd\Image\SetImageOpacityCmd.cs" />
+    <Compile Include="Assets\GameSample\MyScripts\Mod\Ui\Event\UiModStoryGlobalVarCtrl.cs" />
     <Compile Include="Assets\GameSample\MyScripts\Main\Event\Cmd\CharacterPartyCmd.cs" />
     <Compile Include="Assets\Z_Level3\Z_Fight\Core\Weapon\WeaponInstance.cs" />
     <Compile Include="Assets\Z_Level3\Z_UI\Core\Basic\Element\Img.cs" />
@@ -292,6 +295,7 @@
     <Compile Include="Assets\GameSample\UiBase\UiModStoryEventCmdClipsBase.cs" />
     <Compile Include="Assets\GameSample\MyScripts\Main\Event\Cmd\NewVectorCmd.cs" />
     <Compile Include="Assets\Z_Level0\Z_Shader\Func\DisDark\DisFadeMaterialBinding.cs" />
+    <Compile Include="Assets\GameSample\MyScripts\Main\ObjectUnit.Direction.cs" />
     <Compile Include="Assets\GameSample\MyScripts\Util\DisplayCameraAreaManager.cs" />
     <Compile Include="Assets\GameSample\MyScripts\Main\Event\Cmd\Ui\Dialog\ShowDialogCmd.cs" />
     <Compile Include="Assets\Z_Level2\Z_Text\Core\TextManager.cs" />
@@ -329,6 +333,7 @@
     <Compile Include="Assets\GameSample\MyScripts\Play\Ui\Scene\UiPlaySceneMessageCtrl.cs" />
     <Compile Include="Assets\GameSample\MyScripts\Mod\Ui\Effect\UiModStoryEffectUnitCtrl.cs" />
     <Compile Include="Assets\GameSample\MyScripts\Play\Ui\PlayerData\UiPlayDataBackpackCtrl.cs" />
+    <Compile Include="Assets\Z_Level3\Z_Map\Core\MapModelColliderGeometry.cs" />
     <Compile Include="Assets\GameSample\Forms\ExcelCs\MissionForm.cs" />
     <Compile Include="Assets\GameSample\MyScripts\Main\Event\Cmd\Scene\TriggerTargetObject.cs" />
     <Compile Include="Assets\GameSample\MyScripts\Main\Event\Cmd\Math\GreaterCmd.cs" />
@@ -437,6 +442,7 @@
     <Compile Include="Assets\GameSample\MyScripts\Mod\Ui\Mission\UiModStoryMissionCtrl.cs" />
     <Compile Include="Assets\Z_Level3\Z_IlRuntime\Sample\Z_IlRuntime_Sample.cs" />
     <Compile Include="Assets\GameSample\Forms\ExcelCs\PassTypeForm.cs" />
+    <Compile Include="Assets\GameSample\UiBase\UiPlayEffectBase.cs" />
     <Compile Include="Assets\GameSample\MyScripts\Main\Event\Cmd\Character\CharacterPlayAnimCmd.cs" />
     <Compile Include="Assets\GameSample\MyScripts\Play\Ui\UiTeamSelectWindowCtrl.cs" />
     <Compile Include="Assets\GameSample\MyScripts\Main\Event\Cmd\Mission\IsMissionCompleteCmd.cs" />
@@ -452,6 +458,7 @@
     <Compile Include="Assets\Z_Level3\Z_UI\Ui\UiBase\UiDialogBgBase.cs" />
     <Compile Include="Assets\GameSample\MyScripts\Play\Ui\PlayerData\UiPlayDataCharacterDataCtrl.cs" />
     <Compile Include="Assets\Z_Level3\Z_UI\Core\Basic\Addition\TouchPass.cs" />
+    <Compile Include="Assets\GameSample\MyScripts\Main\Event\Cmd\Scene\IsSameObjectCmd.cs" />
     <Compile Include="Assets\Z_Level3\Z_Map\Core\Tile\TileUnit.cs" />
     <Compile Include="Assets\Z_Level3\Z_Map\Core\Form\ExcelCs\MapMainForm.cs" />
     <Compile Include="Assets\GameSample\MyScripts\Mod\Ui\Parameter\UiModStoryCharacterParameterCtrl.cs" />
@@ -483,6 +490,7 @@
     <Compile Include="Assets\GameSample\Forms\ExcelCs\SkillProductForm.cs" />
     <Compile Include="Assets\GameSample\UiBase\UiEnterMainBase.cs" />
     <Compile Include="Assets\GameSample\MyScripts\Mod\Ui\Item\UiModStoryItemUnitAppearanceCtrl.cs" />
+    <Compile Include="Assets\GameSample\MyScripts\Main\Event\Cmd\Scene\FadeOutCmd.cs" />
     <Compile Include="Assets\GameSample\UiBase\UiEventCustomTriggerBase.cs" />
     <Compile Include="Assets\GameSample\UiBase\UiModAssetSelectWindowBase.cs" />
     <Compile Include="Assets\GameSample\MyScripts\Mod\Ui\Item\UiModStoryItemUnitOverviewCtrl.cs" />
@@ -490,6 +498,8 @@
     <Compile Include="Assets\GameSample\MyScripts\Main\Event\Cmd\Scene\IsObjectActiveCmd.cs" />
     <Compile Include="Assets\Z_Level2\Z_Code\Sample\Z_Code_Sample.cs" />
     <Compile Include="Assets\GameSample\MyScripts\Mod\Ui\Character\UiModStoryCharacterUnitAppearanceListCtrl.cs" />
+    <Compile Include="Assets\GameSample\MyScripts\Main\Event\Cmd\Scene\DestroyCmd.cs" />
+    <Compile Include="Assets\GameSample\MyScripts\Main\Event\Cmd\Scene\FadeInCmd.cs" />
     <Compile Include="Assets\Z_Level3\Z_UI\Ui\Tips\UiInputAreaCtrl.cs" />
     <Compile Include="Assets\GameSample\MyScripts\Mod\Ui\Character\UiModStoryCharacterUnitOverviewCtrl.cs" />
     <Compile Include="Assets\GameSample\MyScripts\Main\Event\Cmd\VideoCmd.cs" />

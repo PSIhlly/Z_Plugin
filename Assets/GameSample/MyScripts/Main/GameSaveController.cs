@@ -11,6 +11,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using UnityEngine;
 using Z_ByteSerialize;
+using Z_Code.Form;
 using Z_DataSystem;
 using Z_DataSystem.Form;
 using Z_DesignStyle;
@@ -33,6 +34,7 @@ public class GameSaveController : Z_Controller<GameManager>
     public string sceneFormFileName => "saf";
     public string characterProductFormFileName => "cprf";
     public string eventFormFileName => "ef";
+    public string globalVariableFormFileName => "egvf";
     public string itemParamFormFileName => "ipaf";
     public string effectFormFileName => "etf";
     public string skillProductFormFileName => "splf";
@@ -71,16 +73,19 @@ public class GameSaveController : Z_Controller<GameManager>
 
     // Enter on the Unity thread: capture the cover and absolute path before any
     // worker touches files. No Texture, Form, or Unity API is used by the worker.
-    public Task<byte[]> PackageAsync(int storyId, CancellationToken cancellationToken = default)
+    public Task<byte[]> PackageAsync(int storyId, CancellationToken cancellationToken = default,
+        Action<string, long, long> report = null)
     {
         cancellationToken.ThrowIfCancellationRequested();
+        report?.Invoke("Package source bytes", 0, 0);
+        report?.Invoke("Encode PNG rows", 0, 0);
         var cover = CapturePackageCover(storyId);
         var core = SaveAndLoad.GetRealPath(Main2StoryManager.GetStoryCoreFolder(storyId));
         return Task.Run(() =>
         {
             cancellationToken.ThrowIfCancellationRequested();
             var png = PngPixelPackage.EncodeStreamWithCover(cover,
-                output => SaveAndLoad.WritePackage(core, output, cancellationToken), cancellationToken);
+                output => SaveAndLoad.WritePackage(core, output, cancellationToken, report), cancellationToken, report);
             cancellationToken.ThrowIfCancellationRequested();
             return png;
         }, cancellationToken);
@@ -187,12 +192,17 @@ public class GameSaveController : Z_Controller<GameManager>
         }
     }
 
-    public async Task<StoryForm.Data> ImportPackageAsync(string path, CancellationToken cancellationToken = default)
+    public async Task<StoryForm.Data> ImportPackageAsync(string path, CancellationToken cancellationToken = default,
+        Action<string, long, long> report = null)
     {
         // Force SaveAndLoad's Unity-backed static initialization on the caller
         // thread and keep workers independent of later perPath changes.
         var root = SaveAndLoad.GetRealPath(".");
-        var prepared = await Task.Run(() => PreparePackageImport(path, root, cancellationToken), cancellationToken);
+        foreach (var phase in new[] { "Read package file", "Decode PNG rows", "Verify package bytes", "Expand package bytes",
+            "Validate package files", "Extract package files", "Register Story" })
+            report?.Invoke(phase, 0, 0);
+        report?.Invoke("Read package file", 0, 1);
+        var prepared = await Task.Run(() => PreparePackageImport(path, root, cancellationToken, report), cancellationToken);
         StoryForm.Data story = null;
         string targetRoot = null;
         var moved = false;
@@ -202,6 +212,7 @@ public class GameSaveController : Z_Controller<GameManager>
             cancellationToken.ThrowIfCancellationRequested();
             // Generated Form parsing, IDs and registration belong to Unity's
             // thread, never to the decoder/extraction worker.
+            report?.Invoke("Register Story", 0, 1);
             story = StoryForm.GetDataByJo(prepared.overview);
             var id = 1;
             for (; id < StoryForm.autoIdCnt; id++)
@@ -227,6 +238,7 @@ public class GameSaveController : Z_Controller<GameManager>
             moved = true;
             StoryForm.AddData(story);
             committed = true;
+            report?.Invoke("Register Story", 1, 1);
             return story;
         }
         catch
@@ -252,10 +264,13 @@ public class GameSaveController : Z_Controller<GameManager>
         public JObject overview;
     }
 
-    private PreparedPackageImport PreparePackageImport(string path, string root, CancellationToken cancellationToken)
+    private PreparedPackageImport PreparePackageImport(string path, string root, CancellationToken cancellationToken,
+        Action<string, long, long> report)
     {
         cancellationToken.ThrowIfCancellationRequested();
-        var files = ReadPackage(File.ReadAllBytes(path));
+        var content = File.ReadAllBytes(path);
+        report?.Invoke("Read package file", 1, 1);
+        var files = ReadPackage(content, report, cancellationToken);
         var overview = ReadPackageOverview(files);
         cancellationToken.ThrowIfCancellationRequested();
         var stageRoot = Path.Combine(root, ".mod-import-" + Guid.NewGuid().ToString("N"));
@@ -263,10 +278,13 @@ public class GameSaveController : Z_Controller<GameManager>
         {
             var core = Path.Combine(stageRoot, "Core");
             Directory.CreateDirectory(core);
+            int completed = 0;
+            report?.Invoke("Extract package files", 0, Math.Max(1, files.Count));
             foreach (var file in files)
             {
                 cancellationToken.ThrowIfCancellationRequested();
                 SaveAndLoad.Save(Path.Combine(core, file.Key), (byte[])file.Value);
+                report?.Invoke("Extract package files", ++completed, Math.Max(1, files.Count));
             }
             cancellationToken.ThrowIfCancellationRequested();
             return new PreparedPackageImport { stageRoot = stageRoot, overview = overview };
@@ -296,7 +314,8 @@ public class GameSaveController : Z_Controller<GameManager>
             Directory.Delete(ownedRoot, true);
     }
 
-    private static JObject ReadPackage(byte[] content)
+    private static JObject ReadPackage(byte[] content, Action<string, long, long> report = null,
+        CancellationToken cancellationToken = default)
     {
         var signature = new byte[] { 137, 80, 78, 71, 13, 10, 26, 10 };
         if (content == null || content.Length < 20 || !signature.SequenceEqual(content.Take(8)))
@@ -321,22 +340,27 @@ public class GameSaveController : Z_Controller<GameManager>
         }
         if (!ended)
             throw new InvalidDataException("Incomplete Mod package.");
-        var extra = TextureHelper.GetExtraInfoByPNG(content);
+        var extra = TextureHelper.GetExtraInfoByPNG(content, report, cancellationToken);
         if (extra == null)
             throw new InvalidDataException("This file contains no Mod package data.");
+        report?.Invoke("Validate package files", 0, 1);
         var root = JObject.Parse(new System.Text.UTF8Encoding(false, true).GetString(extra));
         var files = new JObject();
         var names = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
         var queue = new Queue<JObject>();
         queue.Enqueue(root);
+        int completed = 0, total = root.Descendants().OfType<JProperty>().Count();
+        report?.Invoke("Validate package files", 0, Math.Max(1, total));
         while (queue.Count > 0)
         {
             foreach (var entry in queue.Dequeue())
             {
+                cancellationToken.ThrowIfCancellationRequested();
                 // Existing Package emits /directory objects plus flat file keys.
                 if (entry.Key.StartsWith("/") && entry.Value is JObject directory)
                 {
                     queue.Enqueue(directory);
+                    report?.Invoke("Validate package files", ++completed, Math.Max(1, total));
                     continue;
                 }
                 var path = entry.Key.Replace('\\', '/');
@@ -348,6 +372,7 @@ public class GameSaveController : Z_Controller<GameManager>
                     throw new InvalidDataException("Invalid or duplicate file path in Mod package: " + entry.Key);
                 // Validate Base64 for every file before any extraction/write.
                 files[path] = (byte[])entry.Value;
+                report?.Invoke("Validate package files", ++completed, Math.Max(1, total));
             }
         }
         return files;
@@ -360,7 +385,7 @@ public class GameSaveController : Z_Controller<GameManager>
     {
         if (MapManager.instance.data != null)
         {
-            SaveAndLoad.Save(scenePath, JsonConvert.SerializeObject(MapManager.instance.data.GetJsonData()));
+            SaveSceneMap(scenePath, MapManager.instance.data);
         }
     }
     public void SaveSceneMap(string scenePath, MapInfo data)
@@ -383,6 +408,7 @@ public class GameSaveController : Z_Controller<GameManager>
         SaveEffect(path);
         SaveMission(path);
         SaveEvent(path, null);
+        SaveGlobalVariables(path);
         SaveConfig(path);
         SaveScene(path);
 
@@ -411,6 +437,7 @@ public class GameSaveController : Z_Controller<GameManager>
         SaveEffect(path);
         SaveMission(path);
         SaveEvent(path);
+        SaveGlobalVariables(path);
         SaveConfig(path);
         SaveScene(path);
 
@@ -479,6 +506,7 @@ public class GameSaveController : Z_Controller<GameManager>
             {
                 product.EnsureDirectionData();
                 product.SyncLegacyAnimClip(product.GetDefaultAnimDirection());
+                product.SyncLegacyModelTransform(product.GetDefaultAnimDirection());
                 products.Add(ObjectProductForm.GetJoByData(product));
             }
         SaveAndLoad.Save(folder + "/" + objectProductFormFileName, products.ToString());
@@ -527,6 +555,12 @@ public class GameSaveController : Z_Controller<GameManager>
 
 
 
+    }
+
+    public void SaveGlobalVariables(string storyFolder)
+    {
+        SaveAndLoad.Save(storyFolder + "/" + globalVariableFormFileName,
+            EventGlobalVariableForm.GetJaByDatas().ToString());
     }
 
     public void SaveConfig(string storyFolder)
@@ -721,6 +755,7 @@ public class GameSaveController : Z_Controller<GameManager>
         LoadMission(folder);
 
         LoadEvent(folder);
+        LoadGlobalVariables(folder);
         LoadProgress(folder);
 
         DeleteCache(id);
@@ -731,6 +766,7 @@ public class GameSaveController : Z_Controller<GameManager>
     }
     public void ResetStory()
     {
+        Main2StoryManager.instance.DestroyWangTileTextures();
         LoadObjectProducts(null);
         LoadScene(null);
         LoadMaterial(null);
@@ -743,6 +779,7 @@ public class GameSaveController : Z_Controller<GameManager>
         LoadMission(null);
 
         LoadEvent(null);
+        LoadGlobalVariables(null);
         LoadProgress(null);
         LoadUiItem(null);
         LoadAsset(null);
@@ -770,6 +807,7 @@ public class GameSaveController : Z_Controller<GameManager>
         LoadMission(folder);
 
         LoadEvent(folder);
+        LoadGlobalVariables(folder);
         LoadProgress(folder);
         if (RepairSavedCurrentCharacter())
             SaveProgress(folder);
@@ -1162,6 +1200,21 @@ public class GameSaveController : Z_Controller<GameManager>
 
     }
 
+    public void LoadGlobalVariables(string folder)
+    {
+        // This Form contains only story-owned globals, including the maximum UID.
+        EventGlobalVariableForm.Clear();
+        if (folder == null)
+            return;
+
+        var path = folder + "/" + globalVariableFormFileName;
+        if (!SaveAndLoad.Exist(path))
+            return;
+
+        foreach (var variable in EventGlobalVariableForm.GetDatasByJa(JArray.Parse(SaveAndLoad.Load<string>(path))))
+            EventGlobalVariableForm.AddData(variable);
+    }
+
     public void LoadEvent(string folder)
     {
         var pathForm = folder + eventFormFileName;
@@ -1549,62 +1602,83 @@ public class GameSaveController : Z_Controller<GameManager>
 
     public void ResetPrefabPool()
     {
-        InstancePoolManager.instance.Clear();
-        foreach (Transform child in InstancePoolManager.instance.defaultRoot)
+        foreach (var step in GetPrefabPoolSteps()) step();
+    }
+
+    public IEnumerable<Action> GetPrefabPoolSteps()
+    {
+        yield return () =>
         {
-            GameObject.Destroy(child.gameObject); // 销毁子物体
-        }
+            InstancePoolManager.instance.Clear();
+            foreach (Transform child in InstancePoolManager.instance.defaultRoot)
+                GameObject.Destroy(child.gameObject);
+        };
         foreach (var form in GameObjectAssetForm.DataById.Values)
         {
             if (form.name.StartsWith(GlobalDefaultHelper.GetInternalPrefabName("")))
             {
-                InstancePoolManager.instance.AddPool(form.GetGo());
+                yield return () => InstancePoolManager.instance.AddPool(form.GetGo());
             }
         }
-        MapObjectForm.Clear();
-        if (ObjectProductForm.DatasByProtouid.TryGetValue(0, out var prototypes))
-            foreach (var product in prototypes.OrderBy(product => product.uid))
-                MapObjectForm.AddData(new MapObjectForm.Data(-1, product.name, product.icon,
-                    LabForm.GetOrCreateForBelong(product.labId, nameof(MapObjectForm)), product.uid));
+        yield return () =>
+        {
+            MapObjectForm.Clear();
+            if (ObjectProductForm.DatasByProtouid.TryGetValue(0, out var prototypes))
+                foreach (var product in prototypes.OrderBy(product => product.uid))
+                    MapObjectForm.AddData(new MapObjectForm.Data(-1, product.name, product.icon,
+                        LabForm.GetOrCreateForBelong(product.labId, nameof(MapObjectForm)), product.uid));
+        };
         foreach (var form in ObjectProductForm.DataByUid.Values.Where(product => product.protoUid == 0))
         {
-            var obj = _super.utilCtrl.CombineNewObjectByPrefabs(GlobalDefaultHelper.GetRuntimeMapObjectPrefabName(form.uid), form, true);
-            obj.transform.parent = InstancePoolManager.instance.defaultRoot;
-            InstancePoolManager.instance.AddPool(obj);
+            yield return () =>
+            {
+                var obj = _super.utilCtrl.CombineNewObjectByPrefabs(GlobalDefaultHelper.GetRuntimeMapObjectPrefabName(form.uid), form, true);
+                obj.transform.parent = InstancePoolManager.instance.defaultRoot;
+                InstancePoolManager.instance.AddPool(obj);
+            };
         }
 
-        //item生成mapItem
-        MapItemForm.Clear();
-        if (ItemProductForm.DatasByProtouid.ContainsKey(0))
+        yield return () =>
         {
-            foreach (var itemData in ItemProductForm.DatasByProtouid[0])
+            //item生成mapItem
+            MapItemForm.Clear();
+            if (ItemProductForm.DatasByProtouid.ContainsKey(0))
             {
-                var labId = LabForm.GetOrCreateForBelong(itemData.labId, nameof(MapItemForm));
-                MapItemForm.AddData(new MapItemForm.Data(-1, itemData.name, itemData.iconTexName, itemData.model, labId, itemData.uid));
+                foreach (var itemData in ItemProductForm.DatasByProtouid[0])
+                {
+                    var labId = LabForm.GetOrCreateForBelong(itemData.labId, nameof(MapItemForm));
+                    MapItemForm.AddData(new MapItemForm.Data(-1, itemData.name, itemData.iconTexName, itemData.model, labId, itemData.uid));
+                }
             }
-        }
 
-        //character生成mapCharacter
-        MapCharacterForm.Clear();
-        if (CharacterProductForm.DatasByProtouid.ContainsKey(0))
-        {
-            foreach (var characterData in CharacterProductForm.DatasByProtouid[0])
+            //character生成mapCharacter
+            MapCharacterForm.Clear();
+            if (CharacterProductForm.DatasByProtouid.ContainsKey(0))
             {
-                var labId = LabForm.GetOrCreateForBelong(characterData.labId, nameof(MapCharacterForm));
-                MapCharacterForm.AddData(new MapCharacterForm.Data(-1, characterData.name, characterData.avatarTex, labId, characterData.uid));
+                foreach (var characterData in CharacterProductForm.DatasByProtouid[0])
+                {
+                    var labId = LabForm.GetOrCreateForBelong(characterData.labId, nameof(MapCharacterForm));
+                    MapCharacterForm.AddData(new MapCharacterForm.Data(-1, characterData.name, characterData.avatarTex, labId, characterData.uid));
+                }
             }
-        }
+        };
 
         foreach (var form in ItemProductForm.DataByUid.Values)
         {
-            var obj = _super.utilCtrl.CombineNewObjectByPrefabs(GlobalDefaultHelper.GetRuntimeMapItemPrefabName(form.uid), form.model, true, true);
-            obj.transform.parent = InstancePoolManager.instance.defaultRoot;
-            InstancePoolManager.instance.AddPool(obj);
+            yield return () =>
+            {
+                var obj = _super.utilCtrl.CombineNewObjectByPrefabs(GlobalDefaultHelper.GetRuntimeMapItemPrefabName(form.uid), form.model, true, true);
+                obj.transform.parent = InstancePoolManager.instance.defaultRoot;
+                InstancePoolManager.instance.AddPool(obj);
+            };
         }
 
-        var character = _super.utilCtrl.CombineNewCharacterByPrefabs(GlobalDefaultHelper.GetRuntimePrefabName("character"), new List<int>() { GlobalDefaultHelper.DefaultTexId, GlobalDefaultHelper.DefaultTexId, -1 }, true);
-        character.transform.parent = InstancePoolManager.instance.defaultRoot;
-        InstancePoolManager.instance.AddPool(character);
+        yield return () =>
+        {
+            var character = _super.utilCtrl.CombineNewCharacterByPrefabs(GlobalDefaultHelper.GetRuntimePrefabName("character"), new List<int>() { GlobalDefaultHelper.DefaultTexId, GlobalDefaultHelper.DefaultTexId, -1 }, true);
+            character.transform.parent = InstancePoolManager.instance.defaultRoot;
+            InstancePoolManager.instance.AddPool(character);
+        };
 
     }
 

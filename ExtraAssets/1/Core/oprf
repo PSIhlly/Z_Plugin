@@ -1,8 +1,758 @@
 [
   {
-    "uid": 57,
-    "name": "触发1-1-3",
-    "labId": 0,
+    "uid": 70,
+    "name": "碎罐",
+    "labId": 14,
+    "protoUid": 0,
+    "icon": 210000,
+    "model": {
+      "id": 0,
+      "subPrefabUnitName": [
+        {
+          "v": 125049
+        }
+      ],
+      "subPrefabUnitPos": [
+        {
+          "v": "0|-0.25|0"
+        }
+      ],
+      "subPrefabUnitScale": [
+        {
+          "v": "0.6|0.5|0.6"
+        }
+      ],
+      "subUnitTexsName": [
+        {
+          "v": [
+            {
+              "v": 57
+            }
+          ]
+        }
+      ],
+      "animTimeInterval": 0.0,
+      "isObstacle": false,
+      "colliderScale": 1.0
+    },
+    "collision": false,
+    "events": [],
+    "paramDic": [],
+    "minimapIcon": 210000,
+    "faceType": 0,
+    "animClip": [
+      {
+        "k": 0,
+        "v": [
+          {
+            "v": 57
+          }
+        ]
+      },
+      {
+        "k": 1,
+        "v": []
+      },
+      {
+        "k": 2,
+        "v": []
+      },
+      {
+        "k": 3,
+        "v": []
+      },
+      {
+        "k": 4,
+        "v": []
+      }
+    ],
+    "isWangTile": false,
+    "boundsCollision": false,
+    "centerCollider": true,
+    "modelSizes": [
+      {
+        "k": 0,
+        "v": "0.6|0.5|0.6"
+      },
+      {
+        "k": 1,
+        "v": "1|1|1"
+      },
+      {
+        "k": 2,
+        "v": "1|1|1"
+      },
+      {
+        "k": 3,
+        "v": "1|1|1"
+      },
+      {
+        "k": 4,
+        "v": "1|1|1"
+      }
+    ],
+    "modelPositions": [
+      {
+        "k": 0,
+        "v": "0|-0.25|0"
+      },
+      {
+        "k": 1,
+        "v": "0|0|0"
+      },
+      {
+        "k": 2,
+        "v": "0|0|0"
+      },
+      {
+        "k": 3,
+        "v": "0|0|0"
+      },
+      {
+        "k": 4,
+        "v": "0|0|0"
+      }
+    ]
+  },
+  {
+    "uid": 69,
+    "name": "罐",
+    "labId": 17,
+    "protoUid": 0,
+    "icon": 210000,
+    "model": {
+      "id": 0,
+      "subPrefabUnitName": [
+        {
+          "v": 125049
+        }
+      ],
+      "subPrefabUnitPos": [
+        {
+          "v": "0|-0.25|0"
+        }
+      ],
+      "subPrefabUnitScale": [
+        {
+          "v": "0.6|0.5|0.6"
+        }
+      ],
+      "subUnitTexsName": [
+        {
+          "v": [
+            {
+              "v": 1614
+            }
+          ]
+        }
+      ],
+      "animTimeInterval": 0.0,
+      "isObstacle": false,
+      "colliderScale": 1.0
+    },
+    "collision": true,
+    "events": [],
+    "paramDic": [
+      {
+        "k": "可破坏",
+        "v": {
+          "uid": -1,
+          "name": "可破坏",
+          "valueType": 0,
+          "min": "",
+          "v": "{\r\n  \"uid\": -1,\r\n  \"str\": null,\r\n  \"valName\": null,\r\n  \"num\": 1.0,\r\n  \"dic\": []\r\n}",
+          "max": ""
+        }
+      }
+    ],
+    "minimapIcon": 210000,
+    "faceType": 0,
+    "animClip": [
+      {
+        "k": 0,
+        "v": [
+          {
+            "v": 1614
+          }
+        ]
+      },
+      {
+        "k": 1,
+        "v": []
+      },
+      {
+        "k": 2,
+        "v": []
+      },
+      {
+        "k": 3,
+        "v": []
+      },
+      {
+        "k": 4,
+        "v": []
+      }
+    ],
+    "isWangTile": false,
+    "boundsCollision": false,
+    "centerCollider": true,
+    "modelSizes": [
+      {
+        "k": 0,
+        "v": "0.6|0.5|0.6"
+      },
+      {
+        "k": 1,
+        "v": "1|1|1"
+      },
+      {
+        "k": 2,
+        "v": "1|1|1"
+      },
+      {
+        "k": 3,
+        "v": "1|1|1"
+      },
+      {
+        "k": 4,
+        "v": "1|1|1"
+      }
+    ],
+    "modelPositions": [
+      {
+        "k": 0,
+        "v": "0|-0.25|0"
+      },
+      {
+        "k": 1,
+        "v": "0|0|0"
+      },
+      {
+        "k": 2,
+        "v": "0|0|0"
+      },
+      {
+        "k": 3,
+        "v": "0|0|0"
+      },
+      {
+        "k": 4,
+        "v": "0|0|0"
+      }
+    ]
+  },
+  {
+    "uid": 68,
+    "name": "灯柱",
+    "labId": 14,
+    "protoUid": 0,
+    "icon": 210000,
+    "model": {
+      "id": 0,
+      "subPrefabUnitName": [
+        {
+          "v": 125049
+        }
+      ],
+      "subPrefabUnitPos": [
+        {
+          "v": "0|0.25|0"
+        }
+      ],
+      "subPrefabUnitScale": [
+        {
+          "v": "0.8|1.5|0.8"
+        }
+      ],
+      "subUnitTexsName": [
+        {
+          "v": [
+            {
+              "v": 890
+            }
+          ]
+        }
+      ],
+      "animTimeInterval": 0.0,
+      "isObstacle": false,
+      "colliderScale": 1.0
+    },
+    "collision": true,
+    "events": [],
+    "paramDic": [
+      {
+        "k": "可破坏",
+        "v": {
+          "uid": -1,
+          "name": "可破坏",
+          "valueType": 0,
+          "min": "",
+          "v": "{\r\n  \"uid\": -1,\r\n  \"str\": null,\r\n  \"valName\": null,\r\n  \"num\": 0.0,\r\n  \"dic\": []\r\n}",
+          "max": ""
+        }
+      }
+    ],
+    "minimapIcon": 210000,
+    "faceType": 0,
+    "animClip": [
+      {
+        "k": 0,
+        "v": [
+          {
+            "v": 890
+          }
+        ]
+      },
+      {
+        "k": 1,
+        "v": []
+      },
+      {
+        "k": 2,
+        "v": []
+      },
+      {
+        "k": 3,
+        "v": []
+      },
+      {
+        "k": 4,
+        "v": []
+      }
+    ],
+    "isWangTile": false,
+    "boundsCollision": false,
+    "centerCollider": true,
+    "modelSizes": [
+      {
+        "k": 0,
+        "v": "0.8|1.5|0.8"
+      },
+      {
+        "k": 1,
+        "v": "1|2|1"
+      },
+      {
+        "k": 2,
+        "v": "1|2|1"
+      },
+      {
+        "k": 3,
+        "v": "1|2|1"
+      },
+      {
+        "k": 4,
+        "v": "1|2|1"
+      }
+    ],
+    "modelPositions": [
+      {
+        "k": 0,
+        "v": "0|0.25|0"
+      },
+      {
+        "k": 1,
+        "v": "0|0.5|0"
+      },
+      {
+        "k": 2,
+        "v": "0|0.5|0"
+      },
+      {
+        "k": 3,
+        "v": "0|0.5|0"
+      },
+      {
+        "k": 4,
+        "v": "0|0.5|0"
+      }
+    ]
+  },
+  {
+    "uid": 67,
+    "name": "注绳2",
+    "labId": 14,
+    "protoUid": 0,
+    "icon": 210000,
+    "model": {
+      "id": 0,
+      "subPrefabUnitName": [
+        {
+          "v": 125049
+        }
+      ],
+      "subPrefabUnitPos": [
+        {
+          "v": "0|0.85|0"
+        }
+      ],
+      "subPrefabUnitScale": [
+        {
+          "v": "3|0.7|1"
+        }
+      ],
+      "subUnitTexsName": [
+        {
+          "v": [
+            {
+              "v": 314
+            }
+          ]
+        }
+      ],
+      "animTimeInterval": 0.0,
+      "isObstacle": false,
+      "colliderScale": 1.0
+    },
+    "collision": false,
+    "events": [],
+    "paramDic": [
+      {
+        "k": "可破坏",
+        "v": {
+          "uid": -1,
+          "name": "可破坏",
+          "valueType": 0,
+          "min": "",
+          "v": "{\r\n  \"uid\": -1,\r\n  \"str\": null,\r\n  \"valName\": null,\r\n  \"num\": 0.0,\r\n  \"dic\": []\r\n}",
+          "max": ""
+        }
+      }
+    ],
+    "minimapIcon": 210000,
+    "faceType": 0,
+    "animClip": [
+      {
+        "k": 0,
+        "v": [
+          {
+            "v": 314
+          }
+        ]
+      },
+      {
+        "k": 1,
+        "v": []
+      },
+      {
+        "k": 2,
+        "v": []
+      },
+      {
+        "k": 3,
+        "v": []
+      },
+      {
+        "k": 4,
+        "v": []
+      }
+    ],
+    "isWangTile": false,
+    "boundsCollision": false,
+    "centerCollider": true,
+    "modelSizes": [
+      {
+        "k": 0,
+        "v": "3|0.7|1"
+      },
+      {
+        "k": 1,
+        "v": "1|2|1"
+      },
+      {
+        "k": 2,
+        "v": "1|2|1"
+      },
+      {
+        "k": 3,
+        "v": "1|2|1"
+      },
+      {
+        "k": 4,
+        "v": "1|2|1"
+      }
+    ],
+    "modelPositions": [
+      {
+        "k": 0,
+        "v": "0|0.85|0"
+      },
+      {
+        "k": 1,
+        "v": "0|0.5|0"
+      },
+      {
+        "k": 2,
+        "v": "0|0.5|0"
+      },
+      {
+        "k": 3,
+        "v": "0|0.5|0"
+      },
+      {
+        "k": 4,
+        "v": "0|0.5|0"
+      }
+    ]
+  },
+  {
+    "uid": 66,
+    "name": "注绳1",
+    "labId": 14,
+    "protoUid": 0,
+    "icon": 210000,
+    "model": {
+      "id": 0,
+      "subPrefabUnitName": [
+        {
+          "v": 125049
+        }
+      ],
+      "subPrefabUnitPos": [
+        {
+          "v": "0|0.85|0"
+        }
+      ],
+      "subPrefabUnitScale": [
+        {
+          "v": "3|0.7|1"
+        }
+      ],
+      "subUnitTexsName": [
+        {
+          "v": [
+            {
+              "v": 315
+            }
+          ]
+        }
+      ],
+      "animTimeInterval": 0.0,
+      "isObstacle": false,
+      "colliderScale": 1.0
+    },
+    "collision": false,
+    "events": [],
+    "paramDic": [
+      {
+        "k": "可破坏",
+        "v": {
+          "uid": -1,
+          "name": "可破坏",
+          "valueType": 0,
+          "min": "",
+          "v": "{\r\n  \"uid\": -1,\r\n  \"str\": null,\r\n  \"valName\": null,\r\n  \"num\": 0.0,\r\n  \"dic\": []\r\n}",
+          "max": ""
+        }
+      }
+    ],
+    "minimapIcon": 210000,
+    "faceType": 0,
+    "animClip": [
+      {
+        "k": 0,
+        "v": [
+          {
+            "v": 315
+          }
+        ]
+      },
+      {
+        "k": 1,
+        "v": []
+      },
+      {
+        "k": 2,
+        "v": []
+      },
+      {
+        "k": 3,
+        "v": []
+      },
+      {
+        "k": 4,
+        "v": []
+      }
+    ],
+    "isWangTile": false,
+    "boundsCollision": false,
+    "centerCollider": true,
+    "modelSizes": [
+      {
+        "k": 0,
+        "v": "3|0.7|1"
+      },
+      {
+        "k": 1,
+        "v": "1|2|1"
+      },
+      {
+        "k": 2,
+        "v": "1|2|1"
+      },
+      {
+        "k": 3,
+        "v": "1|2|1"
+      },
+      {
+        "k": 4,
+        "v": "1|2|1"
+      }
+    ],
+    "modelPositions": [
+      {
+        "k": 0,
+        "v": "0|0.85|0"
+      },
+      {
+        "k": 1,
+        "v": "0|0.5|0"
+      },
+      {
+        "k": 2,
+        "v": "0|0.5|0"
+      },
+      {
+        "k": 3,
+        "v": "0|0.5|0"
+      },
+      {
+        "k": 4,
+        "v": "0|0.5|0"
+      }
+    ]
+  },
+  {
+    "uid": 23,
+    "name": "神乐铃",
+    "labId": 14,
+    "protoUid": 0,
+    "icon": 210000,
+    "model": {
+      "id": 0,
+      "subPrefabUnitName": [
+        {
+          "v": 125049
+        }
+      ],
+      "subPrefabUnitPos": [
+        {
+          "v": "0|0.25|0"
+        }
+      ],
+      "subPrefabUnitScale": [
+        {
+          "v": "0.8|1.5|0.8"
+        }
+      ],
+      "subUnitTexsName": [
+        {
+          "v": [
+            {
+              "v": 1598
+            }
+          ]
+        }
+      ],
+      "animTimeInterval": 0.0,
+      "isObstacle": false,
+      "colliderScale": 1.0
+    },
+    "collision": true,
+    "events": [],
+    "paramDic": [
+      {
+        "k": "可破坏",
+        "v": {
+          "uid": -1,
+          "name": "可破坏",
+          "valueType": 0,
+          "min": "",
+          "v": "{\r\n  \"uid\": -1,\r\n  \"str\": null,\r\n  \"valName\": null,\r\n  \"num\": 0.0,\r\n  \"dic\": []\r\n}",
+          "max": ""
+        }
+      }
+    ],
+    "minimapIcon": 210000,
+    "faceType": 0,
+    "animClip": [
+      {
+        "k": 0,
+        "v": [
+          {
+            "v": 1598
+          }
+        ]
+      },
+      {
+        "k": 1,
+        "v": []
+      },
+      {
+        "k": 2,
+        "v": []
+      },
+      {
+        "k": 3,
+        "v": []
+      },
+      {
+        "k": 4,
+        "v": []
+      }
+    ],
+    "isWangTile": false,
+    "boundsCollision": false,
+    "centerCollider": true,
+    "modelSizes": [
+      {
+        "k": 0,
+        "v": "0.8|1.5|0.8"
+      },
+      {
+        "k": 1,
+        "v": "1|2|1"
+      },
+      {
+        "k": 2,
+        "v": "1|2|1"
+      },
+      {
+        "k": 3,
+        "v": "1|2|1"
+      },
+      {
+        "k": 4,
+        "v": "1|2|1"
+      }
+    ],
+    "modelPositions": [
+      {
+        "k": 0,
+        "v": "0|0.25|0"
+      },
+      {
+        "k": 1,
+        "v": "0|0.5|0"
+      },
+      {
+        "k": 2,
+        "v": "0|0.5|0"
+      },
+      {
+        "k": 3,
+        "v": "0|0.5|0"
+      },
+      {
+        "k": 4,
+        "v": "0|0.5|0"
+      }
+    ]
+  },
+  {
+    "uid": 65,
+    "name": "柜",
+    "labId": 14,
     "protoUid": 0,
     "icon": 210000,
     "model": {
@@ -19,14 +769,14 @@
       ],
       "subPrefabUnitScale": [
         {
-          "v": "8|1|8"
+          "v": "1|1|1"
         }
       ],
       "subUnitTexsName": [
         {
           "v": [
             {
-              "v": 210000
+              "v": 1616
             }
           ]
         }
@@ -35,58 +785,116 @@
       "isObstacle": false,
       "colliderScale": 1.0
     },
-    "collision": false,
-    "events": [
+    "collision": true,
+    "events": [],
+    "paramDic": [
       {
-        "k": "onCharacterTouchEvent",
+        "k": "可破坏",
         "v": {
           "uid": -1,
-          "name": "onCharacterTouchEvent",
-          "evt": [
-            {
-              "v": 29
-            }
-          ],
-          "type": 0
+          "name": "可破坏",
+          "valueType": 0,
+          "min": "",
+          "v": "{\r\n  \"uid\": -1,\r\n  \"str\": null,\r\n  \"valName\": null,\r\n  \"num\": 0.0,\r\n  \"dic\": []\r\n}",
+          "max": ""
         }
       }
     ],
-    "paramDic": [],
     "minimapIcon": 210000,
-    "faceType": 0,
+    "faceType": 1,
     "animClip": [
       {
         "k": 0,
         "v": [
           {
-            "v": 210000
+            "v": 1616
           }
         ]
       },
       {
         "k": 1,
-        "v": []
+        "v": [
+          {
+            "v": 1616
+          }
+        ]
       },
       {
         "k": 2,
-        "v": []
+        "v": [
+          {
+            "v": 1414
+          }
+        ]
       },
       {
         "k": 3,
-        "v": []
+        "v": [
+          {
+            "v": 1415
+          }
+        ]
       },
       {
         "k": 4,
-        "v": []
+        "v": [
+          {
+            "v": 1415
+          }
+        ]
       }
     ],
     "isWangTile": false,
     "boundsCollision": false,
-    "centerCollider": true
+    "centerCollider": true,
+    "modelSizes": [
+      {
+        "k": 0,
+        "v": "1|1|1"
+      },
+      {
+        "k": 1,
+        "v": "1|1|1"
+      },
+      {
+        "k": 2,
+        "v": "1|1|1"
+      },
+      {
+        "k": 3,
+        "v": "1|1|1"
+      },
+      {
+        "k": 4,
+        "v": "1|1|1"
+      }
+    ],
+    "modelPositions": [
+      {
+        "k": 0,
+        "v": "0|0|0"
+      },
+      {
+        "k": 1,
+        "v": "0|0|0"
+      },
+      {
+        "k": 2,
+        "v": "0|0|0"
+      },
+      {
+        "k": 3,
+        "v": "0|0|0"
+      },
+      {
+        "k": 4,
+        "v": "0|0|0"
+      }
+    ]
   },
   {
-    "uid": 56,
-    "name": "森",
+    "uid": 64,
+    "name": "杂物箱",
     "labId": 14,
     "protoUid": 0,
     "icon": 210000,
@@ -99,19 +907,19 @@
       ],
       "subPrefabUnitPos": [
         {
-          "v": "0|0.25|0"
+          "v": "0|0|0"
         }
       ],
       "subPrefabUnitScale": [
         {
-          "v": "5|1.5|5"
+          "v": "1|1|1"
         }
       ],
       "subUnitTexsName": [
         {
           "v": [
             {
-              "v": 2240
+              "v": 1613
             }
           ]
         }
@@ -122,42 +930,114 @@
     },
     "collision": true,
     "events": [],
-    "paramDic": [],
+    "paramDic": [
+      {
+        "k": "可破坏",
+        "v": {
+          "uid": -1,
+          "name": "可破坏",
+          "valueType": 0,
+          "min": "",
+          "v": "{\r\n  \"uid\": -1,\r\n  \"str\": null,\r\n  \"valName\": null,\r\n  \"num\": 0.0,\r\n  \"dic\": []\r\n}",
+          "max": ""
+        }
+      }
+    ],
     "minimapIcon": 210000,
-    "faceType": 0,
+    "faceType": 1,
     "animClip": [
       {
         "k": 0,
         "v": [
           {
-            "v": 2240
+            "v": 1613
           }
         ]
       },
       {
         "k": 1,
-        "v": []
+        "v": [
+          {
+            "v": 1613
+          }
+        ]
       },
       {
         "k": 2,
-        "v": []
+        "v": [
+          {
+            "v": 1416
+          }
+        ]
       },
       {
         "k": 3,
-        "v": []
+        "v": [
+          {
+            "v": 1417
+          }
+        ]
       },
       {
         "k": 4,
-        "v": []
+        "v": [
+          {
+            "v": 1417
+          }
+        ]
       }
     ],
     "isWangTile": false,
     "boundsCollision": false,
-    "centerCollider": true
+    "centerCollider": true,
+    "modelSizes": [
+      {
+        "k": 0,
+        "v": "1|1|1"
+      },
+      {
+        "k": 1,
+        "v": "1|1|1"
+      },
+      {
+        "k": 2,
+        "v": "1|1|1"
+      },
+      {
+        "k": 3,
+        "v": "1|1|1"
+      },
+      {
+        "k": 4,
+        "v": "1|1|1"
+      }
+    ],
+    "modelPositions": [
+      {
+        "k": 0,
+        "v": "0|0|0"
+      },
+      {
+        "k": 1,
+        "v": "0|0|0"
+      },
+      {
+        "k": 2,
+        "v": "0|0|0"
+      },
+      {
+        "k": 3,
+        "v": "0|0|0"
+      },
+      {
+        "k": 4,
+        "v": "0|0|0"
+      }
+    ]
   },
   {
-    "uid": 55,
-    "name": "林",
+    "uid": 63,
+    "name": "坐垫",
     "labId": 14,
     "protoUid": 0,
     "icon": 210000,
@@ -170,30 +1050,42 @@
       ],
       "subPrefabUnitPos": [
         {
-          "v": "0|0.25|0"
+          "v": "0|-0.45|0"
         }
       ],
       "subPrefabUnitScale": [
         {
-          "v": "3|1.5|3"
+          "v": "0.5|0.1|0.5"
         }
       ],
       "subUnitTexsName": [
         {
           "v": [
             {
-              "v": 123
+              "v": 1631
             }
           ]
         }
       ],
       "animTimeInterval": 0.0,
       "isObstacle": false,
-      "colliderScale": 1.0
+      "colliderScale": 0.0
     },
-    "collision": true,
+    "collision": false,
     "events": [],
-    "paramDic": [],
+    "paramDic": [
+      {
+        "k": "可破坏",
+        "v": {
+          "uid": -1,
+          "name": "可破坏",
+          "valueType": 0,
+          "min": "",
+          "v": "{\r\n  \"uid\": -1,\r\n  \"str\": null,\r\n  \"valName\": null,\r\n  \"num\": 0.0,\r\n  \"dic\": []\r\n}",
+          "max": ""
+        }
+      }
+    ],
     "minimapIcon": 210000,
     "faceType": 0,
     "animClip": [
@@ -201,7 +1093,7 @@
         "k": 0,
         "v": [
           {
-            "v": 123
+            "v": 1631
           }
         ]
       },
@@ -224,11 +1116,182 @@
     ],
     "isWangTile": false,
     "boundsCollision": false,
-    "centerCollider": true
+    "centerCollider": true,
+    "modelSizes": [
+      {
+        "k": 0,
+        "v": "0.5|0.1|0.5"
+      },
+      {
+        "k": 1,
+        "v": "1|1|1"
+      },
+      {
+        "k": 2,
+        "v": "1|1|1"
+      },
+      {
+        "k": 3,
+        "v": "1|1|1"
+      },
+      {
+        "k": 4,
+        "v": "1|1|1"
+      }
+    ],
+    "modelPositions": [
+      {
+        "k": 0,
+        "v": "0|-0.45|0"
+      },
+      {
+        "k": 1,
+        "v": "0|0|0"
+      },
+      {
+        "k": 2,
+        "v": "0|0|0"
+      },
+      {
+        "k": 3,
+        "v": "0|0|0"
+      },
+      {
+        "k": 4,
+        "v": "0|0|0"
+      }
+    ]
   },
   {
-    "uid": 54,
-    "name": "小树",
+    "uid": 36,
+    "name": "钱箱",
+    "labId": 14,
+    "protoUid": 0,
+    "icon": 210000,
+    "model": {
+      "id": 0,
+      "subPrefabUnitName": [
+        {
+          "v": 125049
+        }
+      ],
+      "subPrefabUnitPos": [
+        {
+          "v": "0|-0.15|0"
+        }
+      ],
+      "subPrefabUnitScale": [
+        {
+          "v": "1|0.7|1"
+        }
+      ],
+      "subUnitTexsName": [
+        {
+          "v": [
+            {
+              "v": 1600
+            }
+          ]
+        }
+      ],
+      "animTimeInterval": 0.0,
+      "isObstacle": false,
+      "colliderScale": 1.0
+    },
+    "collision": true,
+    "events": [],
+    "paramDic": [
+      {
+        "k": "可破坏",
+        "v": {
+          "uid": -1,
+          "name": "可破坏",
+          "valueType": 0,
+          "min": "",
+          "v": "{\r\n  \"uid\": -1,\r\n  \"str\": null,\r\n  \"valName\": null,\r\n  \"num\": 0.0,\r\n  \"dic\": []\r\n}",
+          "max": ""
+        }
+      }
+    ],
+    "minimapIcon": 210000,
+    "faceType": 0,
+    "animClip": [
+      {
+        "k": 0,
+        "v": [
+          {
+            "v": 1600
+          }
+        ]
+      },
+      {
+        "k": 1,
+        "v": []
+      },
+      {
+        "k": 2,
+        "v": []
+      },
+      {
+        "k": 3,
+        "v": []
+      },
+      {
+        "k": 4,
+        "v": []
+      }
+    ],
+    "isWangTile": false,
+    "boundsCollision": false,
+    "centerCollider": true,
+    "modelSizes": [
+      {
+        "k": 0,
+        "v": "1|0.7|1"
+      },
+      {
+        "k": 1,
+        "v": "1|1|1"
+      },
+      {
+        "k": 2,
+        "v": "1|1|1"
+      },
+      {
+        "k": 3,
+        "v": "1|1|1"
+      },
+      {
+        "k": 4,
+        "v": "1|1|1"
+      }
+    ],
+    "modelPositions": [
+      {
+        "k": 0,
+        "v": "0|-0.15|0"
+      },
+      {
+        "k": 1,
+        "v": "0|0|0"
+      },
+      {
+        "k": 2,
+        "v": "0|0|0"
+      },
+      {
+        "k": 3,
+        "v": "0|0|0"
+      },
+      {
+        "k": 4,
+        "v": "0|0|0"
+      }
+    ]
+  },
+  {
+    "uid": 22,
+    "name": "石灯",
     "labId": 14,
     "protoUid": 0,
     "icon": 210000,
@@ -253,7 +1316,134 @@
         {
           "v": [
             {
-              "v": 691
+              "v": 1599
+            }
+          ]
+        }
+      ],
+      "animTimeInterval": 0.0,
+      "isObstacle": false,
+      "colliderScale": 0.0
+    },
+    "collision": true,
+    "events": [],
+    "paramDic": [
+      {
+        "k": "可破坏",
+        "v": {
+          "uid": -1,
+          "name": "可破坏",
+          "valueType": 0,
+          "min": "",
+          "v": "{\r\n  \"uid\": -1,\r\n  \"str\": null,\r\n  \"valName\": null,\r\n  \"num\": 0.0,\r\n  \"dic\": []\r\n}",
+          "max": ""
+        }
+      }
+    ],
+    "minimapIcon": 210000,
+    "faceType": 0,
+    "animClip": [
+      {
+        "k": 0,
+        "v": [
+          {
+            "v": 1599
+          }
+        ]
+      },
+      {
+        "k": 1,
+        "v": []
+      },
+      {
+        "k": 2,
+        "v": []
+      },
+      {
+        "k": 3,
+        "v": []
+      },
+      {
+        "k": 4,
+        "v": []
+      }
+    ],
+    "isWangTile": false,
+    "boundsCollision": false,
+    "centerCollider": true,
+    "modelSizes": [
+      {
+        "k": 0,
+        "v": "1|1.5|1"
+      },
+      {
+        "k": 1,
+        "v": "1|1|1"
+      },
+      {
+        "k": 2,
+        "v": "1|1|1"
+      },
+      {
+        "k": 3,
+        "v": "1|1|1"
+      },
+      {
+        "k": 4,
+        "v": "1|1|1"
+      }
+    ],
+    "modelPositions": [
+      {
+        "k": 0,
+        "v": "0|0.25|0"
+      },
+      {
+        "k": 1,
+        "v": "0|0|0"
+      },
+      {
+        "k": 2,
+        "v": "0|0|0"
+      },
+      {
+        "k": 3,
+        "v": "0|0|0"
+      },
+      {
+        "k": 4,
+        "v": "0|0|0"
+      }
+    ]
+  },
+  {
+    "uid": 14,
+    "name": "樱树",
+    "labId": 14,
+    "protoUid": 0,
+    "icon": 210000,
+    "model": {
+      "id": 0,
+      "subPrefabUnitName": [
+        {
+          "v": 125049
+        }
+      ],
+      "subPrefabUnitPos": [
+        {
+          "v": "0|0.25|0"
+        }
+      ],
+      "subPrefabUnitScale": [
+        {
+          "v": "1|1.5|1"
+        }
+      ],
+      "subUnitTexsName": [
+        {
+          "v": [
+            {
+              "v": 767
             }
           ]
         }
@@ -264,163 +1454,19 @@
     },
     "collision": true,
     "events": [],
-    "paramDic": [],
-    "minimapIcon": 210000,
-    "faceType": 0,
-    "animClip": [
+    "paramDic": [
       {
-        "k": 0,
-        "v": [
-          {
-            "v": 691
-          }
-        ]
-      },
-      {
-        "k": 1,
-        "v": []
-      },
-      {
-        "k": 2,
-        "v": []
-      },
-      {
-        "k": 3,
-        "v": []
-      },
-      {
-        "k": 4,
-        "v": []
-      }
-    ],
-    "isWangTile": false,
-    "boundsCollision": false,
-    "centerCollider": true
-  },
-  {
-    "uid": 53,
-    "name": "窗1",
-    "labId": 15,
-    "protoUid": 0,
-    "icon": 210000,
-    "model": {
-      "id": 0,
-      "subPrefabUnitName": [
-        {
-          "v": 125049
-        }
-      ],
-      "subPrefabUnitPos": [
-        {
-          "v": "-2.682209E-07|0.2|-0.2060958"
-        }
-      ],
-      "subPrefabUnitScale": [
-        {
-          "v": "1|1|0.1"
-        }
-      ],
-      "subUnitTexsName": [
-        {
-          "v": [
-            {
-              "v": 1304
-            }
-          ]
-        }
-      ],
-      "animTimeInterval": 0.0,
-      "isObstacle": false,
-      "colliderScale": 0.0
-    },
-    "collision": false,
-    "events": [],
-    "paramDic": [],
-    "minimapIcon": 210000,
-    "faceType": 0,
-    "animClip": [
-      {
-        "k": 0,
-        "v": [
-          {
-            "v": 1304
-          }
-        ]
-      },
-      {
-        "k": 1,
-        "v": []
-      },
-      {
-        "k": 2,
-        "v": []
-      },
-      {
-        "k": 3,
-        "v": []
-      },
-      {
-        "k": 4,
-        "v": []
-      }
-    ],
-    "isWangTile": false,
-    "boundsCollision": false,
-    "centerCollider": true
-  },
-  {
-    "uid": 52,
-    "name": "触发1-1-2",
-    "labId": 0,
-    "protoUid": 0,
-    "icon": 210000,
-    "model": {
-      "id": 0,
-      "subPrefabUnitName": [
-        {
-          "v": 125049
-        }
-      ],
-      "subPrefabUnitPos": [
-        {
-          "v": "0|0|0"
-        }
-      ],
-      "subPrefabUnitScale": [
-        {
-          "v": "1|1|5"
-        }
-      ],
-      "subUnitTexsName": [
-        {
-          "v": [
-            {
-              "v": 210000
-            }
-          ]
-        }
-      ],
-      "animTimeInterval": 0.0,
-      "isObstacle": false,
-      "colliderScale": 1.0
-    },
-    "collision": false,
-    "events": [
-      {
-        "k": "onCharacterTouchEvent",
+        "k": "可破坏",
         "v": {
           "uid": -1,
-          "name": "onCharacterTouchEvent",
-          "evt": [
-            {
-              "v": 24
-            }
-          ],
-          "type": 0
+          "name": "可破坏",
+          "valueType": 0,
+          "min": "",
+          "v": "{\r\n  \"uid\": -1,\r\n  \"str\": null,\r\n  \"valName\": null,\r\n  \"num\": 0.0,\r\n  \"dic\": []\r\n}",
+          "max": ""
         }
       }
     ],
-    "paramDic": [],
     "minimapIcon": 210000,
     "faceType": 0,
     "animClip": [
@@ -428,7 +1474,7 @@
         "k": 0,
         "v": [
           {
-            "v": 210000
+            "v": 767
           }
         ]
       },
@@ -451,641 +1497,55 @@
     ],
     "isWangTile": false,
     "boundsCollision": false,
-    "centerCollider": true
-  },
-  {
-    "uid": 51,
-    "name": "木墙",
-    "labId": 14,
-    "protoUid": 0,
-    "icon": 210000,
-    "model": {
-      "id": 0,
-      "subPrefabUnitName": [
-        {
-          "v": 125049
-        }
-      ],
-      "subPrefabUnitPos": [
-        {
-          "v": "0|0.3|0"
-        }
-      ],
-      "subPrefabUnitScale": [
-        {
-          "v": "1|2|1"
-        }
-      ],
-      "subUnitTexsName": [
-        {
-          "v": [
-            {
-              "v": 268
-            }
-          ]
-        }
-      ],
-      "animTimeInterval": 0.0,
-      "isObstacle": false,
-      "colliderScale": 1.0
-    },
-    "collision": true,
-    "events": [],
-    "paramDic": [],
-    "minimapIcon": 210000,
-    "faceType": 0,
-    "animClip": [
+    "centerCollider": true,
+    "modelSizes": [
       {
         "k": 0,
-        "v": [
-          {
-            "v": 268
-          }
-        ]
+        "v": "1|1.5|1"
       },
       {
         "k": 1,
-        "v": [
-          {
-            "v": 108
-          }
-        ]
+        "v": "1|1.5|1"
       },
       {
         "k": 2,
-        "v": [
-          {
-            "v": 108
-          }
-        ]
+        "v": "1|1.5|1"
       },
       {
         "k": 3,
-        "v": [
-          {
-            "v": 108
-          }
-        ]
+        "v": "1|1.5|1"
       },
       {
         "k": 4,
-        "v": [
-          {
-            "v": 108
-          }
-        ]
+        "v": "1|1.5|1"
       }
     ],
-    "isWangTile": true,
-    "boundsCollision": true,
-    "centerCollider": true
-  },
-  {
-    "uid": 50,
-    "name": "木墙桩",
-    "labId": 14,
-    "protoUid": 0,
-    "icon": 210000,
-    "model": {
-      "id": 0,
-      "subPrefabUnitName": [
-        {
-          "v": 125049
-        }
-      ],
-      "subPrefabUnitPos": [
-        {
-          "v": "0|0|0"
-        }
-      ],
-      "subPrefabUnitScale": [
-        {
-          "v": "1|1|1"
-        }
-      ],
-      "subUnitTexsName": [
-        {
-          "v": [
-            {
-              "v": 271
-            }
-          ]
-        }
-      ],
-      "animTimeInterval": 0.0,
-      "isObstacle": false,
-      "colliderScale": 1.0
-    },
-    "collision": true,
-    "events": [],
-    "paramDic": [],
-    "minimapIcon": 210000,
-    "faceType": 0,
-    "animClip": [
+    "modelPositions": [
       {
         "k": 0,
-        "v": [
-          {
-            "v": 271
-          }
-        ]
+        "v": "0|0.25|0"
       },
       {
         "k": 1,
-        "v": []
+        "v": "0|0.25|0"
       },
       {
         "k": 2,
-        "v": []
+        "v": "0|0.25|0"
       },
       {
         "k": 3,
-        "v": []
+        "v": "0|0.25|0"
       },
       {
         "k": 4,
-        "v": []
+        "v": "0|0.25|0"
       }
-    ],
-    "isWangTile": false,
-    "boundsCollision": false,
-    "centerCollider": true
+    ]
   },
   {
-    "uid": 49,
-    "name": "触发1-1-1",
-    "labId": 0,
-    "protoUid": 0,
-    "icon": 210000,
-    "model": {
-      "id": 0,
-      "subPrefabUnitName": [
-        {
-          "v": 125049
-        }
-      ],
-      "subPrefabUnitPos": [
-        {
-          "v": "0|0|0"
-        }
-      ],
-      "subPrefabUnitScale": [
-        {
-          "v": "8|1|1"
-        }
-      ],
-      "subUnitTexsName": [
-        {
-          "v": [
-            {
-              "v": 210000
-            }
-          ]
-        }
-      ],
-      "animTimeInterval": 0.0,
-      "isObstacle": false,
-      "colliderScale": 1.0
-    },
-    "collision": false,
-    "events": [
-      {
-        "k": "onCharacterTouchEvent",
-        "v": {
-          "uid": -1,
-          "name": "onCharacterTouchEvent",
-          "evt": [
-            {
-              "v": 22
-            }
-          ],
-          "type": 0
-        }
-      }
-    ],
-    "paramDic": [],
-    "minimapIcon": 210000,
-    "faceType": 0,
-    "animClip": [
-      {
-        "k": 0,
-        "v": [
-          {
-            "v": 210000
-          }
-        ]
-      },
-      {
-        "k": 1,
-        "v": []
-      },
-      {
-        "k": 2,
-        "v": []
-      },
-      {
-        "k": 3,
-        "v": []
-      },
-      {
-        "k": 4,
-        "v": []
-      }
-    ],
-    "isWangTile": false,
-    "boundsCollision": false,
-    "centerCollider": true
-  },
-  {
-    "uid": 48,
-    "name": "树桩",
-    "labId": 15,
-    "protoUid": 0,
-    "icon": 210000,
-    "model": {
-      "id": 0,
-      "subPrefabUnitName": [
-        {
-          "v": 125049
-        }
-      ],
-      "subPrefabUnitPos": [
-        {
-          "v": "0|-0.4|0"
-        }
-      ],
-      "subPrefabUnitScale": [
-        {
-          "v": "0.8|0.2|0.8"
-        }
-      ],
-      "subUnitTexsName": [
-        {
-          "v": [
-            {
-              "v": 217
-            }
-          ]
-        }
-      ],
-      "animTimeInterval": 0.0,
-      "isObstacle": false,
-      "colliderScale": 0.3
-    },
-    "collision": true,
-    "events": [],
-    "paramDic": [],
-    "minimapIcon": 210000,
-    "faceType": 0,
-    "animClip": [
-      {
-        "k": 0,
-        "v": [
-          {
-            "v": 217
-          }
-        ]
-      },
-      {
-        "k": 1,
-        "v": []
-      },
-      {
-        "k": 2,
-        "v": []
-      },
-      {
-        "k": 3,
-        "v": []
-      },
-      {
-        "k": 4,
-        "v": []
-      }
-    ],
-    "isWangTile": false,
-    "boundsCollision": false,
-    "centerCollider": true
-  },
-  {
-    "uid": 47,
-    "name": "柴堆",
-    "labId": 15,
-    "protoUid": 0,
-    "icon": 210000,
-    "model": {
-      "id": 0,
-      "subPrefabUnitName": [
-        {
-          "v": 125049
-        }
-      ],
-      "subPrefabUnitPos": [
-        {
-          "v": "0|-0.4|0"
-        }
-      ],
-      "subPrefabUnitScale": [
-        {
-          "v": "0.6|0.2|0.6"
-        }
-      ],
-      "subUnitTexsName": [
-        {
-          "v": [
-            {
-              "v": 799
-            }
-          ]
-        }
-      ],
-      "animTimeInterval": 0.0,
-      "isObstacle": false,
-      "colliderScale": 1.0
-    },
-    "collision": true,
-    "events": [],
-    "paramDic": [],
-    "minimapIcon": 210000,
-    "faceType": 0,
-    "animClip": [
-      {
-        "k": 0,
-        "v": [
-          {
-            "v": 799
-          }
-        ]
-      },
-      {
-        "k": 1,
-        "v": []
-      },
-      {
-        "k": 2,
-        "v": []
-      },
-      {
-        "k": 3,
-        "v": []
-      },
-      {
-        "k": 4,
-        "v": []
-      }
-    ],
-    "isWangTile": false,
-    "boundsCollision": false,
-    "centerCollider": true
-  },
-  {
-    "uid": 46,
-    "name": "石3",
-    "labId": 14,
-    "protoUid": 0,
-    "icon": 210000,
-    "model": {
-      "id": 0,
-      "subPrefabUnitName": [
-        {
-          "v": 125049
-        }
-      ],
-      "subPrefabUnitPos": [
-        {
-          "v": "0|0.5|0"
-        }
-      ],
-      "subPrefabUnitScale": [
-        {
-          "v": "0.5|2|0.5"
-        }
-      ],
-      "subUnitTexsName": [
-        {
-          "v": [
-            {
-              "v": 803
-            }
-          ]
-        }
-      ],
-      "animTimeInterval": 0.0,
-      "isObstacle": false,
-      "colliderScale": 1.0
-    },
-    "collision": true,
-    "events": [],
-    "paramDic": [],
-    "minimapIcon": 210000,
-    "faceType": 0,
-    "animClip": [
-      {
-        "k": 0,
-        "v": [
-          {
-            "v": 803
-          }
-        ]
-      },
-      {
-        "k": 1,
-        "v": []
-      },
-      {
-        "k": 2,
-        "v": []
-      },
-      {
-        "k": 3,
-        "v": []
-      },
-      {
-        "k": 4,
-        "v": []
-      }
-    ],
-    "isWangTile": false,
-    "boundsCollision": false,
-    "centerCollider": true
-  },
-  {
-    "uid": 45,
-    "name": "篱笆1",
-    "labId": 14,
-    "protoUid": 0,
-    "icon": 210000,
-    "model": {
-      "id": 0,
-      "subPrefabUnitName": [
-        {
-          "v": 125049
-        }
-      ],
-      "subPrefabUnitPos": [
-        {
-          "v": "0|-0.1|0"
-        }
-      ],
-      "subPrefabUnitScale": [
-        {
-          "v": "1|1|1"
-        }
-      ],
-      "subUnitTexsName": [
-        {
-          "v": [
-            {
-              "v": 798
-            }
-          ]
-        }
-      ],
-      "animTimeInterval": 0.0,
-      "isObstacle": false,
-      "colliderScale": 1.0
-    },
-    "collision": true,
-    "events": [],
-    "paramDic": [],
-    "minimapIcon": 210000,
-    "faceType": 0,
-    "animClip": [
-      {
-        "k": 0,
-        "v": [
-          {
-            "v": 798
-          }
-        ]
-      },
-      {
-        "k": 1,
-        "v": [
-          {
-            "v": 108
-          }
-        ]
-      },
-      {
-        "k": 2,
-        "v": [
-          {
-            "v": 108
-          }
-        ]
-      },
-      {
-        "k": 3,
-        "v": [
-          {
-            "v": 108
-          }
-        ]
-      },
-      {
-        "k": 4,
-        "v": [
-          {
-            "v": 108
-          }
-        ]
-      }
-    ],
-    "isWangTile": true,
-    "boundsCollision": true,
-    "centerCollider": true
-  },
-  {
-    "uid": 44,
-    "name": "枯木1",
-    "labId": 14,
-    "protoUid": 0,
-    "icon": 210000,
-    "model": {
-      "id": 0,
-      "subPrefabUnitName": [
-        {
-          "v": 125049
-        }
-      ],
-      "subPrefabUnitPos": [
-        {
-          "v": "0|-0.2|0"
-        }
-      ],
-      "subPrefabUnitScale": [
-        {
-          "v": "1.5|0.8|1.5"
-        }
-      ],
-      "subUnitTexsName": [
-        {
-          "v": [
-            {
-              "v": 800
-            }
-          ]
-        }
-      ],
-      "animTimeInterval": 0.0,
-      "isObstacle": false,
-      "colliderScale": 1.0
-    },
-    "collision": true,
-    "events": [],
-    "paramDic": [],
-    "minimapIcon": 210000,
-    "faceType": 0,
-    "animClip": [
-      {
-        "k": 0,
-        "v": [
-          {
-            "v": 800
-          }
-        ]
-      },
-      {
-        "k": 1,
-        "v": [
-          {
-            "v": 800
-          }
-        ]
-      },
-      {
-        "k": 2,
-        "v": [
-          {
-            "v": 800
-          }
-        ]
-      },
-      {
-        "k": 3,
-        "v": [
-          {
-            "v": 801
-          }
-        ]
-      },
-      {
-        "k": 4,
-        "v": [
-          {
-            "v": 801
-          }
-        ]
-      }
-    ],
-    "isWangTile": false,
-    "boundsCollision": true,
-    "centerCollider": true
-  },
-  {
-    "uid": 41,
-    "name": "石2",
+    "uid": 58,
+    "name": "桌",
     "labId": 14,
     "protoUid": 0,
     "icon": 210000,
@@ -1110,7 +1570,7 @@
         {
           "v": [
             {
-              "v": 802
+              "v": 1630
             }
           ]
         }
@@ -1121,7 +1581,19 @@
     },
     "collision": true,
     "events": [],
-    "paramDic": [],
+    "paramDic": [
+      {
+        "k": "可破坏",
+        "v": {
+          "uid": -1,
+          "name": "可破坏",
+          "valueType": 0,
+          "min": "",
+          "v": "{\r\n  \"uid\": -1,\r\n  \"str\": null,\r\n  \"valName\": null,\r\n  \"num\": 0.0,\r\n  \"dic\": []\r\n}",
+          "max": ""
+        }
+      }
+    ],
     "minimapIcon": 210000,
     "faceType": 0,
     "animClip": [
@@ -1129,7 +1601,7 @@
         "k": 0,
         "v": [
           {
-            "v": 802
+            "v": 1630
           }
         ]
       },
@@ -1152,11 +1624,863 @@
     ],
     "isWangTile": false,
     "boundsCollision": false,
-    "centerCollider": true
+    "centerCollider": true,
+    "modelSizes": [
+      {
+        "k": 0,
+        "v": "1|0.4|1"
+      },
+      {
+        "k": 1,
+        "v": "1|0.4|1"
+      },
+      {
+        "k": 2,
+        "v": "1|0.4|1"
+      },
+      {
+        "k": 3,
+        "v": "1|0.4|1"
+      },
+      {
+        "k": 4,
+        "v": "1|0.4|1"
+      }
+    ],
+    "modelPositions": [
+      {
+        "k": 0,
+        "v": "0|-0.3|0"
+      },
+      {
+        "k": 1,
+        "v": "0|-0.3|0"
+      },
+      {
+        "k": 2,
+        "v": "0|-0.3|0"
+      },
+      {
+        "k": 3,
+        "v": "0|-0.3|0"
+      },
+      {
+        "k": 4,
+        "v": "0|-0.3|0"
+      }
+    ]
   },
   {
-    "uid": 40,
-    "name": "草7",
+    "uid": 61,
+    "name": "透明遮挡",
+    "labId": 0,
+    "protoUid": 0,
+    "icon": 210000,
+    "model": {
+      "id": 0,
+      "subPrefabUnitName": [
+        {
+          "v": 125049
+        }
+      ],
+      "subPrefabUnitPos": [
+        {
+          "v": "0|0|0"
+        }
+      ],
+      "subPrefabUnitScale": [
+        {
+          "v": "1|1|1"
+        }
+      ],
+      "subUnitTexsName": [
+        {
+          "v": [
+            {
+              "v": 0
+            }
+          ]
+        }
+      ],
+      "animTimeInterval": 0.0,
+      "isObstacle": false,
+      "colliderScale": 1.0
+    },
+    "collision": true,
+    "events": [],
+    "paramDic": [
+      {
+        "k": "可破坏",
+        "v": {
+          "uid": -1,
+          "name": "可破坏",
+          "valueType": 0,
+          "min": "",
+          "v": "{\r\n  \"uid\": -1,\r\n  \"str\": null,\r\n  \"valName\": null,\r\n  \"num\": 0.0,\r\n  \"dic\": []\r\n}",
+          "max": ""
+        }
+      }
+    ],
+    "minimapIcon": 210000,
+    "faceType": 0,
+    "animClip": [
+      {
+        "k": 0,
+        "v": [
+          {
+            "v": 0
+          }
+        ]
+      },
+      {
+        "k": 1,
+        "v": []
+      },
+      {
+        "k": 2,
+        "v": []
+      },
+      {
+        "k": 3,
+        "v": []
+      },
+      {
+        "k": 4,
+        "v": []
+      }
+    ],
+    "isWangTile": false,
+    "boundsCollision": false,
+    "centerCollider": true,
+    "modelSizes": [
+      {
+        "k": 0,
+        "v": "1|1|1"
+      },
+      {
+        "k": 1,
+        "v": "1|1|1"
+      },
+      {
+        "k": 2,
+        "v": "1|1|1"
+      },
+      {
+        "k": 3,
+        "v": "1|1|1"
+      },
+      {
+        "k": 4,
+        "v": "1|1|1"
+      }
+    ],
+    "modelPositions": [
+      {
+        "k": 0,
+        "v": "0|0|0"
+      },
+      {
+        "k": 1,
+        "v": "0|0|0"
+      },
+      {
+        "k": 2,
+        "v": "0|0|0"
+      },
+      {
+        "k": 3,
+        "v": "0|0|0"
+      },
+      {
+        "k": 4,
+        "v": "0|0|0"
+      }
+    ]
+  },
+  {
+    "uid": 60,
+    "name": "立柱",
+    "labId": 14,
+    "protoUid": 0,
+    "icon": 210000,
+    "model": {
+      "id": 0,
+      "subPrefabUnitName": [
+        {
+          "v": 125049
+        }
+      ],
+      "subPrefabUnitPos": [
+        {
+          "v": "0|0.5|0"
+        }
+      ],
+      "subPrefabUnitScale": [
+        {
+          "v": "1|2|1"
+        }
+      ],
+      "subUnitTexsName": [
+        {
+          "v": [
+            {
+              "v": 1597
+            }
+          ]
+        }
+      ],
+      "animTimeInterval": 0.0,
+      "isObstacle": false,
+      "colliderScale": 1.0
+    },
+    "collision": true,
+    "events": [],
+    "paramDic": [
+      {
+        "k": "可破坏",
+        "v": {
+          "uid": -1,
+          "name": "可破坏",
+          "valueType": 0,
+          "min": "",
+          "v": "{\r\n  \"uid\": -1,\r\n  \"str\": null,\r\n  \"valName\": null,\r\n  \"num\": 0.0,\r\n  \"dic\": []\r\n}",
+          "max": ""
+        }
+      }
+    ],
+    "minimapIcon": 210000,
+    "faceType": 0,
+    "animClip": [
+      {
+        "k": 0,
+        "v": [
+          {
+            "v": 1597
+          }
+        ]
+      },
+      {
+        "k": 1,
+        "v": []
+      },
+      {
+        "k": 2,
+        "v": []
+      },
+      {
+        "k": 3,
+        "v": []
+      },
+      {
+        "k": 4,
+        "v": []
+      }
+    ],
+    "isWangTile": false,
+    "boundsCollision": false,
+    "centerCollider": true,
+    "modelSizes": [
+      {
+        "k": 0,
+        "v": "1|2|1"
+      },
+      {
+        "k": 1,
+        "v": "1|2|1"
+      },
+      {
+        "k": 2,
+        "v": "1|2|1"
+      },
+      {
+        "k": 3,
+        "v": "1|2|1"
+      },
+      {
+        "k": 4,
+        "v": "1|2|1"
+      }
+    ],
+    "modelPositions": [
+      {
+        "k": 0,
+        "v": "0|0.5|0"
+      },
+      {
+        "k": 1,
+        "v": "0|0.5|0"
+      },
+      {
+        "k": 2,
+        "v": "0|0.5|0"
+      },
+      {
+        "k": 3,
+        "v": "0|0.5|0"
+      },
+      {
+        "k": 4,
+        "v": "0|0.5|0"
+      }
+    ]
+  },
+  {
+    "uid": 59,
+    "name": "鸟居",
+    "labId": 14,
+    "protoUid": 0,
+    "icon": 210000,
+    "model": {
+      "id": 0,
+      "subPrefabUnitName": [
+        {
+          "v": 125049
+        }
+      ],
+      "subPrefabUnitPos": [
+        {
+          "v": "0|1|0"
+        }
+      ],
+      "subPrefabUnitScale": [
+        {
+          "v": "3|3|1"
+        }
+      ],
+      "subUnitTexsName": [
+        {
+          "v": [
+            {
+              "v": 1596
+            }
+          ]
+        }
+      ],
+      "animTimeInterval": 0.0,
+      "isObstacle": false,
+      "colliderScale": 0.8
+    },
+    "collision": false,
+    "events": [],
+    "paramDic": [
+      {
+        "k": "可破坏",
+        "v": {
+          "uid": -1,
+          "name": "可破坏",
+          "valueType": 0,
+          "min": "",
+          "v": "{\r\n  \"uid\": -1,\r\n  \"str\": null,\r\n  \"valName\": null,\r\n  \"num\": 0.0,\r\n  \"dic\": []\r\n}",
+          "max": ""
+        }
+      }
+    ],
+    "minimapIcon": 210000,
+    "faceType": 0,
+    "animClip": [
+      {
+        "k": 0,
+        "v": [
+          {
+            "v": 1596
+          }
+        ]
+      },
+      {
+        "k": 1,
+        "v": []
+      },
+      {
+        "k": 2,
+        "v": []
+      },
+      {
+        "k": 3,
+        "v": []
+      },
+      {
+        "k": 4,
+        "v": []
+      }
+    ],
+    "isWangTile": false,
+    "boundsCollision": false,
+    "centerCollider": true,
+    "modelSizes": [
+      {
+        "k": 0,
+        "v": "3|3|1"
+      },
+      {
+        "k": 1,
+        "v": "3|3|1"
+      },
+      {
+        "k": 2,
+        "v": "3|3|1"
+      },
+      {
+        "k": 3,
+        "v": "3|3|1"
+      },
+      {
+        "k": 4,
+        "v": "3|3|1"
+      }
+    ],
+    "modelPositions": [
+      {
+        "k": 0,
+        "v": "0|1|0"
+      },
+      {
+        "k": 1,
+        "v": "0|1|0"
+      },
+      {
+        "k": 2,
+        "v": "0|1|0"
+      },
+      {
+        "k": 3,
+        "v": "0|1|0"
+      },
+      {
+        "k": 4,
+        "v": "0|1|0"
+      }
+    ]
+  },
+  {
+    "uid": 62,
+    "name": "长木凳",
+    "labId": 14,
+    "protoUid": 0,
+    "icon": 210000,
+    "model": {
+      "id": 0,
+      "subPrefabUnitName": [
+        {
+          "v": 125049
+        }
+      ],
+      "subPrefabUnitPos": [
+        {
+          "v": "0|-0.35|0"
+        }
+      ],
+      "subPrefabUnitScale": [
+        {
+          "v": "1|0.3|0.4"
+        }
+      ],
+      "subUnitTexsName": [
+        {
+          "v": [
+            {
+              "v": 310
+            }
+          ]
+        }
+      ],
+      "animTimeInterval": 0.0,
+      "isObstacle": false,
+      "colliderScale": 1.0
+    },
+    "collision": true,
+    "events": [],
+    "paramDic": [
+      {
+        "k": "可破坏",
+        "v": {
+          "uid": -1,
+          "name": "可破坏",
+          "valueType": 0,
+          "min": "",
+          "v": "{\r\n  \"uid\": -1,\r\n  \"str\": null,\r\n  \"valName\": null,\r\n  \"num\": 0.0,\r\n  \"dic\": []\r\n}",
+          "max": ""
+        }
+      }
+    ],
+    "minimapIcon": 210000,
+    "faceType": 1,
+    "animClip": [
+      {
+        "k": 0,
+        "v": [
+          {
+            "v": 1611
+          }
+        ]
+      },
+      {
+        "k": 1,
+        "v": [
+          {
+            "v": 310
+          }
+        ]
+      },
+      {
+        "k": 2,
+        "v": [
+          {
+            "v": 310
+          }
+        ]
+      },
+      {
+        "k": 3,
+        "v": [
+          {
+            "v": 1611
+          }
+        ]
+      },
+      {
+        "k": 4,
+        "v": [
+          {
+            "v": 1611
+          }
+        ]
+      }
+    ],
+    "isWangTile": false,
+    "boundsCollision": false,
+    "centerCollider": true,
+    "modelSizes": [
+      {
+        "k": 0,
+        "v": "0.5|0.3|1"
+      },
+      {
+        "k": 1,
+        "v": "1|0.3|0.4"
+      },
+      {
+        "k": 2,
+        "v": "1|0.3|0.4"
+      },
+      {
+        "k": 3,
+        "v": "0.4|0.3|1"
+      },
+      {
+        "k": 4,
+        "v": "0.4|0.3|1"
+      }
+    ],
+    "modelPositions": [
+      {
+        "k": 0,
+        "v": "0|-0.35|0"
+      },
+      {
+        "k": 1,
+        "v": "0|-0.35|0"
+      },
+      {
+        "k": 2,
+        "v": "0|-0.35|0"
+      },
+      {
+        "k": 3,
+        "v": "0|-0.35|0"
+      },
+      {
+        "k": 4,
+        "v": "0|-0.35|0"
+      }
+    ]
+  },
+  {
+    "uid": 15,
+    "name": "屋顶",
+    "labId": 14,
+    "protoUid": 0,
+    "icon": 210000,
+    "model": {
+      "id": 0,
+      "subPrefabUnitName": [
+        {
+          "v": 125049
+        }
+      ],
+      "subPrefabUnitPos": [
+        {
+          "v": "0|0|0"
+        }
+      ],
+      "subPrefabUnitScale": [
+        {
+          "v": "1|1|1"
+        }
+      ],
+      "subUnitTexsName": [
+        {
+          "v": [
+            {
+              "v": 270
+            }
+          ]
+        }
+      ],
+      "animTimeInterval": 0.0,
+      "isObstacle": false,
+      "colliderScale": 1.0
+    },
+    "collision": true,
+    "events": [],
+    "paramDic": [
+      {
+        "k": "可破坏",
+        "v": {
+          "uid": -1,
+          "name": "可破坏",
+          "valueType": 0,
+          "min": "",
+          "v": "{\r\n  \"uid\": -1,\r\n  \"str\": null,\r\n  \"valName\": null,\r\n  \"num\": 0.0,\r\n  \"dic\": []\r\n}",
+          "max": ""
+        }
+      }
+    ],
+    "minimapIcon": 210000,
+    "faceType": 1,
+    "animClip": [
+      {
+        "k": 0,
+        "v": [
+          {
+            "v": 269
+          }
+        ]
+      },
+      {
+        "k": 1,
+        "v": [
+          {
+            "v": 270
+          }
+        ]
+      },
+      {
+        "k": 2,
+        "v": [
+          {
+            "v": 270
+          }
+        ]
+      },
+      {
+        "k": 3,
+        "v": [
+          {
+            "v": 269
+          }
+        ]
+      },
+      {
+        "k": 4,
+        "v": [
+          {
+            "v": 273
+          }
+        ]
+      }
+    ],
+    "isWangTile": false,
+    "boundsCollision": false,
+    "centerCollider": true,
+    "modelSizes": [
+      {
+        "k": 0,
+        "v": "1|1|1"
+      },
+      {
+        "k": 1,
+        "v": "1|1|1"
+      },
+      {
+        "k": 2,
+        "v": "1|1|1"
+      },
+      {
+        "k": 3,
+        "v": "1|1|1"
+      },
+      {
+        "k": 4,
+        "v": "1|1|1"
+      }
+    ],
+    "modelPositions": [
+      {
+        "k": 0,
+        "v": "0|0|0"
+      },
+      {
+        "k": 1,
+        "v": "0|0|0"
+      },
+      {
+        "k": 2,
+        "v": "0|0|0"
+      },
+      {
+        "k": 3,
+        "v": "0|0|0"
+      },
+      {
+        "k": 4,
+        "v": "0|0|0"
+      }
+    ]
+  },
+  {
+    "uid": 16,
+    "name": "空气墙",
+    "labId": 0,
+    "protoUid": 0,
+    "icon": 210000,
+    "model": {
+      "id": 0,
+      "subPrefabUnitName": [
+        {
+          "v": 125049
+        }
+      ],
+      "subPrefabUnitPos": [
+        {
+          "v": "0|0|0"
+        }
+      ],
+      "subPrefabUnitScale": [
+        {
+          "v": "2|1|2"
+        }
+      ],
+      "subUnitTexsName": [
+        {
+          "v": [
+            {
+              "v": 210000
+            }
+          ]
+        }
+      ],
+      "animTimeInterval": 0.0,
+      "isObstacle": false,
+      "colliderScale": 1.0
+    },
+    "collision": true,
+    "events": [
+      {
+        "k": "onCharacterTouchEvent",
+        "v": {
+          "uid": -1,
+          "name": "onCharacterTouchEvent",
+          "evt": [
+            {
+              "v": 21
+            }
+          ],
+          "type": 0
+        }
+      }
+    ],
+    "paramDic": [
+      {
+        "k": "可破坏",
+        "v": {
+          "uid": -1,
+          "name": "可破坏",
+          "valueType": 0,
+          "min": "",
+          "v": "{\r\n  \"uid\": -1,\r\n  \"str\": null,\r\n  \"valName\": null,\r\n  \"num\": 0.0,\r\n  \"dic\": []\r\n}",
+          "max": ""
+        }
+      }
+    ],
+    "minimapIcon": 210000,
+    "faceType": 0,
+    "animClip": [
+      {
+        "k": 0,
+        "v": [
+          {
+            "v": 210000
+          }
+        ]
+      },
+      {
+        "k": 1,
+        "v": []
+      },
+      {
+        "k": 2,
+        "v": []
+      },
+      {
+        "k": 3,
+        "v": []
+      },
+      {
+        "k": 4,
+        "v": []
+      }
+    ],
+    "isWangTile": false,
+    "boundsCollision": false,
+    "centerCollider": true,
+    "modelSizes": [
+      {
+        "k": 0,
+        "v": "2|1|2"
+      },
+      {
+        "k": 1,
+        "v": "2|1|2"
+      },
+      {
+        "k": 2,
+        "v": "2|1|2"
+      },
+      {
+        "k": 3,
+        "v": "2|1|2"
+      },
+      {
+        "k": 4,
+        "v": "2|1|2"
+      }
+    ],
+    "modelPositions": [
+      {
+        "k": 0,
+        "v": "0|0|0"
+      },
+      {
+        "k": 1,
+        "v": "0|0|0"
+      },
+      {
+        "k": 2,
+        "v": "0|0|0"
+      },
+      {
+        "k": 3,
+        "v": "0|0|0"
+      },
+      {
+        "k": 4,
+        "v": "0|0|0"
+      }
+    ]
+  },
+  {
+    "uid": 18,
+    "name": "草1",
     "labId": 15,
     "protoUid": 0,
     "icon": 210000,
@@ -1169,19 +2493,19 @@
       ],
       "subPrefabUnitPos": [
         {
-          "v": "0|-0.4|0"
+          "v": "0|-0.35|0"
         }
       ],
       "subPrefabUnitScale": [
         {
-          "v": "0.5|0.2|0.5"
+          "v": "0.5|0.3|0.5"
         }
       ],
       "subUnitTexsName": [
         {
           "v": [
             {
-              "v": 58
+              "v": 172
             }
           ]
         }
@@ -1192,7 +2516,19 @@
     },
     "collision": false,
     "events": [],
-    "paramDic": [],
+    "paramDic": [
+      {
+        "k": "可破坏",
+        "v": {
+          "uid": -1,
+          "name": "可破坏",
+          "valueType": 0,
+          "min": "",
+          "v": "{\r\n  \"uid\": -1,\r\n  \"str\": null,\r\n  \"valName\": null,\r\n  \"num\": 0.0,\r\n  \"dic\": []\r\n}",
+          "max": ""
+        }
+      }
+    ],
     "minimapIcon": 210000,
     "faceType": 0,
     "animClip": [
@@ -1200,7 +2536,7 @@
         "k": 0,
         "v": [
           {
-            "v": 58
+            "v": 172
           }
         ]
       },
@@ -1223,95 +2559,56 @@
     ],
     "isWangTile": false,
     "boundsCollision": false,
-    "centerCollider": true
-  },
-  {
-    "uid": 39,
-    "name": "空宝箱",
-    "labId": 17,
-    "protoUid": 0,
-    "icon": 210000,
-    "model": {
-      "id": 0,
-      "subPrefabUnitName": [
-        {
-          "v": 125049
-        }
-      ],
-      "subPrefabUnitPos": [
-        {
-          "v": "0|-0.2|0"
-        }
-      ],
-      "subPrefabUnitScale": [
-        {
-          "v": "0.8|0.8|0.8"
-        }
-      ],
-      "subUnitTexsName": [
-        {
-          "v": [
-            {
-              "v": 43
-            }
-          ]
-        }
-      ],
-      "animTimeInterval": 0.0,
-      "isObstacle": false,
-      "colliderScale": 0.5
-    },
-    "collision": true,
-    "events": [],
-    "paramDic": [],
-    "minimapIcon": 210000,
-    "faceType": 1,
-    "animClip": [
+    "centerCollider": true,
+    "modelSizes": [
       {
         "k": 0,
-        "v": []
+        "v": "0.5|0.3|0.5"
       },
       {
         "k": 1,
-        "v": [
-          {
-            "v": 43
-          }
-        ]
+        "v": "0.5|0.3|0.5"
       },
       {
         "k": 2,
-        "v": [
-          {
-            "v": 37
-          }
-        ]
+        "v": "0.5|0.3|0.5"
       },
       {
         "k": 3,
-        "v": [
-          {
-            "v": 39
-          }
-        ]
+        "v": "0.5|0.3|0.5"
       },
       {
         "k": 4,
-        "v": [
-          {
-            "v": 41
-          }
-        ]
+        "v": "0.5|0.3|0.5"
       }
     ],
-    "isWangTile": false,
-    "boundsCollision": false,
-    "centerCollider": true
+    "modelPositions": [
+      {
+        "k": 0,
+        "v": "0|-0.35|0"
+      },
+      {
+        "k": 1,
+        "v": "0|-0.35|0"
+      },
+      {
+        "k": 2,
+        "v": "0|-0.35|0"
+      },
+      {
+        "k": 3,
+        "v": "0|-0.35|0"
+      },
+      {
+        "k": 4,
+        "v": "0|-0.35|0"
+      }
+    ]
   },
   {
-    "uid": 38,
-    "name": "宝箱",
-    "labId": 17,
+    "uid": 19,
+    "name": "桥1",
+    "labId": 14,
     "protoUid": 0,
     "icon": 210000,
     "model": {
@@ -1328,51 +2625,53 @@
       ],
       "subPrefabUnitScale": [
         {
-          "v": "0.8|0.6|0.8"
+          "v": "1|0.1|1"
         }
       ],
       "subUnitTexsName": [
         {
           "v": [
             {
-              "v": 44
+              "v": 216
             }
           ]
         }
       ],
       "animTimeInterval": 0.0,
       "isObstacle": false,
-      "colliderScale": 0.5
+      "colliderScale": 1.0
     },
     "collision": true,
-    "events": [
+    "events": [],
+    "paramDic": [
       {
-        "k": "onInteractEvent",
+        "k": "可破坏",
         "v": {
           "uid": -1,
-          "name": "onInteractEvent",
-          "evt": [
-            {
-              "v": 12
-            }
-          ],
-          "type": 1
+          "name": "可破坏",
+          "valueType": 0,
+          "min": "",
+          "v": "{\r\n  \"uid\": -1,\r\n  \"str\": null,\r\n  \"valName\": null,\r\n  \"num\": 0.0,\r\n  \"dic\": []\r\n}",
+          "max": ""
         }
       }
     ],
-    "paramDic": [],
     "minimapIcon": 210000,
     "faceType": 1,
     "animClip": [
       {
         "k": 0,
-        "v": []
+        "v": [
+          {
+            "v": 216
+          }
+        ]
       },
       {
         "k": 1,
         "v": [
           {
-            "v": 44
+            "v": 216
           }
         ]
       },
@@ -1380,7 +2679,7 @@
         "k": 2,
         "v": [
           {
-            "v": 38
+            "v": 216
           }
         ]
       },
@@ -1388,7 +2687,7 @@
         "k": 3,
         "v": [
           {
-            "v": 42
+            "v": 157
           }
         ]
       },
@@ -1396,18 +2695,62 @@
         "k": 4,
         "v": [
           {
-            "v": 40
+            "v": 157
           }
         ]
       }
     ],
     "isWangTile": false,
-    "boundsCollision": false,
-    "centerCollider": true
+    "boundsCollision": true,
+    "centerCollider": true,
+    "modelSizes": [
+      {
+        "k": 0,
+        "v": "1|0.1|1"
+      },
+      {
+        "k": 1,
+        "v": "1|0.1|1"
+      },
+      {
+        "k": 2,
+        "v": "1|0.1|1"
+      },
+      {
+        "k": 3,
+        "v": "1|0.1|1"
+      },
+      {
+        "k": 4,
+        "v": "1|0.1|1"
+      }
+    ],
+    "modelPositions": [
+      {
+        "k": 0,
+        "v": "0|-0.3|0"
+      },
+      {
+        "k": 1,
+        "v": "0|-0.3|0"
+      },
+      {
+        "k": 2,
+        "v": "0|-0.3|0"
+      },
+      {
+        "k": 3,
+        "v": "0|-0.3|0"
+      },
+      {
+        "k": 4,
+        "v": "0|-0.3|0"
+      }
+    ]
   },
   {
-    "uid": 37,
-    "name": "草8",
+    "uid": 20,
+    "name": "草6",
     "labId": 15,
     "protoUid": 0,
     "icon": 210000,
@@ -1420,7 +2763,7 @@
       ],
       "subPrefabUnitPos": [
         {
-          "v": "0|-0.25|0"
+          "v": "0|-0.2|0"
         }
       ],
       "subPrefabUnitScale": [
@@ -1432,7 +2775,7 @@
         {
           "v": [
             {
-              "v": 127
+              "v": 54
             }
           ]
         }
@@ -1443,7 +2786,19 @@
     },
     "collision": false,
     "events": [],
-    "paramDic": [],
+    "paramDic": [
+      {
+        "k": "可破坏",
+        "v": {
+          "uid": -1,
+          "name": "可破坏",
+          "valueType": 0,
+          "min": "",
+          "v": "{\r\n  \"uid\": -1,\r\n  \"str\": null,\r\n  \"valName\": null,\r\n  \"num\": 0.0,\r\n  \"dic\": []\r\n}",
+          "max": ""
+        }
+      }
+    ],
     "minimapIcon": 210000,
     "faceType": 0,
     "animClip": [
@@ -1451,1067 +2806,7 @@
         "k": 0,
         "v": [
           {
-            "v": 127
-          }
-        ]
-      },
-      {
-        "k": 1,
-        "v": [
-          {
-            "v": 56
-          }
-        ]
-      },
-      {
-        "k": 2,
-        "v": [
-          {
-            "v": 56
-          }
-        ]
-      },
-      {
-        "k": 3,
-        "v": [
-          {
-            "v": 56
-          }
-        ]
-      },
-      {
-        "k": 4,
-        "v": [
-          {
-            "v": 56
-          }
-        ]
-      }
-    ],
-    "isWangTile": false,
-    "boundsCollision": false,
-    "centerCollider": true
-  },
-  {
-    "uid": 36,
-    "name": "树1",
-    "labId": 14,
-    "protoUid": 0,
-    "icon": 210000,
-    "model": {
-      "id": 0,
-      "subPrefabUnitName": [
-        {
-          "v": 125049
-        }
-      ],
-      "subPrefabUnitPos": [
-        {
-          "v": "0|0.4|0"
-        }
-      ],
-      "subPrefabUnitScale": [
-        {
-          "v": "3|2|3"
-        }
-      ],
-      "subUnitTexsName": [
-        {
-          "v": [
-            {
-              "v": 108
-            }
-          ]
-        }
-      ],
-      "animTimeInterval": 0.0,
-      "isObstacle": false,
-      "colliderScale": 0.4
-    },
-    "collision": true,
-    "events": [],
-    "paramDic": [],
-    "minimapIcon": 210000,
-    "faceType": 0,
-    "animClip": [
-      {
-        "k": 0,
-        "v": [
-          {
-            "v": 108
-          }
-        ]
-      },
-      {
-        "k": 1,
-        "v": [
-          {
-            "v": 108
-          }
-        ]
-      },
-      {
-        "k": 2,
-        "v": [
-          {
-            "v": 108
-          }
-        ]
-      },
-      {
-        "k": 3,
-        "v": [
-          {
-            "v": 108
-          }
-        ]
-      },
-      {
-        "k": 4,
-        "v": [
-          {
-            "v": 108
-          }
-        ]
-      }
-    ],
-    "isWangTile": false,
-    "boundsCollision": true,
-    "centerCollider": false
-  },
-  {
-    "uid": 35,
-    "name": "树干1",
-    "labId": 14,
-    "protoUid": 0,
-    "icon": 210000,
-    "model": {
-      "id": 0,
-      "subPrefabUnitName": [
-        {
-          "v": 125049
-        }
-      ],
-      "subPrefabUnitPos": [
-        {
-          "v": "-2.682209E-07|0.3|-0.07894832"
-        }
-      ],
-      "subPrefabUnitScale": [
-        {
-          "v": "3|2|3"
-        }
-      ],
-      "subUnitTexsName": [
-        {
-          "v": [
-            {
-              "v": 109
-            }
-          ]
-        }
-      ],
-      "animTimeInterval": 0.0,
-      "isObstacle": false,
-      "colliderScale": 0.4
-    },
-    "collision": true,
-    "events": [],
-    "paramDic": [],
-    "minimapIcon": 210000,
-    "faceType": 0,
-    "animClip": [
-      {
-        "k": 0,
-        "v": [
-          {
-            "v": 109
-          }
-        ]
-      },
-      {
-        "k": 1,
-        "v": [
-          {
-            "v": 109
-          }
-        ]
-      },
-      {
-        "k": 2,
-        "v": [
-          {
-            "v": 109
-          }
-        ]
-      },
-      {
-        "k": 3,
-        "v": [
-          {
-            "v": 109
-          }
-        ]
-      },
-      {
-        "k": 4,
-        "v": [
-          {
-            "v": 109
-          }
-        ]
-      }
-    ],
-    "isWangTile": false,
-    "boundsCollision": false,
-    "centerCollider": false
-  },
-  {
-    "uid": 33,
-    "name": "玉弹",
-    "labId": 16,
-    "protoUid": 0,
-    "icon": 210000,
-    "model": {
-      "id": 0,
-      "subPrefabUnitName": [
-        {
-          "v": 125049
-        }
-      ],
-      "subPrefabUnitPos": [
-        {
-          "v": "0|0|0"
-        }
-      ],
-      "subPrefabUnitScale": [
-        {
-          "v": "0.4|0.2|0.4"
-        }
-      ],
-      "subUnitTexsName": [
-        {
-          "v": [
-            {
-              "v": 47
-            }
-          ]
-        }
-      ],
-      "animTimeInterval": 0.0,
-      "isObstacle": false,
-      "colliderScale": 0.2
-    },
-    "collision": false,
-    "events": [
-      {
-        "k": "onTileTouchEvent",
-        "v": {
-          "uid": -1,
-          "name": "onTileTouchEvent",
-          "evt": [
-            {
-              "v": 2
-            }
-          ],
-          "type": 0
-        }
-      }
-    ],
-    "paramDic": [],
-    "minimapIcon": 210000,
-    "faceType": 2,
-    "animClip": [
-      {
-        "k": 0,
-        "v": [
-          {
-            "v": 47
-          }
-        ]
-      },
-      {
-        "k": 1,
-        "v": [
-          {
-            "v": 47
-          }
-        ]
-      },
-      {
-        "k": 2,
-        "v": [
-          {
-            "v": 47
-          }
-        ]
-      },
-      {
-        "k": 3,
-        "v": [
-          {
-            "v": 47
-          }
-        ]
-      },
-      {
-        "k": 4,
-        "v": [
-          {
-            "v": 47
-          }
-        ]
-      }
-    ],
-    "isWangTile": false,
-    "boundsCollision": false,
-    "centerCollider": true
-  },
-  {
-    "uid": 32,
-    "name": "札弹",
-    "labId": 16,
-    "protoUid": 0,
-    "icon": 210000,
-    "model": {
-      "id": 0,
-      "subPrefabUnitName": [
-        {
-          "v": 125049
-        }
-      ],
-      "subPrefabUnitPos": [
-        {
-          "v": "0|0|0"
-        }
-      ],
-      "subPrefabUnitScale": [
-        {
-          "v": "0.4|0.2|0.4"
-        }
-      ],
-      "subUnitTexsName": [
-        {
-          "v": [
-            {
-              "v": 46
-            }
-          ]
-        }
-      ],
-      "animTimeInterval": 0.0,
-      "isObstacle": false,
-      "colliderScale": 0.2
-    },
-    "collision": false,
-    "events": [
-      {
-        "k": "onCharacterTouchEvent",
-        "v": {
-          "uid": -1,
-          "name": "onCharacterTouchEvent",
-          "evt": [
-            {
-              "v": 8
-            }
-          ],
-          "type": 0
-        }
-      },
-      {
-        "k": "onObjectTouchEvent",
-        "v": {
-          "uid": -1,
-          "name": "onObjectTouchEvent",
-          "evt": [
-            {
-              "v": 10
-            }
-          ],
-          "type": 0
-        }
-      },
-      {
-        "k": "onShowEvent",
-        "v": {
-          "uid": -1,
-          "name": "onShowEvent",
-          "evt": [
-            {
-              "v": 7
-            }
-          ],
-          "type": 0
-        }
-      },
-      {
-        "k": "onLeaveSceneEvent",
-        "v": {
-          "uid": -1,
-          "name": "onLeaveSceneEvent",
-          "evt": [
-            {
-              "v": 2
-            }
-          ],
-          "type": 0
-        }
-      },
-      {
-        "k": "onBoundaryTouchEvent",
-        "v": {
-          "uid": -1,
-          "name": "onBoundaryTouchEvent",
-          "evt": [
-            {
-              "v": 2
-            }
-          ],
-          "type": 0
-        }
-      },
-      {
-        "k": "onTileTouchEvent",
-        "v": {
-          "uid": -1,
-          "name": "onTileTouchEvent",
-          "evt": [
-            {
-              "v": 2
-            }
-          ],
-          "type": 0
-        }
-      }
-    ],
-    "paramDic": [],
-    "minimapIcon": 210000,
-    "faceType": 2,
-    "animClip": [
-      {
-        "k": 0,
-        "v": [
-          {
-            "v": 46
-          }
-        ]
-      },
-      {
-        "k": 1,
-        "v": [
-          {
-            "v": 46
-          }
-        ]
-      },
-      {
-        "k": 2,
-        "v": [
-          {
-            "v": 46
-          }
-        ]
-      },
-      {
-        "k": 3,
-        "v": [
-          {
-            "v": 46
-          }
-        ]
-      },
-      {
-        "k": 4,
-        "v": [
-          {
-            "v": 46
-          }
-        ]
-      }
-    ],
-    "isWangTile": false,
-    "boundsCollision": false,
-    "centerCollider": true
-  },
-  {
-    "uid": 31,
-    "name": "星弹",
-    "labId": 16,
-    "protoUid": 0,
-    "icon": 210000,
-    "model": {
-      "id": 0,
-      "subPrefabUnitName": [
-        {
-          "v": 125049
-        }
-      ],
-      "subPrefabUnitPos": [
-        {
-          "v": "0|0|0"
-        }
-      ],
-      "subPrefabUnitScale": [
-        {
-          "v": "0.4|0.2|0.4"
-        }
-      ],
-      "subUnitTexsName": [
-        {
-          "v": [
-            {
-              "v": 33
-            }
-          ]
-        }
-      ],
-      "animTimeInterval": 0.0,
-      "isObstacle": false,
-      "colliderScale": 0.2
-    },
-    "collision": false,
-    "events": [
-      {
-        "k": "onCharacterTouchEvent",
-        "v": {
-          "uid": -1,
-          "name": "onCharacterTouchEvent",
-          "evt": [
-            {
-              "v": 8
-            }
-          ],
-          "type": 0
-        }
-      },
-      {
-        "k": "onCharacterLeaveEvent",
-        "v": {
-          "uid": -1,
-          "name": "onCharacterLeaveEvent",
-          "evt": [],
-          "type": 0
-        }
-      },
-      {
-        "k": "onObjectTouchEvent",
-        "v": {
-          "uid": -1,
-          "name": "onObjectTouchEvent",
-          "evt": [
-            {
-              "v": 10
-            }
-          ],
-          "type": 0
-        }
-      },
-      {
-        "k": "onLeaveSceneEvent",
-        "v": {
-          "uid": -1,
-          "name": "onLeaveSceneEvent",
-          "evt": [
-            {
-              "v": 2
-            }
-          ],
-          "type": 0
-        }
-      },
-      {
-        "k": "onBoundaryTouchEvent",
-        "v": {
-          "uid": -1,
-          "name": "onBoundaryTouchEvent",
-          "evt": [
-            {
-              "v": 2
-            }
-          ],
-          "type": 0
-        }
-      },
-      {
-        "k": "onPerSecondEvent",
-        "v": {
-          "uid": -1,
-          "name": "onPerSecondEvent",
-          "evt": [],
-          "type": 0
-        }
-      },
-      {
-        "k": "onShowEvent",
-        "v": {
-          "uid": -1,
-          "name": "onShowEvent",
-          "evt": [
-            {
-              "v": 9
-            }
-          ],
-          "type": 0
-        }
-      },
-      {
-        "k": "onTileTouchEvent",
-        "v": {
-          "uid": -1,
-          "name": "onTileTouchEvent",
-          "evt": [
-            {
-              "v": 2
-            }
-          ],
-          "type": 0
-        }
-      }
-    ],
-    "paramDic": [],
-    "minimapIcon": 210000,
-    "faceType": 2,
-    "animClip": [
-      {
-        "k": 0,
-        "v": [
-          {
-            "v": 33
-          }
-        ]
-      },
-      {
-        "k": 1,
-        "v": [
-          {
-            "v": 33
-          }
-        ]
-      },
-      {
-        "k": 2,
-        "v": [
-          {
-            "v": 33
-          }
-        ]
-      },
-      {
-        "k": 3,
-        "v": [
-          {
-            "v": 33
-          }
-        ]
-      },
-      {
-        "k": 4,
-        "v": [
-          {
-            "v": 33
-          }
-        ]
-      }
-    ],
-    "isWangTile": false,
-    "boundsCollision": false,
-    "centerCollider": true
-  },
-  {
-    "uid": 30,
-    "name": "草2",
-    "labId": 15,
-    "protoUid": 0,
-    "icon": 210000,
-    "model": {
-      "id": 0,
-      "subPrefabUnitName": [
-        {
-          "v": 125049
-        }
-      ],
-      "subPrefabUnitPos": [
-        {
-          "v": "0|-0.35|0"
-        }
-      ],
-      "subPrefabUnitScale": [
-        {
-          "v": "0.5|0.3|0.5"
-        }
-      ],
-      "subUnitTexsName": [
-        {
-          "v": [
-            {
-              "v": 173
-            }
-          ]
-        }
-      ],
-      "animTimeInterval": 0.0,
-      "isObstacle": false,
-      "colliderScale": 0.0
-    },
-    "collision": false,
-    "events": [],
-    "paramDic": [],
-    "minimapIcon": 210000,
-    "faceType": 0,
-    "animClip": [
-      {
-        "k": 0,
-        "v": [
-          {
-            "v": 173
-          }
-        ]
-      },
-      {
-        "k": 1,
-        "v": [
-          {
-            "v": 56
-          }
-        ]
-      },
-      {
-        "k": 2,
-        "v": [
-          {
-            "v": 56
-          }
-        ]
-      },
-      {
-        "k": 3,
-        "v": [
-          {
-            "v": 56
-          }
-        ]
-      },
-      {
-        "k": 4,
-        "v": [
-          {
-            "v": 56
-          }
-        ]
-      }
-    ],
-    "isWangTile": false,
-    "boundsCollision": false,
-    "centerCollider": true
-  },
-  {
-    "uid": 29,
-    "name": "草3",
-    "labId": 15,
-    "protoUid": 0,
-    "icon": 210000,
-    "model": {
-      "id": 0,
-      "subPrefabUnitName": [
-        {
-          "v": 125049
-        }
-      ],
-      "subPrefabUnitPos": [
-        {
-          "v": "0|-0.35|0"
-        }
-      ],
-      "subPrefabUnitScale": [
-        {
-          "v": "0.5|0.3|0.5"
-        }
-      ],
-      "subUnitTexsName": [
-        {
-          "v": [
-            {
-              "v": 174
-            }
-          ]
-        }
-      ],
-      "animTimeInterval": 0.0,
-      "isObstacle": false,
-      "colliderScale": 0.0
-    },
-    "collision": false,
-    "events": [],
-    "paramDic": [],
-    "minimapIcon": 210000,
-    "faceType": 0,
-    "animClip": [
-      {
-        "k": 0,
-        "v": [
-          {
-            "v": 174
-          }
-        ]
-      },
-      {
-        "k": 1,
-        "v": [
-          {
-            "v": 56
-          }
-        ]
-      },
-      {
-        "k": 2,
-        "v": [
-          {
-            "v": 56
-          }
-        ]
-      },
-      {
-        "k": 3,
-        "v": [
-          {
-            "v": 56
-          }
-        ]
-      },
-      {
-        "k": 4,
-        "v": [
-          {
-            "v": 56
-          }
-        ]
-      }
-    ],
-    "isWangTile": false,
-    "boundsCollision": false,
-    "centerCollider": true
-  },
-  {
-    "uid": 28,
-    "name": "草4",
-    "labId": 15,
-    "protoUid": 0,
-    "icon": 210000,
-    "model": {
-      "id": 0,
-      "subPrefabUnitName": [
-        {
-          "v": 125049
-        }
-      ],
-      "subPrefabUnitPos": [
-        {
-          "v": "0|-0.35|0"
-        }
-      ],
-      "subPrefabUnitScale": [
-        {
-          "v": "0.5|0.3|0.5"
-        }
-      ],
-      "subUnitTexsName": [
-        {
-          "v": [
-            {
-              "v": 176
-            }
-          ]
-        }
-      ],
-      "animTimeInterval": 0.0,
-      "isObstacle": false,
-      "colliderScale": 0.0
-    },
-    "collision": false,
-    "events": [],
-    "paramDic": [],
-    "minimapIcon": 210000,
-    "faceType": 0,
-    "animClip": [
-      {
-        "k": 0,
-        "v": [
-          {
-            "v": 176
-          }
-        ]
-      },
-      {
-        "k": 1,
-        "v": [
-          {
-            "v": 56
-          }
-        ]
-      },
-      {
-        "k": 2,
-        "v": [
-          {
-            "v": 56
-          }
-        ]
-      },
-      {
-        "k": 3,
-        "v": [
-          {
-            "v": 56
-          }
-        ]
-      },
-      {
-        "k": 4,
-        "v": [
-          {
-            "v": 56
-          }
-        ]
-      }
-    ],
-    "isWangTile": false,
-    "boundsCollision": false,
-    "centerCollider": true
-  },
-  {
-    "uid": 25,
-    "name": "草5",
-    "labId": 15,
-    "protoUid": 0,
-    "icon": 210000,
-    "model": {
-      "id": 0,
-      "subPrefabUnitName": [
-        {
-          "v": 125049
-        }
-      ],
-      "subPrefabUnitPos": [
-        {
-          "v": "0|-0.35|0"
-        }
-      ],
-      "subPrefabUnitScale": [
-        {
-          "v": "0.5|0.3|0.5"
-        }
-      ],
-      "subUnitTexsName": [
-        {
-          "v": [
-            {
-              "v": 177
-            }
-          ]
-        }
-      ],
-      "animTimeInterval": 0.0,
-      "isObstacle": false,
-      "colliderScale": 0.0
-    },
-    "collision": false,
-    "events": [],
-    "paramDic": [],
-    "minimapIcon": 210000,
-    "faceType": 0,
-    "animClip": [
-      {
-        "k": 0,
-        "v": [
-          {
-            "v": 177
-          }
-        ]
-      },
-      {
-        "k": 1,
-        "v": [
-          {
-            "v": 56
-          }
-        ]
-      },
-      {
-        "k": 2,
-        "v": [
-          {
-            "v": 56
-          }
-        ]
-      },
-      {
-        "k": 3,
-        "v": [
-          {
-            "v": 56
-          }
-        ]
-      },
-      {
-        "k": 4,
-        "v": [
-          {
-            "v": 56
-          }
-        ]
-      }
-    ],
-    "isWangTile": false,
-    "boundsCollision": false,
-    "centerCollider": true
-  },
-  {
-    "uid": 24,
-    "name": "石1",
-    "labId": 14,
-    "protoUid": 0,
-    "icon": 210000,
-    "model": {
-      "id": 0,
-      "subPrefabUnitName": [
-        {
-          "v": 125049
-        }
-      ],
-      "subPrefabUnitPos": [
-        {
-          "v": "0|-0.4|0"
-        }
-      ],
-      "subPrefabUnitScale": [
-        {
-          "v": "0.5|0.2|0.5"
-        }
-      ],
-      "subUnitTexsName": [
-        {
-          "v": [
-            {
-              "v": 175
-            }
-          ]
-        }
-      ],
-      "animTimeInterval": 0.0,
-      "isObstacle": false,
-      "colliderScale": 0.0
-    },
-    "collision": false,
-    "events": [],
-    "paramDic": [],
-    "minimapIcon": 210000,
-    "faceType": 0,
-    "animClip": [
-      {
-        "k": 0,
-        "v": [
-          {
-            "v": 175
+            "v": 54
           }
         ]
       },
@@ -2534,181 +2829,51 @@
     ],
     "isWangTile": false,
     "boundsCollision": false,
-    "centerCollider": true
-  },
-  {
-    "uid": 23,
-    "name": "树2",
-    "labId": 14,
-    "protoUid": 0,
-    "icon": 210000,
-    "model": {
-      "id": 0,
-      "subPrefabUnitName": [
-        {
-          "v": 125049
-        }
-      ],
-      "subPrefabUnitPos": [
-        {
-          "v": "0|0.4|0"
-        }
-      ],
-      "subPrefabUnitScale": [
-        {
-          "v": "3|2|3"
-        }
-      ],
-      "subUnitTexsName": [
-        {
-          "v": [
-            {
-              "v": 51
-            }
-          ]
-        }
-      ],
-      "animTimeInterval": 0.0,
-      "isObstacle": false,
-      "colliderScale": 0.4
-    },
-    "collision": true,
-    "events": [],
-    "paramDic": [],
-    "minimapIcon": 210000,
-    "faceType": 0,
-    "animClip": [
+    "centerCollider": true,
+    "modelSizes": [
       {
         "k": 0,
-        "v": [
-          {
-            "v": 51
-          }
-        ]
+        "v": "0.5|0.5|0.5"
       },
       {
         "k": 1,
-        "v": [
-          {
-            "v": 108
-          }
-        ]
+        "v": "0.5|0.5|0.5"
       },
       {
         "k": 2,
-        "v": [
-          {
-            "v": 108
-          }
-        ]
+        "v": "0.5|0.5|0.5"
       },
       {
         "k": 3,
-        "v": [
-          {
-            "v": 108
-          }
-        ]
+        "v": "0.5|0.5|0.5"
       },
       {
         "k": 4,
-        "v": [
-          {
-            "v": 108
-          }
-        ]
+        "v": "0.5|0.5|0.5"
       }
     ],
-    "isWangTile": false,
-    "boundsCollision": true,
-    "centerCollider": false
-  },
-  {
-    "uid": 22,
-    "name": "树3",
-    "labId": 14,
-    "protoUid": 0,
-    "icon": 210000,
-    "model": {
-      "id": 0,
-      "subPrefabUnitName": [
-        {
-          "v": 125049
-        }
-      ],
-      "subPrefabUnitPos": [
-        {
-          "v": "0|0.4|0"
-        }
-      ],
-      "subPrefabUnitScale": [
-        {
-          "v": "3|2|3"
-        }
-      ],
-      "subUnitTexsName": [
-        {
-          "v": [
-            {
-              "v": 52
-            }
-          ]
-        }
-      ],
-      "animTimeInterval": 0.0,
-      "isObstacle": false,
-      "colliderScale": 0.4
-    },
-    "collision": true,
-    "events": [],
-    "paramDic": [],
-    "minimapIcon": 210000,
-    "faceType": 0,
-    "animClip": [
+    "modelPositions": [
       {
         "k": 0,
-        "v": [
-          {
-            "v": 52
-          }
-        ]
+        "v": "0|-0.2|0"
       },
       {
         "k": 1,
-        "v": [
-          {
-            "v": 108
-          }
-        ]
+        "v": "0|-0.2|0"
       },
       {
         "k": 2,
-        "v": [
-          {
-            "v": 108
-          }
-        ]
+        "v": "0|-0.2|0"
       },
       {
         "k": 3,
-        "v": [
-          {
-            "v": 108
-          }
-        ]
+        "v": "0|-0.2|0"
       },
       {
         "k": 4,
-        "v": [
-          {
-            "v": 108
-          }
-        ]
+        "v": "0|-0.2|0"
       }
-    ],
-    "isWangTile": false,
-    "boundsCollision": true,
-    "centerCollider": false
+    ]
   },
   {
     "uid": 21,
@@ -2845,7 +3010,19 @@
         }
       }
     ],
-    "paramDic": [],
+    "paramDic": [
+      {
+        "k": "可破坏",
+        "v": {
+          "uid": -1,
+          "name": "可破坏",
+          "valueType": 0,
+          "min": "",
+          "v": "{\r\n  \"uid\": -1,\r\n  \"str\": null,\r\n  \"valName\": null,\r\n  \"num\": 0.0,\r\n  \"dic\": []\r\n}",
+          "max": ""
+        }
+      }
+    ],
     "minimapIcon": 210000,
     "faceType": 2,
     "animClip": [
@@ -2892,12 +3069,56 @@
     ],
     "isWangTile": false,
     "boundsCollision": false,
-    "centerCollider": true
+    "centerCollider": true,
+    "modelSizes": [
+      {
+        "k": 0,
+        "v": "0.4|0.2|0.4"
+      },
+      {
+        "k": 1,
+        "v": "0.4|0.2|0.4"
+      },
+      {
+        "k": 2,
+        "v": "0.4|0.2|0.4"
+      },
+      {
+        "k": 3,
+        "v": "0.4|0.2|0.4"
+      },
+      {
+        "k": 4,
+        "v": "0.4|0.2|0.4"
+      }
+    ],
+    "modelPositions": [
+      {
+        "k": 0,
+        "v": "0|0|0"
+      },
+      {
+        "k": 1,
+        "v": "0|0|0"
+      },
+      {
+        "k": 2,
+        "v": "0|0|0"
+      },
+      {
+        "k": 3,
+        "v": "0|0|0"
+      },
+      {
+        "k": 4,
+        "v": "0|0|0"
+      }
+    ]
   },
   {
-    "uid": 20,
-    "name": "草6",
-    "labId": 15,
+    "uid": 24,
+    "name": "石1",
+    "labId": 14,
     "protoUid": 0,
     "icon": 210000,
     "model": {
@@ -2909,19 +3130,19 @@
       ],
       "subPrefabUnitPos": [
         {
-          "v": "0|-0.2|0"
+          "v": "0|-0.4|0"
         }
       ],
       "subPrefabUnitScale": [
         {
-          "v": "0.5|0.5|0.5"
+          "v": "0.5|0.2|0.5"
         }
       ],
       "subUnitTexsName": [
         {
           "v": [
             {
-              "v": 54
+              "v": 175
             }
           ]
         }
@@ -2932,7 +3153,19 @@
     },
     "collision": false,
     "events": [],
-    "paramDic": [],
+    "paramDic": [
+      {
+        "k": "可破坏",
+        "v": {
+          "uid": -1,
+          "name": "可破坏",
+          "valueType": 0,
+          "min": "",
+          "v": "{\r\n  \"uid\": -1,\r\n  \"str\": null,\r\n  \"valName\": null,\r\n  \"num\": 0.0,\r\n  \"dic\": []\r\n}",
+          "max": ""
+        }
+      }
+    ],
     "minimapIcon": 210000,
     "faceType": 0,
     "animClip": [
@@ -2940,7 +3173,7 @@
         "k": 0,
         "v": [
           {
-            "v": 54
+            "v": 175
           }
         ]
       },
@@ -2963,98 +3196,55 @@
     ],
     "isWangTile": false,
     "boundsCollision": false,
-    "centerCollider": true
-  },
-  {
-    "uid": 19,
-    "name": "桥1",
-    "labId": 14,
-    "protoUid": 0,
-    "icon": 210000,
-    "model": {
-      "id": 0,
-      "subPrefabUnitName": [
-        {
-          "v": 125049
-        }
-      ],
-      "subPrefabUnitPos": [
-        {
-          "v": "0|-0.3|0"
-        }
-      ],
-      "subPrefabUnitScale": [
-        {
-          "v": "1|0.1|1"
-        }
-      ],
-      "subUnitTexsName": [
-        {
-          "v": [
-            {
-              "v": 216
-            }
-          ]
-        }
-      ],
-      "animTimeInterval": 0.0,
-      "isObstacle": false,
-      "colliderScale": 1.0
-    },
-    "collision": true,
-    "events": [],
-    "paramDic": [],
-    "minimapIcon": 210000,
-    "faceType": 1,
-    "animClip": [
+    "centerCollider": true,
+    "modelSizes": [
       {
         "k": 0,
-        "v": [
-          {
-            "v": 216
-          }
-        ]
+        "v": "0.5|0.2|0.5"
       },
       {
         "k": 1,
-        "v": [
-          {
-            "v": 216
-          }
-        ]
+        "v": "0.5|0.2|0.5"
       },
       {
         "k": 2,
-        "v": [
-          {
-            "v": 216
-          }
-        ]
+        "v": "0.5|0.2|0.5"
       },
       {
         "k": 3,
-        "v": [
-          {
-            "v": 157
-          }
-        ]
+        "v": "0.5|0.2|0.5"
       },
       {
         "k": 4,
-        "v": [
-          {
-            "v": 157
-          }
-        ]
+        "v": "0.5|0.2|0.5"
       }
     ],
-    "isWangTile": false,
-    "boundsCollision": true,
-    "centerCollider": true
+    "modelPositions": [
+      {
+        "k": 0,
+        "v": "0|-0.4|0"
+      },
+      {
+        "k": 1,
+        "v": "0|-0.4|0"
+      },
+      {
+        "k": 2,
+        "v": "0|-0.4|0"
+      },
+      {
+        "k": 3,
+        "v": "0|-0.4|0"
+      },
+      {
+        "k": 4,
+        "v": "0|-0.4|0"
+      }
+    ]
   },
   {
-    "uid": 18,
-    "name": "草1",
+    "uid": 25,
+    "name": "草5",
     "labId": 15,
     "protoUid": 0,
     "icon": 210000,
@@ -3079,7 +3269,7 @@
         {
           "v": [
             {
-              "v": 172
+              "v": 177
             }
           ]
         }
@@ -3090,7 +3280,19 @@
     },
     "collision": false,
     "events": [],
-    "paramDic": [],
+    "paramDic": [
+      {
+        "k": "可破坏",
+        "v": {
+          "uid": -1,
+          "name": "可破坏",
+          "valueType": 0,
+          "min": "",
+          "v": "{\r\n  \"uid\": -1,\r\n  \"str\": null,\r\n  \"valName\": null,\r\n  \"num\": 0.0,\r\n  \"dic\": []\r\n}",
+          "max": ""
+        }
+      }
+    ],
     "minimapIcon": 210000,
     "faceType": 0,
     "animClip": [
@@ -3098,7 +3300,1776 @@
         "k": 0,
         "v": [
           {
-            "v": 172
+            "v": 177
+          }
+        ]
+      },
+      {
+        "k": 1,
+        "v": [
+          {
+            "v": 56
+          }
+        ]
+      },
+      {
+        "k": 2,
+        "v": [
+          {
+            "v": 56
+          }
+        ]
+      },
+      {
+        "k": 3,
+        "v": [
+          {
+            "v": 56
+          }
+        ]
+      },
+      {
+        "k": 4,
+        "v": [
+          {
+            "v": 56
+          }
+        ]
+      }
+    ],
+    "isWangTile": false,
+    "boundsCollision": false,
+    "centerCollider": true,
+    "modelSizes": [
+      {
+        "k": 0,
+        "v": "0.5|0.3|0.5"
+      },
+      {
+        "k": 1,
+        "v": "0.5|0.3|0.5"
+      },
+      {
+        "k": 2,
+        "v": "0.5|0.3|0.5"
+      },
+      {
+        "k": 3,
+        "v": "0.5|0.3|0.5"
+      },
+      {
+        "k": 4,
+        "v": "0.5|0.3|0.5"
+      }
+    ],
+    "modelPositions": [
+      {
+        "k": 0,
+        "v": "0|-0.35|0"
+      },
+      {
+        "k": 1,
+        "v": "0|-0.35|0"
+      },
+      {
+        "k": 2,
+        "v": "0|-0.35|0"
+      },
+      {
+        "k": 3,
+        "v": "0|-0.35|0"
+      },
+      {
+        "k": 4,
+        "v": "0|-0.35|0"
+      }
+    ]
+  },
+  {
+    "uid": 28,
+    "name": "草4",
+    "labId": 15,
+    "protoUid": 0,
+    "icon": 210000,
+    "model": {
+      "id": 0,
+      "subPrefabUnitName": [
+        {
+          "v": 125049
+        }
+      ],
+      "subPrefabUnitPos": [
+        {
+          "v": "0|-0.35|0"
+        }
+      ],
+      "subPrefabUnitScale": [
+        {
+          "v": "0.5|0.3|0.5"
+        }
+      ],
+      "subUnitTexsName": [
+        {
+          "v": [
+            {
+              "v": 176
+            }
+          ]
+        }
+      ],
+      "animTimeInterval": 0.0,
+      "isObstacle": false,
+      "colliderScale": 0.0
+    },
+    "collision": false,
+    "events": [],
+    "paramDic": [
+      {
+        "k": "可破坏",
+        "v": {
+          "uid": -1,
+          "name": "可破坏",
+          "valueType": 0,
+          "min": "",
+          "v": "{\r\n  \"uid\": -1,\r\n  \"str\": null,\r\n  \"valName\": null,\r\n  \"num\": 0.0,\r\n  \"dic\": []\r\n}",
+          "max": ""
+        }
+      }
+    ],
+    "minimapIcon": 210000,
+    "faceType": 0,
+    "animClip": [
+      {
+        "k": 0,
+        "v": [
+          {
+            "v": 176
+          }
+        ]
+      },
+      {
+        "k": 1,
+        "v": [
+          {
+            "v": 56
+          }
+        ]
+      },
+      {
+        "k": 2,
+        "v": [
+          {
+            "v": 56
+          }
+        ]
+      },
+      {
+        "k": 3,
+        "v": [
+          {
+            "v": 56
+          }
+        ]
+      },
+      {
+        "k": 4,
+        "v": [
+          {
+            "v": 56
+          }
+        ]
+      }
+    ],
+    "isWangTile": false,
+    "boundsCollision": false,
+    "centerCollider": true,
+    "modelSizes": [
+      {
+        "k": 0,
+        "v": "0.5|0.3|0.5"
+      },
+      {
+        "k": 1,
+        "v": "0.5|0.3|0.5"
+      },
+      {
+        "k": 2,
+        "v": "0.5|0.3|0.5"
+      },
+      {
+        "k": 3,
+        "v": "0.5|0.3|0.5"
+      },
+      {
+        "k": 4,
+        "v": "0.5|0.3|0.5"
+      }
+    ],
+    "modelPositions": [
+      {
+        "k": 0,
+        "v": "0|-0.35|0"
+      },
+      {
+        "k": 1,
+        "v": "0|-0.35|0"
+      },
+      {
+        "k": 2,
+        "v": "0|-0.35|0"
+      },
+      {
+        "k": 3,
+        "v": "0|-0.35|0"
+      },
+      {
+        "k": 4,
+        "v": "0|-0.35|0"
+      }
+    ]
+  },
+  {
+    "uid": 29,
+    "name": "草3",
+    "labId": 15,
+    "protoUid": 0,
+    "icon": 210000,
+    "model": {
+      "id": 0,
+      "subPrefabUnitName": [
+        {
+          "v": 125049
+        }
+      ],
+      "subPrefabUnitPos": [
+        {
+          "v": "0|-0.35|0"
+        }
+      ],
+      "subPrefabUnitScale": [
+        {
+          "v": "0.5|0.3|0.5"
+        }
+      ],
+      "subUnitTexsName": [
+        {
+          "v": [
+            {
+              "v": 174
+            }
+          ]
+        }
+      ],
+      "animTimeInterval": 0.0,
+      "isObstacle": false,
+      "colliderScale": 0.0
+    },
+    "collision": false,
+    "events": [],
+    "paramDic": [
+      {
+        "k": "可破坏",
+        "v": {
+          "uid": -1,
+          "name": "可破坏",
+          "valueType": 0,
+          "min": "",
+          "v": "{\r\n  \"uid\": -1,\r\n  \"str\": null,\r\n  \"valName\": null,\r\n  \"num\": 0.0,\r\n  \"dic\": []\r\n}",
+          "max": ""
+        }
+      }
+    ],
+    "minimapIcon": 210000,
+    "faceType": 0,
+    "animClip": [
+      {
+        "k": 0,
+        "v": [
+          {
+            "v": 174
+          }
+        ]
+      },
+      {
+        "k": 1,
+        "v": [
+          {
+            "v": 56
+          }
+        ]
+      },
+      {
+        "k": 2,
+        "v": [
+          {
+            "v": 56
+          }
+        ]
+      },
+      {
+        "k": 3,
+        "v": [
+          {
+            "v": 56
+          }
+        ]
+      },
+      {
+        "k": 4,
+        "v": [
+          {
+            "v": 56
+          }
+        ]
+      }
+    ],
+    "isWangTile": false,
+    "boundsCollision": false,
+    "centerCollider": true,
+    "modelSizes": [
+      {
+        "k": 0,
+        "v": "0.5|0.3|0.5"
+      },
+      {
+        "k": 1,
+        "v": "0.5|0.3|0.5"
+      },
+      {
+        "k": 2,
+        "v": "0.5|0.3|0.5"
+      },
+      {
+        "k": 3,
+        "v": "0.5|0.3|0.5"
+      },
+      {
+        "k": 4,
+        "v": "0.5|0.3|0.5"
+      }
+    ],
+    "modelPositions": [
+      {
+        "k": 0,
+        "v": "0|-0.35|0"
+      },
+      {
+        "k": 1,
+        "v": "0|-0.35|0"
+      },
+      {
+        "k": 2,
+        "v": "0|-0.35|0"
+      },
+      {
+        "k": 3,
+        "v": "0|-0.35|0"
+      },
+      {
+        "k": 4,
+        "v": "0|-0.35|0"
+      }
+    ]
+  },
+  {
+    "uid": 30,
+    "name": "草2",
+    "labId": 15,
+    "protoUid": 0,
+    "icon": 210000,
+    "model": {
+      "id": 0,
+      "subPrefabUnitName": [
+        {
+          "v": 125049
+        }
+      ],
+      "subPrefabUnitPos": [
+        {
+          "v": "0|-0.35|0"
+        }
+      ],
+      "subPrefabUnitScale": [
+        {
+          "v": "0.5|0.3|0.5"
+        }
+      ],
+      "subUnitTexsName": [
+        {
+          "v": [
+            {
+              "v": 173
+            }
+          ]
+        }
+      ],
+      "animTimeInterval": 0.0,
+      "isObstacle": false,
+      "colliderScale": 0.0
+    },
+    "collision": false,
+    "events": [],
+    "paramDic": [
+      {
+        "k": "可破坏",
+        "v": {
+          "uid": -1,
+          "name": "可破坏",
+          "valueType": 0,
+          "min": "",
+          "v": "{\r\n  \"uid\": -1,\r\n  \"str\": null,\r\n  \"valName\": null,\r\n  \"num\": 0.0,\r\n  \"dic\": []\r\n}",
+          "max": ""
+        }
+      }
+    ],
+    "minimapIcon": 210000,
+    "faceType": 0,
+    "animClip": [
+      {
+        "k": 0,
+        "v": [
+          {
+            "v": 173
+          }
+        ]
+      },
+      {
+        "k": 1,
+        "v": [
+          {
+            "v": 56
+          }
+        ]
+      },
+      {
+        "k": 2,
+        "v": [
+          {
+            "v": 56
+          }
+        ]
+      },
+      {
+        "k": 3,
+        "v": [
+          {
+            "v": 56
+          }
+        ]
+      },
+      {
+        "k": 4,
+        "v": [
+          {
+            "v": 56
+          }
+        ]
+      }
+    ],
+    "isWangTile": false,
+    "boundsCollision": false,
+    "centerCollider": true,
+    "modelSizes": [
+      {
+        "k": 0,
+        "v": "0.5|0.3|0.5"
+      },
+      {
+        "k": 1,
+        "v": "0.5|0.3|0.5"
+      },
+      {
+        "k": 2,
+        "v": "0.5|0.3|0.5"
+      },
+      {
+        "k": 3,
+        "v": "0.5|0.3|0.5"
+      },
+      {
+        "k": 4,
+        "v": "0.5|0.3|0.5"
+      }
+    ],
+    "modelPositions": [
+      {
+        "k": 0,
+        "v": "0|-0.35|0"
+      },
+      {
+        "k": 1,
+        "v": "0|-0.35|0"
+      },
+      {
+        "k": 2,
+        "v": "0|-0.35|0"
+      },
+      {
+        "k": 3,
+        "v": "0|-0.35|0"
+      },
+      {
+        "k": 4,
+        "v": "0|-0.35|0"
+      }
+    ]
+  },
+  {
+    "uid": 31,
+    "name": "星弹",
+    "labId": 16,
+    "protoUid": 0,
+    "icon": 210000,
+    "model": {
+      "id": 0,
+      "subPrefabUnitName": [
+        {
+          "v": 125049
+        }
+      ],
+      "subPrefabUnitPos": [
+        {
+          "v": "0|0|0"
+        }
+      ],
+      "subPrefabUnitScale": [
+        {
+          "v": "0.4|0.2|0.4"
+        }
+      ],
+      "subUnitTexsName": [
+        {
+          "v": [
+            {
+              "v": 33
+            }
+          ]
+        }
+      ],
+      "animTimeInterval": 0.0,
+      "isObstacle": false,
+      "colliderScale": 0.2
+    },
+    "collision": false,
+    "events": [
+      {
+        "k": "onCharacterTouchEvent",
+        "v": {
+          "uid": -1,
+          "name": "onCharacterTouchEvent",
+          "evt": [
+            {
+              "v": 8
+            }
+          ],
+          "type": 0
+        }
+      },
+      {
+        "k": "onCharacterLeaveEvent",
+        "v": {
+          "uid": -1,
+          "name": "onCharacterLeaveEvent",
+          "evt": [],
+          "type": 0
+        }
+      },
+      {
+        "k": "onObjectTouchEvent",
+        "v": {
+          "uid": -1,
+          "name": "onObjectTouchEvent",
+          "evt": [
+            {
+              "v": 10
+            }
+          ],
+          "type": 0
+        }
+      },
+      {
+        "k": "onLeaveSceneEvent",
+        "v": {
+          "uid": -1,
+          "name": "onLeaveSceneEvent",
+          "evt": [
+            {
+              "v": 2
+            }
+          ],
+          "type": 0
+        }
+      },
+      {
+        "k": "onBoundaryTouchEvent",
+        "v": {
+          "uid": -1,
+          "name": "onBoundaryTouchEvent",
+          "evt": [
+            {
+              "v": 2
+            }
+          ],
+          "type": 0
+        }
+      },
+      {
+        "k": "onPerSecondEvent",
+        "v": {
+          "uid": -1,
+          "name": "onPerSecondEvent",
+          "evt": [],
+          "type": 0
+        }
+      },
+      {
+        "k": "onShowEvent",
+        "v": {
+          "uid": -1,
+          "name": "onShowEvent",
+          "evt": [
+            {
+              "v": 9
+            }
+          ],
+          "type": 0
+        }
+      },
+      {
+        "k": "onTileTouchEvent",
+        "v": {
+          "uid": -1,
+          "name": "onTileTouchEvent",
+          "evt": [
+            {
+              "v": 2
+            }
+          ],
+          "type": 0
+        }
+      }
+    ],
+    "paramDic": [
+      {
+        "k": "可破坏",
+        "v": {
+          "uid": -1,
+          "name": "可破坏",
+          "valueType": 0,
+          "min": "",
+          "v": "{\r\n  \"uid\": -1,\r\n  \"str\": null,\r\n  \"valName\": null,\r\n  \"num\": 0.0,\r\n  \"dic\": []\r\n}",
+          "max": ""
+        }
+      }
+    ],
+    "minimapIcon": 210000,
+    "faceType": 2,
+    "animClip": [
+      {
+        "k": 0,
+        "v": [
+          {
+            "v": 33
+          }
+        ]
+      },
+      {
+        "k": 1,
+        "v": [
+          {
+            "v": 33
+          }
+        ]
+      },
+      {
+        "k": 2,
+        "v": [
+          {
+            "v": 33
+          }
+        ]
+      },
+      {
+        "k": 3,
+        "v": [
+          {
+            "v": 33
+          }
+        ]
+      },
+      {
+        "k": 4,
+        "v": [
+          {
+            "v": 33
+          }
+        ]
+      }
+    ],
+    "isWangTile": false,
+    "boundsCollision": false,
+    "centerCollider": true,
+    "modelSizes": [
+      {
+        "k": 0,
+        "v": "0.4|0.2|0.4"
+      },
+      {
+        "k": 1,
+        "v": "0.4|0.2|0.4"
+      },
+      {
+        "k": 2,
+        "v": "0.4|0.2|0.4"
+      },
+      {
+        "k": 3,
+        "v": "0.4|0.2|0.4"
+      },
+      {
+        "k": 4,
+        "v": "0.4|0.2|0.4"
+      }
+    ],
+    "modelPositions": [
+      {
+        "k": 0,
+        "v": "0|0|0"
+      },
+      {
+        "k": 1,
+        "v": "0|0|0"
+      },
+      {
+        "k": 2,
+        "v": "0|0|0"
+      },
+      {
+        "k": 3,
+        "v": "0|0|0"
+      },
+      {
+        "k": 4,
+        "v": "0|0|0"
+      }
+    ]
+  },
+  {
+    "uid": 32,
+    "name": "札弹",
+    "labId": 16,
+    "protoUid": 0,
+    "icon": 210000,
+    "model": {
+      "id": 0,
+      "subPrefabUnitName": [
+        {
+          "v": 125049
+        }
+      ],
+      "subPrefabUnitPos": [
+        {
+          "v": "0|0|0"
+        }
+      ],
+      "subPrefabUnitScale": [
+        {
+          "v": "0.4|0.2|0.4"
+        }
+      ],
+      "subUnitTexsName": [
+        {
+          "v": [
+            {
+              "v": 46
+            }
+          ]
+        }
+      ],
+      "animTimeInterval": 0.0,
+      "isObstacle": false,
+      "colliderScale": 0.2
+    },
+    "collision": false,
+    "events": [
+      {
+        "k": "onCharacterTouchEvent",
+        "v": {
+          "uid": -1,
+          "name": "onCharacterTouchEvent",
+          "evt": [
+            {
+              "v": 8
+            }
+          ],
+          "type": 0
+        }
+      },
+      {
+        "k": "onObjectTouchEvent",
+        "v": {
+          "uid": -1,
+          "name": "onObjectTouchEvent",
+          "evt": [
+            {
+              "v": 10
+            }
+          ],
+          "type": 0
+        }
+      },
+      {
+        "k": "onShowEvent",
+        "v": {
+          "uid": -1,
+          "name": "onShowEvent",
+          "evt": [
+            {
+              "v": 7
+            }
+          ],
+          "type": 0
+        }
+      },
+      {
+        "k": "onLeaveSceneEvent",
+        "v": {
+          "uid": -1,
+          "name": "onLeaveSceneEvent",
+          "evt": [
+            {
+              "v": 2
+            }
+          ],
+          "type": 0
+        }
+      },
+      {
+        "k": "onBoundaryTouchEvent",
+        "v": {
+          "uid": -1,
+          "name": "onBoundaryTouchEvent",
+          "evt": [
+            {
+              "v": 2
+            }
+          ],
+          "type": 0
+        }
+      },
+      {
+        "k": "onTileTouchEvent",
+        "v": {
+          "uid": -1,
+          "name": "onTileTouchEvent",
+          "evt": [
+            {
+              "v": 2
+            }
+          ],
+          "type": 0
+        }
+      }
+    ],
+    "paramDic": [
+      {
+        "k": "可破坏",
+        "v": {
+          "uid": -1,
+          "name": "可破坏",
+          "valueType": 0,
+          "min": "",
+          "v": "{\r\n  \"uid\": -1,\r\n  \"str\": null,\r\n  \"valName\": null,\r\n  \"num\": 0.0,\r\n  \"dic\": []\r\n}",
+          "max": ""
+        }
+      }
+    ],
+    "minimapIcon": 210000,
+    "faceType": 2,
+    "animClip": [
+      {
+        "k": 0,
+        "v": [
+          {
+            "v": 46
+          }
+        ]
+      },
+      {
+        "k": 1,
+        "v": [
+          {
+            "v": 46
+          }
+        ]
+      },
+      {
+        "k": 2,
+        "v": [
+          {
+            "v": 46
+          }
+        ]
+      },
+      {
+        "k": 3,
+        "v": [
+          {
+            "v": 46
+          }
+        ]
+      },
+      {
+        "k": 4,
+        "v": [
+          {
+            "v": 46
+          }
+        ]
+      }
+    ],
+    "isWangTile": false,
+    "boundsCollision": false,
+    "centerCollider": true,
+    "modelSizes": [
+      {
+        "k": 0,
+        "v": "0.4|0.2|0.4"
+      },
+      {
+        "k": 1,
+        "v": "0.4|0.2|0.4"
+      },
+      {
+        "k": 2,
+        "v": "0.4|0.2|0.4"
+      },
+      {
+        "k": 3,
+        "v": "0.4|0.2|0.4"
+      },
+      {
+        "k": 4,
+        "v": "0.4|0.2|0.4"
+      }
+    ],
+    "modelPositions": [
+      {
+        "k": 0,
+        "v": "0|0|0"
+      },
+      {
+        "k": 1,
+        "v": "0|0|0"
+      },
+      {
+        "k": 2,
+        "v": "0|0|0"
+      },
+      {
+        "k": 3,
+        "v": "0|0|0"
+      },
+      {
+        "k": 4,
+        "v": "0|0|0"
+      }
+    ]
+  },
+  {
+    "uid": 33,
+    "name": "玉弹",
+    "labId": 16,
+    "protoUid": 0,
+    "icon": 210000,
+    "model": {
+      "id": 0,
+      "subPrefabUnitName": [
+        {
+          "v": 125049
+        }
+      ],
+      "subPrefabUnitPos": [
+        {
+          "v": "0|0|0"
+        }
+      ],
+      "subPrefabUnitScale": [
+        {
+          "v": "0.4|0.2|0.4"
+        }
+      ],
+      "subUnitTexsName": [
+        {
+          "v": [
+            {
+              "v": 47
+            }
+          ]
+        }
+      ],
+      "animTimeInterval": 0.0,
+      "isObstacle": false,
+      "colliderScale": 0.2
+    },
+    "collision": false,
+    "events": [
+      {
+        "k": "onTileTouchEvent",
+        "v": {
+          "uid": -1,
+          "name": "onTileTouchEvent",
+          "evt": [
+            {
+              "v": 2
+            }
+          ],
+          "type": 0
+        }
+      }
+    ],
+    "paramDic": [
+      {
+        "k": "可破坏",
+        "v": {
+          "uid": -1,
+          "name": "可破坏",
+          "valueType": 0,
+          "min": "",
+          "v": "{\r\n  \"uid\": -1,\r\n  \"str\": null,\r\n  \"valName\": null,\r\n  \"num\": 0.0,\r\n  \"dic\": []\r\n}",
+          "max": ""
+        }
+      }
+    ],
+    "minimapIcon": 210000,
+    "faceType": 2,
+    "animClip": [
+      {
+        "k": 0,
+        "v": [
+          {
+            "v": 47
+          }
+        ]
+      },
+      {
+        "k": 1,
+        "v": [
+          {
+            "v": 47
+          }
+        ]
+      },
+      {
+        "k": 2,
+        "v": [
+          {
+            "v": 47
+          }
+        ]
+      },
+      {
+        "k": 3,
+        "v": [
+          {
+            "v": 47
+          }
+        ]
+      },
+      {
+        "k": 4,
+        "v": [
+          {
+            "v": 47
+          }
+        ]
+      }
+    ],
+    "isWangTile": false,
+    "boundsCollision": false,
+    "centerCollider": true,
+    "modelSizes": [
+      {
+        "k": 0,
+        "v": "0.4|0.2|0.4"
+      },
+      {
+        "k": 1,
+        "v": "0.4|0.2|0.4"
+      },
+      {
+        "k": 2,
+        "v": "0.4|0.2|0.4"
+      },
+      {
+        "k": 3,
+        "v": "0.4|0.2|0.4"
+      },
+      {
+        "k": 4,
+        "v": "0.4|0.2|0.4"
+      }
+    ],
+    "modelPositions": [
+      {
+        "k": 0,
+        "v": "0|0|0"
+      },
+      {
+        "k": 1,
+        "v": "0|0|0"
+      },
+      {
+        "k": 2,
+        "v": "0|0|0"
+      },
+      {
+        "k": 3,
+        "v": "0|0|0"
+      },
+      {
+        "k": 4,
+        "v": "0|0|0"
+      }
+    ]
+  },
+  {
+    "uid": 35,
+    "name": "树干1",
+    "labId": 14,
+    "protoUid": 0,
+    "icon": 210000,
+    "model": {
+      "id": 0,
+      "subPrefabUnitName": [
+        {
+          "v": 125049
+        }
+      ],
+      "subPrefabUnitPos": [
+        {
+          "v": "-2.682209E-07|0.3|-0.07894832"
+        }
+      ],
+      "subPrefabUnitScale": [
+        {
+          "v": "3|2|3"
+        }
+      ],
+      "subUnitTexsName": [
+        {
+          "v": [
+            {
+              "v": 109
+            }
+          ]
+        }
+      ],
+      "animTimeInterval": 0.0,
+      "isObstacle": false,
+      "colliderScale": 0.4
+    },
+    "collision": true,
+    "events": [],
+    "paramDic": [
+      {
+        "k": "可破坏",
+        "v": {
+          "uid": -1,
+          "name": "可破坏",
+          "valueType": 0,
+          "min": "",
+          "v": "{\r\n  \"uid\": -1,\r\n  \"str\": null,\r\n  \"valName\": null,\r\n  \"num\": 0.0,\r\n  \"dic\": []\r\n}",
+          "max": ""
+        }
+      }
+    ],
+    "minimapIcon": 210000,
+    "faceType": 0,
+    "animClip": [
+      {
+        "k": 0,
+        "v": [
+          {
+            "v": 109
+          }
+        ]
+      },
+      {
+        "k": 1,
+        "v": [
+          {
+            "v": 109
+          }
+        ]
+      },
+      {
+        "k": 2,
+        "v": [
+          {
+            "v": 109
+          }
+        ]
+      },
+      {
+        "k": 3,
+        "v": [
+          {
+            "v": 109
+          }
+        ]
+      },
+      {
+        "k": 4,
+        "v": [
+          {
+            "v": 109
+          }
+        ]
+      }
+    ],
+    "isWangTile": false,
+    "boundsCollision": false,
+    "centerCollider": false,
+    "modelSizes": [
+      {
+        "k": 0,
+        "v": "3|2|3"
+      },
+      {
+        "k": 1,
+        "v": "3|2|3"
+      },
+      {
+        "k": 2,
+        "v": "3|2|3"
+      },
+      {
+        "k": 3,
+        "v": "3|2|3"
+      },
+      {
+        "k": 4,
+        "v": "3|2|3"
+      }
+    ],
+    "modelPositions": [
+      {
+        "k": 0,
+        "v": "-2.682209E-07|0.3|-0.07894832"
+      },
+      {
+        "k": 1,
+        "v": "-2.682209E-07|0.3|-0.07894832"
+      },
+      {
+        "k": 2,
+        "v": "-2.682209E-07|0.3|-0.07894832"
+      },
+      {
+        "k": 3,
+        "v": "-2.682209E-07|0.3|-0.07894832"
+      },
+      {
+        "k": 4,
+        "v": "-2.682209E-07|0.3|-0.07894832"
+      }
+    ]
+  },
+  {
+    "uid": 37,
+    "name": "草8",
+    "labId": 15,
+    "protoUid": 0,
+    "icon": 210000,
+    "model": {
+      "id": 0,
+      "subPrefabUnitName": [
+        {
+          "v": 125049
+        }
+      ],
+      "subPrefabUnitPos": [
+        {
+          "v": "0|-0.25|0"
+        }
+      ],
+      "subPrefabUnitScale": [
+        {
+          "v": "0.5|0.5|0.5"
+        }
+      ],
+      "subUnitTexsName": [
+        {
+          "v": [
+            {
+              "v": 127
+            }
+          ]
+        }
+      ],
+      "animTimeInterval": 0.0,
+      "isObstacle": false,
+      "colliderScale": 0.0
+    },
+    "collision": false,
+    "events": [],
+    "paramDic": [
+      {
+        "k": "可破坏",
+        "v": {
+          "uid": -1,
+          "name": "可破坏",
+          "valueType": 0,
+          "min": "",
+          "v": "{\r\n  \"uid\": -1,\r\n  \"str\": null,\r\n  \"valName\": null,\r\n  \"num\": 0.0,\r\n  \"dic\": []\r\n}",
+          "max": ""
+        }
+      }
+    ],
+    "minimapIcon": 210000,
+    "faceType": 0,
+    "animClip": [
+      {
+        "k": 0,
+        "v": [
+          {
+            "v": 127
+          }
+        ]
+      },
+      {
+        "k": 1,
+        "v": [
+          {
+            "v": 56
+          }
+        ]
+      },
+      {
+        "k": 2,
+        "v": [
+          {
+            "v": 56
+          }
+        ]
+      },
+      {
+        "k": 3,
+        "v": [
+          {
+            "v": 56
+          }
+        ]
+      },
+      {
+        "k": 4,
+        "v": [
+          {
+            "v": 56
+          }
+        ]
+      }
+    ],
+    "isWangTile": false,
+    "boundsCollision": false,
+    "centerCollider": true,
+    "modelSizes": [
+      {
+        "k": 0,
+        "v": "0.5|0.5|0.5"
+      },
+      {
+        "k": 1,
+        "v": "0.5|0.5|0.5"
+      },
+      {
+        "k": 2,
+        "v": "0.5|0.5|0.5"
+      },
+      {
+        "k": 3,
+        "v": "0.5|0.5|0.5"
+      },
+      {
+        "k": 4,
+        "v": "0.5|0.5|0.5"
+      }
+    ],
+    "modelPositions": [
+      {
+        "k": 0,
+        "v": "0|-0.25|0"
+      },
+      {
+        "k": 1,
+        "v": "0|-0.25|0"
+      },
+      {
+        "k": 2,
+        "v": "0|-0.25|0"
+      },
+      {
+        "k": 3,
+        "v": "0|-0.25|0"
+      },
+      {
+        "k": 4,
+        "v": "0|-0.25|0"
+      }
+    ]
+  },
+  {
+    "uid": 38,
+    "name": "宝箱",
+    "labId": 17,
+    "protoUid": 0,
+    "icon": 210000,
+    "model": {
+      "id": 0,
+      "subPrefabUnitName": [
+        {
+          "v": 125049
+        }
+      ],
+      "subPrefabUnitPos": [
+        {
+          "v": "0|-0.3|0"
+        }
+      ],
+      "subPrefabUnitScale": [
+        {
+          "v": "0.8|0.6|0.8"
+        }
+      ],
+      "subUnitTexsName": [
+        {
+          "v": [
+            {
+              "v": 44
+            }
+          ]
+        }
+      ],
+      "animTimeInterval": 0.0,
+      "isObstacle": false,
+      "colliderScale": 0.5
+    },
+    "collision": true,
+    "events": [
+      {
+        "k": "onInteractEvent",
+        "v": {
+          "uid": -1,
+          "name": "onInteractEvent",
+          "evt": [
+            {
+              "v": 12
+            }
+          ],
+          "type": 1
+        }
+      }
+    ],
+    "paramDic": [
+      {
+        "k": "可破坏",
+        "v": {
+          "uid": -1,
+          "name": "可破坏",
+          "valueType": 0,
+          "min": "",
+          "v": "{\r\n  \"uid\": -1,\r\n  \"str\": null,\r\n  \"valName\": null,\r\n  \"num\": 0.0,\r\n  \"dic\": []\r\n}",
+          "max": ""
+        }
+      }
+    ],
+    "minimapIcon": 210000,
+    "faceType": 1,
+    "animClip": [
+      {
+        "k": 0,
+        "v": []
+      },
+      {
+        "k": 1,
+        "v": [
+          {
+            "v": 44
+          }
+        ]
+      },
+      {
+        "k": 2,
+        "v": [
+          {
+            "v": 38
+          }
+        ]
+      },
+      {
+        "k": 3,
+        "v": [
+          {
+            "v": 42
+          }
+        ]
+      },
+      {
+        "k": 4,
+        "v": [
+          {
+            "v": 40
+          }
+        ]
+      }
+    ],
+    "isWangTile": false,
+    "boundsCollision": false,
+    "centerCollider": true,
+    "modelSizes": [
+      {
+        "k": 0,
+        "v": "0.8|0.6|0.8"
+      },
+      {
+        "k": 1,
+        "v": "0.8|0.6|0.8"
+      },
+      {
+        "k": 2,
+        "v": "0.8|0.6|0.8"
+      },
+      {
+        "k": 3,
+        "v": "0.8|0.6|0.8"
+      },
+      {
+        "k": 4,
+        "v": "0.8|0.6|0.8"
+      }
+    ],
+    "modelPositions": [
+      {
+        "k": 0,
+        "v": "0|-0.3|0"
+      },
+      {
+        "k": 1,
+        "v": "0|-0.3|0"
+      },
+      {
+        "k": 2,
+        "v": "0|-0.3|0"
+      },
+      {
+        "k": 3,
+        "v": "0|-0.3|0"
+      },
+      {
+        "k": 4,
+        "v": "0|-0.3|0"
+      }
+    ]
+  },
+  {
+    "uid": 39,
+    "name": "空宝箱",
+    "labId": 17,
+    "protoUid": 0,
+    "icon": 210000,
+    "model": {
+      "id": 0,
+      "subPrefabUnitName": [
+        {
+          "v": 125049
+        }
+      ],
+      "subPrefabUnitPos": [
+        {
+          "v": "0|-0.2|0"
+        }
+      ],
+      "subPrefabUnitScale": [
+        {
+          "v": "0.8|0.8|0.8"
+        }
+      ],
+      "subUnitTexsName": [
+        {
+          "v": [
+            {
+              "v": 43
+            }
+          ]
+        }
+      ],
+      "animTimeInterval": 0.0,
+      "isObstacle": false,
+      "colliderScale": 0.5
+    },
+    "collision": true,
+    "events": [],
+    "paramDic": [
+      {
+        "k": "可破坏",
+        "v": {
+          "uid": -1,
+          "name": "可破坏",
+          "valueType": 0,
+          "min": "",
+          "v": "{\r\n  \"uid\": -1,\r\n  \"str\": null,\r\n  \"valName\": null,\r\n  \"num\": 0.0,\r\n  \"dic\": []\r\n}",
+          "max": ""
+        }
+      }
+    ],
+    "minimapIcon": 210000,
+    "faceType": 1,
+    "animClip": [
+      {
+        "k": 0,
+        "v": []
+      },
+      {
+        "k": 1,
+        "v": [
+          {
+            "v": 43
+          }
+        ]
+      },
+      {
+        "k": 2,
+        "v": [
+          {
+            "v": 37
+          }
+        ]
+      },
+      {
+        "k": 3,
+        "v": [
+          {
+            "v": 39
+          }
+        ]
+      },
+      {
+        "k": 4,
+        "v": [
+          {
+            "v": 41
+          }
+        ]
+      }
+    ],
+    "isWangTile": false,
+    "boundsCollision": false,
+    "centerCollider": true,
+    "modelSizes": [
+      {
+        "k": 0,
+        "v": "0.8|0.8|0.8"
+      },
+      {
+        "k": 1,
+        "v": "0.8|0.8|0.8"
+      },
+      {
+        "k": 2,
+        "v": "0.8|0.8|0.8"
+      },
+      {
+        "k": 3,
+        "v": "0.8|0.8|0.8"
+      },
+      {
+        "k": 4,
+        "v": "0.8|0.8|0.8"
+      }
+    ],
+    "modelPositions": [
+      {
+        "k": 0,
+        "v": "0|-0.2|0"
+      },
+      {
+        "k": 1,
+        "v": "0|-0.2|0"
+      },
+      {
+        "k": 2,
+        "v": "0|-0.2|0"
+      },
+      {
+        "k": 3,
+        "v": "0|-0.2|0"
+      },
+      {
+        "k": 4,
+        "v": "0|-0.2|0"
+      }
+    ]
+  },
+  {
+    "uid": 40,
+    "name": "草7",
+    "labId": 15,
+    "protoUid": 0,
+    "icon": 210000,
+    "model": {
+      "id": 0,
+      "subPrefabUnitName": [
+        {
+          "v": 125049
+        }
+      ],
+      "subPrefabUnitPos": [
+        {
+          "v": "0|-0.4|0"
+        }
+      ],
+      "subPrefabUnitScale": [
+        {
+          "v": "0.5|0.2|0.5"
+        }
+      ],
+      "subUnitTexsName": [
+        {
+          "v": [
+            {
+              "v": 58
+            }
+          ]
+        }
+      ],
+      "animTimeInterval": 0.0,
+      "isObstacle": false,
+      "colliderScale": 0.0
+    },
+    "collision": false,
+    "events": [],
+    "paramDic": [
+      {
+        "k": "可破坏",
+        "v": {
+          "uid": -1,
+          "name": "可破坏",
+          "valueType": 0,
+          "min": "",
+          "v": "{\r\n  \"uid\": -1,\r\n  \"str\": null,\r\n  \"valName\": null,\r\n  \"num\": 0.0,\r\n  \"dic\": []\r\n}",
+          "max": ""
+        }
+      }
+    ],
+    "minimapIcon": 210000,
+    "faceType": 0,
+    "animClip": [
+      {
+        "k": 0,
+        "v": [
+          {
+            "v": 58
           }
         ]
       },
@@ -3121,11 +5092,849 @@
     ],
     "isWangTile": false,
     "boundsCollision": false,
-    "centerCollider": true
+    "centerCollider": true,
+    "modelSizes": [
+      {
+        "k": 0,
+        "v": "0.5|0.2|0.5"
+      },
+      {
+        "k": 1,
+        "v": "0.5|0.2|0.5"
+      },
+      {
+        "k": 2,
+        "v": "0.5|0.2|0.5"
+      },
+      {
+        "k": 3,
+        "v": "0.5|0.2|0.5"
+      },
+      {
+        "k": 4,
+        "v": "0.5|0.2|0.5"
+      }
+    ],
+    "modelPositions": [
+      {
+        "k": 0,
+        "v": "0|-0.4|0"
+      },
+      {
+        "k": 1,
+        "v": "0|-0.4|0"
+      },
+      {
+        "k": 2,
+        "v": "0|-0.4|0"
+      },
+      {
+        "k": 3,
+        "v": "0|-0.4|0"
+      },
+      {
+        "k": 4,
+        "v": "0|-0.4|0"
+      }
+    ]
   },
   {
-    "uid": 16,
-    "name": "空气墙",
+    "uid": 41,
+    "name": "石2",
+    "labId": 14,
+    "protoUid": 0,
+    "icon": 210000,
+    "model": {
+      "id": 0,
+      "subPrefabUnitName": [
+        {
+          "v": 125049
+        }
+      ],
+      "subPrefabUnitPos": [
+        {
+          "v": "0|-0.3|0"
+        }
+      ],
+      "subPrefabUnitScale": [
+        {
+          "v": "1|0.4|1"
+        }
+      ],
+      "subUnitTexsName": [
+        {
+          "v": [
+            {
+              "v": 802
+            }
+          ]
+        }
+      ],
+      "animTimeInterval": 0.0,
+      "isObstacle": false,
+      "colliderScale": 1.0
+    },
+    "collision": true,
+    "events": [],
+    "paramDic": [
+      {
+        "k": "可破坏",
+        "v": {
+          "uid": -1,
+          "name": "可破坏",
+          "valueType": 0,
+          "min": "",
+          "v": "{\r\n  \"uid\": -1,\r\n  \"str\": null,\r\n  \"valName\": null,\r\n  \"num\": 0.0,\r\n  \"dic\": []\r\n}",
+          "max": ""
+        }
+      }
+    ],
+    "minimapIcon": 210000,
+    "faceType": 0,
+    "animClip": [
+      {
+        "k": 0,
+        "v": [
+          {
+            "v": 802
+          }
+        ]
+      },
+      {
+        "k": 1,
+        "v": []
+      },
+      {
+        "k": 2,
+        "v": []
+      },
+      {
+        "k": 3,
+        "v": []
+      },
+      {
+        "k": 4,
+        "v": []
+      }
+    ],
+    "isWangTile": false,
+    "boundsCollision": false,
+    "centerCollider": true,
+    "modelSizes": [
+      {
+        "k": 0,
+        "v": "1|0.4|1"
+      },
+      {
+        "k": 1,
+        "v": "1|0.4|1"
+      },
+      {
+        "k": 2,
+        "v": "1|0.4|1"
+      },
+      {
+        "k": 3,
+        "v": "1|0.4|1"
+      },
+      {
+        "k": 4,
+        "v": "1|0.4|1"
+      }
+    ],
+    "modelPositions": [
+      {
+        "k": 0,
+        "v": "0|-0.3|0"
+      },
+      {
+        "k": 1,
+        "v": "0|-0.3|0"
+      },
+      {
+        "k": 2,
+        "v": "0|-0.3|0"
+      },
+      {
+        "k": 3,
+        "v": "0|-0.3|0"
+      },
+      {
+        "k": 4,
+        "v": "0|-0.3|0"
+      }
+    ]
+  },
+  {
+    "uid": 44,
+    "name": "枯木1",
+    "labId": 14,
+    "protoUid": 0,
+    "icon": 210000,
+    "model": {
+      "id": 0,
+      "subPrefabUnitName": [
+        {
+          "v": 125049
+        }
+      ],
+      "subPrefabUnitPos": [
+        {
+          "v": "0|-0.2|0"
+        }
+      ],
+      "subPrefabUnitScale": [
+        {
+          "v": "1.5|0.8|1.5"
+        }
+      ],
+      "subUnitTexsName": [
+        {
+          "v": [
+            {
+              "v": 800
+            }
+          ]
+        }
+      ],
+      "animTimeInterval": 0.0,
+      "isObstacle": false,
+      "colliderScale": 1.0
+    },
+    "collision": true,
+    "events": [],
+    "paramDic": [
+      {
+        "k": "可破坏",
+        "v": {
+          "uid": -1,
+          "name": "可破坏",
+          "valueType": 0,
+          "min": "",
+          "v": "{\r\n  \"uid\": -1,\r\n  \"str\": null,\r\n  \"valName\": null,\r\n  \"num\": 0.0,\r\n  \"dic\": []\r\n}",
+          "max": ""
+        }
+      }
+    ],
+    "minimapIcon": 210000,
+    "faceType": 0,
+    "animClip": [
+      {
+        "k": 0,
+        "v": [
+          {
+            "v": 800
+          }
+        ]
+      },
+      {
+        "k": 1,
+        "v": [
+          {
+            "v": 800
+          }
+        ]
+      },
+      {
+        "k": 2,
+        "v": [
+          {
+            "v": 800
+          }
+        ]
+      },
+      {
+        "k": 3,
+        "v": [
+          {
+            "v": 801
+          }
+        ]
+      },
+      {
+        "k": 4,
+        "v": [
+          {
+            "v": 801
+          }
+        ]
+      }
+    ],
+    "isWangTile": false,
+    "boundsCollision": true,
+    "centerCollider": true,
+    "modelSizes": [
+      {
+        "k": 0,
+        "v": "1.5|0.8|1.5"
+      },
+      {
+        "k": 1,
+        "v": "1.5|0.8|1.5"
+      },
+      {
+        "k": 2,
+        "v": "1.5|0.8|1.5"
+      },
+      {
+        "k": 3,
+        "v": "1.5|0.8|1.5"
+      },
+      {
+        "k": 4,
+        "v": "1.5|0.8|1.5"
+      }
+    ],
+    "modelPositions": [
+      {
+        "k": 0,
+        "v": "0|-0.2|0"
+      },
+      {
+        "k": 1,
+        "v": "0|-0.2|0"
+      },
+      {
+        "k": 2,
+        "v": "0|-0.2|0"
+      },
+      {
+        "k": 3,
+        "v": "0|-0.2|0"
+      },
+      {
+        "k": 4,
+        "v": "0|-0.2|0"
+      }
+    ]
+  },
+  {
+    "uid": 45,
+    "name": "篱笆1",
+    "labId": 14,
+    "protoUid": 0,
+    "icon": 210000,
+    "model": {
+      "id": 0,
+      "subPrefabUnitName": [
+        {
+          "v": 125049
+        }
+      ],
+      "subPrefabUnitPos": [
+        {
+          "v": "0|-0.1|0"
+        }
+      ],
+      "subPrefabUnitScale": [
+        {
+          "v": "1|1|1"
+        }
+      ],
+      "subUnitTexsName": [
+        {
+          "v": [
+            {
+              "v": 798
+            }
+          ]
+        }
+      ],
+      "animTimeInterval": 0.0,
+      "isObstacle": false,
+      "colliderScale": 1.0
+    },
+    "collision": true,
+    "events": [],
+    "paramDic": [
+      {
+        "k": "可破坏",
+        "v": {
+          "uid": -1,
+          "name": "可破坏",
+          "valueType": 0,
+          "min": "",
+          "v": "{\r\n  \"uid\": -1,\r\n  \"str\": null,\r\n  \"valName\": null,\r\n  \"num\": 0.0,\r\n  \"dic\": []\r\n}",
+          "max": ""
+        }
+      }
+    ],
+    "minimapIcon": 210000,
+    "faceType": 0,
+    "animClip": [
+      {
+        "k": 0,
+        "v": [
+          {
+            "v": 798
+          }
+        ]
+      },
+      {
+        "k": 1,
+        "v": [
+          {
+            "v": 108
+          }
+        ]
+      },
+      {
+        "k": 2,
+        "v": [
+          {
+            "v": 108
+          }
+        ]
+      },
+      {
+        "k": 3,
+        "v": [
+          {
+            "v": 108
+          }
+        ]
+      },
+      {
+        "k": 4,
+        "v": [
+          {
+            "v": 108
+          }
+        ]
+      }
+    ],
+    "isWangTile": true,
+    "boundsCollision": true,
+    "centerCollider": true,
+    "modelSizes": [
+      {
+        "k": 0,
+        "v": "1|1|1"
+      },
+      {
+        "k": 1,
+        "v": "1|1|1"
+      },
+      {
+        "k": 2,
+        "v": "1|1|1"
+      },
+      {
+        "k": 3,
+        "v": "1|1|1"
+      },
+      {
+        "k": 4,
+        "v": "1|1|1"
+      }
+    ],
+    "modelPositions": [
+      {
+        "k": 0,
+        "v": "0|-0.1|0"
+      },
+      {
+        "k": 1,
+        "v": "0|-0.1|0"
+      },
+      {
+        "k": 2,
+        "v": "0|-0.1|0"
+      },
+      {
+        "k": 3,
+        "v": "0|-0.1|0"
+      },
+      {
+        "k": 4,
+        "v": "0|-0.1|0"
+      }
+    ]
+  },
+  {
+    "uid": 46,
+    "name": "石3",
+    "labId": 14,
+    "protoUid": 0,
+    "icon": 210000,
+    "model": {
+      "id": 0,
+      "subPrefabUnitName": [
+        {
+          "v": 125049
+        }
+      ],
+      "subPrefabUnitPos": [
+        {
+          "v": "0|0.5|0"
+        }
+      ],
+      "subPrefabUnitScale": [
+        {
+          "v": "0.5|2|0.5"
+        }
+      ],
+      "subUnitTexsName": [
+        {
+          "v": [
+            {
+              "v": 803
+            }
+          ]
+        }
+      ],
+      "animTimeInterval": 0.0,
+      "isObstacle": false,
+      "colliderScale": 1.0
+    },
+    "collision": true,
+    "events": [],
+    "paramDic": [
+      {
+        "k": "可破坏",
+        "v": {
+          "uid": -1,
+          "name": "可破坏",
+          "valueType": 0,
+          "min": "",
+          "v": "{\r\n  \"uid\": -1,\r\n  \"str\": null,\r\n  \"valName\": null,\r\n  \"num\": 0.0,\r\n  \"dic\": []\r\n}",
+          "max": ""
+        }
+      }
+    ],
+    "minimapIcon": 210000,
+    "faceType": 0,
+    "animClip": [
+      {
+        "k": 0,
+        "v": [
+          {
+            "v": 803
+          }
+        ]
+      },
+      {
+        "k": 1,
+        "v": []
+      },
+      {
+        "k": 2,
+        "v": []
+      },
+      {
+        "k": 3,
+        "v": []
+      },
+      {
+        "k": 4,
+        "v": []
+      }
+    ],
+    "isWangTile": false,
+    "boundsCollision": false,
+    "centerCollider": true,
+    "modelSizes": [
+      {
+        "k": 0,
+        "v": "0.5|2|0.5"
+      },
+      {
+        "k": 1,
+        "v": "0.5|2|0.5"
+      },
+      {
+        "k": 2,
+        "v": "0.5|2|0.5"
+      },
+      {
+        "k": 3,
+        "v": "0.5|2|0.5"
+      },
+      {
+        "k": 4,
+        "v": "0.5|2|0.5"
+      }
+    ],
+    "modelPositions": [
+      {
+        "k": 0,
+        "v": "0|0.5|0"
+      },
+      {
+        "k": 1,
+        "v": "0|0.5|0"
+      },
+      {
+        "k": 2,
+        "v": "0|0.5|0"
+      },
+      {
+        "k": 3,
+        "v": "0|0.5|0"
+      },
+      {
+        "k": 4,
+        "v": "0|0.5|0"
+      }
+    ]
+  },
+  {
+    "uid": 47,
+    "name": "柴堆",
+    "labId": 15,
+    "protoUid": 0,
+    "icon": 210000,
+    "model": {
+      "id": 0,
+      "subPrefabUnitName": [
+        {
+          "v": 125049
+        }
+      ],
+      "subPrefabUnitPos": [
+        {
+          "v": "0|-0.4|0"
+        }
+      ],
+      "subPrefabUnitScale": [
+        {
+          "v": "0.6|0.2|0.6"
+        }
+      ],
+      "subUnitTexsName": [
+        {
+          "v": [
+            {
+              "v": 799
+            }
+          ]
+        }
+      ],
+      "animTimeInterval": 0.0,
+      "isObstacle": false,
+      "colliderScale": 1.0
+    },
+    "collision": true,
+    "events": [],
+    "paramDic": [
+      {
+        "k": "可破坏",
+        "v": {
+          "uid": -1,
+          "name": "可破坏",
+          "valueType": 0,
+          "min": "",
+          "v": "{\r\n  \"uid\": -1,\r\n  \"str\": null,\r\n  \"valName\": null,\r\n  \"num\": 0.0,\r\n  \"dic\": []\r\n}",
+          "max": ""
+        }
+      }
+    ],
+    "minimapIcon": 210000,
+    "faceType": 0,
+    "animClip": [
+      {
+        "k": 0,
+        "v": [
+          {
+            "v": 799
+          }
+        ]
+      },
+      {
+        "k": 1,
+        "v": []
+      },
+      {
+        "k": 2,
+        "v": []
+      },
+      {
+        "k": 3,
+        "v": []
+      },
+      {
+        "k": 4,
+        "v": []
+      }
+    ],
+    "isWangTile": false,
+    "boundsCollision": false,
+    "centerCollider": true,
+    "modelSizes": [
+      {
+        "k": 0,
+        "v": "0.6|0.2|0.6"
+      },
+      {
+        "k": 1,
+        "v": "0.6|0.2|0.6"
+      },
+      {
+        "k": 2,
+        "v": "0.6|0.2|0.6"
+      },
+      {
+        "k": 3,
+        "v": "0.6|0.2|0.6"
+      },
+      {
+        "k": 4,
+        "v": "0.6|0.2|0.6"
+      }
+    ],
+    "modelPositions": [
+      {
+        "k": 0,
+        "v": "0|-0.4|0"
+      },
+      {
+        "k": 1,
+        "v": "0|-0.4|0"
+      },
+      {
+        "k": 2,
+        "v": "0|-0.4|0"
+      },
+      {
+        "k": 3,
+        "v": "0|-0.4|0"
+      },
+      {
+        "k": 4,
+        "v": "0|-0.4|0"
+      }
+    ]
+  },
+  {
+    "uid": 48,
+    "name": "树桩",
+    "labId": 15,
+    "protoUid": 0,
+    "icon": 210000,
+    "model": {
+      "id": 0,
+      "subPrefabUnitName": [
+        {
+          "v": 125049
+        }
+      ],
+      "subPrefabUnitPos": [
+        {
+          "v": "0|-0.4|0"
+        }
+      ],
+      "subPrefabUnitScale": [
+        {
+          "v": "0.8|0.2|0.8"
+        }
+      ],
+      "subUnitTexsName": [
+        {
+          "v": [
+            {
+              "v": 217
+            }
+          ]
+        }
+      ],
+      "animTimeInterval": 0.0,
+      "isObstacle": false,
+      "colliderScale": 0.3
+    },
+    "collision": true,
+    "events": [],
+    "paramDic": [
+      {
+        "k": "可破坏",
+        "v": {
+          "uid": -1,
+          "name": "可破坏",
+          "valueType": 0,
+          "min": "",
+          "v": "{\r\n  \"uid\": -1,\r\n  \"str\": null,\r\n  \"valName\": null,\r\n  \"num\": 0.0,\r\n  \"dic\": []\r\n}",
+          "max": ""
+        }
+      }
+    ],
+    "minimapIcon": 210000,
+    "faceType": 0,
+    "animClip": [
+      {
+        "k": 0,
+        "v": [
+          {
+            "v": 217
+          }
+        ]
+      },
+      {
+        "k": 1,
+        "v": []
+      },
+      {
+        "k": 2,
+        "v": []
+      },
+      {
+        "k": 3,
+        "v": []
+      },
+      {
+        "k": 4,
+        "v": []
+      }
+    ],
+    "isWangTile": false,
+    "boundsCollision": false,
+    "centerCollider": true,
+    "modelSizes": [
+      {
+        "k": 0,
+        "v": "0.8|0.2|0.8"
+      },
+      {
+        "k": 1,
+        "v": "0.8|0.2|0.8"
+      },
+      {
+        "k": 2,
+        "v": "0.8|0.2|0.8"
+      },
+      {
+        "k": 3,
+        "v": "0.8|0.2|0.8"
+      },
+      {
+        "k": 4,
+        "v": "0.8|0.2|0.8"
+      }
+    ],
+    "modelPositions": [
+      {
+        "k": 0,
+        "v": "0|-0.4|0"
+      },
+      {
+        "k": 1,
+        "v": "0|-0.4|0"
+      },
+      {
+        "k": 2,
+        "v": "0|-0.4|0"
+      },
+      {
+        "k": 3,
+        "v": "0|-0.4|0"
+      },
+      {
+        "k": 4,
+        "v": "0|-0.4|0"
+      }
+    ]
+  },
+  {
+    "uid": 49,
+    "name": "触发1-1-1",
     "labId": 0,
     "protoUid": 0,
     "icon": 210000,
@@ -3143,7 +5952,7 @@
       ],
       "subPrefabUnitScale": [
         {
-          "v": "2|1|2"
+          "v": "8|1|1"
         }
       ],
       "subUnitTexsName": [
@@ -3159,7 +5968,7 @@
       "isObstacle": false,
       "colliderScale": 1.0
     },
-    "collision": true,
+    "collision": false,
     "events": [
       {
         "k": "onCharacterTouchEvent",
@@ -3168,14 +5977,26 @@
           "name": "onCharacterTouchEvent",
           "evt": [
             {
-              "v": 21
+              "v": 22
             }
           ],
           "type": 0
         }
       }
     ],
-    "paramDic": [],
+    "paramDic": [
+      {
+        "k": "可破坏",
+        "v": {
+          "uid": -1,
+          "name": "可破坏",
+          "valueType": 0,
+          "min": "",
+          "v": "{\r\n  \"uid\": -1,\r\n  \"str\": null,\r\n  \"valName\": null,\r\n  \"num\": 0.0,\r\n  \"dic\": []\r\n}",
+          "max": ""
+        }
+      }
+    ],
     "minimapIcon": 210000,
     "faceType": 0,
     "animClip": [
@@ -3206,11 +6027,55 @@
     ],
     "isWangTile": false,
     "boundsCollision": false,
-    "centerCollider": true
+    "centerCollider": true,
+    "modelSizes": [
+      {
+        "k": 0,
+        "v": "8|1|1"
+      },
+      {
+        "k": 1,
+        "v": "8|1|1"
+      },
+      {
+        "k": 2,
+        "v": "8|1|1"
+      },
+      {
+        "k": 3,
+        "v": "8|1|1"
+      },
+      {
+        "k": 4,
+        "v": "8|1|1"
+      }
+    ],
+    "modelPositions": [
+      {
+        "k": 0,
+        "v": "0|0|0"
+      },
+      {
+        "k": 1,
+        "v": "0|0|0"
+      },
+      {
+        "k": 2,
+        "v": "0|0|0"
+      },
+      {
+        "k": 3,
+        "v": "0|0|0"
+      },
+      {
+        "k": 4,
+        "v": "0|0|0"
+      }
+    ]
   },
   {
-    "uid": 15,
-    "name": "屋顶",
+    "uid": 50,
+    "name": "木墙桩",
     "labId": 14,
     "protoUid": 0,
     "icon": 210000,
@@ -3235,7 +6100,7 @@
         {
           "v": [
             {
-              "v": 270
+              "v": 271
             }
           ]
         }
@@ -3246,15 +6111,154 @@
     },
     "collision": true,
     "events": [],
-    "paramDic": [],
+    "paramDic": [
+      {
+        "k": "可破坏",
+        "v": {
+          "uid": -1,
+          "name": "可破坏",
+          "valueType": 0,
+          "min": "",
+          "v": "{\r\n  \"uid\": -1,\r\n  \"str\": null,\r\n  \"valName\": null,\r\n  \"num\": 0.0,\r\n  \"dic\": []\r\n}",
+          "max": ""
+        }
+      }
+    ],
     "minimapIcon": 210000,
-    "faceType": 1,
+    "faceType": 0,
     "animClip": [
       {
         "k": 0,
         "v": [
           {
-            "v": 269
+            "v": 271
+          }
+        ]
+      },
+      {
+        "k": 1,
+        "v": []
+      },
+      {
+        "k": 2,
+        "v": []
+      },
+      {
+        "k": 3,
+        "v": []
+      },
+      {
+        "k": 4,
+        "v": []
+      }
+    ],
+    "isWangTile": false,
+    "boundsCollision": false,
+    "centerCollider": true,
+    "modelSizes": [
+      {
+        "k": 0,
+        "v": "1|1|1"
+      },
+      {
+        "k": 1,
+        "v": "1|1|1"
+      },
+      {
+        "k": 2,
+        "v": "1|1|1"
+      },
+      {
+        "k": 3,
+        "v": "1|1|1"
+      },
+      {
+        "k": 4,
+        "v": "1|1|1"
+      }
+    ],
+    "modelPositions": [
+      {
+        "k": 0,
+        "v": "0|0|0"
+      },
+      {
+        "k": 1,
+        "v": "0|0|0"
+      },
+      {
+        "k": 2,
+        "v": "0|0|0"
+      },
+      {
+        "k": 3,
+        "v": "0|0|0"
+      },
+      {
+        "k": 4,
+        "v": "0|0|0"
+      }
+    ]
+  },
+  {
+    "uid": 51,
+    "name": "木墙",
+    "labId": 14,
+    "protoUid": 0,
+    "icon": 210000,
+    "model": {
+      "id": 0,
+      "subPrefabUnitName": [
+        {
+          "v": 125049
+        }
+      ],
+      "subPrefabUnitPos": [
+        {
+          "v": "0|0.3|0"
+        }
+      ],
+      "subPrefabUnitScale": [
+        {
+          "v": "1|2|1"
+        }
+      ],
+      "subUnitTexsName": [
+        {
+          "v": [
+            {
+              "v": 268
+            }
+          ]
+        }
+      ],
+      "animTimeInterval": 0.0,
+      "isObstacle": false,
+      "colliderScale": 1.0
+    },
+    "collision": true,
+    "events": [],
+    "paramDic": [
+      {
+        "k": "可破坏",
+        "v": {
+          "uid": -1,
+          "name": "可破坏",
+          "valueType": 0,
+          "min": "",
+          "v": "{\r\n  \"uid\": -1,\r\n  \"str\": null,\r\n  \"valName\": null,\r\n  \"num\": 0.0,\r\n  \"dic\": []\r\n}",
+          "max": ""
+        }
+      }
+    ],
+    "minimapIcon": 210000,
+    "faceType": 0,
+    "animClip": [
+      {
+        "k": 0,
+        "v": [
+          {
+            "v": 268
           }
         ]
       },
@@ -3262,7 +6266,7 @@
         "k": 1,
         "v": [
           {
-            "v": 270
+            "v": 108
           }
         ]
       },
@@ -3270,7 +6274,7 @@
         "k": 2,
         "v": [
           {
-            "v": 270
+            "v": 108
           }
         ]
       },
@@ -3278,7 +6282,7 @@
         "k": 3,
         "v": [
           {
-            "v": 269
+            "v": 108
           }
         ]
       },
@@ -3286,18 +6290,330 @@
         "k": 4,
         "v": [
           {
-            "v": 273
+            "v": 108
           }
         ]
       }
     ],
-    "isWangTile": false,
-    "boundsCollision": false,
-    "centerCollider": true
+    "isWangTile": true,
+    "boundsCollision": true,
+    "centerCollider": true,
+    "modelSizes": [
+      {
+        "k": 0,
+        "v": "1|2|1"
+      },
+      {
+        "k": 1,
+        "v": "1|2|1"
+      },
+      {
+        "k": 2,
+        "v": "1|2|1"
+      },
+      {
+        "k": 3,
+        "v": "1|2|1"
+      },
+      {
+        "k": 4,
+        "v": "1|2|1"
+      }
+    ],
+    "modelPositions": [
+      {
+        "k": 0,
+        "v": "0|0.3|0"
+      },
+      {
+        "k": 1,
+        "v": "0|0.3|0"
+      },
+      {
+        "k": 2,
+        "v": "0|0.3|0"
+      },
+      {
+        "k": 3,
+        "v": "0|0.3|0"
+      },
+      {
+        "k": 4,
+        "v": "0|0.3|0"
+      }
+    ]
   },
   {
-    "uid": 14,
-    "name": "New0",
+    "uid": 52,
+    "name": "触发1-1-2",
+    "labId": 0,
+    "protoUid": 0,
+    "icon": 210000,
+    "model": {
+      "id": 0,
+      "subPrefabUnitName": [
+        {
+          "v": 125049
+        }
+      ],
+      "subPrefabUnitPos": [
+        {
+          "v": "0|0|0"
+        }
+      ],
+      "subPrefabUnitScale": [
+        {
+          "v": "1|1|5"
+        }
+      ],
+      "subUnitTexsName": [
+        {
+          "v": [
+            {
+              "v": 210000
+            }
+          ]
+        }
+      ],
+      "animTimeInterval": 0.0,
+      "isObstacle": false,
+      "colliderScale": 1.0
+    },
+    "collision": false,
+    "events": [
+      {
+        "k": "onCharacterTouchEvent",
+        "v": {
+          "uid": -1,
+          "name": "onCharacterTouchEvent",
+          "evt": [
+            {
+              "v": 24
+            }
+          ],
+          "type": 0
+        }
+      }
+    ],
+    "paramDic": [
+      {
+        "k": "可破坏",
+        "v": {
+          "uid": -1,
+          "name": "可破坏",
+          "valueType": 0,
+          "min": "",
+          "v": "{\r\n  \"uid\": -1,\r\n  \"str\": null,\r\n  \"valName\": null,\r\n  \"num\": 0.0,\r\n  \"dic\": []\r\n}",
+          "max": ""
+        }
+      }
+    ],
+    "minimapIcon": 210000,
+    "faceType": 0,
+    "animClip": [
+      {
+        "k": 0,
+        "v": [
+          {
+            "v": 210000
+          }
+        ]
+      },
+      {
+        "k": 1,
+        "v": []
+      },
+      {
+        "k": 2,
+        "v": []
+      },
+      {
+        "k": 3,
+        "v": []
+      },
+      {
+        "k": 4,
+        "v": []
+      }
+    ],
+    "isWangTile": false,
+    "boundsCollision": false,
+    "centerCollider": true,
+    "modelSizes": [
+      {
+        "k": 0,
+        "v": "1|1|5"
+      },
+      {
+        "k": 1,
+        "v": "1|1|5"
+      },
+      {
+        "k": 2,
+        "v": "1|1|5"
+      },
+      {
+        "k": 3,
+        "v": "1|1|5"
+      },
+      {
+        "k": 4,
+        "v": "1|1|5"
+      }
+    ],
+    "modelPositions": [
+      {
+        "k": 0,
+        "v": "0|0|0"
+      },
+      {
+        "k": 1,
+        "v": "0|0|0"
+      },
+      {
+        "k": 2,
+        "v": "0|0|0"
+      },
+      {
+        "k": 3,
+        "v": "0|0|0"
+      },
+      {
+        "k": 4,
+        "v": "0|0|0"
+      }
+    ]
+  },
+  {
+    "uid": 53,
+    "name": "窗1",
+    "labId": 15,
+    "protoUid": 0,
+    "icon": 210000,
+    "model": {
+      "id": 0,
+      "subPrefabUnitName": [
+        {
+          "v": 125049
+        }
+      ],
+      "subPrefabUnitPos": [
+        {
+          "v": "-2.682209E-07|0.2|-0.2060958"
+        }
+      ],
+      "subPrefabUnitScale": [
+        {
+          "v": "1|1|0.1"
+        }
+      ],
+      "subUnitTexsName": [
+        {
+          "v": [
+            {
+              "v": 1304
+            }
+          ]
+        }
+      ],
+      "animTimeInterval": 0.0,
+      "isObstacle": false,
+      "colliderScale": 0.0
+    },
+    "collision": false,
+    "events": [],
+    "paramDic": [
+      {
+        "k": "可破坏",
+        "v": {
+          "uid": -1,
+          "name": "可破坏",
+          "valueType": 0,
+          "min": "",
+          "v": "{\r\n  \"uid\": -1,\r\n  \"str\": null,\r\n  \"valName\": null,\r\n  \"num\": 0.0,\r\n  \"dic\": []\r\n}",
+          "max": ""
+        }
+      }
+    ],
+    "minimapIcon": 210000,
+    "faceType": 0,
+    "animClip": [
+      {
+        "k": 0,
+        "v": [
+          {
+            "v": 1304
+          }
+        ]
+      },
+      {
+        "k": 1,
+        "v": []
+      },
+      {
+        "k": 2,
+        "v": []
+      },
+      {
+        "k": 3,
+        "v": []
+      },
+      {
+        "k": 4,
+        "v": []
+      }
+    ],
+    "isWangTile": false,
+    "boundsCollision": false,
+    "centerCollider": true,
+    "modelSizes": [
+      {
+        "k": 0,
+        "v": "1|1|0.1"
+      },
+      {
+        "k": 1,
+        "v": "1|1|0.1"
+      },
+      {
+        "k": 2,
+        "v": "1|1|0.1"
+      },
+      {
+        "k": 3,
+        "v": "1|1|0.1"
+      },
+      {
+        "k": 4,
+        "v": "1|1|0.1"
+      }
+    ],
+    "modelPositions": [
+      {
+        "k": 0,
+        "v": "-2.682209E-07|0.2|-0.2060958"
+      },
+      {
+        "k": 1,
+        "v": "-2.682209E-07|0.2|-0.2060958"
+      },
+      {
+        "k": 2,
+        "v": "-2.682209E-07|0.2|-0.2060958"
+      },
+      {
+        "k": 3,
+        "v": "-2.682209E-07|0.2|-0.2060958"
+      },
+      {
+        "k": 4,
+        "v": "-2.682209E-07|0.2|-0.2060958"
+      }
+    ]
+  },
+  {
+    "uid": 54,
+    "name": "小树",
     "labId": 14,
     "protoUid": 0,
     "icon": 210000,
@@ -3322,78 +6638,7 @@
         {
           "v": [
             {
-              "v": 1101
-            }
-          ]
-        }
-      ],
-      "animTimeInterval": 0.0,
-      "isObstacle": false,
-      "colliderScale": 0.0
-    },
-    "collision": false,
-    "events": [],
-    "paramDic": [],
-    "minimapIcon": 210000,
-    "faceType": 0,
-    "animClip": [
-      {
-        "k": 0,
-        "v": [
-          {
-            "v": 1101
-          }
-        ]
-      },
-      {
-        "k": 1,
-        "v": []
-      },
-      {
-        "k": 2,
-        "v": []
-      },
-      {
-        "k": 3,
-        "v": []
-      },
-      {
-        "k": 4,
-        "v": []
-      }
-    ],
-    "isWangTile": false,
-    "boundsCollision": false,
-    "centerCollider": true
-  },
-  {
-    "uid": 59,
-    "name": "鸟居",
-    "labId": 14,
-    "protoUid": 0,
-    "icon": 210000,
-    "model": {
-      "id": 0,
-      "subPrefabUnitName": [
-        {
-          "v": 125049
-        }
-      ],
-      "subPrefabUnitPos": [
-        {
-          "v": "0|1|0"
-        }
-      ],
-      "subPrefabUnitScale": [
-        {
-          "v": "3|3|1"
-        }
-      ],
-      "subUnitTexsName": [
-        {
-          "v": [
-            {
-              "v": 1596
+              "v": 691
             }
           ]
         }
@@ -3402,9 +6647,21 @@
       "isObstacle": false,
       "colliderScale": 0.8
     },
-    "collision": false,
+    "collision": true,
     "events": [],
-    "paramDic": [],
+    "paramDic": [
+      {
+        "k": "可破坏",
+        "v": {
+          "uid": -1,
+          "name": "可破坏",
+          "valueType": 0,
+          "min": "",
+          "v": "{\r\n  \"uid\": -1,\r\n  \"str\": null,\r\n  \"valName\": null,\r\n  \"num\": 0.0,\r\n  \"dic\": []\r\n}",
+          "max": ""
+        }
+      }
+    ],
     "minimapIcon": 210000,
     "faceType": 0,
     "animClip": [
@@ -3412,7 +6669,7 @@
         "k": 0,
         "v": [
           {
-            "v": 1596
+            "v": 691
           }
         ]
       },
@@ -3435,11 +6692,55 @@
     ],
     "isWangTile": false,
     "boundsCollision": false,
-    "centerCollider": true
+    "centerCollider": true,
+    "modelSizes": [
+      {
+        "k": 0,
+        "v": "1|1.5|1"
+      },
+      {
+        "k": 1,
+        "v": "1|1.5|1"
+      },
+      {
+        "k": 2,
+        "v": "1|1.5|1"
+      },
+      {
+        "k": 3,
+        "v": "1|1.5|1"
+      },
+      {
+        "k": 4,
+        "v": "1|1.5|1"
+      }
+    ],
+    "modelPositions": [
+      {
+        "k": 0,
+        "v": "0|0.25|0"
+      },
+      {
+        "k": 1,
+        "v": "0|0.25|0"
+      },
+      {
+        "k": 2,
+        "v": "0|0.25|0"
+      },
+      {
+        "k": 3,
+        "v": "0|0.25|0"
+      },
+      {
+        "k": 4,
+        "v": "0|0.25|0"
+      }
+    ]
   },
   {
-    "uid": 60,
-    "name": "立柱",
+    "uid": 55,
+    "name": "林",
     "labId": 14,
     "protoUid": 0,
     "icon": 210000,
@@ -3452,19 +6753,19 @@
       ],
       "subPrefabUnitPos": [
         {
-          "v": "0|0.5|0"
+          "v": "0|0.25|0"
         }
       ],
       "subPrefabUnitScale": [
         {
-          "v": "1|2|1"
+          "v": "3|1.5|3"
         }
       ],
       "subUnitTexsName": [
         {
           "v": [
             {
-              "v": 1597
+              "v": 123
             }
           ]
         }
@@ -3475,7 +6776,19 @@
     },
     "collision": true,
     "events": [],
-    "paramDic": [],
+    "paramDic": [
+      {
+        "k": "可破坏",
+        "v": {
+          "uid": -1,
+          "name": "可破坏",
+          "valueType": 0,
+          "min": "",
+          "v": "{\r\n  \"uid\": -1,\r\n  \"str\": null,\r\n  \"valName\": null,\r\n  \"num\": 0.0,\r\n  \"dic\": []\r\n}",
+          "max": ""
+        }
+      }
+    ],
     "minimapIcon": 210000,
     "faceType": 0,
     "animClip": [
@@ -3483,7 +6796,7 @@
         "k": 0,
         "v": [
           {
-            "v": 1597
+            "v": 123
           }
         ]
       },
@@ -3506,11 +6819,182 @@
     ],
     "isWangTile": false,
     "boundsCollision": false,
-    "centerCollider": true
+    "centerCollider": true,
+    "modelSizes": [
+      {
+        "k": 0,
+        "v": "3|1.5|3"
+      },
+      {
+        "k": 1,
+        "v": "3|1.5|3"
+      },
+      {
+        "k": 2,
+        "v": "3|1.5|3"
+      },
+      {
+        "k": 3,
+        "v": "3|1.5|3"
+      },
+      {
+        "k": 4,
+        "v": "3|1.5|3"
+      }
+    ],
+    "modelPositions": [
+      {
+        "k": 0,
+        "v": "0|0.25|0"
+      },
+      {
+        "k": 1,
+        "v": "0|0.25|0"
+      },
+      {
+        "k": 2,
+        "v": "0|0.25|0"
+      },
+      {
+        "k": 3,
+        "v": "0|0.25|0"
+      },
+      {
+        "k": 4,
+        "v": "0|0.25|0"
+      }
+    ]
   },
   {
-    "uid": 61,
-    "name": "透明遮挡",
+    "uid": 56,
+    "name": "森",
+    "labId": 14,
+    "protoUid": 0,
+    "icon": 210000,
+    "model": {
+      "id": 0,
+      "subPrefabUnitName": [
+        {
+          "v": 125049
+        }
+      ],
+      "subPrefabUnitPos": [
+        {
+          "v": "0|0.25|0"
+        }
+      ],
+      "subPrefabUnitScale": [
+        {
+          "v": "5|1.5|5"
+        }
+      ],
+      "subUnitTexsName": [
+        {
+          "v": [
+            {
+              "v": 2240
+            }
+          ]
+        }
+      ],
+      "animTimeInterval": 0.0,
+      "isObstacle": false,
+      "colliderScale": 1.0
+    },
+    "collision": true,
+    "events": [],
+    "paramDic": [
+      {
+        "k": "可破坏",
+        "v": {
+          "uid": -1,
+          "name": "可破坏",
+          "valueType": 0,
+          "min": "",
+          "v": "{\r\n  \"uid\": -1,\r\n  \"str\": null,\r\n  \"valName\": null,\r\n  \"num\": 0.0,\r\n  \"dic\": []\r\n}",
+          "max": ""
+        }
+      }
+    ],
+    "minimapIcon": 210000,
+    "faceType": 0,
+    "animClip": [
+      {
+        "k": 0,
+        "v": [
+          {
+            "v": 2240
+          }
+        ]
+      },
+      {
+        "k": 1,
+        "v": []
+      },
+      {
+        "k": 2,
+        "v": []
+      },
+      {
+        "k": 3,
+        "v": []
+      },
+      {
+        "k": 4,
+        "v": []
+      }
+    ],
+    "isWangTile": false,
+    "boundsCollision": false,
+    "centerCollider": true,
+    "modelSizes": [
+      {
+        "k": 0,
+        "v": "5|1.5|5"
+      },
+      {
+        "k": 1,
+        "v": "5|1.5|5"
+      },
+      {
+        "k": 2,
+        "v": "5|1.5|5"
+      },
+      {
+        "k": 3,
+        "v": "5|1.5|5"
+      },
+      {
+        "k": 4,
+        "v": "5|1.5|5"
+      }
+    ],
+    "modelPositions": [
+      {
+        "k": 0,
+        "v": "0|0.25|0"
+      },
+      {
+        "k": 1,
+        "v": "0|0.25|0"
+      },
+      {
+        "k": 2,
+        "v": "0|0.25|0"
+      },
+      {
+        "k": 3,
+        "v": "0|0.25|0"
+      },
+      {
+        "k": 4,
+        "v": "0|0.25|0"
+      }
+    ]
+  },
+  {
+    "uid": 57,
+    "name": "触发1-1-3",
     "labId": 0,
     "protoUid": 0,
     "icon": 210000,
@@ -3528,14 +7012,14 @@
       ],
       "subPrefabUnitScale": [
         {
-          "v": "1|1|1"
+          "v": "8|1|8"
         }
       ],
       "subUnitTexsName": [
         {
           "v": [
             {
-              "v": 0
+              "v": 210000
             }
           ]
         }
@@ -3544,9 +7028,35 @@
       "isObstacle": false,
       "colliderScale": 1.0
     },
-    "collision": true,
-    "events": [],
-    "paramDic": [],
+    "collision": false,
+    "events": [
+      {
+        "k": "onCharacterTouchEvent",
+        "v": {
+          "uid": -1,
+          "name": "onCharacterTouchEvent",
+          "evt": [
+            {
+              "v": 29
+            }
+          ],
+          "type": 0
+        }
+      }
+    ],
+    "paramDic": [
+      {
+        "k": "可破坏",
+        "v": {
+          "uid": -1,
+          "name": "可破坏",
+          "valueType": 0,
+          "min": "",
+          "v": "{\r\n  \"uid\": -1,\r\n  \"str\": null,\r\n  \"valName\": null,\r\n  \"num\": 0.0,\r\n  \"dic\": []\r\n}",
+          "max": ""
+        }
+      }
+    ],
     "minimapIcon": 210000,
     "faceType": 0,
     "animClip": [
@@ -3554,7 +7064,7 @@
         "k": 0,
         "v": [
           {
-            "v": 0
+            "v": 210000
           }
         ]
       },
@@ -3577,6 +7087,1132 @@
     ],
     "isWangTile": false,
     "boundsCollision": false,
-    "centerCollider": true
+    "centerCollider": true,
+    "modelSizes": [
+      {
+        "k": 0,
+        "v": "8|1|8"
+      },
+      {
+        "k": 1,
+        "v": "8|1|8"
+      },
+      {
+        "k": 2,
+        "v": "8|1|8"
+      },
+      {
+        "k": 3,
+        "v": "8|1|8"
+      },
+      {
+        "k": 4,
+        "v": "8|1|8"
+      }
+    ],
+    "modelPositions": [
+      {
+        "k": 0,
+        "v": "0|0|0"
+      },
+      {
+        "k": 1,
+        "v": "0|0|0"
+      },
+      {
+        "k": 2,
+        "v": "0|0|0"
+      },
+      {
+        "k": 3,
+        "v": "0|0|0"
+      },
+      {
+        "k": 4,
+        "v": "0|0|0"
+      }
+    ]
+  },
+  {
+    "uid": 1111,
+    "name": "铺",
+    "labId": 14,
+    "protoUid": 0,
+    "icon": 210000,
+    "model": {
+      "id": 0,
+      "subPrefabUnitName": [
+        {
+          "v": 125049
+        }
+      ],
+      "subPrefabUnitPos": [
+        {
+          "v": "0|-0.45|0"
+        }
+      ],
+      "subPrefabUnitScale": [
+        {
+          "v": "1|0.1|2"
+        }
+      ],
+      "subUnitTexsName": [
+        {
+          "v": [
+            {
+              "v": 1827
+            }
+          ]
+        }
+      ],
+      "animTimeInterval": 0.0,
+      "isObstacle": false,
+      "colliderScale": 1.0
+    },
+    "collision": true,
+    "events": [],
+    "paramDic": [],
+    "minimapIcon": 210000,
+    "faceType": 0,
+    "animClip": [
+      {
+        "k": 0,
+        "v": [
+          {
+            "v": 1827
+          }
+        ]
+      },
+      {
+        "k": 1,
+        "v": []
+      },
+      {
+        "k": 2,
+        "v": []
+      },
+      {
+        "k": 3,
+        "v": []
+      },
+      {
+        "k": 4,
+        "v": []
+      }
+    ],
+    "isWangTile": false,
+    "boundsCollision": false,
+    "centerCollider": true,
+    "modelSizes": [
+      {
+        "k": 0,
+        "v": "1|0.1|2"
+      },
+      {
+        "k": 1,
+        "v": "1|1|1"
+      },
+      {
+        "k": 2,
+        "v": "1|1|1"
+      },
+      {
+        "k": 3,
+        "v": "1|1|1"
+      },
+      {
+        "k": 4,
+        "v": "1|1|1"
+      }
+    ],
+    "modelPositions": [
+      {
+        "k": 0,
+        "v": "0|-0.45|0"
+      },
+      {
+        "k": 1,
+        "v": "0|0|0"
+      },
+      {
+        "k": 2,
+        "v": "0|0|0"
+      },
+      {
+        "k": 3,
+        "v": "0|0|0"
+      },
+      {
+        "k": 4,
+        "v": "0|0|0"
+      }
+    ]
+  },
+  {
+    "uid": 1112,
+    "name": "柜2",
+    "labId": 14,
+    "protoUid": 0,
+    "icon": 210000,
+    "model": {
+      "id": 0,
+      "subPrefabUnitName": [
+        {
+          "v": 125049
+        }
+      ],
+      "subPrefabUnitPos": [
+        {
+          "v": "0|-0.2|0"
+        }
+      ],
+      "subPrefabUnitScale": [
+        {
+          "v": "1|0.6|1"
+        }
+      ],
+      "subUnitTexsName": [
+        {
+          "v": [
+            {
+              "v": 1619
+            }
+          ]
+        }
+      ],
+      "animTimeInterval": 0.0,
+      "isObstacle": false,
+      "colliderScale": 1.0
+    },
+    "collision": true,
+    "events": [],
+    "paramDic": [
+      {
+        "k": "可破坏",
+        "v": {
+          "uid": -1,
+          "name": "可破坏",
+          "valueType": 0,
+          "min": "",
+          "v": "{\r\n  \"uid\": -1,\r\n  \"str\": null,\r\n  \"valName\": null,\r\n  \"num\": 0.0,\r\n  \"dic\": []\r\n}",
+          "max": ""
+        }
+      }
+    ],
+    "minimapIcon": 210000,
+    "faceType": 1,
+    "animClip": [
+      {
+        "k": 0,
+        "v": [
+          {
+            "v": 1616
+          }
+        ]
+      },
+      {
+        "k": 1,
+        "v": [
+          {
+            "v": 1619
+          }
+        ]
+      },
+      {
+        "k": 2,
+        "v": [
+          {
+            "v": 1414
+          }
+        ]
+      },
+      {
+        "k": 3,
+        "v": [
+          {
+            "v": 1415
+          }
+        ]
+      },
+      {
+        "k": 4,
+        "v": [
+          {
+            "v": 1415
+          }
+        ]
+      }
+    ],
+    "isWangTile": false,
+    "boundsCollision": false,
+    "centerCollider": true,
+    "modelSizes": [
+      {
+        "k": 0,
+        "v": "1|1|1"
+      },
+      {
+        "k": 1,
+        "v": "1|0.6|1"
+      },
+      {
+        "k": 2,
+        "v": "1|1|1"
+      },
+      {
+        "k": 3,
+        "v": "1|1|1"
+      },
+      {
+        "k": 4,
+        "v": "1|1|1"
+      }
+    ],
+    "modelPositions": [
+      {
+        "k": 0,
+        "v": "0|0|0"
+      },
+      {
+        "k": 1,
+        "v": "0|-0.2|0"
+      },
+      {
+        "k": 2,
+        "v": "0|0|0"
+      },
+      {
+        "k": 3,
+        "v": "0|0|0"
+      },
+      {
+        "k": 4,
+        "v": "0|0|0"
+      }
+    ]
+  },
+  {
+    "uid": 71,
+    "name": "蝴蝶",
+    "labId": 15,
+    "protoUid": 0,
+    "icon": 210000,
+    "model": {
+      "id": 0,
+      "subPrefabUnitName": [
+        {
+          "v": 125049
+        }
+      ],
+      "subPrefabUnitPos": [
+        {
+          "v": "0|0.1|0"
+        }
+      ],
+      "subPrefabUnitScale": [
+        {
+          "v": "0.4|0.4|0.4"
+        }
+      ],
+      "subUnitTexsName": [
+        {
+          "v": [
+            {
+              "v": 158
+            }
+          ]
+        }
+      ],
+      "animTimeInterval": 0.0,
+      "isObstacle": false,
+      "colliderScale": 1.0
+    },
+    "collision": false,
+    "events": [],
+    "paramDic": [],
+    "minimapIcon": 210000,
+    "faceType": 0,
+    "animClip": [
+      {
+        "k": 0,
+        "v": [
+          {
+            "v": 158
+          }
+        ]
+      },
+      {
+        "k": 1,
+        "v": []
+      },
+      {
+        "k": 2,
+        "v": []
+      },
+      {
+        "k": 3,
+        "v": []
+      },
+      {
+        "k": 4,
+        "v": []
+      }
+    ],
+    "isWangTile": false,
+    "boundsCollision": false,
+    "centerCollider": true,
+    "modelSizes": [
+      {
+        "k": 0,
+        "v": "0.4|0.4|0.4"
+      },
+      {
+        "k": 1,
+        "v": "1|1|1"
+      },
+      {
+        "k": 2,
+        "v": "1|1|1"
+      },
+      {
+        "k": 3,
+        "v": "1|1|1"
+      },
+      {
+        "k": 4,
+        "v": "1|1|1"
+      }
+    ],
+    "modelPositions": [
+      {
+        "k": 0,
+        "v": "0|0.1|0"
+      },
+      {
+        "k": 1,
+        "v": "0|0|0"
+      },
+      {
+        "k": 2,
+        "v": "0|0|0"
+      },
+      {
+        "k": 3,
+        "v": "0|0|0"
+      },
+      {
+        "k": 4,
+        "v": "0|0|0"
+      }
+    ]
+  },
+  {
+    "uid": 72,
+    "name": "尘",
+    "labId": 15,
+    "protoUid": 0,
+    "icon": 210000,
+    "model": {
+      "id": 0,
+      "subPrefabUnitName": [
+        {
+          "v": 125049
+        }
+      ],
+      "subPrefabUnitPos": [
+        {
+          "v": "0|-0.2|0"
+        }
+      ],
+      "subPrefabUnitScale": [
+        {
+          "v": "0.6|0.6|0.6"
+        }
+      ],
+      "subUnitTexsName": [
+        {
+          "v": [
+            {
+              "v": 159
+            }
+          ]
+        }
+      ],
+      "animTimeInterval": 0.0,
+      "isObstacle": false,
+      "colliderScale": 1.0
+    },
+    "collision": false,
+    "events": [],
+    "paramDic": [],
+    "minimapIcon": 210000,
+    "faceType": 0,
+    "animClip": [
+      {
+        "k": 0,
+        "v": [
+          {
+            "v": 159
+          }
+        ]
+      },
+      {
+        "k": 1,
+        "v": []
+      },
+      {
+        "k": 2,
+        "v": []
+      },
+      {
+        "k": 3,
+        "v": []
+      },
+      {
+        "k": 4,
+        "v": []
+      }
+    ],
+    "isWangTile": false,
+    "boundsCollision": false,
+    "centerCollider": true,
+    "modelSizes": [
+      {
+        "k": 0,
+        "v": "0.6|0.6|0.6"
+      },
+      {
+        "k": 1,
+        "v": "1|1|1"
+      },
+      {
+        "k": 2,
+        "v": "1|1|1"
+      },
+      {
+        "k": 3,
+        "v": "1|1|1"
+      },
+      {
+        "k": 4,
+        "v": "1|1|1"
+      }
+    ],
+    "modelPositions": [
+      {
+        "k": 0,
+        "v": "0|-0.2|0"
+      },
+      {
+        "k": 1,
+        "v": "0|0|0"
+      },
+      {
+        "k": 2,
+        "v": "0|0|0"
+      },
+      {
+        "k": 3,
+        "v": "0|0|0"
+      },
+      {
+        "k": 4,
+        "v": "0|0|0"
+      }
+    ]
+  },
+  {
+    "uid": 74,
+    "name": "蜻蜓",
+    "labId": 15,
+    "protoUid": 0,
+    "icon": 210000,
+    "model": {
+      "id": 0,
+      "subPrefabUnitName": [
+        {
+          "v": 125049
+        }
+      ],
+      "subPrefabUnitPos": [
+        {
+          "v": "0|0.1|0"
+        }
+      ],
+      "subPrefabUnitScale": [
+        {
+          "v": "0.4|0.4|0.4"
+        }
+      ],
+      "subUnitTexsName": [
+        {
+          "v": [
+            {
+              "v": 842
+            }
+          ]
+        }
+      ],
+      "animTimeInterval": 0.0,
+      "isObstacle": false,
+      "colliderScale": 1.0
+    },
+    "collision": false,
+    "events": [],
+    "paramDic": [],
+    "minimapIcon": 210000,
+    "faceType": 0,
+    "animClip": [
+      {
+        "k": 0,
+        "v": [
+          {
+            "v": 842
+          }
+        ]
+      },
+      {
+        "k": 1,
+        "v": []
+      },
+      {
+        "k": 2,
+        "v": []
+      },
+      {
+        "k": 3,
+        "v": []
+      },
+      {
+        "k": 4,
+        "v": []
+      }
+    ],
+    "isWangTile": false,
+    "boundsCollision": false,
+    "centerCollider": true,
+    "modelSizes": [
+      {
+        "k": 0,
+        "v": "0.4|0.4|0.4"
+      },
+      {
+        "k": 1,
+        "v": "1|1|1"
+      },
+      {
+        "k": 2,
+        "v": "1|1|1"
+      },
+      {
+        "k": 3,
+        "v": "1|1|1"
+      },
+      {
+        "k": 4,
+        "v": "1|1|1"
+      }
+    ],
+    "modelPositions": [
+      {
+        "k": 0,
+        "v": "0|0.1|0"
+      },
+      {
+        "k": 1,
+        "v": "0|0|0"
+      },
+      {
+        "k": 2,
+        "v": "0|0|0"
+      },
+      {
+        "k": 3,
+        "v": "0|0|0"
+      },
+      {
+        "k": 4,
+        "v": "0|0|0"
+      }
+    ]
+  },
+  {
+    "uid": 75,
+    "name": "鸟飞",
+    "labId": 15,
+    "protoUid": 0,
+    "icon": 210000,
+    "model": {
+      "id": 0,
+      "subPrefabUnitName": [
+        {
+          "v": 125049
+        }
+      ],
+      "subPrefabUnitPos": [
+        {
+          "v": "0|0.25|0"
+        }
+      ],
+      "subPrefabUnitScale": [
+        {
+          "v": "0.5|0.5|0.5"
+        }
+      ],
+      "subUnitTexsName": [
+        {
+          "v": [
+            {
+              "v": 843
+            }
+          ]
+        }
+      ],
+      "animTimeInterval": 0.0,
+      "isObstacle": false,
+      "colliderScale": 1.0
+    },
+    "collision": false,
+    "events": [
+      {
+        "k": "onCharacterTouchEvent",
+        "v": {
+          "uid": -1,
+          "name": "onCharacterTouchEvent",
+          "evt": [
+            {
+              "v": 33
+            }
+          ],
+          "type": 1
+        }
+      }
+    ],
+    "paramDic": [],
+    "minimapIcon": 210000,
+    "faceType": 0,
+    "animClip": [
+      {
+        "k": 0,
+        "v": [
+          {
+            "v": 843
+          }
+        ]
+      },
+      {
+        "k": 1,
+        "v": []
+      },
+      {
+        "k": 2,
+        "v": []
+      },
+      {
+        "k": 3,
+        "v": []
+      },
+      {
+        "k": 4,
+        "v": []
+      }
+    ],
+    "isWangTile": false,
+    "boundsCollision": false,
+    "centerCollider": true,
+    "modelSizes": [
+      {
+        "k": 0,
+        "v": "0.5|0.5|0.5"
+      },
+      {
+        "k": 1,
+        "v": "1|1|1"
+      },
+      {
+        "k": 2,
+        "v": "1|1|1"
+      },
+      {
+        "k": 3,
+        "v": "1|1|1"
+      },
+      {
+        "k": 4,
+        "v": "1|1|1"
+      }
+    ],
+    "modelPositions": [
+      {
+        "k": 0,
+        "v": "0|0.25|0"
+      },
+      {
+        "k": 1,
+        "v": "0|0|0"
+      },
+      {
+        "k": 2,
+        "v": "0|0|0"
+      },
+      {
+        "k": 3,
+        "v": "0|0|0"
+      },
+      {
+        "k": 4,
+        "v": "0|0|0"
+      }
+    ]
+  },
+  {
+    "uid": 73,
+    "name": "麟弹",
+    "labId": 16,
+    "protoUid": 0,
+    "icon": 210000,
+    "model": {
+      "id": 0,
+      "subPrefabUnitName": [
+        {
+          "v": 125049
+        }
+      ],
+      "subPrefabUnitPos": [
+        {
+          "v": "0|0|0"
+        }
+      ],
+      "subPrefabUnitScale": [
+        {
+          "v": "0.4|0.2|0.4"
+        }
+      ],
+      "subUnitTexsName": [
+        {
+          "v": [
+            {
+              "v": 160
+            }
+          ]
+        }
+      ],
+      "animTimeInterval": 0.0,
+      "isObstacle": false,
+      "colliderScale": 0.2
+    },
+    "collision": false,
+    "events": [
+      {
+        "k": "onTileTouchEvent",
+        "v": {
+          "uid": -1,
+          "name": "onTileTouchEvent",
+          "evt": [
+            {
+              "v": 2
+            }
+          ],
+          "type": 0
+        }
+      },
+      {
+        "k": "onCharacterTouchEvent",
+        "v": {
+          "uid": -1,
+          "name": "onCharacterTouchEvent",
+          "evt": [
+            {
+              "v": 8
+            }
+          ],
+          "type": 0
+        }
+      },
+      {
+        "k": "onBoundaryTouchEvent",
+        "v": {
+          "uid": -1,
+          "name": "onBoundaryTouchEvent",
+          "evt": [
+            {
+              "v": 2
+            }
+          ],
+          "type": 0
+        }
+      },
+      {
+        "k": "onObjectTouchEvent",
+        "v": {
+          "uid": -1,
+          "name": "onObjectTouchEvent",
+          "evt": [
+            {
+              "v": 10
+            }
+          ],
+          "type": 0
+        }
+      },
+      {
+        "k": "onShowEvent",
+        "v": {
+          "uid": -1,
+          "name": "onShowEvent",
+          "evt": [
+            {
+              "v": 9
+            }
+          ],
+          "type": 0
+        }
+      }
+    ],
+    "paramDic": [
+      {
+        "k": "可破坏",
+        "v": {
+          "uid": -1,
+          "name": "可破坏",
+          "valueType": 0,
+          "min": "",
+          "v": "{\r\n  \"uid\": -1,\r\n  \"str\": null,\r\n  \"valName\": null,\r\n  \"num\": 0.0,\r\n  \"dic\": []\r\n}",
+          "max": ""
+        }
+      }
+    ],
+    "minimapIcon": 210000,
+    "faceType": 2,
+    "animClip": [
+      {
+        "k": 0,
+        "v": [
+          {
+            "v": 160
+          }
+        ]
+      },
+      {
+        "k": 1,
+        "v": [
+          {
+            "v": 47
+          }
+        ]
+      },
+      {
+        "k": 2,
+        "v": [
+          {
+            "v": 47
+          }
+        ]
+      },
+      {
+        "k": 3,
+        "v": [
+          {
+            "v": 47
+          }
+        ]
+      },
+      {
+        "k": 4,
+        "v": [
+          {
+            "v": 47
+          }
+        ]
+      }
+    ],
+    "isWangTile": false,
+    "boundsCollision": false,
+    "centerCollider": true,
+    "modelSizes": [
+      {
+        "k": 0,
+        "v": "0.4|0.2|0.4"
+      },
+      {
+        "k": 1,
+        "v": "0.4|0.2|0.4"
+      },
+      {
+        "k": 2,
+        "v": "0.4|0.2|0.4"
+      },
+      {
+        "k": 3,
+        "v": "0.4|0.2|0.4"
+      },
+      {
+        "k": 4,
+        "v": "0.4|0.2|0.4"
+      }
+    ],
+    "modelPositions": [
+      {
+        "k": 0,
+        "v": "0|0|0"
+      },
+      {
+        "k": 1,
+        "v": "0|0|0"
+      },
+      {
+        "k": 2,
+        "v": "0|0|0"
+      },
+      {
+        "k": 3,
+        "v": "0|0|0"
+      },
+      {
+        "k": 4,
+        "v": "0|0|0"
+      }
+    ]
+  },
+  {
+    "uid": 78,
+    "name": "触发1-1-4",
+    "labId": 0,
+    "protoUid": 0,
+    "icon": 210000,
+    "model": {
+      "id": 0,
+      "subPrefabUnitName": [
+        {
+          "v": 125049
+        }
+      ],
+      "subPrefabUnitPos": [
+        {
+          "v": "0|0|0"
+        }
+      ],
+      "subPrefabUnitScale": [
+        {
+          "v": "8|1|1"
+        }
+      ],
+      "subUnitTexsName": [
+        {
+          "v": [
+            {
+              "v": 210000
+            }
+          ]
+        }
+      ],
+      "animTimeInterval": 0.0,
+      "isObstacle": false,
+      "colliderScale": 1.0
+    },
+    "collision": false,
+    "events": [
+      {
+        "k": "onCharacterTouchEvent",
+        "v": {
+          "uid": -1,
+          "name": "onCharacterTouchEvent",
+          "evt": [
+            {
+              "v": 36
+            }
+          ],
+          "type": 0
+        }
+      }
+    ],
+    "paramDic": [
+      {
+        "k": "可破坏",
+        "v": {
+          "uid": -1,
+          "name": "可破坏",
+          "valueType": 0,
+          "min": "",
+          "v": "{\r\n  \"uid\": -1,\r\n  \"str\": null,\r\n  \"valName\": null,\r\n  \"num\": 0.0,\r\n  \"dic\": []\r\n}",
+          "max": ""
+        }
+      }
+    ],
+    "minimapIcon": 210000,
+    "faceType": 0,
+    "animClip": [
+      {
+        "k": 0,
+        "v": [
+          {
+            "v": 210000
+          }
+        ]
+      },
+      {
+        "k": 1,
+        "v": []
+      },
+      {
+        "k": 2,
+        "v": []
+      },
+      {
+        "k": 3,
+        "v": []
+      },
+      {
+        "k": 4,
+        "v": []
+      }
+    ],
+    "isWangTile": false,
+    "boundsCollision": false,
+    "centerCollider": true,
+    "modelSizes": [
+      {
+        "k": 0,
+        "v": "8|1|1"
+      },
+      {
+        "k": 1,
+        "v": "8|1|8"
+      },
+      {
+        "k": 2,
+        "v": "8|1|8"
+      },
+      {
+        "k": 3,
+        "v": "8|1|8"
+      },
+      {
+        "k": 4,
+        "v": "8|1|8"
+      }
+    ],
+    "modelPositions": [
+      {
+        "k": 0,
+        "v": "0|0|0"
+      },
+      {
+        "k": 1,
+        "v": "0|0|0"
+      },
+      {
+        "k": 2,
+        "v": "0|0|0"
+      },
+      {
+        "k": 3,
+        "v": "0|0|0"
+      },
+      {
+        "k": 4,
+        "v": "0|0|0"
+      }
+    ]
   }
 ]

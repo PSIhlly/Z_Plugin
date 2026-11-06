@@ -18,10 +18,12 @@ namespace Z_Code
         }
         public override void GetUnitChooseCode(Action<string> act, SyntaxNode cur)
         {
+            int? selectedAssetId = cur?.desc?.type == CodeType.Str
+                ? AssetManager.instance.texCtrl.GetId(cur.desc.code) : (int?)null;
             ModManager.instance.assetCtrl.ImportImage((form) =>
             {
                 act.Invoke("\""+AssetManager.instance.texCtrl.GetName(form.id)+ "\"");
-            });
+            }, selectedAssetId);
         }
         public override string GetName() => "Image";
         public override CmdBase GetNew() => new ImageCmd();

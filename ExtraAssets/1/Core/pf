@@ -39,8 +39,8 @@
     "largeMap": 210000,
     "curMissionId": 0,
     "targetScene": {
-      "item1": 1,
-      "item2": "-38|0|23"
+      "item1": 2,
+      "item2": "18|0|-1"
     },
     "banSceneChange": false,
     "eventState": 0,

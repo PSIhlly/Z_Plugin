@@ -66,17 +66,26 @@ namespace Ui.Mod
             {
                 await LoadingManager.instance.RunAsync("modImport", async () =>
                 {
-                    var path = await AssetFilePicker.GetModPackageAsync(TextManager.instance.GetTxt("import"), cancellation.Token);
-                    if (!active || version != model.importVersion || !model.importing)
-                        return;
-                    if (string.IsNullOrEmpty(path))
-                        return;
-                    var story = await GameManager.instance.saveCtrl.ImportPackageAsync(path, cancellation.Token);
-                    if (active && version == model.importVersion)
+                    var loading = LoadingManager.instance;
+                    string work = "modImportWork:" + Guid.NewGuid().ToString("N");
+                    string[] phases = { "Decode/extract/register package", "Refresh Story list" };
+                    loading.AddLoadItem(work, phases.Length);
+                    try
                     {
-                        Refresh();
-                        NotifyManager.instance.AddTip(TextManager.instance.GetTxt("import") + ": " + story.name);
+                        loading.SetPhase(work, "Select import package");
+                        var path = await AssetFilePicker.GetModPackageAsync(TextManager.instance.GetTxt("import"), cancellation.Token);
+                        if (!active || version != model.importVersion || !model.importing)
+                            return;
+                        if (string.IsNullOrEmpty(path))
+                            return;
+                        var story = await loading.RunStepAsync(work, phases[0], report => GameManager.instance.saveCtrl.ImportPackageAsync(path, cancellation.Token, report));
+                        if (active && version == model.importVersion)
+                        {
+                            loading.RunStep(work, phases[1], Refresh);
+                            NotifyManager.instance.AddTip(TextManager.instance.GetTxt("import") + ": " + story.name);
+                        }
                     }
+                    finally { loading.RemoveLoadItem(work); }
                 }, cancellation.Token);
             }
             catch (OperationCanceledException)

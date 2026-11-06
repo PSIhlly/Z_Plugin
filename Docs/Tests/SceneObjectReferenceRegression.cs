@@ -31,6 +31,7 @@ public static class SceneObjectReferenceRegression
                 typeof(GameCmdDataForm), typeof(GameCmdTypeDataForm) })
                 form.GetMethod("Register", BindingFlags.Static | BindingFlags.NonPublic).Invoke(null, null);
             typeof(SceneObjectCmd).GetMethod("Init", BindingFlags.Static | BindingFlags.NonPublic).Invoke(null, null);
+            typeof(IsSameObjectCmd).GetMethod("Init", BindingFlags.Static | BindingFlags.NonPublic).Invoke(null, null);
             Check(CmdBase.TryGetForm("SceneObject", out var canonical) && canonical.name == "SceneObject"
                 && CmdBase.TryGetForm("SceneObjectProto", out var alias) && ReferenceEquals(canonical, alias),
                 "retired constant method resolves canonical metadata without a duplicate chooser entry");
@@ -38,6 +39,11 @@ public static class SceneObjectReferenceRegression
                 && !GameCmdTypeDataForm.DataByName.ContainsKey("sceneObjectProto")
                 && GameCmdTypeDataForm.defaultData.name == "void",
                 "unified Object argument metadata retains the void default and removes the old separate type");
+            Check(CmdBase.TryGetForm("IsSameObject", out var sameForm)
+                && sameForm is GameCmdDataForm.Data gameSameForm && gameSameForm.labId == 10016
+                && sameForm.prmTypes.SequenceEqual(new[] { "sceneObject", "sceneObject" })
+                && sameForm.retNames.Count == 1 && sameForm.retTypes.SequenceEqual(new[] { "num" }),
+                "IsSameObject is registered with two Object arguments and one numeric result");
             var game = CreateManager<GameManager>();
             var map = CreateManager<MapManager>();
             map.data = new MapInfo
@@ -75,6 +81,34 @@ public static class SceneObjectReferenceRegression
             string authored = GlobalEventHelper.GetSceneObjectTemplateReference(template.id);
             string legacyTemplate = "$sop$" + template.id + "$sop$";
             string exact = GlobalEventHelper.GetSceneObjectReference(unitA.unit);
+            string prototypeReference = GlobalEventHelper.GetSceneObjectProductReference(prototype.uid);
+            string siblingReference = GlobalEventHelper.GetSceneObjectProductReference(productB.uid);
+            string otherReference = GlobalEventHelper.GetSceneObjectProductReference(otherProduct.uid);
+
+            foreach (string first in new[] { exact, numeric })
+            {
+                foreach (string second in new[] { authored, legacyTemplate, prototypeReference, siblingReference,
+                    "$so$" + unitB.uid + "$so$" })
+                    Check(Same(first, second) == 1f,
+                        "Object prototype comparison accepts prototype and sibling references: " + first + "/" + second);
+                Check(Same(first, otherReference) == 0f, "different Object prototypes do not match");
+            }
+            Check(Same(exact, exact) == 1f, "the same runtime Object shares its own prototype");
+            Check(Same(prototypeReference, prototypeReference) == 0f
+                && Same(prototypeReference, GlobalEventHelper.GetSceneObjectProductReference(otherPrototype.uid)) == 0f,
+                "missing source prototype does not match itself or another zero prototype");
+            Check(prototype.protoUid == 0 && productA.protoUid == prototype.uid && productB.protoUid == prototype.uid,
+                "Object prototype comparison does not mutate Products");
+            var sameProgram = ProgramDataForm.defaultData;
+            sameProgram.name = "IsSameObjectRegression";
+            Check(sameProgram.TryApplyCode("Return IsSameObject(\"" + exact + "\",\"" + prototypeReference + "\");",
+                    out _, out _), "the registered command compiles in an event expression");
+            var sameExecution = new InterpretDataForm.Data(-1, new List<BoxDataForm.Data>(),
+                new Dictionary<string, BoxDataForm.Data>(), sameProgram, 0, -1, 0, null,
+                new List<BoxDataForm.Data>(), 0);
+            var sameResult = sameExecution.Interpret();
+            Check(sameResult.complete && sameResult.errors.Count == 0 && sameResult.ret.num == 1f
+                && sameExecution.stack.Count == 0, "interpreter preserves argument order and returns the comparison");
 
             CheckKind(numeric, GlobalEventHelper.ObjectReferenceKind.Unit, collisionId);
             CheckKind(authored, GlobalEventHelper.ObjectReferenceKind.Template, template.id);
@@ -113,6 +147,8 @@ public static class SceneObjectReferenceRegression
                 Invoke(new DestroyObjectCmd(), malformed);
                 Check(Invoke(new IsObjectActiveCmd(), malformed).res[0].num == 0,
                     "malformed scene-object activity query safely returns zero");
+                Check(Same(malformed, exact) == 0f && Same(exact, malformed) == 0f,
+                    "malformed Object comparison argument safely returns zero");
             }
 
             Check(Get(authored) == 11, "parameter getter chooses the first current live Object Product");
@@ -133,6 +169,9 @@ public static class SceneObjectReferenceRegression
             // The authoring identity must work before a scene's Unit rows exist.
             ObjectUnitForm.RemoveData(unitA.uid);
             ObjectUnitForm.RemoveData(unitB.uid);
+            Check(Same(exact, prototypeReference) == 1f && Same(exact, siblingReference) == 1f
+                && Same(numeric, prototypeReference) == 0f,
+                "persistent Product comparison works without loaded Units while removed Unit handles fail");
             Check(GlobalEventHelper.ResolveSceneObjectUnits(authored).Count == 0 && Get(authored) == 40,
                 "parameter getter falls back to stored runtime Product before scene load");
             Set(authored, 50);
@@ -159,6 +198,8 @@ public static class SceneObjectReferenceRegression
             UnitForm.DataByUid[unitA.uid] = unitA;
             ObjectUnitForm.RemoveData(unitA.uid);
             var reused = Unit(unitA.uid, otherTemplate.id, otherProduct.uid);
+            Check(Same(numeric, prototypeReference) == 0f && Same(exact, prototypeReference) == 1f,
+                "overlapping/reused Unit and Product UIDs keep their distinct comparison meanings");
             Check(GlobalEventHelper.ResolveSceneObjectUnits(exact).Count == 0
                 && GlobalEventHelper.ResolveSceneObjectUnit(numeric) == reused.unit,
                 "reused Unit UID cannot revive the old Product reference; bare legacy UID keeps its original semantics");
@@ -173,6 +214,7 @@ public static class SceneObjectReferenceRegression
                 && ObjectUnitForm.DataByUid.ContainsKey(otherUnit.uid) && ObjectProductForm.DataByUid.ContainsKey(otherProduct.uid),
                 "template destruction preserves authored data/prototype and unrelated placements");
             Invoke(new DestroyObjectCmd(), authored);
+            Check(Same(exact, prototypeReference) == 0f, "removed Product references no longer match a prototype");
             Check(Invoke(new IsObjectActiveCmd(), authored).res[0].num == 0,
                 "repeated destruction is a harmless no-op");
 
@@ -231,6 +273,16 @@ public static class SceneObjectReferenceRegression
     }
 
     private static float Value(ObjectProductForm.Data data) => data.paramDic[ParameterName].GetValue().num;
+    private static float Same(string first, string second)
+    {
+        var task = new InterpretAsyncTask(null);
+        // CmdBase accepts the interpreter's reverse-stack argument order.
+        new IsSameObjectCmd().Execute(new[] { CodeHelper.CreateBoxByStr(second), CodeHelper.CreateBoxByStr(first) },
+            new Dictionary<string, BoxDataForm.Data>(), task);
+        Check(task.IsComplete() && string.IsNullOrEmpty(task.error) && task.res?.Length == 1,
+            "Object comparison returns one value synchronously");
+        return task.res[0].num;
+    }
     private static float Get(string reference) => Invoke(new GetSceneObjectParameterCmd(), reference).res[0].num;
     private static void Set(string reference, float value) => Invoke(new SetSceneObjectParameterCmd(), reference, value);
 

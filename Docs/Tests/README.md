@@ -4,14 +4,79 @@ Product reference checks run in independent temporary Unity projects:
 
 - `Run-MapRuntimeRegression.ps1 -Fixture CharacterReferenceRegression`: Character constant registration/typed chooser metadata and literal compilation, exact/runtime versus prototype Character resolution, current-scene snapshots, unique singleton, invalid references, recycled Data identity, team/current remapping and independent skill copies. In Mod's event editor, manually select a `character` argument, choose the basic `Character` constant, select a Story Character, then Apply/reopen to confirm the quoted `$ch$ProductUid$ch$` persists; canceling must preserve the prior argument.
 - `Run-MapRuntimeRegression.ps1 -Fixture CharacterPartyRegression`: five Character party commands, command metadata/default compilation, prototype recruitment and fan-out, unique Characters, team/active/current invariants, idempotence, current-character fallback, deliberate reserve-only save reload versus legacy invalid-UID repair, invalid/omitted references, HUD/trigger null safety and existing team-slot UI entry points. Test actual HUD refresh/player switching in Play mode too.
+- `Run-MapRuntimeRegression.ps1 -Fixture CharacterRemovalRegression`: real legacy `DestroyCharacter` execution through Product and scene-Unit references for unique/non-unique Characters. Checks synchronous instance/registry/index/interaction cleanup, repeated deletion, preserved unique Product/parameter identities and party references, recreating a scene instance from that Product, and rejection of stale Data after Unit UID reuse. This focused fixture has no old Renderer API dependencies and never loads a story or save. Success is `CHARACTER_REMOVAL_REGRESSION_PASS`; actual scene UI and Player behavior still need a smoke check.
+- `Run-MapRuntimeRegression.ps1 -Fixture UnifiedDestroyRegression`: checks canonical `Destroy` metadata/scene Lab and both legacy aliases; Character/Object prototype fan-out and exact references; Item Product/scene references; unique Character preservation; registry, instance, interaction and owned-event/task cleanup; malformed/mismatched/Tile no-ops and reentrant UID reuse. Item destruction removes matching scene drops, never backpack entries or Item Products. Uses the real command and removal owners without loading a story/save. Success is `UNIFIED_DESTROY_REGRESSION_PASS`; real scene/Player smoke checks remain separate.
 - `Run-MapRuntimeRegression.ps1 -Fixture ObjectProductRuntimeRegression`: legacy `mof` and wrapper `oprf` migration, full Product-owned model/events/animation/collision/params, transient MapObject rows, all-scene copies without scene provenance, idempotence, Mod memory-only loading, unvisited Core upgrades on explicit save, replacement-table round trips and reset.
-- `Run-MapRuntimeRegression.ps1 -Fixture SceneObjectReferenceRegression`: discriminated Unit/Product/template IDs, legacy `$sop$` compatibility, parameter fan-out and saved cached values, unloaded Product reads/writes, malformed refs and actual multi-instance removal.
+- `Run-MapRuntimeRegression.ps1 -Fixture SceneObjectReferenceRegression`: discriminated Unit/Product/template IDs, legacy `$sop$` compatibility, `IsSameObject` prototype comparisons and interpreter calls, parameter fan-out and saved cached values, unloaded Product reads/writes, malformed refs and actual multi-instance removal. Prototype comparison covers exact prototypes, sibling/self Products, different/zero prototypes, both invalid argument positions, unloaded Products and recycled Unit IDs.
 - `Run-MapRuntimeRegression.ps1 -Fixture SceneProductCommandRegression`: Character/Object template versus exact position/move/rotation, independent relative starts, bounded time, legacy duration aliases, original Data identity and all-target completion. It does not compile the unrelated renderer probes in the broad map fixture.
 - `Run-MapRuntimeRegression.ps1 -Fixture StoryTargetSelectionRegression`: registers and compiles all Story 1 programs, compiling the `vector`-returning `朝向敌人` first, then executes the real compiler/interpreter with deterministic command probes. Covers nearest visible selection across self-first/unsorted/reversed candidates, friendly/occluded exclusion, higher/lower targets, forward fallback, raw query/distance coordinates and explicitly raised LOS endpoints. Executes player shot events, the enemy ranged/Sword chain, the beam's projectile routing, straight movement and homing; checks returned 3D directions, Sword's doubled speed, nonzero height displacement and unchanged movement durations. A real `IsUnobstructed`/`CaptureCast` low-wall case requires unraised endpoints to hit and caller-raised endpoints to pass. Exports the seven changed events (`5`, `6`, `7`, `19`, `20`, `23`, `28`) to `compiled-bullet-events.json` inside the isolated project; actual Play aiming/projectile rendering still requires a smoke check.
 
 These Editor checks do not replace Mod/Play scene-switch or target Player smoke tests.
 
+`Run-MapRuntimeRegression.ps1 -Fixture ModSceneHistoryRuntimeRegression -ItemPicking`
+generates real Item prefabs with zero/small gameplay collider scales and nested
+Box/Sphere triggers, then checks mouse down/up selection in normal/Event mode,
+overhead/side view and after pool reuse. Play/preview collision scale, authored
+Item/MapModel data and source prefabs must retain their original values.
+
+`Run-LoadingProgressRegression.ps1` executes the production LoadingManager and
+UiLoading text controller with in-memory UI/frame dependencies. It covers work
+counts, visibility guards, retained completed children, discovered work, monotonic
+text, session reset, duplicate/stale reports, async failure/cancellation, parallel
+worker increments, detailed substage counts, render budgets, generated bilingual
+stage titles (including unchanged percentages and language changes). Loading does
+not write runtime diagnostic logs.
+
+`Run-ObjectWangTileNeighbourRegression.ps1` executes the actual WangTile mask,
+footprint and neighbour invalidation methods with geometry/column/appearance spies.
+It checks add/move/remove, old/new templates, hidden/fitted neighbours, ordinary
+instances sharing a WangTile template, first-notification ordering, contact tolerance
+and repeated warm calls. The 10,000-call unchanged workload must make zero column
+queries; this is a deterministic call-count check, not a Player FPS benchmark.
+
+`Run-MapRuntimeRegression.ps1 -Fixture FadeCommandsRegression` checks the actual
+FadeIn/FadeOut commands, generated metadata, black-image start/mid/end alpha,
+one-second unscaled completion and closing, replacement/reopening/Hide cleanup,
+and immediate execution of the following statement by the real interpreter.
+Visually check the registered PlayEffect prefab in Play too.
+
+`Run-SceneTransitionRegression.ps1` runs the production Play transition/unload
+methods and LoadingManager with in-memory frame/save/map/UI spies. It checks
+Loading render before save, a single old-map save, stopped Play updates, reentry
+guards, asynchronous completion, failure cleanup and first-event loading ownership.
+`Run-MapRuntimeRegression.ps1 -Fixture WangTileStoryCacheRegression` checks
+WangTile generated-ID/Texture reuse across scene resets, configuration/same-ID
+asset/animation invalidation, and full Story release followed by fresh generation.
+Run two scene switches in Play to verify Loading presentation and end-to-end
+latency in the actual game.
+
+`Run-MapRuntimeRegression.ps1 -Fixture MapRelatedUnitRefreshRegression` exercises
+the actual Object Show -> GameMapController appearance -> RefreshObjectOverlap
+chain with a facing different from the pooled template, proving that reverse
+Tile lists really change while every initial Object still becomes visible.
+Character/Item/Object probes also cover self/peer unlink, reorder and insertion
+from Show/Hide, latest multi-Tile visibility, cross-type snapshot capture,
+synchronous nested refresh, exception-safe buffer return and warm list reuse,
+non-mutating absent-key reads and single-unit refresh. It uses no scene/save or
+shader rendering. Success is `MAP_RELATED_UNIT_REFRESH_REGRESSION_PASS`;
+real Mod/Play entry and view movement still need a smoke check.
+
 `Run-MapRuntimeRegression.ps1 -Fixture ObjectProductEditorRegression` checks Product-backed creation/deletion, concrete label ownership, transient MapObject list projection and stable row identity across refreshes. After one successful production build, use `-SkipBuild` for additional isolated fixtures to avoid competing writes to the same compiler output; it deliberately assumes the existing binaries match the current source.
+
+The Object editor fixture also checks New Collider scale `1` through the editor
+and `AddStorySceneObject`, preserving the shared MapModel default and existing/
+copied authored scales. `Run-MapRuntimeRegression.ps1 -Fixture AssetPickerSelectionRegression`
+checks current-image typed ID lookup, its own Label instead of All, missing/empty/
+wrong-kind fallback, inaccessible-label All fallback that retains selection/focus,
+pending-focus lifetime and dual-list completion, and absence of completion/events or
+automatic media playback. Actual Object frame/minimap calls pass their stored
+image through UiManager; Image command literal, empty and variable inputs keep
+the typed current ID and quoted callback marker contract. Real `ScrView.ScrollToIndex` tests cover offscreen,
+first/last and invalid indices, horizontal/vertical lists, nonuniform Canvas/
+content scaling, stopped inertia and partial virtualization. This tests data and
+native layout geometry without opening real story files; visual highlight and
+UGUI input still need a manual smoke check. Success is
+`ASSET_PICKER_SELECTION_REGRESSION_PASS`.
 
 `Run-MapRuntimeRegression.ps1 -Fixture MapEdgeTransitionRegression` builds the
 production runtime, then tests the actual edge component source in an isolated
@@ -49,6 +114,22 @@ edit refresh probes cover the neighbouring 3-by-3 on the same/adjacent heights,
 overlapping-batch deduplication, removal, unchanged distant Tiles and view bounds.
 Success is `WANG_TILE_SLOPE_NEIGHBOUR_REGRESSION_PASS`; actual Mod/Play slope-edge
 rendering still needs a visual smoke check.
+
+`Run-MapRuntimeRegression.ps1 -Fixture ObjectDirectionGeometryRegression` checks
+Object-facing `modelSizes`/`modelPositions`: legacy/partial-data fallback, five
+independent entries, facing-mode changes, JSON round trips, independent runtime
+Products, bottom-preserving height/axis edits, directional previews, offscreen
+body/Trigger and visual bounds, independent 0.1-world-unit Trigger padding,
+immediate live-facing changes, two simultaneous facings and pooled-owner handoff
+without changing the shared prefab or Unit root. Visual, physical-navigation and
+terrain-pass candidate indexes must update their old/new Tile links exactly.
+Texture-fitted, rear-anchored Cube and Sphere-to-Box models are also compared
+against independent directional previews for body/Trigger vertices at ordinary
+and nonuniform root scales, including repeated facing changes.
+Growing from a zero-height default direction must also produce finite,
+ordinary-sized body/Trigger geometry identical to an independently built facing.
+Success is `OBJECT_DIRECTION_GEOMETRY_REGRESSION_PASS`. This isolated data/geometry
+fixture does not establish final Mod/Play rendering or target-Player behavior.
 
 `Run-MapRuntimeRegression.ps1 -Fixture CodeInterpreterRuntimeRegression` runs the
 event-language NUnit assertions on isolated Unity Mono, including compilation of
@@ -281,6 +362,40 @@ and unit/non-unit cells), small-batch completion and active-rebuild request supp
 An axis-aligned microbenchmark logs legacy/optimized time without asserting a
 machine-dependent speed ratio. Play periodic batches are `/100, min 5` instead of
 `/50, min 10`; actual frame-time improvement needs in-scene profiling.
+
+`Run-MapRuntimeRegression.ps1 -Fixture NavigationRouteCacheRegression` exercises
+the completed full-route cache using the production BFS and controlled logical
+frames, without loading a story or scene. A 118-edge one-cell-wide serpentine
+corridor prevents smoothing beyond the first adjacent cell. At speed 6 and
+60 FPS, warm routes must advance every frame through multiple turns while new
+search rounds remain pending; consuming many cached waypoints in one logical
+frame must not replenish the ten-cell search budget or lose a route when search
+working buffers are cleared. It also checks independent Characters sharing one
+BFS, ordinary target changes, removed/blocked/pass-restricted cells, removed
+directional links, Reset and radius/capability changes, plus the exact final
+non-center coordinate without backtracking. This verifies native vector/query
+semantics and invokes the actual Character remaining-distance method, its real
+Move and ApplyMove chain against a registered Sphere prefab, spending a large
+single-frame distance across several waypoints and consecutive corners without
+refilling the BFS budget. That synthetic graph has no physical Tiles/obstacles,
+so it does not replace collision/Trigger or real Player timing checks; replay
+the normal movement smoke checks and confirm frame-time in the target scene
+separately.
+The fixture also retains the former navigation-endpoint query cases without the
+large legacy fixture's renderer dependencies: blocked/missing/null/pass-restricted
+starts, retained escape centers and large-character clearance; blocked or
+pass-restricted destinations, graph movement before the final direct leg, same-cell
+target following, independent endpoint phases, and a closest geometric but
+unreachable anchor. Both an exhausted depth limit and an unfinished frame budget
+must not grant a direct segment; changing target cells invalidates old direct
+results and prevents an obsolete pending round from publishing its final leg.
+The actual Character check also verifies endpoint permission scope cleanup and
+teleport invalidation of its full cached route.
+Small open-grid checks retain center-line-only pass requirements on smoothed
+diagonals, immediate cached-raw fallback when a target's within-cell offset would
+cross a restricted neighbour, completion without repeated waits, and adoption of
+a changed target direction during an unfinished far smoothed leg.
+Success is `NAVIGATION_ROUTE_CACHE_REGRESSION_PASS`.
 
 The same entry now runs incremental path queries against controlled logical
 frames: every Character receives at most ten cell work items per frame, including
@@ -784,3 +899,50 @@ in the basic/constant group with a localized label, while mission operations kee
 their own category; the generated indexes and wrapped MissionForm ID are checked.
 Success is reported as `MISSION_RUNTIME_REGRESSION_PASS` in the printed log.
 Still smoke-test choosing a Mission in the actual event editor and the Play HUD.
+
+## Global variable command regression
+
+```powershell
+./Docs/Tests/Run-MapRuntimeRegression.ps1 -Fixture GlobalVariableRegression
+```
+
+Uses an isolated runtime project to check `GetGlobalVar(name)` / `SetGlobalVar(name,value)`
+registration, basic CmdLab metadata and compiler/interpreter stack balance. Covers
+numeric, string and nested dictionary Boxes, overwrite and copy isolation, missing
+and empty names, sharing across event heaps and subprograms, plus the actual `egvf`
+file save/load path. Missing files, null loads and consecutive story folders must
+clear stale globals. Filesystem checks use only a fixture-owned temporary directory;
+no production story or save is loaded or changed. Success marker:
+`GLOBAL_VARIABLE_REGRESSION_PASS`.
+
+## Scene global-variable change triggers
+
+```powershell
+./Docs/Tests/Run-MapRuntimeRegression.ps1 -Fixture GlobalVariableSceneTriggerRegression
+```
+
+Exercises the actual `SetGlobalVar` command, change event, Story trigger listener,
+queued event interpreter and normal LateUpdate scheduling in an isolated project.
+Bindings use the global UID (`onGlobalVarChangeEvent$UID`), or the empty Any suffix.
+Trigger arguments are `param1 = name`, `param2 = old value`, `param3 = new value`.
+Checks include deep equality and type changes, rename-stable matching, independent
+handler snapshots, same-value reassignments, scene/Mod/Leave guards and Scene JSON
+round trips. The actual Scene configuration builder and chooser callbacks also
+cover Any/UID selection, unused New keys, duplicate-target rejection and stale
+Scene/global-record protection. No production scene, UI or save is loaded. Success marker:
+`GLOBAL_VARIABLE_SCENE_TRIGGER_REGRESSION_PASS`.
+
+## ModStory typed defaults and global-variable editor
+
+```powershell
+./Docs/Tests/Run-MapRuntimeRegression.ps1 -Fixture ModStoryVariableEditorRegression
+```
+
+Runs the actual editor controllers and shared value chooser in an isolated project,
+without loading the production UI or story. Covers numeric/Text selection, correct
+text prefill and completion, immediate serialized-default updates before copying a
+new Product parameter, template/pool safety, Event/global-variable page selection,
+global creation/rename/deletion and separate Core defaults versus Save values.
+Filesystem checks use fixture-owned temporary folders only. Success marker:
+`MOD_STORY_VARIABLE_EDITOR_REGRESSION_PASS`. Also retain `GlobalVariableRegression`
+for command execution, deep Box copies and the `egvf` persistence lifecycle.

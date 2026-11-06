@@ -6,13 +6,22 @@ import tempfile
 from pathlib import Path
 
 try:
-    from PIL import Image, ImageChops, ImageStat
+    from PIL import Image
 except ImportError:
     print("Pillow is required. Run: python -m pip install Pillow", file=sys.stderr)
     raise SystemExit(1)
 
 
 FOLDER = Path(__file__).resolve().parent
+
+# Source coordinates are (column, row), 1-based in the 4x6 atlas.
+# Matches TileHelper.GetPartId/CreateParts for each missing diagonal neighbor.
+INNER_CORNER_LAYOUTS = {
+    6: ((None, (1, 4), (2, 4)), ((2, 3), (3, 1), (2, 5)), ((2, 4), (3, 4), (2, 4))),
+    7: (((3, 4), (4, 4), None), ((3, 5), (4, 1), (3, 3)), ((3, 4), (2, 4), (3, 4))),
+    8: (((2, 5), (3, 5), (2, 5)), ((2, 6), (3, 2), (2, 4)), (None, (1, 5), (2, 5))),
+    9: (((3, 5), (2, 5), (3, 5)), ((3, 4), (4, 2), (3, 6)), ((3, 5), (4, 5), None)),
+}
 
 
 def crop_closed(image: Image.Image, x1: int, x2: int, y1: int, y2: int) -> Image.Image:
@@ -188,28 +197,22 @@ def save_png(image: Image.Image, name: str) -> None:
             temporary.unlink()
 
 
-def composite_3x3(
-    center: Image.Image,
-    left: Image.Image,
-    right: Image.Image,
-    up: Image.Image,
-    down: Image.Image,
-) -> Image.Image:
-    cell_width, cell_height = center.size
-    for part in (left, right, up, down):
-        if part.height != cell_height or part.width not in (cell_width, 2 * cell_width):
-            raise ValueError("Invalid component size for a 3x3 image.")
-
+def inner_corner_preview(source: Image.Image, number: int) -> Image.Image:
+    _, _, cell_width, cell_height = require_size(source)
     result = Image.new("RGBA", (3 * cell_width, 3 * cell_height), (0, 0, 0, 0))
-    result.paste(center, (cell_width, cell_height))
-    result.paste(left, (0, cell_height))
-    result.paste(right, (2 * cell_width, cell_height))
-    result.paste(up, (0 if up.width == 2 * cell_width else cell_width, 0))
-    result.paste(down, (0 if down.width == 2 * cell_width else cell_width, 2 * cell_height))
-    result.paste((0, 0, 0, 0), (0, 0, cell_width, cell_height))
-    result.paste((0, 0, 0, 0), (2 * cell_width, 0, 3 * cell_width, cell_height))
-    result.paste((0, 0, 0, 0), (0, 2 * cell_height, cell_width, 3 * cell_height))
-    result.paste((0, 0, 0, 0), (2 * cell_width, 2 * cell_height, 3 * cell_width, 3 * cell_height))
+    for row, cells in enumerate(INNER_CORNER_LAYOUTS[number]):
+        for column, coordinates in enumerate(cells):
+            if coordinates is None:
+                continue
+            source_column, source_row = coordinates
+            part = crop_half_open(
+                source,
+                (source_column - 1) * cell_width,
+                (source_row - 1) * cell_height,
+                source_column * cell_width,
+                source_row * cell_height,
+            )
+            result.paste(part, (column * cell_width, row * cell_height))
     return result
 
 
@@ -282,7 +285,7 @@ def split_image() -> None:
     save_png(image_2, "2.png")
     image_14_marked = fill_percentage(image_2, 1 / 4, 0, 1 / 2, 1)
     image_14_base = crop_right_fraction(image_14_marked, 1 / 4)
-    image_14_added = crop_closed(source, quarter, three_quarters_x, half_y, two_thirds_y)
+    image_14_added = crop_closed(source, quarter + 1, three_quarters_x, half_y + 1, two_thirds_y)
     image_18 = stack_vertical(image_14_base, image_14_added)
     image_18 = fill_missing_corner(
         image_18,
@@ -297,7 +300,7 @@ def split_image() -> None:
     save_png(image_3, "3.png")
     image_15_marked = fill_percentage(image_3, 1 / 4, 0, 1 / 2, 1)
     image_15_base = crop_right_fraction(image_15_marked, 1 / 4)
-    image_15_added = crop_closed(source, quarter, three_quarters_x, two_thirds_y, five_sixths_y)
+    image_15_added = crop_closed(source, quarter + 1, three_quarters_x, two_thirds_y + 1, five_sixths_y)
     image_19 = stack_vertical(image_15_added, image_15_base)
     image_19 = fill_missing_corner(
         image_19,
@@ -312,7 +315,7 @@ def split_image() -> None:
     save_png(image_4, "4.png")
     image_16_marked = fill_percentage(image_4, 0, 1 / 4, 1, 1 / 2)
     image_16_base = crop_bottom_fraction(image_16_marked, 1 / 4)
-    image_16_added = crop_closed(source, quarter, half_x, half_y, five_sixths_y)
+    image_16_added = crop_closed(source, quarter + 1, half_x, half_y + 1, five_sixths_y)
     image_20 = stack_horizontal(image_16_base, image_16_added)
     image_20 = fill_missing_corner(
         image_20,
@@ -327,7 +330,7 @@ def split_image() -> None:
     save_png(image_5, "5.png")
     image_17_marked = fill_percentage(image_5, 0, 1 / 4, 1, 1 / 2)
     image_17_base = crop_bottom_fraction(image_17_marked, 1 / 4)
-    image_17_added = crop_closed(source, half_x, three_quarters_x, half_y, five_sixths_y)
+    image_17_added = crop_closed(source, half_x + 1, three_quarters_x, half_y + 1, five_sixths_y)
     image_21 = stack_horizontal(image_17_added, image_17_base)
     image_21 = fill_missing_corner(
         image_21,
@@ -337,51 +340,10 @@ def split_image() -> None:
     )
     save_png(image_21, "21.png")
 
-    image_6 = composite_3x3(
-        crop_closed(source, half_x + 1, three_quarters_x, 1, sixth),
-        crop_closed(source, quarter + 1, half_x, third_y + 1, half_y),
-        crop_closed(source, quarter + 1, half_x, half_y + 1, two_thirds_y),
-        crop_closed(source, 1, quarter, two_thirds_y + 1, five_sixths_y),
-        crop_closed(source, half_x + 1, three_quarters_x, half_y + 1, two_thirds_y),
-    )
-    image_6 = complete_wang_corners(image_6, source, (0, 0))
-    save_png(image_6, "6.png")
-    save_png(fill_percentage(image_6, 1 / 3, 1 / 3, 2 / 3, 2 / 3), "22.png")
-
-    image_7 = composite_3x3(
-        crop_closed(source, three_quarters_x + 1, x, 1, sixth),
-        crop_closed(source, half_x + 1, three_quarters_x, two_thirds_y + 1, five_sixths_y),
-        crop_closed(source, half_x + 1, three_quarters_x, third_y + 1, half_y),
-        crop_closed(source, three_quarters_x + 1, x, half_y + 1, two_thirds_y),
-        crop_closed(source, quarter + 1, half_x, half_y + 1, two_thirds_y),
-    )
-    image_7 = complete_wang_corners(image_7, source, (0, 2))
-    save_png(image_7, "7.png")
-    save_png(fill_percentage(image_7, 1 / 3, 1 / 3, 2 / 3, 2 / 3), "23.png")
-
-    image_8 = composite_3x3(
-        crop_closed(source, half_x + 1, three_quarters_x, sixth + 1, third_y),
-        crop_closed(source, quarter + 1, half_x, five_sixths_y + 1, y),
-        crop_closed(source, quarter + 1, half_x, half_y + 1, two_thirds_y),
-        crop_closed(source, half_x + 1, three_quarters_x, two_thirds_y + 1, five_sixths_y),
-        crop_closed(source, 1, quarter, two_thirds_y + 1, five_sixths_y),
-    )
-    image_8 = complete_wang_corners(image_8, source, (2, 0))
-    save_png(image_8, "8.png")
-    save_png(fill_percentage(image_8, 1 / 3, 1 / 3, 2 / 3, 2 / 3), "24.png")
-
-    image_9 = composite_3x3(
-        crop_closed(source, three_quarters_x + 1, x, sixth + 1, third_y),
-        crop_closed(source, half_x + 1, three_quarters_x, half_y + 1, two_thirds_y),
-        crop_closed(source, half_x + 1, three_quarters_x, five_sixths_y + 1, y),
-        crop_closed(source, quarter + 1, half_x, two_thirds_y + 1, five_sixths_y),
-        crop_closed(source, three_quarters_x + 1, x, two_thirds_y + 1, five_sixths_y),
-    )
-    image_9 = complete_wang_corners(image_9, source, (2, 2))
-    image_9 = correct_image_9_upper_right(image_9, source)
-    save_png(image_9, "9.png")
-    image_25 = image_9.copy()
-    save_png(fill_percentage(image_25, 1 / 3, 1 / 3, 2 / 3, 2 / 3), "25.png")
+    for number in range(6, 10):
+        preview = inner_corner_preview(source, number)
+        save_png(preview, f"{number}.png")
+        save_png(fill_percentage(preview, 1 / 3, 1 / 3, 2 / 3, 2 / 3), f"{number + 16}.png")
 
 
 def open_required(name: str) -> Image.Image:
@@ -452,100 +414,17 @@ def fill_missing_corner(
     return result
 
 
-def correct_image_9_upper_right(image: Image.Image, source: Image.Image) -> Image.Image:
-    _, _, quarter, sixth = require_size(source)
-    result = image.copy()
-    result.paste(
-        crop_half_open(source, 2 * quarter, 3 * sixth, 3 * quarter, 4 * sixth),
-        (2 * quarter, 0),
-    )
-    return result
-
-
-def tile_water_score(tile: Image.Image) -> float:
-    pixels = list(tile.convert("RGBA").getdata())
-    visible = [pixel for pixel in pixels if pixel[3] > 32]
-    if not visible:
-        return -1e9
-    blue_bias = sum(pixel[2] - pixel[0] for pixel in visible) / len(visible)
-    return blue_bias + 0.25 * sum(pixel[2] - pixel[1] for pixel in visible) / len(visible)
-
-
-def seam_score(first: Image.Image, second: Image.Image, direction: str) -> float:
-    strip = max(1, min(first.width, first.height) // 16)
-    if direction == "horizontal":
-        first_edge = first.crop((first.width - strip, 0, first.width, first.height))
-        second_edge = second.crop((0, 0, strip, second.height))
-    else:
-        first_edge = first.crop((0, first.height - strip, first.width, first.height))
-        second_edge = second.crop((0, 0, second.width, strip))
-    difference = ImageChops.difference(first_edge, second_edge)
-    means = ImageStat.Stat(difference).mean
-    return sum(means[:3]) / 3 + means[3] * 0.25
-
-
-def complete_wang_corners(
+def is_standard_strip(
     image: Image.Image,
-    source: Image.Image,
-    keep_corner: tuple[int, int],
-) -> Image.Image:
-    cell_width = image.width // 3
-    cell_height = image.height // 3
-    candidates: list[Image.Image] = []
-    for row in range(6):
-        for column in range(4):
-            candidate = crop_half_open(
-                source,
-                column * cell_width,
-                row * cell_height,
-                (column + 1) * cell_width,
-                (row + 1) * cell_height,
-            )
-            if tile_water_score(candidate) > 0:
-                candidates.append(candidate)
-    if not candidates:
-        candidates = [
-            crop_half_open(
-                source,
-                column * cell_width,
-                row * cell_height,
-                (column + 1) * cell_width,
-                (row + 1) * cell_height,
-            )
-            for row in range(6)
-            for column in range(4)
-        ]
+    standard_size: tuple[int, int],
+    expanded_size: tuple[int, int],
+) -> bool:
+    def ratio_error(size: tuple[int, int]) -> float:
+        first = image.width * size[1]
+        second = image.height * size[0]
+        return abs(first - second) / (first + second)
 
-    def tile_at(row: int, column: int) -> Image.Image:
-        return crop_half_open(
-            image,
-            column * cell_width,
-            row * cell_height,
-            (column + 1) * cell_width,
-            (row + 1) * cell_height,
-        )
-
-    corner_rules = {
-        (0, 0): (tile_at(0, 1), tile_at(1, 0)),
-        (0, 2): (tile_at(0, 1), tile_at(1, 2)),
-        (2, 0): (tile_at(1, 0), tile_at(2, 1)),
-        (2, 2): (tile_at(1, 2), tile_at(2, 1)),
-    }
-    result = image.copy()
-    for corner, (first_neighbor, second_neighbor) in corner_rules.items():
-        if corner == keep_corner:
-            continue
-        if corner == (0, 0):
-            score = lambda candidate: seam_score(candidate, first_neighbor, "horizontal") + seam_score(candidate, second_neighbor, "vertical")
-        elif corner == (0, 2):
-            score = lambda candidate: seam_score(first_neighbor, candidate, "horizontal") + seam_score(second_neighbor, candidate, "vertical")
-        elif corner == (2, 0):
-            score = lambda candidate: seam_score(first_neighbor, candidate, "vertical") + seam_score(candidate, second_neighbor, "horizontal")
-        else:
-            score = lambda candidate: seam_score(first_neighbor, candidate, "vertical") + seam_score(second_neighbor, candidate, "horizontal")
-        best = min(candidates, key=score)
-        result.paste(best, (corner[1] * cell_width, corner[0] * cell_height))
-    return result
+    return ratio_error(standard_size) <= ratio_error(expanded_size)
 
 
 def join_horizontal_strip(
@@ -554,7 +433,7 @@ def join_horizontal_strip(
     target_size: tuple[int, int],
     use_bottom: bool,
 ) -> Image.Image:
-    if image.size == expected_size:
+    if is_standard_strip(image, expected_size, (3 * expected_size[0], 8 * expected_size[1])):
         cropped = crop_percentage(image, 0, 0, 1 / 2, 1)
     elif use_bottom:
         cropped = crop_percentage(image, 0, 1 / 2, 2 / 3, 1)
@@ -569,7 +448,7 @@ def join_vertical_strip(
     target_size: tuple[int, int],
     use_right: bool,
 ) -> Image.Image:
-    if image.size == expected_size:
+    if is_standard_strip(image, expected_size, (8 * expected_size[0], 3 * expected_size[1])):
         cropped = crop_percentage(image, 0, 0, 1, 1 / 2)
     elif use_right:
         cropped = crop_percentage(image, 1 / 2, 0, 1, 2 / 3)

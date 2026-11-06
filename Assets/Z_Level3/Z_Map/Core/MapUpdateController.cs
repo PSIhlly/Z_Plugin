@@ -33,6 +33,7 @@ namespace Z_Map
         public DoubleDictionary<CharacterUnit, TileUnit> characterOverlapTileDic = new DoubleDictionary<CharacterUnit, TileUnit>();
         public DoubleDictionary<ItemUnit, TileUnit> itemTileDic = new DoubleDictionary<ItemUnit, TileUnit>();
         private readonly DoubleDictionary<MapUnit, (int, int)> unitColumns = new DoubleDictionary<MapUnit, (int, int)>();
+        private readonly Stack<List<MapUnit>> relatedUnitBuffers = new Stack<List<MapUnit>>();
 
         public void ForgetUnitColumns(MapUnit unit) => unitColumns.Del(unit);
 
@@ -285,50 +286,54 @@ namespace Z_Map
         }
         private void UpdateRelatedUnit(TileUnit tile)
         {
-            if (characterTileDic.TryGet(tile, out var characters))
-            foreach (var ch in characters)
+            // Show/Hide callbacks can rebuild these same reverse-index lists
+            // (e.g. Object facing/texture Collider refresh). Capture all types
+            // before callbacks; a nested refresh must rent a different buffer.
+            var units = relatedUnitBuffers.Count > 0 ? relatedUnitBuffers.Pop() : new List<MapUnit>();
+            try
             {
-                if (HasShowingTile(ch, characterTileDic))
+                CopyRelatedUnits(tile, characterTileDic, units);
+                CopyRelatedUnits(tile, itemTileDic, units);
+                CopyRelatedUnits(tile, objectTileDic, units);
+                foreach (var unit in units)
                 {
-                    ch.Show();
-                    curCharacterLst.Add(ch.data);
-                }
-                else
-                {
-                    ch.Hide();
-                    curCharacterLst.Remove(ch.data);
+                    if (unit is CharacterUnit character)
+                        UpdateRelatedVisibility(character, characterTileDic, curCharacterLst, character.data);
+                    else if (unit is ItemUnit item)
+                        UpdateRelatedVisibility(item, itemTileDic, curItemLst, item.data);
+                    else if (unit is ObjectUnit obj)
+                        UpdateRelatedVisibility(obj, objectTileDic, curObjectLst, obj.data);
                 }
             }
-            if (itemTileDic.TryGet(tile, out var items))
-            foreach (var item in items)
+            finally
             {
-                if (HasShowingTile(item, itemTileDic))
+                units.Clear();
+                relatedUnitBuffers.Push(units);
+            }
+        }
+        private static void CopyRelatedUnits<T>(TileUnit tile, DoubleDictionary<T, TileUnit> index,
+            List<MapUnit> units) where T : MapUnit
+        {
+            if (index.TryGet(tile, out var related))
+                for (int i = 0; i < related.Count; i++)
+                    units.Add(related[i]);
+        }
+        private static void UpdateRelatedVisibility<T, TData>(T unit, DoubleDictionary<T, TileUnit> index,
+            HashSet<TData> visible, TData data) where T : MapUnit
+        {
+            if (HasShowingTile(unit, index))
+            {
+                unit.Show();
+                // Showing may move/unlink the unit, so do not publish stale
+                // visibility after its synchronous appearance callbacks finish.
+                if (HasShowingTile(unit, index))
                 {
-                    item.Show();
-                    curItemLst.Add(item.data);
-                }
-                else
-                {
-                    item.Hide();
-                    curItemLst.Remove(item.data);
+                    visible.Add(data);
+                    return;
                 }
             }
-
-            if (objectTileDic.TryGet(tile, out var objects))
-            foreach (var obj in objects)
-            {
-                if (HasShowingTile(obj, objectTileDic))
-                {
-                    obj.Show();
-                    curObjectLst.Add(obj.data);
-                }
-                else
-                {
-                    obj.Hide();
-                    curObjectLst.Remove(obj.data);
-                }
-            }
-
+            unit.Hide();
+            visible.Remove(data);
         }
         private static bool HasShowingTile<T>(T unit, DoubleDictionary<T, TileUnit> tileDictionary)
         {
@@ -400,38 +405,20 @@ namespace Z_Map
             }
             else if (unit is CharacterUnit ch)
             {
-                foreach (var tile in characterTileDic.Get(ch))
-                {
-                    if (tile.isShowing)
-                    {
-                        ch.Show();
-                        curCharacterLst.Add(ch.data);
-                    }
-                }
+                if (HasShowingTile(ch, characterTileDic))
+                    UpdateRelatedVisibility(ch, characterTileDic, curCharacterLst, ch.data);
             }
             else if (unit is ItemUnit it)
             {
                 RefreshUnitColumns(it);
-                foreach (var tile in itemTileDic.Get(it))
-                {
-                    if (tile.isShowing)
-                    {
-                        it.Show();
-                        curItemLst.Add(it.data);
-                    }
-                }
+                if (HasShowingTile(it, itemTileDic))
+                    UpdateRelatedVisibility(it, itemTileDic, curItemLst, it.data);
             }
             else if (unit is ObjectUnit ob)
             {
                 RefreshObjectOverlap(ob);
-                foreach (var tile in objectTileDic.Get(ob))
-                {
-                    if (tile.isShowing)
-                    {
-                        ob.Show();
-                        curObjectLst.Add(ob.data);
-                    }
-                }
+                if (HasShowingTile(ob, objectTileDic))
+                    UpdateRelatedVisibility(ob, objectTileDic, curObjectLst, ob.data);
                 Z_EventHelper.Invoke(new ObjectEvent
                 {
                     type = MapEventType.Refresh,

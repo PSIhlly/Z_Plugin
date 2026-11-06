@@ -8,6 +8,8 @@ using Z_Ui.Base;
 using Z_Texture;
 using Z_String;
 using Z_Text;
+using Z_Code;
+using Z_Code.Form;
 namespace Ui.ModStory.ModStoryParameter.ModStoryCharacterParameter
 {
 
@@ -77,16 +79,31 @@ namespace Ui.ModStory.ModStoryParameter.ModStoryCharacterParameter
             });
             view.btn_delete.onClick.AddListener(() =>
             {
+                if (model.data == null)
+                    return;
                 ModManager.instance.assetCtrl.DeleteCharacterArg(model.data.name);
                 parent.Refresh();
             });
-            view.ipt_value.onFinishInput+=(s)=>
+            view.btn_value.onClick.AddListener(() =>
             {
-                model.data.SetValue(StringHelper.ToFloat(s, 0f));
-                Refresh();
-            };
+                var data = model.data;
+                if (data == null)
+                    return;
+                var value = data.GetValue();
+                ModManager.instance.assetCtrl.ChooseBasicCmd(value, () =>
+                {
+                    if (!CharacterParamForm.DataByUid.TryGetValue(data.uid, out var registered)
+                        || !ReferenceEquals(registered, data))
+                        return;
+                    data.v = BoxDataForm.GetJoByData(data.GetValue()).ToString();
+                    if (active && ReferenceEquals(model.data, data) && ReferenceEquals(data.GetValue(), value))
+                        Refresh();
+                });
+            });
             view.ipt_name.onFinishInput+=(s)=>
             {
+                if (model.data == null)
+                    return;
                 if (StringHelper.IsUniqueName(CharacterParamForm.DataByName.Keys, s))
                 {
                     ModManager.instance.assetCtrl.RenameCharacterParam(model.data.name,s);
@@ -95,6 +112,8 @@ namespace Ui.ModStory.ModStoryParameter.ModStoryCharacterParameter
             };
             view.dp_.onFinishSelect = (v) => 
             {
+                if (model.data == null)
+                    return;
                 model.data.showType = (ParamShowType)v;
                 Refresh();
             };
@@ -106,7 +125,12 @@ namespace Ui.ModStory.ModStoryParameter.ModStoryCharacterParameter
         }
         public override void OnShow()
         {
-            model.data=param.data;
+            model.data = param?.data;
+            if (param == null)
+            {
+                gameObject.SetActive(false);
+                return;
+            }
             Refresh();
         }
 
@@ -117,7 +141,7 @@ namespace Ui.ModStory.ModStoryParameter.ModStoryCharacterParameter
             if (model.data != null)
             {
                 view.ipt_name.Set(model.data.name);
-                view.ipt_value.Set(model.data.GetValue().num.ToString("0.##"));
+                view.txt_value.text = model.data.GetValue().GetBoxContent();
                 view.dp_.Set((int)model.data.showType);
             }
 

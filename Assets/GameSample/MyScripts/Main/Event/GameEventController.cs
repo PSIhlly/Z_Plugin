@@ -626,7 +626,7 @@ public class GameEventController : Z_Controller<GameManager>
     }
 
 
-    public void TriggerEventExecute(EventTriggerForm.Data trigger, int user, Dictionary<string, Z_Code.Form.BoxDataForm.Data> defaultHeap)
+    public void TriggerEventExecute(EventTriggerForm.Data trigger, int user, Dictionary<string, Z_Code.Form.BoxDataForm.Data> defaultHeap, bool copyDefaultHeap = false)
     {
         if (trigger == null)
         {
@@ -651,7 +651,8 @@ public class GameEventController : Z_Controller<GameManager>
                 dict[user].Add(trigger.name);
                 foreach (var id in trigger.evt)
                 {
-                    Execute(EventProgramDataForm.DataByUid.GetDv(id, null), user, defaultHeap, trigger.name);
+                    Execute(EventProgramDataForm.DataByUid.GetDv(id, null), user,
+                        copyDefaultHeap ? CopyTriggerHeap(defaultHeap) : defaultHeap, trigger.name);
                 }
 
                 break;
@@ -671,19 +672,31 @@ public class GameEventController : Z_Controller<GameManager>
                 dict[user].Add(trigger.name);
                 foreach (var nm in trigger.evt)
                 {
-                    Execute(EventProgramDataForm.DataByUid.GetDv(nm, null), user, defaultHeap, trigger.name);
+                    Execute(EventProgramDataForm.DataByUid.GetDv(nm, null), user,
+                        copyDefaultHeap ? CopyTriggerHeap(defaultHeap) : defaultHeap, trigger.name);
                 }
                 break;
                 }
             default:
                 foreach (var nm in trigger.evt)
                 {
-                    Execute(EventProgramDataForm.DataByUid.GetDv(nm, null), user, defaultHeap, trigger.name);
+                    Execute(EventProgramDataForm.DataByUid.GetDv(nm, null), user,
+                        copyDefaultHeap ? CopyTriggerHeap(defaultHeap) : defaultHeap, trigger.name);
                 }
                 break;
         }
     }
     int debugId = 0;
+    private static Dictionary<string, BoxDataForm.Data> CopyTriggerHeap(Dictionary<string, BoxDataForm.Data> heap)
+    {
+        if (heap == null)
+            return null;
+        var copy = new Dictionary<string, BoxDataForm.Data>(heap.Count);
+        foreach (var pair in heap)
+            copy[pair.Key] = pair.Value?.DeepCopy() ?? CodeHelper.CreateBoxByNum(0);
+        return copy;
+    }
+
     public void Execute(EventProgramDataForm.Data evt, int user, Dictionary<string, Z_Code.Form.BoxDataForm.Data> defaultHeap, string releaseTrigger = "", bool noreleaseTrigger = false)
     {
         if (evt == null)

@@ -45,6 +45,7 @@ namespace Ui.ModStory.ModStoryMapObject.ModStoryMapObjectObject.ModStoryMapObjec
                         model.data.EnsureDirectionData();
                         model.data.faceType = (FaceType)item.id;
                         model.data.SyncLegacyAnimClip(model.data.GetDefaultAnimDirection());
+                        model.data.SyncLegacyModelTransform(model.data.GetDefaultAnimDirection());
                         if (model.data.isWangTile || model.data.boundsCollision)
                             Main2StoryManager.instance.RefreshObjectWangTileTextures(model.data);
                         Refresh();

@@ -94,6 +94,10 @@ namespace Form
                 
         public static Action<Data,bool,bool> changeCentercolliderAction;
                 
+        public static Action<Data,Dictionary<AnimDirecton,Vector3>,Dictionary<AnimDirecton,Vector3>> changeModelsizesAction;
+                
+        public static Action<Data,Dictionary<AnimDirecton,Vector3>,Dictionary<AnimDirecton,Vector3>> changeModelpositionsAction;
+                
 
 
         public partial class Data : ProductForm.Data
@@ -297,11 +301,47 @@ namespace Form
                  
                      }
                     
+                    private Dictionary<AnimDirecton,Vector3>  _modelSizes;
+                    /// <summary>
+                    ///各朝向模型尺寸
+                    ///</summary>
+                    public Dictionary<AnimDirecton,Vector3>  modelSizes{
+                                get{return _modelSizes;}
+ set{
+
+                    if(_DataByUid!=null&&_DatasHashSet.Contains(this))
+                    {
+                       ChangeModelsizes(this,_modelSizes,value); 
+                    }
+        
+                _modelSizes = value;
+                }
+                 
+                     }
+                    
+                    private Dictionary<AnimDirecton,Vector3>  _modelPositions;
+                    /// <summary>
+                    ///各朝向模型局部偏移
+                    ///</summary>
+                    public Dictionary<AnimDirecton,Vector3>  modelPositions{
+                                get{return _modelPositions;}
+ set{
+
+                    if(_DataByUid!=null&&_DatasHashSet.Contains(this))
+                    {
+                       ChangeModelpositions(this,_modelPositions,value); 
+                    }
+        
+                _modelPositions = value;
+                }
+                 
+                     }
+                    
             public Data(ProductForm.Data data):base(data.uid,data.name,data.labId,data.protoUid)
             {
             }
             
-            public Data(int uid,string name,int labId,int protoUid,int icon,MapModelForm.Data model,bool collision,Dictionary<string,EventTriggerForm.Data> events,Dictionary<string,MapObjectParamForm.Data> paramDic,int minimapIcon,FaceType faceType,Dictionary<AnimDirecton,List<int>> animClip,bool isWangTile,bool boundsCollision,bool centerCollider):base(uid,name,labId,protoUid)
+            public Data(int uid,string name,int labId,int protoUid,int icon,MapModelForm.Data model,bool collision,Dictionary<string,EventTriggerForm.Data> events,Dictionary<string,MapObjectParamForm.Data> paramDic,int minimapIcon,FaceType faceType,Dictionary<AnimDirecton,List<int>> animClip,bool isWangTile,bool boundsCollision,bool centerCollider,Dictionary<AnimDirecton,Vector3> modelSizes,Dictionary<AnimDirecton,Vector3> modelPositions):base(uid,name,labId,protoUid)
             {
 
              this.uid = uid;
@@ -319,6 +359,8 @@ namespace Form
              this.isWangTile = isWangTile;
              this.boundsCollision = boundsCollision;
              this.centerCollider = centerCollider;
+             this.modelSizes = modelSizes;
+             this.modelPositions = modelPositions;
 
             }
             public void Reset(Data data)
@@ -339,11 +381,13 @@ namespace Form
              this.isWangTile = data.isWangTile;
              this.boundsCollision = data.boundsCollision;
              this.centerCollider = data.centerCollider;
+             this.modelSizes = data.modelSizes;
+             this.modelPositions = data.modelPositions;
             }
 
                 public Data Copy(bool sameId = true)
                 {
-        return new Data(sameId? uid:uidChain.GetId(),name,labId,protoUid,icon,model,collision,events==null?new Dictionary<string,EventTriggerForm.Data>():new Dictionary<string,EventTriggerForm.Data>(events),paramDic==null?new Dictionary<string,MapObjectParamForm.Data>():new Dictionary<string,MapObjectParamForm.Data>(paramDic),minimapIcon,faceType,animClip==null?new Dictionary<AnimDirecton,List<int>>():new Dictionary<AnimDirecton,List<int>>(animClip),isWangTile,boundsCollision,centerCollider);
+        return new Data(sameId? uid:uidChain.GetId(),name,labId,protoUid,icon,model,collision,events==null?new Dictionary<string,EventTriggerForm.Data>():new Dictionary<string,EventTriggerForm.Data>(events),paramDic==null?new Dictionary<string,MapObjectParamForm.Data>():new Dictionary<string,MapObjectParamForm.Data>(paramDic),minimapIcon,faceType,animClip==null?new Dictionary<AnimDirecton,List<int>>():new Dictionary<AnimDirecton,List<int>>(animClip),isWangTile,boundsCollision,centerCollider,modelSizes==null?new Dictionary<AnimDirecton,Vector3>():new Dictionary<AnimDirecton,Vector3>(modelSizes),modelPositions==null?new Dictionary<AnimDirecton,Vector3>():new Dictionary<AnimDirecton,Vector3>(modelPositions));
                 }
             
             public override  void BeforeGet()
@@ -353,7 +397,7 @@ namespace Form
             }
         }
 
-                   private static Data _defaultData=new Data(0,"",0,0,0,MapModelForm.defaultData,true,new Dictionary<string,EventTriggerForm.Data>(){},new Dictionary<string,MapObjectParamForm.Data>(){},0,FaceType.Fixed,new Dictionary<AnimDirecton,List<int>>(){},false,false,true);
+                   private static Data _defaultData=new Data(0,"",0,0,0,MapModelForm.defaultData,true,new Dictionary<string,EventTriggerForm.Data>(){},new Dictionary<string,MapObjectParamForm.Data>(){},0,FaceType.Fixed,new Dictionary<AnimDirecton,List<int>>(){},false,false,true,new Dictionary<AnimDirecton,Vector3>(){},new Dictionary<AnimDirecton,Vector3>(){});
                    public static Data defaultData=>_defaultData.Copy();
 
 
@@ -510,7 +554,11 @@ namespace Form
 
                 jo.SelectToken("boundsCollision")==null?defaultData.boundsCollision:jo.Get<bool>("boundsCollision"),
 
-                jo.SelectToken("centerCollider")==null?defaultData.centerCollider:jo.Get<bool>("centerCollider")
+                jo.SelectToken("centerCollider")==null?defaultData.centerCollider:jo.Get<bool>("centerCollider"),
+
+                jo.SelectToken("modelSizes")==null?defaultData.modelSizes:jo.Get<Dictionary<AnimDirecton,Vector3>>("modelSizes"),
+
+                jo.SelectToken("modelPositions")==null?defaultData.modelPositions:jo.Get<Dictionary<AnimDirecton,Vector3>>("modelPositions")
                     );
 
             return data;
@@ -552,6 +600,10 @@ namespace Form
             jo.Set<bool>("boundsCollision",data.boundsCollision);
 
             jo.Set<bool>("centerCollider",data.centerCollider);
+
+            jo.Set<Dictionary<AnimDirecton,Vector3>>("modelSizes",data.modelSizes);
+
+            jo.Set<Dictionary<AnimDirecton,Vector3>>("modelPositions",data.modelPositions);
 
             return jo;
         }
@@ -831,6 +883,26 @@ ProductForm.RemoveData(uid);
                 {
 
                 changeCentercolliderAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeModelsizes(Data superData,Dictionary<AnimDirecton,Vector3> oldV,Dictionary<AnimDirecton,Vector3> newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeModelsizesAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeModelpositions(Data superData,Dictionary<AnimDirecton,Vector3> oldV,Dictionary<AnimDirecton,Vector3> newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeModelpositionsAction?.Invoke(data,oldV,newV);
                 }
                     
             }

@@ -1,0 +1,188 @@
+[
+  {
+    "Name": "草1",
+    "OriginalUnchanged": true,
+    "UniqueFrames": 3,
+    "Frames": [
+      {
+        "File": "草1_01.png",
+        "Width": 16,
+        "Height": 16,
+        "VisiblePixels": 65,
+        "ChangedPixels": 38,
+        "RootFixed": true
+      },
+      {
+        "File": "草1_02.png",
+        "Width": 16,
+        "Height": 16,
+        "VisiblePixels": 64,
+        "ChangedPixels": 0,
+        "RootFixed": true
+      },
+      {
+        "File": "草1_03.png",
+        "Width": 16,
+        "Height": 16,
+        "VisiblePixels": 64,
+        "ChangedPixels": 35,
+        "RootFixed": true
+      }
+    ]
+  },
+  {
+    "Name": "草2",
+    "OriginalUnchanged": true,
+    "UniqueFrames": 3,
+    "Frames": [
+      {
+        "File": "草2_01.png",
+        "Width": 16,
+        "Height": 16,
+        "VisiblePixels": 122,
+        "ChangedPixels": 75,
+        "RootFixed": true
+      },
+      {
+        "File": "草2_02.png",
+        "Width": 16,
+        "Height": 16,
+        "VisiblePixels": 122,
+        "ChangedPixels": 0,
+        "RootFixed": true
+      },
+      {
+        "File": "草2_03.png",
+        "Width": 16,
+        "Height": 16,
+        "VisiblePixels": 116,
+        "ChangedPixels": 72,
+        "RootFixed": true
+      }
+    ]
+  },
+  {
+    "Name": "花1",
+    "OriginalUnchanged": true,
+    "UniqueFrames": 3,
+    "Frames": [
+      {
+        "File": "花1_01.png",
+        "Width": 16,
+        "Height": 16,
+        "VisiblePixels": 92,
+        "ChangedPixels": 54,
+        "RootFixed": true
+      },
+      {
+        "File": "花1_02.png",
+        "Width": 16,
+        "Height": 16,
+        "VisiblePixels": 94,
+        "ChangedPixels": 0,
+        "RootFixed": true
+      },
+      {
+        "File": "花1_03.png",
+        "Width": 16,
+        "Height": 16,
+        "VisiblePixels": 87,
+        "ChangedPixels": 54,
+        "RootFixed": true
+      }
+    ]
+  },
+  {
+    "Name": "花2",
+    "OriginalUnchanged": true,
+    "UniqueFrames": 3,
+    "Frames": [
+      {
+        "File": "花2_01.png",
+        "Width": 16,
+        "Height": 16,
+        "VisiblePixels": 93,
+        "ChangedPixels": 65,
+        "RootFixed": true
+      },
+      {
+        "File": "花2_02.png",
+        "Width": 16,
+        "Height": 16,
+        "VisiblePixels": 96,
+        "ChangedPixels": 0,
+        "RootFixed": true
+      },
+      {
+        "File": "花2_03.png",
+        "Width": 16,
+        "Height": 16,
+        "VisiblePixels": 95,
+        "ChangedPixels": 54,
+        "RootFixed": true
+      }
+    ]
+  },
+  {
+    "Name": "花3",
+    "OriginalUnchanged": true,
+    "UniqueFrames": 3,
+    "Frames": [
+      {
+        "File": "花3_01.png",
+        "Width": 16,
+        "Height": 16,
+        "VisiblePixels": 76,
+        "ChangedPixels": 55,
+        "RootFixed": true
+      },
+      {
+        "File": "花3_02.png",
+        "Width": 16,
+        "Height": 16,
+        "VisiblePixels": 76,
+        "ChangedPixels": 0,
+        "RootFixed": true
+      },
+      {
+        "File": "花3_03.png",
+        "Width": 16,
+        "Height": 16,
+        "VisiblePixels": 76,
+        "ChangedPixels": 56,
+        "RootFixed": true
+      }
+    ]
+  },
+  {
+    "Name": "花4",
+    "OriginalUnchanged": true,
+    "UniqueFrames": 3,
+    "Frames": [
+      {
+        "File": "花4_01.png",
+        "Width": 16,
+        "Height": 16,
+        "VisiblePixels": 80,
+        "ChangedPixels": 56,
+        "RootFixed": true
+      },
+      {
+        "File": "花4_02.png",
+        "Width": 16,
+        "Height": 16,
+        "VisiblePixels": 73,
+        "ChangedPixels": 0,
+        "RootFixed": true
+      },
+      {
+        "File": "花4_03.png",
+        "Width": 16,
+        "Height": 16,
+        "VisiblePixels": 74,
+        "ChangedPixels": 49,
+        "RootFixed": true
+      }
+    ]
+  }
+]

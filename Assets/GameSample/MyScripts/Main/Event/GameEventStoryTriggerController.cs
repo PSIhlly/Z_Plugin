@@ -36,7 +36,7 @@ public class CharacterSkillEvent : Z_Event
     public CharacterProductForm.Data data;
     public int skillUid;
 }
-public class GameEventStoryTriggerController : Z_Controller<GameEventController>, IZ_Listener<StoryLifeEvent>, IZ_Listener<StoryItemEvent>, IZ_Listener<StoryCharacterEvent>, IZ_Listener<CharacterSkillEvent>
+public class GameEventStoryTriggerController : Z_Controller<GameEventController>, IZ_Listener<StoryLifeEvent>, IZ_Listener<StoryItemEvent>, IZ_Listener<StoryCharacterEvent>, IZ_Listener<CharacterSkillEvent>, IZ_Listener<GlobalVariableChangedEvent>
 {
 
     public GameEventStoryTriggerController(GameEventController super) : base(super)
@@ -45,6 +45,27 @@ public class GameEventStoryTriggerController : Z_Controller<GameEventController>
         Z_EventHelper.Register<StoryItemEvent>(this);
         Z_EventHelper.Register<StoryCharacterEvent>(this);
         Z_EventHelper.Register<CharacterSkillEvent>(this);
+        Z_EventHelper.Register<GlobalVariableChangedEvent>(this);
+    }
+
+    public void OnEvent(GlobalVariableChangedEvent evt)
+    {
+        if (evt == null || !DynamicGlobalSettings.playing)
+            return;
+        var game = GameManager.instance;
+        var scene = game.curScene;
+        if (scene?.events == null || game.curProgress == null || game.curProgress.eventState == EventState.Leave)
+            return;
+
+        var heap = new Dictionary<string, BoxDataForm.Data>
+        {
+            { "param1", CodeHelper.CreateBoxByStr(evt.name) },
+            { "param2", evt.oldValue ?? CodeHelper.CreateBoxByNum(0) },
+            { "param3", evt.newValue ?? CodeHelper.CreateBoxByNum(0) }
+        };
+        _super.TriggerEventExecute(scene.events.GetDv("onGlobalVarChangeEvent$", null), 0, heap, copyDefaultHeap: true);
+        if (ReferenceEquals(game.curScene, scene))
+            _super.TriggerEventExecute(scene.events.GetDv($"onGlobalVarChangeEvent${evt.uid}", null), 0, heap, copyDefaultHeap: true);
     }
     public void OnEvent(StoryLifeEvent evt)
     {

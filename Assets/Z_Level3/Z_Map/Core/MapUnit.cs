@@ -48,6 +48,18 @@ namespace Z_Map
         private Rect? firstPartCollisionBounds;
         private float boundsColliderScale = 1f;
         private bool centerCollider = true;
+        private bool lastHasFirstPartTransform;
+        private Vector3 lastFirstPartPosition;
+        private Vector3 lastFirstPartScale;
+
+        // Product-specific geometry is resolved from current data, including for
+        // off-screen units. The pool template itself always remains immutable.
+        public virtual bool TryGetFirstPartTransform(out Vector3 position, out Vector3 scale)
+        {
+            position = Vector3.zero;
+            scale = Vector3.one;
+            return false;
+        }
 
         // Appearance-dependent geometry must also work without a shown Instance.
         public bool SetFirstPartCollisionBounds(Rect? bounds, float colliderScale, bool centered = true)
@@ -70,15 +82,21 @@ namespace Z_Map
 
         public List<MeshInfo> GetMeshes(CollideType type)
         {
+            bool hasTransform = TryGetFirstPartTransform(out var partPosition, out var partScale);
             bool rebuild = _zMeshes == null
                 || lastPrefabName != data.prefabName
                 || lastEuler != data.euler
-                || lastScale != data.scale;
+                || lastScale != data.scale
+                || lastHasFirstPartTransform != hasTransform
+                || hasTransform && (lastFirstPartPosition != partPosition || lastFirstPartScale != partScale);
             if (rebuild)
             {
                 lastPrefabName = data.prefabName;
                 lastEuler = data.euler;
                 lastScale = data.scale;
+                lastHasFirstPartTransform = hasTransform;
+                lastFirstPartPosition = partPosition;
+                lastFirstPartScale = partScale;
                 var sourcePrefab = prefab;
                 collisionOffsets.Clear();
                 _zMeshes = new Dictionary<CollideType, List<MeshInfo>>();
@@ -108,7 +126,9 @@ namespace Z_Map
         {
             var offsets = manager.utilCtrl.GetCollidersMesh(
                 sourcePrefab, Vector3.zero, lastEuler, lastScale, type,
-                firstPartCollisionBounds, boundsColliderScale, centerCollider);
+                firstPartCollisionBounds, boundsColliderScale, centerCollider,
+                lastHasFirstPartTransform ? lastFirstPartPosition : (Vector3?)null,
+                lastHasFirstPartTransform ? lastFirstPartScale : (Vector3?)null);
             collisionOffsets.AddRange(offsets);
             var meshes = new List<MeshInfo>(offsets.Count);
             foreach (var offset in offsets)

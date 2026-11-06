@@ -47,10 +47,19 @@ namespace Z_UnitSystem
 
         // Preserve Package's filesystem JSON, but never retain all asset bytes,
         // a full UTF-16 JSON string and its UTF-8 copy at the same time.
-        public static void WritePackage(string rootPath, Stream output, CancellationToken cancellationToken = default)
+        public static void WritePackage(string rootPath, Stream output, CancellationToken cancellationToken = default,
+            Action<string, long, long> report = null)
         {
             cancellationToken.ThrowIfCancellationRequested();
             rootPath = GetRealPath(rootPath);
+            long totalBytes = 0, completedBytes = 0;
+            if (report != null)
+                foreach (var file in Directory.EnumerateFiles(rootPath, "*", SearchOption.AllDirectories))
+                {
+                    cancellationToken.ThrowIfCancellationRequested();
+                    totalBytes += new FileInfo(file).Length;
+                }
+            report?.Invoke("Package source bytes", 0, Math.Max(1, totalBytes));
             using (var text = new StreamWriter(output, new UTF8Encoding(false), 65536, true))
             using (var json = new JsonTextWriter(text) { Formatting = Formatting.Indented, CloseOutput = false })
             {
@@ -65,7 +74,21 @@ namespace Z_UnitSystem
                     {
                         cancellationToken.ThrowIfCancellationRequested();
                         json.WritePropertyName(file.Replace(rootPath, ""));
-                        json.WriteValue(File.ReadAllBytes(file));
+                        var bytes = File.ReadAllBytes(file);
+                        // Keep a single JSON Base64 string, but feed compression
+                        // in complete 3-byte blocks so large assets report progress too.
+                        json.WriteRawValue("\"");
+                        for (int offset = 0; offset < bytes.Length;)
+                        {
+                            cancellationToken.ThrowIfCancellationRequested();
+                            int count = Math.Min(49152, bytes.Length - offset);
+                            text.Write(Convert.ToBase64String(bytes, offset, count));
+                            text.Flush();
+                            offset += count;
+                            report?.Invoke("Package source bytes", Math.Min(completedBytes + offset, totalBytes), Math.Max(1, totalBytes));
+                        }
+                        text.Write('"');
+                        completedBytes += bytes.Length;
                     }
                     foreach (var directory in Directory.EnumerateDirectories(path))
                     {
@@ -78,6 +101,7 @@ namespace Z_UnitSystem
                 }
                 json.WriteEndObject();
             }
+            report?.Invoke("Package source bytes", Math.Max(1, totalBytes), Math.Max(1, totalBytes));
         }
         public static void Unpackage(string content, string rootPath)
         {

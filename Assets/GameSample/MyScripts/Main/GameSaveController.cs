@@ -390,7 +390,7 @@ public class GameSaveController : Z_Controller<GameManager>
     }
     public void SaveSceneMap(string scenePath, MapInfo data)
     {
-        SaveAndLoad.Save(scenePath, JsonConvert.SerializeObject(data.GetJsonData()));
+        SaveAndLoad.Save(scenePath, JsonConvert.SerializeObject(GlobalEventHelper.SaveSceneObjectReferences(data.GetJsonData())));
     }
     public void SaveSaveStory(int id)
     {
@@ -490,7 +490,7 @@ public class GameSaveController : Z_Controller<GameManager>
     }
     public void SaveObject(string storyCoreFolder)
     {
-        SaveAndLoad.Save(storyCoreFolder + "/" + mapObjectParamFormFileName, MapObjectParamForm.GetJaByDatas().ToString());
+        SaveReferenceForms(storyCoreFolder + "/" + mapObjectParamFormFileName, MapObjectParamForm.GetJaByDatas());
     }
 
     public void SaveObjectProducts(string folder, bool includeRuntime)
@@ -509,7 +509,7 @@ public class GameSaveController : Z_Controller<GameManager>
                 product.SyncLegacyModelTransform(product.GetDefaultAnimDirection());
                 products.Add(ObjectProductForm.GetJoByData(product));
             }
-        SaveAndLoad.Save(folder + "/" + objectProductFormFileName, products.ToString());
+        SaveReferenceForms(folder + "/" + objectProductFormFileName, products);
         // Delete only this obsolete table after the replacement is saved.
         if (SaveAndLoad.Exist(folder + "/" + mapObjectFormFileName))
             SaveAndLoad.Delete(folder + "/" + mapObjectFormFileName);
@@ -517,26 +517,26 @@ public class GameSaveController : Z_Controller<GameManager>
 
     public void SaveCharacter(string storyCoreFolder)
     {
-        SaveAndLoad.Save(storyCoreFolder + "/" + characterParamFormFileName, CharacterParamForm.GetJaByDatas().ToString());
+        SaveReferenceForms(storyCoreFolder + "/" + characterParamFormFileName, CharacterParamForm.GetJaByDatas());
 
         foreach (var data in CharacterProductForm.DataByUid.Values)
         {
             if (data.size < 1)
                 data.size = 1;
         }
-        SaveAndLoad.Save(storyCoreFolder + "/" + characterProductFormFileName, CharacterProductForm.GetJaByDatas().ToString());
+        SaveReferenceForms(storyCoreFolder + "/" + characterProductFormFileName, CharacterProductForm.GetJaByDatas());
 
     }
     public void SaveSkill(string storyCoreFolder)
     {
-        SaveAndLoad.Save(storyCoreFolder + "/" + skillParamFormFileName, SkillParamForm.GetJaByDatas().ToString());
-        SaveAndLoad.Save(storyCoreFolder + "/" + skillProductFormFileName, SkillProductForm.GetJaByDatas().ToString());
+        SaveReferenceForms(storyCoreFolder + "/" + skillParamFormFileName, SkillParamForm.GetJaByDatas());
+        SaveReferenceForms(storyCoreFolder + "/" + skillProductFormFileName, SkillProductForm.GetJaByDatas());
 
     }
     public void SaveItem(string storyCoreFolder)
     {
-        SaveAndLoad.Save(storyCoreFolder + "/" + itemParamFormFileName, ItemParamForm.GetJaByDatas().ToString());
-        SaveAndLoad.Save(storyCoreFolder + "/" + itemProductFormFileName, ItemProductForm.GetJaByDatas().ToString());
+        SaveReferenceForms(storyCoreFolder + "/" + itemParamFormFileName, ItemParamForm.GetJaByDatas());
+        SaveReferenceForms(storyCoreFolder + "/" + itemProductFormFileName, ItemProductForm.GetJaByDatas());
     }
     public void SaveEffect(string storyCoreFolder)
     {
@@ -551,7 +551,7 @@ public class GameSaveController : Z_Controller<GameManager>
 
     public void SaveEvent(string storyCoreFolder, EventProgramDataForm.Data data = null)
     {
-        SaveAndLoad.Save(storyCoreFolder + "/" + eventFormFileName, EventProgramDataForm.GetJaByDatas().ToString());
+        SaveReferenceForms(storyCoreFolder + "/" + eventFormFileName, EventProgramDataForm.GetJaByDatas());
 
 
 
@@ -559,22 +559,21 @@ public class GameSaveController : Z_Controller<GameManager>
 
     public void SaveGlobalVariables(string storyFolder)
     {
-        SaveAndLoad.Save(storyFolder + "/" + globalVariableFormFileName,
-            EventGlobalVariableForm.GetJaByDatas().ToString());
+        SaveReferenceForms(storyFolder + "/" + globalVariableFormFileName, EventGlobalVariableForm.GetJaByDatas());
     }
 
     public void SaveConfig(string storyFolder)
     {
-        SaveAndLoad.Save(storyFolder + "/" + progressFormFileName, ProgressForm.GetJaByDatas().ToString());
+        SaveReferenceForms(storyFolder + "/" + progressFormFileName, ProgressForm.GetJaByDatas());
     }
 
     public void SaveProgress(string storyFolder)
     {
-        SaveAndLoad.Save(storyFolder + "/" + progressFormFileName, ProgressForm.GetJaByDatas().ToString());
+        SaveReferenceForms(storyFolder + "/" + progressFormFileName, ProgressForm.GetJaByDatas());
     }
     public void SaveUiItem(string storySaveFolder)
     {
-        SaveAndLoad.Save(storySaveFolder + "/" + imageUiItemFormFileName, ImageUiItemForm.GetJaByDatas().ToString());
+        SaveReferenceForms(storySaveFolder + "/" + imageUiItemFormFileName, ImageUiItemForm.GetJaByDatas());
     }
     public void SaveScene(string storyCoreFolder)
     {
@@ -1005,7 +1004,7 @@ public class GameSaveController : Z_Controller<GameManager>
         var path = folder + mapObjectFormFileName;
         if (!SaveAndLoad.Exist(path))
             return;
-        legacyObjectForms = JArray.Parse(SaveAndLoad.Load<string>(path));
+        legacyObjectForms = ReadReferenceForms(path);
         MigrateFlatLabIds(legacyObjectForms, nameof(ObjectProductForm), "label");
     }
 
@@ -1018,7 +1017,7 @@ public class GameSaveController : Z_Controller<GameManager>
         if (folder == null)
             return;
         var path = folder + objectProductFormFileName;
-        var forms = SaveAndLoad.Exist(path) ? JArray.Parse(SaveAndLoad.Load<string>(path)) : null;
+        var forms = SaveAndLoad.Exist(path) ? ReadReferenceForms(path) : null;
         ObjectProductForm.LoadProducts(forms, legacyObjectForms);
     }
 
@@ -1028,7 +1027,7 @@ public class GameSaveController : Z_Controller<GameManager>
         CharacterParamForm.ClearAuto();
         if (SaveAndLoad.Exist(pathForm))
         {
-            foreach (var form in CharacterParamForm.GetDatasByJa(JArray.Parse(SaveAndLoad.Load<string>(pathForm))))
+            foreach (var form in CharacterParamForm.GetDatasByJa(ReadReferenceForms(pathForm)))
             {
                 CharacterParamForm.AddData(form);
             }
@@ -1038,7 +1037,7 @@ public class GameSaveController : Z_Controller<GameManager>
         CharacterProductForm.ClearAuto();
         if (SaveAndLoad.Exist(pathForm))
         {
-            var forms = JArray.Parse(SaveAndLoad.Load<string>(pathForm));
+            var forms = ReadReferenceForms(pathForm);
             MigrateFlatLabIds(forms, nameof(CharacterProductForm), "label");
             foreach (var form in CharacterProductForm.GetDatasByJa(forms))
             {
@@ -1075,7 +1074,7 @@ public class GameSaveController : Z_Controller<GameManager>
         SkillParamForm.ClearAuto();
         if (SaveAndLoad.Exist(pathForm))
         {
-            foreach (var form in SkillParamForm.GetDatasByJa(JArray.Parse(SaveAndLoad.Load<string>(pathForm))))
+            foreach (var form in SkillParamForm.GetDatasByJa(ReadReferenceForms(pathForm)))
             {
                 SkillParamForm.AddData(form);
             }
@@ -1085,7 +1084,7 @@ public class GameSaveController : Z_Controller<GameManager>
         SkillProductForm.ClearAuto();
         if (SaveAndLoad.Exist(pathForm))
         {
-            var forms = JArray.Parse(SaveAndLoad.Load<string>(pathForm));
+            var forms = ReadReferenceForms(pathForm);
             MigrateFlatLabIds(forms, nameof(SkillProductForm), "label");
             foreach (var form in SkillProductForm.GetDatasByJa(forms))
             {
@@ -1101,7 +1100,7 @@ public class GameSaveController : Z_Controller<GameManager>
         ItemParamForm.ClearAuto();
         if (SaveAndLoad.Exist(pathForm))
         {
-            foreach (var form in ItemParamForm.GetDatasByJa(JArray.Parse(SaveAndLoad.Load<string>(pathForm))))
+            foreach (var form in ItemParamForm.GetDatasByJa(ReadReferenceForms(pathForm)))
             {
                 ItemParamForm.AddData(form);
             }
@@ -1111,7 +1110,7 @@ public class GameSaveController : Z_Controller<GameManager>
         ItemProductForm.ClearAuto();
         if (SaveAndLoad.Exist(pathForm))
         {
-            var forms = JArray.Parse(SaveAndLoad.Load<string>(pathForm));
+            var forms = ReadReferenceForms(pathForm);
             MigrateFlatLabIds(forms, nameof(ItemProductForm), "label");
             foreach (var form in ItemProductForm.GetDatasByJa(forms))
             {
@@ -1211,7 +1210,7 @@ public class GameSaveController : Z_Controller<GameManager>
         if (!SaveAndLoad.Exist(path))
             return;
 
-        foreach (var variable in EventGlobalVariableForm.GetDatasByJa(JArray.Parse(SaveAndLoad.Load<string>(path))))
+        foreach (var variable in EventGlobalVariableForm.GetDatasByJa(ReadReferenceForms(path)))
             EventGlobalVariableForm.AddData(variable);
     }
 
@@ -1222,10 +1221,9 @@ public class GameSaveController : Z_Controller<GameManager>
         EventProgramDataForm.ClearAuto();
         if (SaveAndLoad.Exist(pathForm))
         {
-            var forms = JArray.Parse(SaveAndLoad.Load<string>(pathForm));
+            var forms = ReadReferenceForms(pathForm);
             MigrateHierarchicalLabIds(forms, nameof(EventProgramDataForm), "category", "type");
             FlattenEventProgramLabs(forms);
-            MigrateObjectReferences(forms);
             var programs = EventProgramDataForm.GetDatasByJa(forms);
             foreach (var form in programs)
             {
@@ -1234,12 +1232,12 @@ public class GameSaveController : Z_Controller<GameManager>
             // Load every program first, so cross-program calls can be resolved while recompiling.
             foreach (var form in programs)
             {
-                var migratedCode = MigrateLegacyEventParameters(form.code);
+                var migratedCode = SkillCommandMigration.MigrateCode(MigrateLegacyEventParameters(form.code));
                 if (migratedCode == form.code && form.zCode != null && form.zCode.Count > 0)
                     continue;
                 if (!form.TryApplyCode(migratedCode, out _, out var errors))
                 {
-                    Debug.LogWarning($"Event parameter migration failed for {form.name} ({form.uid}): {string.Join("; ", errors)}");
+                    Debug.LogWarning($"Event source migration failed for {form.name} ({form.uid}): {string.Join("; ", errors)}");
                 }
             }
         }
@@ -1262,8 +1260,7 @@ public class GameSaveController : Z_Controller<GameManager>
 
         if (SaveAndLoad.Exist(pathForm))
         {
-            var forms = JArray.Parse(SaveAndLoad.Load<string>(pathForm));
-            MigrateObjectReferences(forms);
+            var forms = ReadReferenceForms(pathForm);
             foreach (var form in ProgressForm.GetDatasByJa(forms))
             {
                 ProgressForm.AddData(form);
@@ -1332,7 +1329,7 @@ public class GameSaveController : Z_Controller<GameManager>
         ImageUiItemForm.Clear();
         if (SaveAndLoad.Exist(pathForm))
         {
-            foreach (var form in ImageUiItemForm.GetDatasByJa(JArray.Parse(SaveAndLoad.Load<string>(pathForm))))
+            foreach (var form in ImageUiItemForm.GetDatasByJa(ReadReferenceForms(pathForm)))
             {
                 ImageUiItemForm.AddData(form);
             }
@@ -1397,24 +1394,16 @@ public class GameSaveController : Z_Controller<GameManager>
         });
     }
 
-    // Upgrade both source code and saved interpreter/string values. Replacing
-    // complete marker pairs leaves surrounding quotes and unrelated text intact.
-    private static void MigrateObjectReferences(JToken token)
+    private static void SaveReferenceForms(string path, JArray forms)
     {
-        var tokens = token is JContainer container ? container.DescendantsAndSelf() : new[] { token };
-        foreach (var value in tokens.OfType<JValue>())
-        {
-            if (value.Type != JTokenType.String)
-                continue;
-            value.Value = Regex.Replace((string)value, @"\$so\$t:([0-9]+)\$so\$|\$sop\$([0-9]+)\$sop\$", match =>
-            {
-                string digits = match.Groups[1].Success ? match.Groups[1].Value : match.Groups[2].Value;
-                if (!int.TryParse(digits, out int mapId))
-                    return match.Value;
-                var product = ObjectProductForm.ResolveLegacyTemplate(mapId);
-                return product == null ? match.Value : "$so$p:" + product.uid + "$so$";
-            });
-        }
+        SaveAndLoad.Save(path, GlobalEventHelper.SaveSceneObjectReferences(forms).ToString());
+    }
+
+    private static JArray ReadReferenceForms(string path)
+    {
+        var forms = JArray.Parse(SaveAndLoad.Load<string>(path));
+        GlobalEventHelper.MigrateSceneObjectReferences(forms);
+        return forms;
     }
 
 

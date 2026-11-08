@@ -47,7 +47,7 @@ namespace Z_Code
                     ObjectProductForm.RefreshUnitParameters(obj.data);
                     continue;
                 }
-                // Bare legacy $so$ references also address Items, Tiles and
+                // Explicit scene-Unit references also address Items, Tiles and
                 // Characters. Preserve their existing scene-local parameters.
                 var dic = unit.paramInfo;
                 if (!dic.TryGetValue(name, out var parameter) || parameter == null)

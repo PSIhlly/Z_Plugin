@@ -13,8 +13,46 @@ public class CameraInstance : Z_MonoSingleton<CameraInstance>
     private Vector3 limitMin;
     private float orthographicSizeMax=7;
     private float orthographicSizeMin=7;
+    public bool followsPlayer { get; private set; } = true;
+    private uint scriptedMoveVersion;
+
+    public uint BeginScriptedMove()
+    {
+        followsPlayer = false;
+        return ++scriptedMoveVersion;
+    }
+
+    public bool HasScriptedControl(uint version) =>
+        isActiveAndEnabled && !followsPlayer && version == scriptedMoveVersion;
+
+    public void SetScriptedPosition(uint version, Vector3 position)
+    {
+        if (HasScriptedControl(version))
+            tarTrs.position = ClampPosition(position);
+    }
+
+    public void RestorePlayerFollow()
+    {
+        ++scriptedMoveVersion;
+        followsPlayer = true;
+    }
+
+    public void FollowPlayer(Vector3 position)
+    {
+        if (followsPlayer)
+            tarTrs.position = ClampPosition(position);
+    }
+
+    public Vector3 ClampPosition(Vector3 position) => new Vector3(
+        Mathf.Clamp(position.x, limitMin.x, limitMax.x),
+        Mathf.Clamp(position.y, limitMin.y, limitMax.y),
+        Mathf.Clamp(position.z, limitMin.z, limitMax.z));
+
+    private void OnDisable() => RestorePlayerFollow();
+
     public void Register(Vector3 limitMin, Vector3 limitMax, float orthographicSizeMin, float orthographicSizeMax,float defaultographicSize=4)
     {
+        RestorePlayerFollow();
         this.limitMax = limitMax;
         this.limitMin = limitMin;
         this.orthographicSizeMax = orthographicSizeMax;
@@ -57,11 +95,7 @@ public class CameraInstance : Z_MonoSingleton<CameraInstance>
     }
     public void LateUpdate()
     {
-        tarTrs.position = new Vector3(
-            Mathf.Max(Mathf.Min(tarTrs.position.x, limitMax.x), limitMin.x),
-            Mathf.Max(Mathf.Min(tarTrs.position.y, limitMax.y), limitMin.y),
-            Mathf.Max(Mathf.Min(tarTrs.position.z, limitMax.z), limitMin.z)
-            );
+        tarTrs.position = ClampPosition(tarTrs.position);
         cam.orthographicSize = Mathf.Max(Mathf.Min(cam.orthographicSize, orthographicSizeMax), orthographicSizeMin); 
     }
 }

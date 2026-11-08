@@ -86,6 +86,8 @@ Rules:
 - Avoid introducing new Level3/4 asmdefs without first resolving existing cross-module cycles.
 - Do not trust namespace ownership alone. For example, `Z_DataSystem/Core/SaveAndLoad.cs` declares a `Z_UnitSystem` namespace.
 
+`Z_Input.IInputUiPassThrough` is a small runtime contract declared in InputManager.cs. Higher-layer TouchPass implements it; Z_Input must never reference Assembly-CSharp/UI types to recognize pass-through backgrounds.
+
 `Z_Time.TimeManager.GetDeltaTime(bool unscaled = false)` is the shared bounded frame clock: clamp scaled Unity delta to `[0, MAX_DELTA_TIME]`, with `MAX_DELTA_TIME = 0.02f`; use `unscaled: true` only for pause-independent UI drag scrolling. `ClampDeltaTime(float)` provides the same rule for explicit/test inputs, including zero for NaN. These static helpers do not require a live manager and never accumulate discarded stall time or change Unity's global time settings. Map movement keeps its `MapUtilController.MovementDeltaTime` / `ClampMovementDeltaTime` compatibility entry points, which forward to this helper. Progress seconds, cooldowns, bullets, interpreter Wait, image animation/removal, scene shake, Canvas chat/toast timers and ObjectAnimator's duration-to-frame conversion use the same cap. Explicit ObjectAnimator frame waits remain frame counts. Absolute-time scheduling, third-party plugins and Sample scripts are not automatically converted. Lower callers reference `Z_Time` and its `Z_DesignStyle` base directly in their real asmdefs.
 
 ## Product entry and modes

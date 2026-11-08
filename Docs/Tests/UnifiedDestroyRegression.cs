@@ -32,6 +32,9 @@ public static class UnifiedDestroyRegression
     private static Dictionary<CharacterProductForm.Data, CharacterUnitForm.Data> characters;
     private static int checks, nextProduct = 73001, nextUnit = 75001;
     private static readonly Dictionary<Type, string> prefabs = new Dictionary<Type, string>();
+    private static readonly List<int> destroyTrace = new List<int>();
+    private static bool destroyGate;
+    private static int programSequence, gatePolls, gateCancels;
 
     public static void Run()
     {
@@ -45,6 +48,7 @@ public static class UnifiedDestroyRegression
             ItemProductAndSceneReferences();
             InvalidReferencesAndKindIsolation();
             SnapshotRejectsReplacementIdentity();
+            BeforeDestroyTriggers();
             Debug.Log("UNIFIED_DESTROY_REGRESSION_PASS checks=" + checks);
             EditorApplication.Exit(0);
         }
@@ -86,6 +90,11 @@ public static class UnifiedDestroyRegression
         ItemProductForm.InitInternal(); ProgressForm.InitInternal(); EventInterpretDataForm.InitInternal();
         UnitForm.InitInternal(); CharacterUnitForm.InitInternal(); ObjectUnitForm.InitInternal();
         ItemUnitForm.InitInternal(); TileUnitForm.InitInternal();
+        foreach (var type in new[] { typeof(SceneForm), typeof(ProgramDataForm), typeof(EventProgramDataForm) })
+        {
+            type.GetMethod("Register", BindingFlags.Static | BindingFlags.NonPublic).Invoke(null, null);
+            type.GetMethod("InitInternal", BindingFlags.Static | BindingFlags.Public).Invoke(null, null);
+        }
         DynamicGlobalSettings.playing = true;
         var game = Manager<GameManager>();
         var play = Manager<PlayManager>();
@@ -95,6 +104,8 @@ public static class UnifiedDestroyRegression
         ProgressForm.AddData(progress);
         events = new GameEventController(game);
         game.evtCtrl = events;
+        var sceneData = SceneForm.defaultData; sceneData.uid = 1;
+        SceneForm.AddData(sceneData); game.curScene = sceneData;
         mapEvents = new GameMapController(game);
         game.mapCtrl = mapEvents;
         // Test real Remove cleanup, without unrelated appearance rendering on Show.
@@ -240,9 +251,9 @@ public static class UnifiedDestroyRegression
         }
         finally { mapEvents.Unregister<ObjectEvent>(); }
     }
-    private static string UnitHandle(MapUnit unit) => "$so$" + unit.data.uid + "$so$";
+    private static string UnitHandle(MapUnit unit) => GlobalEventHelper.GetSceneUnitReference(unit.data.uid);
     private static string CharacterHandle(int uid) => "$ch$" + uid + "$ch$";
-    private static string ObjectHandle(int uid) => "$so$p:" + uid + "$so$";
+    private static string ObjectHandle(int uid) => GlobalEventHelper.GetSceneObjectProductReference(uid);
     private static string ItemHandle(int uid) => "$it$" + uid + "$it$";
 
     private static void Removed(MapUnit unit, Instance instance)
@@ -366,6 +377,144 @@ public static class UnifiedDestroyRegression
         Execute(CharacterHandle(prototype.uid));
         Check(replacement != null && ReferenceEquals(UnitForm.DataByUid[replacement.data.uid], replacement.data)
             && replacement.ins != null, "a snapshot's stale Character cannot remove an Object created with its recycled UID during a callback");
+    }
+
+    private sealed class DestroyProbeCmd : CmdBase
+    {
+        public override string GetName() => "DestroyProbe";
+        public override CmdBase GetNew() => new DestroyProbeCmd();
+        protected override bool ExecuteInternal(BoxDataForm.Data[] prm, InterpretAsyncTask task)
+        {
+            int tag = (int)prm[0].num;
+            var unit = GlobalEventHelper.ResolveSceneObjectUnit(prm[1].str);
+            if (tag < 0) Check(unit == null, "caller continues only after the Unit is removed");
+            else
+            {
+                Check(unit != null && unit.ins != null && UnitForm.DataByUid[unit.data.uid] == unit.data,
+                    "destroy handler executes while its original Unit and visible instance still exist");
+                Check(prm[1].str == UnitHandle(unit), "param1 names the exact destruction owner");
+                Vector3 expected = GameManager.MapPosToPlayerPos(map.utilCtrl.RealPos2MapPos(unit.data.pos));
+                Check(prm[2].dic["x"].num == expected.x && prm[2].dic["height"].num == expected.y
+                    && prm[2].dic["y"].num == expected.z, "GetPosition(param1) reads the still-live owner's position before destruction");
+            }
+            destroyTrace.Add(tag);
+            return true;
+        }
+    }
+
+    private sealed class DestroyGateCmd : CmdBase
+    {
+        public override string GetName() => "DestroyGate";
+        public override CmdBase GetNew() => new DestroyGateCmd();
+        protected override bool ExecuteInternal(BoxDataForm.Data[] prm, InterpretAsyncTask task)
+        {
+            GameManager.instance.evtCtrl.StartTask(task, () =>
+            {
+                gatePolls++;
+                if (!destroyGate) return false;
+                task.Complete(); return true;
+            }, () => gateCancels++);
+            return false;
+        }
+    }
+
+    private static EventProgramDataForm.Data Program(string code)
+    {
+        var program = new EventProgramDataForm.Data(-1, "before-destroy-" + ++programSequence,
+            "", new List<string>(), new List<int>(), 0, "void", 0);
+        Check(program.TryApplyCode(code, out _, out var errors), "destroy script compiles: " + string.Join(";", errors));
+        EventProgramDataForm.AddData(program); return program;
+    }
+    private static EventTriggerForm.Data Hook(string code) => new EventTriggerForm.Data(-1, "onDestroyEvent",
+        new List<int> { Program(code).uid }, TriggerType.NoLimit);
+    private static string Trace(int tag, string reference = "param1") => "DestroyProbe(" + tag + "," + reference + ",GetPosition(" + reference + "));";
+    private static string Quoted(MapUnit unit) => "\"" + UnitHandle(unit) + "\"";
+    private static void LocalHook(MapUnit unit, string code)
+    {
+        var local = unit.evtDic; local["onDestroyEvent"] = Hook(code); unit.evtDic = local;
+    }
+    private static void Drain(Func<bool> done)
+    {
+        for (int i = 0; i < 24 && !done(); i++) events.LateUpdate();
+        Check(done(), "destroy operation finishes without a blocking/reentrant deadlock");
+    }
+    private static void BeforeDestroyTriggers()
+    {
+        foreach (var type in new[] { typeof(PauseCmd), typeof(ContinueCmd), typeof(GetPositionCmd) })
+            type.GetMethod("Init", BindingFlags.Static | BindingFlags.NonPublic).Invoke(null, null);
+        BaseData.cmdDic["DestroyProbe"] = new DestroyProbeCmd();
+        BaseData.cmdDic["DestroyGate"] = new DestroyGateCmd();
+        CmdDataForm.AddData(new CmdDataForm.Data(98601, "DestroyProbe", new List<string> { "tag", "owner", "position" },
+            new List<string> { "num", "var", "var" }, null, new List<string> { "void" }, "", "DestroyProbe(0,param1,GetPosition(param1));"));
+        CmdDataForm.AddData(new CmdDataForm.Data(98602, "DestroyGate", new List<string>(), new List<string>(),
+            null, new List<string> { "void" }, "", "DestroyGate();"));
+        mapEvents.Register<ObjectEvent>();
+        try
+        {
+            events.Reset(); progress.blockProgramUid = 0; destroyTrace.Clear(); destroyGate = false;
+            var product = ObjectProduct(99999); var obj = Spawn(product);
+            product.events = new Dictionary<string, EventTriggerForm.Data>
+            { ["onDestroyEvent"] = Hook(Trace(1) + "Destroy(param1);") };
+            LocalHook(obj, "DestroyGate();" + Trace(2));
+            events.Execute(Program("Pause();Destroy(" + Quoted(obj) + ");Continue();" + Trace(-3, Quoted(obj))), 0, null);
+            events.LateUpdate();
+            Check(UnitForm.DataByUid.ContainsKey(obj.data.uid) && destroyTrace.Count == 0 && progress.blockProgramUid != 0,
+                "Destroy queues its hook through the normal next-pass scheduler before removing anything");
+            events.LateUpdate(); events.LateUpdate();
+            Check(destroyTrace.SequenceEqual(new[] { 1 }) && UnitForm.DataByUid.ContainsKey(obj.data.uid) && gatePolls > 0,
+                "prototype executes before local appends, recursive Destroy(self) is harmless, and an async hook keeps the owner alive under Pause");
+            destroyGate = true;
+            Drain(() => destroyTrace.Contains(-3));
+            Check(destroyTrace.SequenceEqual(new[] { 1, 2, -3 }) && progress.blockProgramUid == 0,
+                "all inherited/local handlers finish before actual removal and caller continuation");
+            Check(obj.evtDic["onDestroyEvent"].evt.Count == 1 && product.events["onDestroyEvent"].evt.Count == 1,
+                "destroy execution never copies inherited event IDs into saved local bindings");
+
+            foreach (bool unique in new[] { false, true })
+            {
+                destroyTrace.Clear(); var character = Character(unique); var unit = Spawn(character);
+                character.events = new Dictionary<string, EventTriggerForm.Data> { ["onDestroyEvent"] = Hook(Trace(4)) };
+                events.Execute(Program("Destroy(" + Quoted(unit) + ");"), 0, null);
+                events.LateUpdate(); Check(UnitForm.DataByUid.ContainsKey(unit.data.uid), "Character survives until its pre-destroy event runs");
+                Drain(() => !UnitForm.DataByUid.ContainsKey(unit.data.uid));
+                Check(destroyTrace.SequenceEqual(new[] { 4 }) && CharacterProductForm.DataByUid.ContainsKey(character.uid) == unique,
+                    "Character hook preserves ordinary versus unique Product cleanup");
+            }
+            destroyTrace.Clear(); var itemProduct = ItemProduct(); var item = Spawn(itemProduct); LocalHook(item, Trace(5));
+            events.Execute(Program("Destroy(\"$it$" + itemProduct.uid + "$it$\");"), 0, null);
+            Drain(() => !UnitForm.DataByUid.ContainsKey(item.data.uid));
+            Check(destroyTrace.SequenceEqual(new[] { 5 }) && ItemProductForm.DataByUid.ContainsKey(itemProduct.uid),
+                "Item hook runs before removal without deleting the stored Item Product");
+
+            destroyTrace.Clear(); destroyGate = false;
+            var cancelled = Spawn(ObjectProduct(99999)); LocalHook(cancelled, "DestroyGate();" + Trace(6));
+            events.Execute(Program("Destroy(" + Quoted(cancelled) + ");"), 0, null);
+            events.LateUpdate(); events.LateUpdate(); int cancelledBefore = gateCancels;
+            events.ClearScene(); destroyGate = true; events.LateUpdate();
+            Check(UnitForm.DataByUid.ContainsKey(cancelled.data.uid) && !destroyTrace.Contains(6) && gateCancels > cancelledBefore,
+                "clearing a caller cancels its child hooks and pending removal together");
+            events.Execute(Program("Destroy(" + Quoted(cancelled) + ");"), 0, null);
+            Drain(() => !UnitForm.DataByUid.ContainsKey(cancelled.data.uid));
+            Check(destroyTrace.SequenceEqual(new[] { 6 }), "cancellation releases the reservation so a later Destroy can run normally");
+
+            destroyTrace.Clear(); destroyGate = false;
+            var stale = (ObjectUnit)Spawn(ObjectProduct(99999)); LocalHook(stale, "DestroyGate();" + Trace(7));
+            events.Execute(Program("Destroy(" + Quoted(stale) + ");"), 0, null);
+            events.LateUpdate(); events.LateUpdate();
+            map.RemoveObject(stale.data); var replacement = Spawn(ObjectProduct(99999), stale.data.uid);
+            destroyGate = true; for (int i = 0; i < 4; i++) events.LateUpdate();
+            Check(ReferenceEquals(UnitForm.DataByUid[replacement.data.uid], replacement.data) && !destroyTrace.Contains(7),
+                "a reused UID cannot receive an old hook or its deferred removal");
+
+            destroyTrace.Clear(); var a = Spawn(ObjectProduct(99999)); var b = Spawn(ObjectProduct(99999));
+            LocalHook(a, "Destroy(" + Quoted(b) + ");" + Trace(8));
+            LocalHook(b, "Destroy(" + Quoted(a) + ");" + Trace(9));
+            events.Execute(Program("Pause();Destroy(" + Quoted(a) + ");Continue();"), 0, null);
+            Drain(() => !UnitForm.DataByUid.ContainsKey(a.data.uid) && !UnitForm.DataByUid.ContainsKey(b.data.uid));
+            Check(destroyTrace.SequenceEqual(new[] { 9, 8 }), "mutually recursive destruction hooks run once each without deadlock");
+            Drain(() => progress.blockProgramUid == 0);
+        }
+        finally { mapEvents.Unregister<ObjectEvent>(); }
     }
 
     private sealed class Probe : IZ_Listener<CharacterEvent>, IZ_Listener<ObjectEvent>, IZ_Listener<ItemEvent>, IZ_Listener<SceneActionEvent>

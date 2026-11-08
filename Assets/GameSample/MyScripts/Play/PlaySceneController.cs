@@ -240,6 +240,7 @@ public class PlaySceneController : Z_Controller<PlayManager>, InternalPlaySceneC
     public void End()
     {
         GameManager.instance.evtCtrl.ClearSceneEvent();
+        CameraInstance.instance.RestorePlayerFollow();
 
         // UnloadScenePlay saves once, before resetting the old scene controllers.
         enable = false;
@@ -372,7 +373,7 @@ public class PlaySceneController : Z_Controller<PlayManager>, InternalPlaySceneC
     }
     public void SetCamera(float x, float y, float z)
     {
-        CameraInstance.instance.tarTrs.position = new Vector3(x, y, z);
+        CameraInstance.instance.FollowPlayer(new Vector3(x, y, z));
         //Z_EventHelper.Invoke(new CameraMoveEvent());
     }
 

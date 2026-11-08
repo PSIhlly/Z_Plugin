@@ -69,9 +69,11 @@ namespace Form
     {
         public partial class Data
         {
+            internal long enqueueOrder;
             // Runtime-only owner identity for scene events. The uid can be reused
             // after removal, so checking the integer alone cannot identify a stale event.
             public UnitForm.Data sceneOwner;
+            internal Data blockingParent;
 
             public override RetInfo Interpret()
             {
@@ -195,6 +197,8 @@ public static partial class GlobalEventHelper
         {
             return false;
         }
+        if (triggerName != null && triggerName.StartsWith("onGlobalVarChangeEvent$", StringComparison.Ordinal))
+            return true;
         switch (triggerName)
         {
             case "onCharacterTouchEvent":
@@ -205,6 +209,7 @@ public static partial class GlobalEventHelper
             case "onShowEvent":
             case "onBoundaryTouchEvent":
             case "onPerSecondEvent":
+            case "onDestroyEvent":
             case "onInteractEvent":
                 return true;
         }
@@ -234,28 +239,35 @@ public class GameEventController : Z_Controller<GameManager>
         public EventTask eventPrevious, eventNext;
         public EventTask scenePrevious, sceneNext;
         private readonly Func<bool> update;
+        private readonly Action onCancel;
         private bool isCancelled;
 
         public EventTask(InterpretAsyncTask asyncTask, InterpretDataForm.Data interpretOwner,
-            EventInterpretDataForm.Data eventOwner, Func<bool> update)
+            EventInterpretDataForm.Data eventOwner, Func<bool> update, Action onCancel)
         {
             this.asyncTask = asyncTask;
             this.interpretOwner = interpretOwner;
             this.eventOwner = eventOwner;
             sceneOwner = eventOwner?.sceneOwner;
             this.update = update;
+            this.onCancel = onCancel;
         }
 
         public void Cancel()
         {
+            if (isCancelled) return;
             isCancelled = true;
             asyncTask.Cancel();
+            onCancel?.Invoke();
         }
 
         public bool Update()
         {
             if (isCancelled || interpretOwner.IsCancelled || asyncTask.IsCancelled())
+            {
+                Cancel();
                 return true;
+            }
 
             if (eventOwner != null && (!IsRegisteredEvent(eventOwner) || !IsSceneEventOwnerAlive(eventOwner)))
             {
@@ -269,7 +281,8 @@ public class GameEventController : Z_Controller<GameManager>
                 Cancel();
                 return true;
             }
-            return complete || isCancelled || interpretOwner.IsCancelled || asyncTask.IsCancelled();
+            if (interpretOwner.IsCancelled || asyncTask.IsCancelled()) Cancel();
+            return complete || isCancelled;
         }
     }
 
@@ -285,6 +298,9 @@ public class GameEventController : Z_Controller<GameManager>
     EventInterpretDataForm.Data currentEventData;
     int taskVersion;
     bool isManagingEvents;
+    readonly HashSet<UnitForm.Data> destroyingUnits = new HashSet<UnitForm.Data>(IdentityComparer<UnitForm.Data>.Instance);
+    internal bool BeginUnitDestroy(UnitForm.Data data) => destroyingUnits.Add(data);
+    internal void EndUnitDestroy(UnitForm.Data data) => destroyingUnits.Remove(data);
     public GameEventController(GameManager super) : base(super)
     {
         sceneTriggerCtrl = new GameEventSceneTriggerController(this);
@@ -301,6 +317,7 @@ public class GameEventController : Z_Controller<GameManager>
             data.Cancel();
         }
         CancelAllTasks();
+        destroyingUnits.Clear();
         EventInterpretDataForm.Clear();
         releaseTriggerTuple.Clear();
         currentEventData = null;
@@ -322,7 +339,7 @@ public class GameEventController : Z_Controller<GameManager>
             EventInterpretDataForm.RemoveData(data.uid);
         }
     }
-    public void StartTask(InterpretAsyncTask asyncTask, Func<bool> func)
+    public void StartTask(InterpretAsyncTask asyncTask, Func<bool> func, Action onCancel = null)
     {
         var interpretData = asyncTask.interpreter.data;
         var eventOwner = interpretData as EventInterpretDataForm.Data;
@@ -331,11 +348,12 @@ public class GameEventController : Z_Controller<GameManager>
             if (!EventInterpretDataForm.DataByUid.TryGetValue(interpretData.rootUid, out eventOwner))
             {
                 asyncTask.Cancel();
+                onCancel?.Invoke();
                 return;
             }
         }
         InterpretDataForm.Data taskOwner = eventOwner ?? interpretData;
-        var task = new EventTask(asyncTask, taskOwner, eventOwner, func);
+        var task = new EventTask(asyncTask, taskOwner, eventOwner, func, onCancel);
         int version = taskVersion;
         bool complete = task.Update();
         // An immediate task callback may unload the scene and create new work.
@@ -448,6 +466,33 @@ public class GameEventController : Z_Controller<GameManager>
         return EventInterpretDataForm.DataByUid.TryGetValue(data.uid, out var registered)
             && ReferenceEquals(registered, data);
     }
+    internal static bool IsPendingEvent(EventInterpretDataForm.Data data) => IsRegisteredEvent(data) && !data.IsCancelled;
+
+    internal static EventInterpretDataForm.Data RootEvent(InterpretAsyncTask task)
+    {
+        var data = task?.interpreter?.data;
+        if (data is EventInterpretDataForm.Data root) return root;
+        return data != null && data.rootUid > 0 ? EventInterpretDataForm.DataByUid.GetDv(data.rootUid, null) : null;
+    }
+
+    internal void CancelTriggerEvents(List<EventInterpretDataForm.Data> executions)
+    {
+        foreach (var execution in executions)
+        {
+            if (!IsRegisteredEvent(execution)) continue;
+            execution.Cancel();
+            CancelEventTasks(execution);
+            ReleaseSceneTrigger(execution.user, execution.releaseTrigger);
+        }
+    }
+
+    private static bool CanRunUnderBlock(EventInterpretDataForm.Data data, int blocker)
+    {
+        if (blocker == 0) return true;
+        for (var current = data; current != null; current = current.blockingParent)
+            if (current.uid == blocker && IsPendingEvent(current)) return true;
+        return false;
+    }
     private static bool IsSceneEventOwnerAlive(EventInterpretDataForm.Data data)
     {
         if (!GlobalEventHelper.IsSceneTrigger(data.releaseTrigger, data.user))
@@ -475,6 +520,7 @@ public class GameEventController : Z_Controller<GameManager>
             data.Cancel();
         }
         CancelAllTasks();
+        destroyingUnits.Clear();
         EventInterpretDataForm.DataByUid.Clear();
         GameManager.instance.curScene.triggeringOnceDuringEvts.Clear();
         releaseTriggerTuple.Clear();
@@ -491,6 +537,9 @@ public class GameEventController : Z_Controller<GameManager>
         try
         {
             eventSnapshot.AddRange(EventInterpretDataForm.DataByUid.Values);
+            // Recycled UIDs reuse Dictionary slots, which do not retain enqueue
+            // order. Preserve trigger list order independently of those slots.
+            eventSnapshot.Sort((left, right) => left.enqueueOrder.CompareTo(right.enqueueOrder));
             ManageEventDatas(eventSnapshot);
         }
         finally
@@ -510,7 +559,7 @@ public class GameEventController : Z_Controller<GameManager>
                 continue;
             }
             bool complete = data.IsCancelled;
-            if (!complete && GameManager.instance.curProgress.blockProgramUid != 0 && GameManager.instance.curProgress.blockProgramUid != data.uid)
+            if (!complete && !CanRunUnderBlock(data, GameManager.instance.curProgress.blockProgramUid))
             {
                 continue;
             }
@@ -626,7 +675,8 @@ public class GameEventController : Z_Controller<GameManager>
     }
 
 
-    public void TriggerEventExecute(EventTriggerForm.Data trigger, int user, Dictionary<string, Z_Code.Form.BoxDataForm.Data> defaultHeap, bool copyDefaultHeap = false)
+    public void TriggerEventExecute(EventTriggerForm.Data trigger, int user, Dictionary<string, Z_Code.Form.BoxDataForm.Data> defaultHeap,
+        bool copyDefaultHeap = false, List<EventInterpretDataForm.Data> executions = null, EventInterpretDataForm.Data blockingParent = null)
     {
         if (trigger == null)
         {
@@ -651,8 +701,7 @@ public class GameEventController : Z_Controller<GameManager>
                 dict[user].Add(trigger.name);
                 foreach (var id in trigger.evt)
                 {
-                    Execute(EventProgramDataForm.DataByUid.GetDv(id, null), user,
-                        copyDefaultHeap ? CopyTriggerHeap(defaultHeap) : defaultHeap, trigger.name);
+                    QueueTriggerProgram(id, user, defaultHeap, trigger.name, copyDefaultHeap, executions, blockingParent);
                 }
 
                 break;
@@ -672,21 +721,29 @@ public class GameEventController : Z_Controller<GameManager>
                 dict[user].Add(trigger.name);
                 foreach (var nm in trigger.evt)
                 {
-                    Execute(EventProgramDataForm.DataByUid.GetDv(nm, null), user,
-                        copyDefaultHeap ? CopyTriggerHeap(defaultHeap) : defaultHeap, trigger.name);
+                    QueueTriggerProgram(nm, user, defaultHeap, trigger.name, copyDefaultHeap, executions, blockingParent);
                 }
                 break;
                 }
             default:
                 foreach (var nm in trigger.evt)
                 {
-                    Execute(EventProgramDataForm.DataByUid.GetDv(nm, null), user,
-                        copyDefaultHeap ? CopyTriggerHeap(defaultHeap) : defaultHeap, trigger.name);
+                    QueueTriggerProgram(nm, user, defaultHeap, trigger.name, copyDefaultHeap, executions, blockingParent);
                 }
                 break;
         }
     }
+    private void QueueTriggerProgram(int uid, int user, Dictionary<string, BoxDataForm.Data> heap, string trigger,
+        bool copyHeap, List<EventInterpretDataForm.Data> executions, EventInterpretDataForm.Data blockingParent)
+    {
+        var execution = Execute(EventProgramDataForm.DataByUid.GetDv(uid, null), user,
+            copyHeap ? CopyTriggerHeap(heap) : heap, trigger);
+        if (execution == null) return;
+        execution.blockingParent = blockingParent;
+        executions?.Add(execution);
+    }
     int debugId = 0;
+    private long nextEnqueueOrder;
     private static Dictionary<string, BoxDataForm.Data> CopyTriggerHeap(Dictionary<string, BoxDataForm.Data> heap)
     {
         if (heap == null)
@@ -697,20 +754,21 @@ public class GameEventController : Z_Controller<GameManager>
         return copy;
     }
 
-    public void Execute(EventProgramDataForm.Data evt, int user, Dictionary<string, Z_Code.Form.BoxDataForm.Data> defaultHeap, string releaseTrigger = "", bool noreleaseTrigger = false)
+    public EventInterpretDataForm.Data Execute(EventProgramDataForm.Data evt, int user, Dictionary<string, Z_Code.Form.BoxDataForm.Data> defaultHeap, string releaseTrigger = "", bool noreleaseTrigger = false)
     {
         if (evt == null)
-            return;
+            return null;
         if (GameManager.instance.curProgress.eventState == EventState.Leave && releaseTrigger != "onLeaveSceneEvent" && releaseTrigger != "onLeaveEvent")
-            return;
+            return null;
         var data = new EventInterpretDataForm.Data(-1, new List<Z_Code.Form.BoxDataForm.Data>(), defaultHeap == null ? new Dictionary<string, Z_Code.Form.BoxDataForm.Data>() : defaultHeap, evt.CreateRuntimeSnapshot(), 0, -1, user, null, new List<BoxDataForm.Data>(), 0, releaseTrigger, 0);
         data.debugId = debugId++;
+        data.enqueueOrder = nextEnqueueOrder++;
         if (GlobalEventHelper.IsSceneTrigger(releaseTrigger, user))
         {
             data.sceneOwner = UnitForm.DataByUid.GetDv(user, null);
         }
         EventInterpretDataForm.AddData(data);
-
+        return data;
     }
     public EntryItem GetEventEntry(SceneEventType objectType, string retType)
     {

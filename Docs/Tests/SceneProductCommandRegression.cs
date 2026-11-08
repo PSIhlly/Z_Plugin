@@ -53,7 +53,7 @@ public static class SceneProductCommandRegression
                 .GetValue(null))[objectTemplate.id] = objectPrototype.uid;
             var objectA = Object(97602, 97611, 97601, objectTemplate.id, new Vector3(5, 0, 7));
             var objectB = Object(97603, 97612, 97601, objectTemplate.id, new Vector3(7, 0, 7));
-            CheckGroup("Object", "$so$p:97601$so$", "$so$p:97602$so$", new MapUnit[] { objectA, objectB });
+            CheckGroup("Object", "$so$97601$so$", "$so$97602$so$", new MapUnit[] { objectA, objectB });
             foreach (string alias in new[] { "$sop$97600$sop$", "$so$p:97601$so$" })
             {
                 objectA.data.euler = Vector3.zero;
@@ -62,9 +62,9 @@ public static class SceneProductCommandRegression
                 Check(objectA.data.euler.y == 90 && objectB.data.euler.y == 90,
                     "legacy/prototype Object alias rotates all current placements");
             }
-            Invoke(new SetPositionRelativeCmd(), Text("$so$97611$so$"), Vector(Vector3.right));
+            Invoke(new SetPositionRelativeCmd(), Text(GlobalEventHelper.GetSceneUnitReference(97611)), Vector(Vector3.right));
             Check(objectA.data.pos.x == 6 && objectB.data.pos.x == 7,
-                "legacy numeric Object reference still mutates exactly one Unit");
+                "explicit scene-Unit reference still mutates exactly one Unit");
             Check(Read(Invoke(new GetPositionCmd(), Text("$so$t:999999$so$")).res[0]) == Vector3.zero,
                 "missing template getter remains a zero vector");
             Debug.Log("SCENE_PRODUCT_COMMAND_REGRESSION_PASS checks=" + checks);

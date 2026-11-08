@@ -851,7 +851,7 @@ namespace Form
 
                 {1000360,new Data(1000360,"TriggerTargetSceneObject","Parameter 2 (scene object)","参数2（场景物体）")},
 
-                {1000361,new Data(1000361,"UseSkill","Use skill","使用技能")},
+                {1000361,new Data(1000361,"UseSkill","Use specified character skill","使用角色指定技能")},
 
                 {1000362,new Data(1000362,"Video","Video","视频")},
 
@@ -894,6 +894,22 @@ namespace Form
                 {1000381,new Data(1000381,"SetCurrentCharacter","Set current character","切换为当前角色")},
 
                 {1000382,new Data(1000382,"onGlobalVarChangeEvent","On global variable change event","全局变量变化事件")},
+
+                {1000383,new Data(1000383,"MoveCamera","Move camera","移动镜头")},
+
+                {1000384,new Data(1000384,"RestoreCamera","Restore camera","恢复镜头")},
+
+                {1000385,new Data(1000385,"MoveCameraTo","Move camera to coordinates","移动镜头至坐标")},
+
+                {1000386,new Data(1000386,"UseCharacterLightAttack","Use character's current light attack","使用角色当前轻击")},
+
+                {1000387,new Data(1000387,"UseCharacterHeavyAttack","Use character's current heavy attack","使用角色当前重击")},
+
+                {1000388,new Data(1000388,"UseCharacterESkill","Use character's current E skill","使用角色当前E技能")},
+
+                {1000389,new Data(1000389,"UseCharacterQSkill","Use character's current Q skill","使用角色当前Q技能")},
+
+                {1000390,new Data(1000390,"onDestroyEvent","On destruction","销毁触发")},
 
                 };
                 _DatasHashSet=new HashSet<Data>();
@@ -1641,6 +1657,22 @@ namespace Form
                         {"SetCurrentCharacter",_DataById[1000381]},
     
                         {"onGlobalVarChangeEvent",_DataById[1000382]},
+    
+                        {"MoveCamera",_DataById[1000383]},
+    
+                        {"RestoreCamera",_DataById[1000384]},
+    
+                        {"MoveCameraTo",_DataById[1000385]},
+    
+                        {"UseCharacterLightAttack",_DataById[1000386]},
+    
+                        {"UseCharacterHeavyAttack",_DataById[1000387]},
+    
+                        {"UseCharacterESkill",_DataById[1000388]},
+    
+                        {"UseCharacterQSkill",_DataById[1000389]},
+    
+                        {"onDestroyEvent",_DataById[1000390]},
     
                     
                     };

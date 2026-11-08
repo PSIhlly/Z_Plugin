@@ -30,7 +30,8 @@
         }
       }
     ],
-    "triggerConditionUid": 0
+    "triggerConditionUid": 0,
+    "sorv": 2
   },
   {
     "uid": 9,
@@ -63,7 +64,8 @@
         }
       }
     ],
-    "triggerConditionUid": 0
+    "triggerConditionUid": 0,
+    "sorv": 2
   },
   {
     "uid": 17,
@@ -96,7 +98,8 @@
         }
       }
     ],
-    "triggerConditionUid": 0
+    "triggerConditionUid": 0,
+    "sorv": 2
   },
   {
     "uid": 3,
@@ -129,7 +132,8 @@
         }
       }
     ],
-    "triggerConditionUid": 0
+    "triggerConditionUid": 0,
+    "sorv": 2
   },
   {
     "uid": 4,
@@ -162,7 +166,8 @@
         }
       }
     ],
-    "triggerConditionUid": 0
+    "triggerConditionUid": 0,
+    "sorv": 2
   },
   {
     "uid": 5,
@@ -195,7 +200,8 @@
         }
       }
     ],
-    "triggerConditionUid": 0
+    "triggerConditionUid": 0,
+    "sorv": 2
   },
   {
     "uid": 11,
@@ -205,12 +211,31 @@
     "protoUid": 0,
     "icon": 210000,
     "paramDic": [],
-    "skillTypes": [],
+    "skillTypes": [
+      {
+        "v": 0
+      }
+    ],
     "characterUid": 0,
     "cd": 1.0,
     "lastUseTime": 0.0,
-    "events": [],
-    "triggerConditionUid": 0
+    "events": [
+      {
+        "k": "invoke",
+        "v": {
+          "uid": -1,
+          "name": "invoke",
+          "evt": [
+            {
+              "v": 18
+            }
+          ],
+          "type": 0
+        }
+      }
+    ],
+    "triggerConditionUid": 0,
+    "sorv": 2
   },
   {
     "uid": 76,
@@ -243,6 +268,41 @@
         }
       }
     ],
-    "triggerConditionUid": 0
+    "triggerConditionUid": 0,
+    "sorv": 2
+  },
+  {
+    "uid": 15796,
+    "name": "敌人星弹",
+    "desc": "发射魔法弹攻击敌人",
+    "labId": 10,
+    "protoUid": 0,
+    "icon": 33,
+    "paramDic": [],
+    "skillTypes": [
+      {
+        "v": 0
+      }
+    ],
+    "characterUid": 0,
+    "cd": 0.3,
+    "lastUseTime": 0.0,
+    "events": [
+      {
+        "k": "invoke",
+        "v": {
+          "uid": -1,
+          "name": "invoke",
+          "evt": [
+            {
+              "v": 41
+            }
+          ],
+          "type": 0
+        }
+      }
+    ],
+    "triggerConditionUid": 0,
+    "sorv": 2
   }
 ]

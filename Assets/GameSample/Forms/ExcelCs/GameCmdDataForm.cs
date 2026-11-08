@@ -403,7 +403,7 @@ namespace Form
 
                 {100080,new Data(100080,"FloatingText",new List<string>(){"content","pos",},new List<string>(){"string","vector",},null,new List<string>(){"void",},"Floating text: {0} at pos {1}","FloatingText(\"empty\",NewVector(1,1,0));",10022,EditorStyle.Rpg,"")},
 
-                {100081,new Data(100081,"UseSkill",new List<string>(){"character","skill","ignoreCd",},new List<string>(){"character","skill","num",},null,new List<string>(){"void",},"Character {0} use skill {1},ignoreCd? {2}","UseSkill(param1,\"$sk$$sk$\",0);",10007,EditorStyle.Rpg,"")},
+                {100081,new Data(100081,"UseSkill",new List<string>(){"character","skill",},new List<string>(){"character","skill",},null,new List<string>(){"void",},"Character {0}: directly cast specified skill {1} without a cooldown check","UseSkill(param1,\"$sk$$sk$\");",10007,EditorStyle.Rpg,"")},
 
                 {100082,new Data(100082,"Skill",null,null,null,new List<string>(){"skill",},"","\"$sk$$sk$\"",10001,EditorStyle.Rpg,"")},
 
@@ -484,6 +484,20 @@ namespace Form
                 {100121,new Data(100121,"GetGlobalVar",new List<string>(){"name",},new List<string>(){"string",},new List<string>(){"value",},new List<string>(){"var",},"Get global variable {0}","GetGlobalVar(\"name\")",10001,EditorStyle.AvgAdvanced,"")},
 
                 {100122,new Data(100122,"SetGlobalVar",new List<string>(){"name","value",},new List<string>(){"string","var",},null,new List<string>(){"void",},"Set global variable {0} to {1}","SetGlobalVar(\"name\",0);",10001,EditorStyle.AvgAdvanced,"")},
+
+                {100123,new Data(100123,"MoveCamera",new List<string>(){"offset","seconds",},new List<string>(){"vector","num",},null,new List<string>(){"void",},"Move camera by relative offset ({0}) linearly over {1} seconds and wait; stop following the current character","MoveCamera(NewVector(0,0,0),1);",10026,EditorStyle.Avg,"")},
+
+                {100124,new Data(100124,"RestoreCamera",null,null,null,new List<string>(){"void",},"Restore camera following the current controlled character","RestoreCamera();",10026,EditorStyle.Avg,"")},
+
+                {100125,new Data(100125,"MoveCameraTo",new List<string>(){"position","seconds",},new List<string>(){"vector","num",},null,new List<string>(){"void",},"Move camera to absolute coordinates ({0}) linearly over {1} seconds and wait; stop following the current character","MoveCameraTo(NewVector(0,0,0),1);",10026,EditorStyle.Avg,"")},
+
+                {100126,new Data(100126,"UseCharacterLightAttack",new List<string>(){"character","ignoreCd",},new List<string>(){"character","num",},null,new List<string>(){"void",},"Character {0}: use the current light attack, ignore cooldown? {1} (1 ignores, 0 checks)","UseCharacterLightAttack(param1,0);",10007,EditorStyle.Rpg,"")},
+
+                {100127,new Data(100127,"UseCharacterHeavyAttack",new List<string>(){"character","ignoreCd",},new List<string>(){"character","num",},null,new List<string>(){"void",},"Character {0}: use the current heavy attack, ignore cooldown? {1} (1 ignores, 0 checks)","UseCharacterHeavyAttack(param1,0);",10007,EditorStyle.Rpg,"")},
+
+                {100128,new Data(100128,"UseCharacterESkill",new List<string>(){"character","ignoreCd",},new List<string>(){"character","num",},null,new List<string>(){"void",},"Character {0}: use the current E skill, ignore cooldown? {1} (1 ignores, 0 checks)","UseCharacterESkill(param1,0);",10007,EditorStyle.Rpg,"")},
+
+                {100129,new Data(100129,"UseCharacterQSkill",new List<string>(){"character","ignoreCd",},new List<string>(){"character","num",},null,new List<string>(){"void",},"Character {0}: use the current Q skill, ignore cooldown? {1} (1 ignores, 0 checks)","UseCharacterQSkill(param1,0);",10007,EditorStyle.Rpg,"")},
 
                 };
                 _DatasHashSet=new HashSet<Data>();
@@ -721,6 +735,20 @@ namespace Form
                         {"GetGlobalVar",_DataByUid[100121]},
     
                         {"SetGlobalVar",_DataByUid[100122]},
+    
+                        {"MoveCamera",_DataByUid[100123]},
+    
+                        {"RestoreCamera",_DataByUid[100124]},
+    
+                        {"MoveCameraTo",_DataByUid[100125]},
+    
+                        {"UseCharacterLightAttack",_DataByUid[100126]},
+    
+                        {"UseCharacterHeavyAttack",_DataByUid[100127]},
+    
+                        {"UseCharacterESkill",_DataByUid[100128]},
+    
+                        {"UseCharacterQSkill",_DataByUid[100129]},
     
                     
                     };
@@ -982,6 +1010,20 @@ namespace Form
                     _DatasByLabid[10001].Add(_DataByUid[100121]);
 
                     _DatasByLabid[10001].Add(_DataByUid[100122]);
+
+                    _DatasByLabid[10026].Add(_DataByUid[100123]);
+
+                    _DatasByLabid[10026].Add(_DataByUid[100124]);
+
+                    _DatasByLabid[10026].Add(_DataByUid[100125]);
+
+                    _DatasByLabid[10007].Add(_DataByUid[100126]);
+
+                    _DatasByLabid[10007].Add(_DataByUid[100127]);
+
+                    _DatasByLabid[10007].Add(_DataByUid[100128]);
+
+                    _DatasByLabid[10007].Add(_DataByUid[100129]);
 
 
             childInitAction?.Invoke();

@@ -1,8 +1,10 @@
+using RenderHeads.Media.AVProVideo;
 using System.Collections;
 using System.Collections.Generic;
 using System.Security.Policy;
 using System.Xml.Linq;
 using UnityEngine;
+using UnityEngine.Events;
 using Z_DataSystem;
 using Z_DataSystem.Form;
 using Z_DesignStyle;
@@ -20,10 +22,15 @@ namespace Ui.DialogBg
     {
         public ClipForm.Data clip;
     }
+    public partial class UiDialogBgModel
+    {
+        public UnityAction<MediaPlayer, MediaPlayerEvent.EventType, ErrorCode> videoCompleteHandler;
+    }
     public partial class UiDialogBgCtrl
     {
         public override void OnShow()
         {
+            ClearMedia();
             view.mp_.gameObject.SetActive(false);
             if (param.clip.mainVideo>0)
             {
@@ -31,8 +38,9 @@ namespace Ui.DialogBg
                 if (videoData != null)
                 {
                     view.mp_.gameObject.SetActive(true);
-                    videoData.Play(view.mp_, () =>
+                    model.videoCompleteHandler = videoData.Play(view.mp_, () =>
                     {
+                        model.videoCompleteHandler = null;
                         Z_EventHelper.Invoke(new ClipPlayEvent()
                         {
                             playType = PlayType.ClipVideoOver
@@ -45,6 +53,22 @@ namespace Ui.DialogBg
             {
                 view.img_.BindTexData(data); 
             }
+        }
+
+        public override void OnHide()
+        {
+            ClearMedia();
+        }
+
+        private void ClearMedia()
+        {
+            if (model.videoCompleteHandler != null)
+            {
+                view.mp_.Events.RemoveListener(model.videoCompleteHandler);
+                model.videoCompleteHandler = null;
+            }
+            view.mp_.Pause();
+            view.mp_.CloseMedia();
         }
     }
 

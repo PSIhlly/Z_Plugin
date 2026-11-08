@@ -17,15 +17,14 @@ namespace Z_Map
         private readonly HashSet<int> passTypeBuffer = new HashSet<int>();
         private readonly NavigationEndpointState navigationEndpointState = new NavigationEndpointState();
         internal bool isNavEndpointMove { get; private set; }
+        private bool isNavigationMove;
 
         /// <summary>
         /// 此角色具备的通行类型。0 表示无限制，不进入该集合。
         /// </summary>
         public IReadOnlyCollection<int> passTypes => _passTypes;
 
-        public CharacterUnit(CharacterUnitForm.Data data) : base(data)
-        {
-        }
+        public CharacterUnit(CharacterUnitForm.Data data) : base(data) { }
         public CharacterUnitForm.Data data => (CharacterUnitForm.Data)_data;
 
         public CharacterInstance ins
@@ -94,10 +93,16 @@ namespace Z_Map
 
         public Vector3 ClampMoveToPassType(Vector3 oldPos, Vector3 newPos)
         {
-            Vector3Int mapPos = manager.utilCtrl.RealPos2MapPosInt(newPos);
+            bool cornerNavigation = isNavigationMove && (GetNavigationSize() & 1) == 0;
+            var queryPos = cornerNavigation ? newPos - manager.navigationCtrl.GetNavigationOffset(GetNavigationSize()) : newPos;
+            Vector3Int mapPos = cornerNavigation
+                ? manager.navigationCtrl.RealPos2NavigationPosInt(queryPos, true)
+                : manager.utilCtrl.RealPos2MapPosInt(queryPos);
             TileUnit targetTile = manager.utilCtrl.GetTile(mapPos.x, mapPos.y, mapPos.z);
             if (CanPass(targetTile))
                 return newPos;
+            if (cornerNavigation)
+                return oldPos;
 
             // passType 只看人物中心所属 Tile，不使用物理 Collider/Trigger 范围。
             // 目标 Tile 不可通行时，放到目标附近最靠近的合法位置。
@@ -144,7 +149,7 @@ namespace Z_Map
                     if (lastNavMoveTime < 0f)
                         lastNavMoveTime = Time.time;
                     Vector3 dir = manager.updateCtrl.GetNavDir(data.pos, data.destination, (int)data.pathDis,
-                        GetNavigationRadius(), passTypes, navigationEndpointState);
+                        GetNavigationRadius(), passTypes, navigationEndpointState, GetNavigationSize());
                     bool movedThisFrame = false;
                     if (avoidPos <= 0 && dir.sqrMagnitude > 1e-8f)
                     {
@@ -225,32 +230,42 @@ namespace Z_Map
         ///    c. 若有避障方向且在同一半球内，计算滑行方向入队
         ///    d. 按最短碰撞距离截断移动并应用位置
         /// </summary>
+        internal int GetNavigationSize() => Mathf.Max(1, Mathf.RoundToInt(data.scale.x));
+
         internal float GetNavigationRadius()
         {
             bool hasPoint = false;
-            float minX = 0f;
-            float maxX = 0f;
-            float minZ = 0f;
-            float maxZ = 0f;
+            float minX = float.PositiveInfinity;
+            float maxX = float.NegativeInfinity;
+            float minZ = float.PositiveInfinity;
+            float maxZ = float.NegativeInfinity;
             foreach (var mesh in GetMeshes(CollideType.CollideOnly))
             {
                 if (mesh.positions == null)
                     continue;
+                if (mesh.type == Z_Mesh.MeshType.Sphere && mesh.positions.Length >= 6)
+                {
+                    // These six points rotate with the body; their world-axis
+                    // extrema are not the sphere's bounds. Match the physical
+                    // radius used by Graph.SphereIntersectCube instead.
+                    var right = mesh.positions[(int)Z_Math.Graph.SphereSixPoint.Right];
+                    var left = mesh.positions[(int)Z_Math.Graph.SphereSixPoint.Left];
+                    var center = (right + left) * .5f;
+                    float radius = (right - left).magnitude * .5f;
+                    minX = Mathf.Min(minX, center.x - radius);
+                    maxX = Mathf.Max(maxX, center.x + radius);
+                    minZ = Mathf.Min(minZ, center.z - radius);
+                    maxZ = Mathf.Max(maxZ, center.z + radius);
+                    hasPoint = true;
+                    continue;
+                }
                 foreach (var point in mesh.positions)
                 {
-                    if (!hasPoint)
-                    {
-                        minX = maxX = point.x;
-                        minZ = maxZ = point.z;
-                        hasPoint = true;
-                    }
-                    else
-                    {
-                        minX = Mathf.Min(minX, point.x);
-                        maxX = Mathf.Max(maxX, point.x);
-                        minZ = Mathf.Min(minZ, point.z);
-                        maxZ = Mathf.Max(maxZ, point.z);
-                    }
+                    minX = Mathf.Min(minX, point.x);
+                    maxX = Mathf.Max(maxX, point.x);
+                    minZ = Mathf.Min(minZ, point.z);
+                    maxZ = Mathf.Max(maxZ, point.z);
+                    hasPoint = true;
                 }
             }
             return hasPoint ? Mathf.Max(maxX - minX, maxZ - minZ) * 0.5f : 0f;
@@ -258,7 +273,9 @@ namespace Z_Map
         private void MoveForNavigation(Vector3 dir, bool directEndpoint)
         {
             bool previousEndpointMove = isNavEndpointMove;
+            bool previousNavigationMove = isNavigationMove;
             isNavEndpointMove = directEndpoint;
+            isNavigationMove = true;
             try
             {
                 Move(dir);
@@ -266,6 +283,7 @@ namespace Z_Map
             finally
             {
                 isNavEndpointMove = previousEndpointMove;
+                isNavigationMove = previousNavigationMove;
             }
         }
 
@@ -293,7 +311,7 @@ namespace Z_Map
                 remaining.y = 0f;
                 if (remaining.magnitude > delta.magnitude - step + 0.0001f) break;
                 direction = manager.updateCtrl.GetNavDir(data.pos, data.destination, (int)data.pathDis,
-                    GetNavigationRadius(), passTypes, navigationEndpointState);
+                    GetNavigationRadius(), passTypes, navigationEndpointState, GetNavigationSize());
             }
             return moved;
         }

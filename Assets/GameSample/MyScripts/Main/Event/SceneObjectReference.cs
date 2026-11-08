@@ -1,19 +1,22 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
+using System.Text.RegularExpressions;
 using Form;
+using Newtonsoft.Json.Linq;
 using Z_Map;
 using Z_Map.Form;
 using Z_UnitSystem.Form;
 
 public static partial class GlobalEventHelper
 {
-    // Bare numeric $so$ stays a legacy Unit UID. Product/template pools can overlap it.
+    // Numeric handles always name Products. Scene-only Units use an explicit u:.
     public enum ObjectReferenceKind { Unit, Product, Template }
 
     public static bool TryGetSceneObjectReference(string reference, out ObjectReferenceKind kind, out int id)
     {
-        kind = ObjectReferenceKind.Unit;
+        kind = ObjectReferenceKind.Product;
         id = 0;
         if (string.IsNullOrEmpty(reference)) return false;
         string marker;
@@ -31,6 +34,11 @@ public static partial class GlobalEventHelper
             kind = ObjectReferenceKind.Product;
             body = body.Substring(2);
         }
+        else if (marker == SCENEOBJECT && body.StartsWith("u:", StringComparison.Ordinal))
+        {
+            kind = ObjectReferenceKind.Unit;
+            body = body.Substring(2);
+        }
         else if (marker == SCENEOBJECT && body.StartsWith("t:", StringComparison.Ordinal))
         {
             kind = ObjectReferenceKind.Template;
@@ -41,7 +49,9 @@ public static partial class GlobalEventHelper
 
     public static string GetSceneObjectTemplateReference(int templateId) => GetName(SCENEOBJECT, "t:" + templateId);
 
-    public static string GetSceneObjectProductReference(int productUid) => GetName(SCENEOBJECT, "p:" + productUid);
+    public static string GetSceneObjectProductReference(int productUid) => GetName(SCENEOBJECT, productUid.ToString(CultureInfo.InvariantCulture));
+
+    public static string GetSceneUnitReference(int unitUid) => GetName(SCENEOBJECT, "u:" + unitUid.ToString(CultureInfo.InvariantCulture));
 
     public static string GetSceneObjectReference(MapUnit unit)
     {
@@ -50,7 +60,84 @@ public static partial class GlobalEventHelper
             var product = ObjectProductForm.GetProduct(obj.data);
             if (product != null) return GetSceneObjectProductReference(product.uid);
         }
-        return GetName(SCENEOBJECT, unit.data.uid.ToString(CultureInfo.InvariantCulture));
+        return GetSceneUnitReference(unit.data.uid);
+    }
+
+    public const string SceneObjectReferenceVersionKey = "sorv";
+    private const int SceneObjectReferenceVersion = 2;
+    private static readonly Regex sceneObjectReferences = new Regex(
+        @"\$so\$(?:(p:|u:|t:))?([0-9]+)\$so\$|\$sop\$([0-9]+)\$sop\$");
+
+    // Each Form row / map payload owns its version. Never infer an old handle's
+    // meaning by searching two registries whose UID pools can overlap.
+    public static bool MigrateSceneObjectReferences(JToken token)
+    {
+        if (token is JArray rows)
+        {
+            bool changed = false;
+            foreach (var row in rows.OfType<JObject>())
+                changed |= RewriteSceneObjectReferences(row, true);
+            return changed;
+        }
+        return token is JObject record && RewriteSceneObjectReferences(record, true);
+    }
+
+    public static T SaveSceneObjectReferences<T>(T token) where T : JToken
+    {
+        if (token is JArray rows)
+        {
+            foreach (var row in rows.OfType<JObject>())
+                RewriteSceneObjectReferences(row, false);
+        }
+        else if (token is JObject record)
+            RewriteSceneObjectReferences(record, false);
+        return token;
+    }
+
+    private static bool RewriteSceneObjectReferences(JObject record, bool loading)
+    {
+        int version = (int?)record[SceneObjectReferenceVersionKey] ?? 1;
+        bool legacyUnitNumbers = loading && version < SceneObjectReferenceVersion;
+        bool changed = version < SceneObjectReferenceVersion;
+        string originalCode = record["code"]?.Type == JTokenType.String ? (string)record["code"] : null;
+        foreach (var value in record.Descendants().OfType<JValue>())
+        {
+            if (value.Type != JTokenType.String)
+                continue;
+            string original = (string)value;
+            string migrated = sceneObjectReferences.Replace(original, match =>
+            {
+                bool oldTemplate = match.Groups[3].Success;
+                string digits = oldTemplate ? match.Groups[3].Value : match.Groups[2].Value;
+                if (!int.TryParse(digits, NumberStyles.None, CultureInfo.InvariantCulture, out int id) || id <= 0)
+                    return match.Value;
+                string prefix = match.Groups[1].Value;
+                if (oldTemplate || prefix == "t:")
+                {
+                    var product = ObjectProductForm.ResolveLegacyTemplate(id);
+                    return product == null ? match.Value : GetSceneObjectProductReference(product.uid);
+                }
+                if (prefix == "p:")
+                    return GetSceneObjectProductReference(id);
+                if (prefix.Length == 0 && legacyUnitNumbers)
+                    return GetSceneUnitReference(id);
+                return match.Value;
+            });
+            if (migrated == original)
+                continue;
+            value.Value = migrated;
+            changed = true;
+        }
+        if (version < SceneObjectReferenceVersion)
+            record[SceneObjectReferenceVersionKey] = SceneObjectReferenceVersion;
+        if (originalCode != null && originalCode != (string)record["code"])
+        {
+            // LoadEvent recompiles after registering every program, preserving
+            // source maps and cross-program calls after literal lengths change.
+            record["zCode"] = new JArray();
+            record["zCodeMap"] = new JArray();
+        }
+        return changed;
     }
 
     public static List<MapUnit> ResolveSceneObjectUnits(string reference)

@@ -13,6 +13,9 @@ using Z_Code;
 using Z_Code.Form;
 using Z_DesignStyle;
 using Z_Map;
+using Z_Map.Form;
+using Z_DataSystem.Form;
+using Z_UnitSystem.Form;
 using Z_Text.Form;
 using Z_Ui;
 using Z_Ui.Base;
@@ -40,6 +43,7 @@ public static class GlobalVariableSceneTriggerRegression
     {
         public int tag;
         public string name;
+        public string owner;
         public BoxDataForm.Data oldValue, newValue;
     }
 
@@ -69,6 +73,18 @@ public static class GlobalVariableSceneTriggerRegression
         }
     }
 
+    private sealed class UnitCaptureCmd : CmdBase
+    {
+        public override string GetName() => "GlobalUnitTriggerProbe";
+        public override CmdBase GetNew() => new UnitCaptureCmd();
+        protected override bool ExecuteInternal(BoxDataForm.Data[] prm, InterpretAsyncTask task)
+        {
+            captures.Add(new Observation { tag = (int)prm[0].num, owner = prm[1].str, name = prm[2].str,
+                oldValue = prm[3].DeepCopy(), newValue = prm[4].DeepCopy() });
+            return true;
+        }
+    }
+
     public static void Run()
     {
         bool previousPlaying = DynamicGlobalSettings.playing;
@@ -86,6 +102,7 @@ public static class GlobalVariableSceneTriggerRegression
             TriggerModes();
             GuardsAndAuthoring();
             PersistenceAndUidRetirement();
+            UnitBindingsAndRetirement();
             Debug.Log("GLOBAL_VARIABLE_SCENE_TRIGGER_REGRESSION_PASS checks=" + checks);
             EditorApplication.Exit(0);
         }
@@ -144,6 +161,12 @@ public static class GlobalVariableSceneTriggerRegression
             new List<string> { "tag", "name", "old", "new" },
             new List<string> { "num", "var", "var", "var" }, null, new List<string> { "void" },
             "", "GlobalSceneTriggerProbe(0,param1,param2,param3);"));
+        var unitCapture = new UnitCaptureCmd();
+        BaseData.cmdDic[unitCapture.GetName()] = unitCapture;
+        CmdDataForm.AddData(new CmdDataForm.Data(98102, unitCapture.GetName(),
+            new List<string> { "tag", "owner", "name", "old", "new" },
+            new List<string> { "num", "var", "var", "var", "var" }, null, new List<string> { "void" },
+            "", "GlobalUnitTriggerProbe(0,param1,param2,param3,param4);"));
         game = Manager<GameManager>();
         progress = ProgressForm.defaultData;
         progress.uid = 1;
@@ -262,6 +285,83 @@ public static class GlobalVariableSceneTriggerRegression
     }
 
     private static string Capture(int tag) => "GlobalSceneTriggerProbe(" + tag + ",param1,param2,param3);";
+
+    private static void UnitBindingsAndRetirement()
+    {
+        FreshCase();
+        var registered = new HashSet<Type>();
+        void Register(Type form)
+        {
+            if (!registered.Add(form)) return;
+            var parent = form.GetNestedType("Data")?.BaseType?.DeclaringType;
+            if (parent != null) Register(parent);
+            form.GetMethod("Register", HiddenStatic)?.Invoke(null, null);
+            form.GetMethod("InitInternal", BindingFlags.Static | BindingFlags.Public)?.Invoke(null, null);
+        }
+        foreach (var form in new[] { typeof(ObjectUnitForm), typeof(CharacterUnitForm), typeof(ItemUnitForm),
+            typeof(TileUnitForm), typeof(ObjectProductForm), typeof(CharacterProductForm), typeof(ItemProductForm), typeof(MapTextureForm) }) Register(form);
+        var global = Global("格挡1", Num(0)); string key = Prefix + global.uid;
+        string UnitCapture(int tag) => "GlobalUnitTriggerProbe(" + tag + ",param1,param2,param3,param4);";
+        EventTriggerForm.Data Trigger(int tag) => new EventTriggerForm.Data(-1, key,
+            new List<int> { Program(UnitCapture(tag)).uid }, TriggerType.NoLimit);
+        var product = ObjectProductForm.GetDataByJo(new JObject()); product.uid = 93001;
+        product.events = new Dictionary<string, EventTriggerForm.Data> { [key] = Trigger(31) };
+        ObjectProductForm.AddData(product);
+        var data = ObjectUnitForm.GetDataByJo(new JObject()); data.uid = 93002;
+        data.extra = new JObject { [ObjectProductForm.ProductVersionKey] = ObjectProductForm.ProductVersion,
+            [MapUnit.productKey] = new JArray(product.uid, -1) }.ToString(); ObjectUnitForm.AddData(data);
+        var local = new Dictionary<string, EventTriggerForm.Data> { [key] = Trigger(32),
+            [Prefix] = new EventTriggerForm.Data(-1, Prefix, new List<int> { Program(UnitCapture(33)).uid }, default) };
+        data.unit.evtDic = local;
+        var character = CharacterProductForm.GetDataByJo(new JObject()); character.uid = 93003;
+        character.events = new Dictionary<string, EventTriggerForm.Data> { [key] = Trigger(34) }; CharacterProductForm.AddData(character);
+        var ch = CharacterUnitForm.GetDataByJo(new JObject()); ch.uid = 93004;
+        ch.extra = new JObject { [MapUnit.productKey] = new JArray(character.uid, -1) }.ToString(); CharacterUnitForm.AddData(ch);
+        var item = ItemProductForm.GetDataByJo(new JObject()); item.uid = 93005;
+        item.events = new Dictionary<string, EventTriggerForm.Data> { [key] = Trigger(35) }; ItemProductForm.AddData(item);
+        var it = ItemUnitForm.GetDataByJo(new JObject()); it.uid = 93006;
+        it.extra = new JObject { [MapUnit.productKey] = new JArray(item.uid, -1) }.ToString(); ItemUnitForm.AddData(it);
+        var texture = MapTextureForm.GetDataByJo(new JObject()); texture.id = 93007;
+        texture.events = new Dictionary<string, EventTriggerForm.Data> { [key] = Trigger(36) }; MapTextureForm.AddData(texture);
+        var tile = TileUnitForm.GetDataByJo(new JObject()); tile.uid = 93008;
+        tile.texDic = new Dictionary<int, int> { [0] = texture.id }; TileUnitForm.AddData(tile);
+        Set(global.name, Num(2));
+        Check(EventInterpretDataForm.DataByUid.Values.All(evt => evt.sceneOwner != null),
+            "global Unit handlers capture their real scene-owner Data for cancellation and UID-reuse guards");
+        Tick();
+        Check(captures.Select(value => value.tag).OrderBy(value => value).SequenceEqual(new[] { 31, 32, 33, 34, 35, 36 }),
+            "Object, Character, Item and Tile instances execute their inherited and appended global bindings");
+        Check(captures.FindIndex(value => value.tag == 31) < captures.FindIndex(value => value.tag == 32)
+            && captures.All(value => value.name == global.name && value.oldValue.num == 0 && value.newValue.num == 2),
+            "prototype handlers run before instance appends with independent global-change arguments: "
+            + string.Join(";", captures.Select(value => value.tag + ":" + value.name + ":" + value.oldValue.num + "/" + value.newValue.num)));
+        foreach (var capture in captures)
+        {
+            int ownerUid = capture.tag <= 33 ? data.uid : capture.tag == 34 ? ch.uid : capture.tag == 35 ? it.uid : tile.uid;
+            Check(capture.owner == GlobalEventHelper.GetSceneUnitReference(ownerUid)
+                && ReferenceEquals(GlobalEventHelper.ResolveSceneObjectUnit(capture.owner)?.data, UnitForm.DataByUid[ownerUid]),
+                "Unit param1 resolves the exact owner for position/destruction commands, independently of the global name");
+        }
+        captures.Clear(); Set(global.name, Num(3)); ObjectUnitForm.RemoveData(data.uid); Tick();
+        Check(captures.All(value => value.tag != 31 && value.tag != 32 && value.tag != 33),
+            "removing a Unit suppresses its queued variable handlers");
+        ObjectUnitForm.AddData(data);
+        string originalExtra = data.extra;
+        var mapJson = new JObject { ["characterJa"] = new JArray(new JObject { ["extra"] = originalExtra,
+            ["untouched"] = key }).ToString(), ["other"] = "preserved" }.ToString();
+        Check(GlobalVariableTriggerBindings.RemoveFromJson(mapJson, key, out var cleaned),
+            "variable retirement traverses serialized map arrays and nested Unit extra JSON");
+        var cleanedMap = JObject.Parse(cleaned); var cleanedUnit = JArray.Parse((string)cleanedMap["characterJa"])[0];
+        var cleanedExtra = JObject.Parse((string)cleanedUnit["extra"]);
+        Check(((JArray)cleanedExtra["events"]).Count == 1 && (string)cleanedExtra["events"][0]["k"] == Prefix
+            && (string)cleanedUnit["untouched"] == key && (string)cleanedMap["other"] == "preserved",
+            "retiring an unloaded-map binding preserves Any and unrelated keys or values");
+        new ModAssetCtrl(null).DeleteGlobalVar(global.uid);
+        Check(!product.events.ContainsKey(key) && !character.events.ContainsKey(key) && !item.events.ContainsKey(key)
+            && !texture.events.ContainsKey(key) && !data.unit.evtDic.ContainsKey(key) && data.unit.evtDic.ContainsKey(Prefix),
+            "deleting a global retires Product, texture and live instance bindings before UID reuse");
+        ObjectUnitForm.Clear(); CharacterUnitForm.Clear(); ItemUnitForm.Clear(); TileUnitForm.Clear();
+    }
 
     private static EventTriggerForm.Data Bind(SceneForm.Data owner, string key, int tag,
         TriggerType type = TriggerType.NoLimit) => Bind(owner, key, type, Program(Capture(tag)));

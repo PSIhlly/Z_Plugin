@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using Form;
@@ -8,6 +9,8 @@ using UnityEditor;
 using UnityEngine;
 using Z_Code;
 using Z_Code.Form;
+using Z_DataSystem;
+using Z_DataSystem.Form;
 using Z_DesignStyle;
 using Z_Map;
 using Z_Map.Form;
@@ -77,7 +80,7 @@ public static class SceneObjectReferenceRegression
             var otherPrototype = Product(98112, 0, otherTemplate.id, 0, 55);
             var otherProduct = Product(98113, otherPrototype.uid, otherTemplate.id, 98106, 66);
             var otherUnit = Unit(98106, otherTemplate.id, otherProduct.uid);
-            string numeric = "$so$" + collisionId + "$so$";
+            string numeric = GlobalEventHelper.GetSceneUnitReference(collisionId);
             string authored = GlobalEventHelper.GetSceneObjectTemplateReference(template.id);
             string legacyTemplate = "$sop$" + template.id + "$sop$";
             string exact = GlobalEventHelper.GetSceneObjectReference(unitA.unit);
@@ -88,7 +91,7 @@ public static class SceneObjectReferenceRegression
             foreach (string first in new[] { exact, numeric })
             {
                 foreach (string second in new[] { authored, legacyTemplate, prototypeReference, siblingReference,
-                    "$so$" + unitB.uid + "$so$" })
+                    GlobalEventHelper.GetSceneUnitReference(unitB.uid) })
                     Check(Same(first, second) == 1f,
                         "Object prototype comparison accepts prototype and sibling references: " + first + "/" + second);
                 Check(Same(first, otherReference) == 0f, "different Object prototypes do not match");
@@ -111,12 +114,16 @@ public static class SceneObjectReferenceRegression
                 && sameExecution.stack.Count == 0, "interpreter preserves argument order and returns the comparison");
 
             CheckKind(numeric, GlobalEventHelper.ObjectReferenceKind.Unit, collisionId);
+            CheckKind("$so$" + collisionId + "$so$", GlobalEventHelper.ObjectReferenceKind.Product, collisionId);
             CheckKind(authored, GlobalEventHelper.ObjectReferenceKind.Template, template.id);
             CheckKind(legacyTemplate, GlobalEventHelper.ObjectReferenceKind.Template, template.id);
             CheckKind(exact, GlobalEventHelper.ObjectReferenceKind.Product, productA.uid);
-            Check(exact == "$so$p:" + productA.uid + "$so$", "new Object references carry the Product discriminator");
+            Check(exact == "$so$" + productA.uid + "$so$", "new Object references contain only the Product UID");
+            Check(GlobalEventHelper.ResolveSceneObjectUnits("$so$p:" + productA.uid + "$so$")
+                .SequenceEqual(new[] { unitA.unit }), "old p: handles remain exact Product aliases");
             Check(GlobalEventHelper.ResolveSceneObjectUnits(numeric).SequenceEqual(new[] { unitA.unit }),
-                "bare numeric reference remains one legacy Unit despite matching template/Product IDs");
+                "explicit Unit reference stays exact despite matching template/Product IDs");
+            ReferenceMigration(prototype.uid, template.id, productA.uid);
             foreach (string templateReference in new[] { authored, legacyTemplate, "$so$p:" + prototype.uid + "$so$" })
             {
                 Check(GlobalEventHelper.ResolveSceneObjectUnits(templateReference)
@@ -202,7 +209,7 @@ public static class SceneObjectReferenceRegression
                 "overlapping/reused Unit and Product UIDs keep their distinct comparison meanings");
             Check(GlobalEventHelper.ResolveSceneObjectUnits(exact).Count == 0
                 && GlobalEventHelper.ResolveSceneObjectUnit(numeric) == reused.unit,
-                "reused Unit UID cannot revive the old Product reference; bare legacy UID keeps its original semantics");
+                "reused Unit UID cannot revive the old Product reference; explicit Unit handle retains scene semantics");
             ObjectUnitForm.RemoveData(reused.uid);
             ObjectUnitForm.AddData(unitA);
 
@@ -295,6 +302,75 @@ public static class SceneObjectReferenceRegression
             .Invoke(command, new object[] { arguments, task });
         checks++;
         return task;
+    }
+
+    private static void ReferenceMigration(int prototypeUid, int templateId, int productUid)
+    {
+        string bare = "$so$" + productUid + "$so$";
+        string unit = GlobalEventHelper.GetSceneUnitReference(productUid);
+        var old = new JObject
+        {
+            ["code"] = "Return \"" + bare + "\";",
+            ["zCode"] = new JArray("stale"), ["zCodeMap"] = new JArray(0),
+            ["values"] = new JArray(bare, "$so$p:" + productUid + "$so$", "$so$t:" + templateId + "$so$",
+                "$sop$" + templateId + "$sop$", unit, "$so$p:bad$so$")
+        };
+        Check(GlobalEventHelper.MigrateSceneObjectReferences(old), "unversioned references migrate once");
+        Check((string)old["code"] == "Return \"" + unit + "\";" && !old["zCode"].HasValues && !old["zCodeMap"].HasValues,
+            "legacy numeric Unit literals migrate before event recompilation");
+        Check(old["values"].Values<string>().SequenceEqual(new[] { unit, bare,
+            "$so$" + prototypeUid + "$so$", "$so$" + prototypeUid + "$so$", unit, "$so$p:bad$so$" }),
+            "old Product/template aliases canonicalize without guessing colliding numeric IDs");
+        string migrated = old.ToString();
+        Check(!GlobalEventHelper.MigrateSceneObjectReferences(old) && old.ToString() == migrated,
+            "repeated migration preserves new numeric Product references");
+        var current = GlobalEventHelper.SaveSceneObjectReferences(new JObject { ["value"] = bare,
+            ["oldAlias"] = "$so$p:" + productUid + "$so$" });
+        Check((int)current[GlobalEventHelper.SceneObjectReferenceVersionKey] == 2
+            && (string)current["oldAlias"] == bare && !GlobalEventHelper.MigrateSceneObjectReferences(current)
+            && (string)current["value"] == bare, "save marks canonical references so reloading cannot reinterpret them as Units");
+        var map = new JObject { ["objectJa"] = "[]", ["itemJa"] = new JArray(new JObject
+            { ["extra"] = new JObject { ["unit"] = bare, ["product"] = "$so$p:" + productUid + "$so$" }.ToString() }).ToString() };
+        var mapJson = ObjectProductForm.MigrateSceneJson(map.ToString(), false);
+        var extra = JObject.Parse((string)JArray.Parse((string)JObject.Parse(mapJson)["itemJa"])[0]["extra"]);
+        Check((string)extra["unit"] == unit && (string)extra["product"] == bare
+            && ObjectProductForm.MigrateSceneJson(mapJson, false) == mapJson,
+            "nested scene extra strings migrate once, including scenes without Object placements");
+
+        Check(new DirectoryInfo(Path.GetDirectoryName(Application.dataPath)).Name.StartsWith("MapRuntimeRegression-"),
+            "file round-trip runs only in an isolated project");
+        foreach (var form in new[] { typeof(BoxDataForm), typeof(EventGlobalVariableForm), typeof(ProgramDataForm),
+            typeof(EventProgramDataForm), typeof(LabForm) })
+            form.GetMethod("Register", BindingFlags.Static | BindingFlags.NonPublic)?.Invoke(null, null);
+        string folder = Path.Combine(Path.GetDirectoryName(Application.dataPath), "ReferenceMigrationTest") + "/";
+        var save = new GameSaveController(GameManager.instance);
+        var legacyGlobal = new EventGlobalVariableForm.Data(99101, "reference", CodeHelper.CreateBoxByStr(bare));
+        SaveAndLoad.Save(folder + save.globalVariableFormFileName,
+            new JArray(EventGlobalVariableForm.GetJoByData(legacyGlobal)).ToString());
+        string original = SaveAndLoad.Load<string>(folder + save.globalVariableFormFileName);
+        save.LoadGlobalVariables(folder);
+        Check(EventGlobalVariableForm.DataByName["reference"].data.str == unit
+            && SaveAndLoad.Load<string>(folder + save.globalVariableFormFileName) == original,
+            "actual legacy global load preserves Unit semantics and never rewrites source files");
+        EventGlobalVariableForm.DataByName["reference"].data = CodeHelper.CreateBoxByStr(bare);
+        save.SaveGlobalVariables(folder); save.LoadGlobalVariables(folder);
+        Check(EventGlobalVariableForm.DataByName["reference"].data.str == bare,
+            "actual global save/load retains canonical Product references");
+
+        var legacyProgram = new EventProgramDataForm.Data(99102, "reference-migration", "Return \"" + bare + "\";",
+            new List<string> { "stale" }, new List<int> { 0 }, 0, "string", 0);
+        SaveAndLoad.Save(folder + save.eventFormFileName, new JArray(EventProgramDataForm.GetJoByData(legacyProgram)).ToString());
+        original = SaveAndLoad.Load<string>(folder + save.eventFormFileName);
+        save.LoadEvent(folder);
+        var program = EventProgramDataForm.DataByUid[99102];
+        Check(program.code == "Return \"" + unit + "\";" && program.zCode.Count > 0
+            && program.zCode.Count == program.zCodeMap.Count
+            && SaveAndLoad.Load<string>(folder + save.eventFormFileName) == original,
+            "legacy event load recompiles its migrated source without overwriting authored files");
+        Check(program.TryApplyCode("Return \"" + bare + "\";", out _, out _), "canonical Product literal compiles");
+        save.SaveEvent(folder); save.LoadEvent(folder);
+        Check(EventProgramDataForm.DataByUid[99102].code == "Return \"" + bare + "\";",
+            "actual event save/reload keeps a bare numeric Product UID");
     }
 
     private static void CheckKind(string reference, GlobalEventHelper.ObjectReferenceKind expected, int id)

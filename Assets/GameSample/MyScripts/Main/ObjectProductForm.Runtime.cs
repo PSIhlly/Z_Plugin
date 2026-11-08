@@ -199,11 +199,11 @@ namespace Form
 
         private static bool MigrateScene(JObject map, bool instantiate)
         {
+            bool changed = GlobalEventHelper.MigrateSceneObjectReferences(map);
             var token = map["objectJa"];
             if (token == null || token.Type == JTokenType.Null)
-                return false;
+                return changed;
             var objects = token.Type == JTokenType.String ? JArray.Parse((string)token) : (JArray)token;
-            bool changed = false;
             foreach (var obj in objects.OfType<JObject>())
             {
                 var extra = ParseExtra(obj["extra"]);

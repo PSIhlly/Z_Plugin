@@ -28,8 +28,13 @@ namespace Ui.ModStory.ModStoryItem.ModStoryItemUnit.ModStoryItemUnitConfig
     public partial class UiModStoryItemUnitConfigCtrl
     {
 
+        private EventChoose.UiSceneEventChooseList eventChooseList;
+        private TriggerEventChoose.GlobalVariableTriggerList globalTriggers;
+
         public override void OnCreate()
         {
+            eventChooseList = new EventChoose.UiSceneEventChooseList(this, view.go_eventChoose);
+            globalTriggers = new TriggerEventChoose.GlobalVariableTriggerList(this, view.go_triggerEventChoose);
 
 
 
@@ -69,6 +74,12 @@ namespace Ui.ModStory.ModStoryItem.ModStoryItemUnit.ModStoryItemUnitConfig
             model.data = param.data;
             Refresh();
         }
+        public override void OnHide()
+        {
+            eventChooseList?.Clear();
+            globalTriggers?.Clear();
+        }
+
         public void Refresh()
         {
             view.go_equipToggle.SetActive(GameManager.instance.curProgress.enableEquip);
@@ -83,23 +94,16 @@ namespace Ui.ModStory.ModStoryItem.ModStoryItemUnit.ModStoryItemUnitConfig
             view.model_EventChooseEquip.Set(new EventChoose.UiEventChooseParam() { dic = model.data.events, key = "onEquipEvent" });
             view.model_EventChooseDisequip.Set(new EventChoose.UiEventChooseParam() { dic = model.data.events, key = "onDisequipEvent" });
 
-            view.model_EventChooseCharacterTouch.Set(new EventChoose.UiEventChooseParam() { dic = model.data.events, key = "onCharacterTouchEvent" });
-            view.model_EventChooseCharacterLeave.Set(new EventChoose.UiEventChooseParam() { dic = model.data.events, key = "onCharacterLeaveEvent" });
-            view.model_EventChooseObjectTouch.Set(new EventChoose.UiEventChooseParam() { dic = model.data.events, key = "onObjectTouchEvent" });
-            view.model_EventChooseObjectLeave.Set(new EventChoose.UiEventChooseParam() { dic = model.data.events, key = "onObjectLeaveEvent" });
-            view.model_EventChooseTileTouch.Set(new EventChoose.UiEventChooseParam() { dic = model.data.events, key = "onTileTouchEvent" });
-            view.model_EventChooseShow.Set(new EventChoose.UiEventChooseParam() { dic = model.data.events, key = "onShowEvent" });
-            view.model_EventChoosePerSecond.Set(new EventChoose.UiEventChooseParam() { dic = model.data.events, key = "onPerSecondEvent" });
-            view.model_EventChooseBoundaryTouch.Set(new EventChoose.UiEventChooseParam() { dic = model.data.events, key = "onBoundaryTouchEvent" });
-            view.model_EventChooseInteract.Set(new EventChoose.UiEventChooseParam() { dic = model.data.events, key = "onInteractEvent" });
-            view.model_EventChooseClickMinimap.Set(new EventChoose.UiEventChooseParam() { dic = model.data.events, key = "onClickMinimapEvent" });
-            view.model_EventChooseClickMinimap.SetShow(GameManager.instance.curProgress.enableMinimap);
-
-            view.model_EventChooseLeaveScene.Set(new EventChoose.UiEventChooseParam() { dic = model.data.events, key = "onLeaveSceneEvent" });
+            eventChooseList.Render(model.data.events, GameManager.instance.curProgress.enableMinimap);
+            var data = model.data;
+            var events = data.events;
+            globalTriggers.Render(events, () => ReferenceEquals(model.data, data) && ReferenceEquals(data.events, events)
+                && ItemProductForm.DataByUid.TryGetValue(data.uid, out var current) && ReferenceEquals(current, data));
 
 
             view.go_minimap.SetActive(GameManager.instance.curProgress.enableMinimap);
             view.img_minimapIcon.BindTexData(TexAssetForm.DataById.GetDv(model.data.minimapIcon, TexAssetForm.DataById[GlobalDefaultHelper.DefaultStoryTexId]));
+            Z_Ui.UiManager.Rebuild(gameObject, true);
         }
     }
 

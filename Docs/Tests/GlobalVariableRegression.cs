@@ -157,7 +157,7 @@ public static class GlobalVariableRegression
         root.dic["title"] = CodeHelper.CreateBoxByStr("原始");
         var nested = CodeHelper.CreateBox();
         nested.dic["height"] = CodeHelper.CreateBoxByNum(0.5f);
-        nested.dic["reference"] = CodeHelper.CreateBoxByStr("$so$p:101$so$");
+        nested.dic["reference"] = CodeHelper.CreateBoxByStr("$so$101$so$");
         root.dic["nested"] = nested;
         return root;
     }
@@ -184,7 +184,7 @@ public static class GlobalVariableRegression
         var actual = Get("nested");
         Check(actual.dic.Count == 3 && actual.dic["x"].num == 2f && actual.dic["title"].str == "原始"
             && actual.dic["nested"].dic["height"].num == 0.5f
-            && actual.dic["nested"].dic["reference"].str == "$so$p:101$so$",
+            && actual.dic["nested"].dic["reference"].str == "$so$101$so$",
             "Source mutation, nested mutation and returned-container clearing do not leak into global storage");
         Check(BoxDataForm.DataByUid.Count == boxes,
             "Inline global Boxes are not registered as unrelated global Box Form rows");
@@ -275,7 +275,7 @@ public static class GlobalVariableRegression
             "Load replaces previous globals and retains numeric/string/empty-string Box types");
         var result = Get("nested");
         Check(result.dic["x"].num == 2f && result.dic["nested"].dic["height"].num == 0.5f
-            && result.dic["nested"].dic["reference"].str == "$so$p:101$so$",
+            && result.dic["nested"].dic["reference"].str == "$so$101$so$",
             "Nested dictionary values and reference strings survive the actual JSON/file round trip");
         result.dic["nested"].dic["height"].num = 9f;
         Check(Get("nested").dic["nested"].dic["height"].num == 0.5f,

@@ -36,6 +36,45 @@ public class CharacterSkillEvent : Z_Event
     public CharacterProductForm.Data data;
     public int skillUid;
 }
+
+public static class GlobalVariableTriggerBindings
+{
+    // MapMain stores the Unit arrays as JSON strings, and each Unit stores extra
+    // as another JSON string. Remove only this dictionary key, preserving all
+    // unrelated fields and Any bindings before the global UID can be reused.
+    public static bool RemoveFromJson(string json, string key, out string result)
+    {
+        result = json;
+        if (string.IsNullOrEmpty(json) || !json.Contains(key)) return false;
+        var token = JToken.Parse(json);
+        if (!Remove(token, key)) return false;
+        result = token.ToString(Newtonsoft.Json.Formatting.None);
+        return true;
+    }
+    private static bool Remove(JToken token, string key)
+    {
+        bool changed = false;
+        if (token is JObject obj)
+        {
+            if (obj["events"] is JArray entries)
+                foreach (var entry in entries.OfType<JObject>().Where(entry => (string)entry["k"] == key).ToArray())
+                { entry.Remove(); changed = true; }
+            foreach (var property in obj.Properties().ToArray())
+            {
+                if (property.Value.Type == JTokenType.String && (property.Name == "extra" || property.Name == "mapJa"
+                    || property.Name == "characterJa" || property.Name == "objectJa" || property.Name == "itemJa"))
+                {
+                    if (RemoveFromJson((string)property.Value, key, out var nested))
+                    { property.Value = nested; changed = true; }
+                }
+                else changed |= Remove(property.Value, key);
+            }
+        }
+        else if (token is JArray array)
+            foreach (var child in array) changed |= Remove(child, key);
+        return changed;
+    }
+}
 public class GameEventStoryTriggerController : Z_Controller<GameEventController>, IZ_Listener<StoryLifeEvent>, IZ_Listener<StoryItemEvent>, IZ_Listener<StoryCharacterEvent>, IZ_Listener<CharacterSkillEvent>, IZ_Listener<GlobalVariableChangedEvent>
 {
 
@@ -66,6 +105,28 @@ public class GameEventStoryTriggerController : Z_Controller<GameEventController>
         _super.TriggerEventExecute(scene.events.GetDv("onGlobalVarChangeEvent$", null), 0, heap, copyDefaultHeap: true);
         if (ReferenceEquals(game.curScene, scene))
             _super.TriggerEventExecute(scene.events.GetDv($"onGlobalVarChangeEvent${evt.uid}", null), 0, heap, copyDefaultHeap: true);
+        // Capture current-scene owners before dispatch. Each handler receives
+        // its own value snapshots and resolves prototype events before appends.
+        var owners = UnitForm.DataByUid.Values.Where(data => data.unit is MapUnit).ToArray();
+        foreach (var data in owners)
+        {
+            if (!ReferenceEquals(game.curScene, scene)) break;
+            if (!UnitForm.DataByUid.TryGetValue(data.uid, out var current) || !ReferenceEquals(current, data)) continue;
+            var unit = (MapUnit)data.unit;
+            // Unit events keep their exact owner in param1, as other scene-unit
+            // triggers do. Scene-level bindings retain name/old/new in param1..3.
+            var unitHeap = new Dictionary<string, BoxDataForm.Data>
+            {
+                { "param1", CodeHelper.CreateBoxByStr(GlobalEventHelper.GetSceneUnitReference(data.uid)) },
+                { "param2", heap["param1"] },
+                { "param3", heap["param2"] },
+                { "param4", heap["param3"] }
+            };
+            _super.TriggerEventExecute(unit.GetEvt("onGlobalVarChangeEvent$"), data.uid, unitHeap, copyDefaultHeap: true);
+            if (ReferenceEquals(game.curScene, scene) && UnitForm.DataByUid.TryGetValue(data.uid, out current)
+                && ReferenceEquals(current, data))
+                _super.TriggerEventExecute(unit.GetEvt($"onGlobalVarChangeEvent${evt.uid}"), data.uid, unitHeap, copyDefaultHeap: true);
+        }
     }
     public void OnEvent(StoryLifeEvent evt)
     {
@@ -85,7 +146,7 @@ public class GameEventStoryTriggerController : Z_Controller<GameEventController>
                 {
                     if (data.unit is MapUnit unit)
                     {
-                        var unitEvt = unit.evtDic.GetDv("onLeaveSceneEvent", null);
+                        var unitEvt = unit.GetEvt("onLeaveSceneEvent");
                         if (unitEvt != null)
                         {
                             _super.TriggerEventExecute(unitEvt, data.uid, null);

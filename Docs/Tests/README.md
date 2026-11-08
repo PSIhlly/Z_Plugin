@@ -1,11 +1,41 @@
 # Map runtime regression
 
+`Run-MapRuntimeRegression.ps1 -Fixture SkillUseCommandsRegression` runs the actual
+two-argument `UseSkill(character,skill)` and four equipped LightAttack/HeavyAttack/E/Q
+commands against `PlayInfoController.UseSkill`. Checks metadata/default compilation,
+event/clock ownership, cooldown enabled versus ignored and exact expiry, global
+skill enablement, current-slot replacement, prototype fan-out/unique characters,
+reentrant UID reuse, malformed/missing slots/references and unloaded controllers.
+Legacy source migration covers quoted punctuation, omitted/grouped third
+arguments and nested calls. Actual `LoadEvent` must recompile an old three-argument
+call despite stale bytecode, keep source-map counts aligned and leave its original
+temporary event file unchanged.
+It never opens a production story or save. Success marker:
+`SKILL_USE_COMMANDS_REGRESSION_PASS`; real HUD casting/skill visuals need a Play smoke test.
+
+`Run-MapRuntimeRegression.ps1 -Fixture CameraCommandsRegression` checks the real
+`MoveCamera(offset,seconds)`, `MoveCameraTo(position,seconds)` and `RestoreCamera()`
+commands in an isolated Unity project. Covers Scene CmdLab metadata/default-source
+compilation, relative versus absolute coordinates with nonuniform map scaling,
+bounded linear timing, immediate/invalid values, normal-follow suppression and
+current-player restoration, overlapping commands, same-frame task polling,
+scene/map/cancellation ownership, registration/disable/Play-End resets and unchanged
+camera-child pose/zoom. It never opens a production scene or save. Success marker:
+`CAMERA_COMMANDS_REGRESSION_PASS`; actual camera/shake rendering and scene entry
+still need a Mod/Play smoke test.
+
+`Run-MapRuntimeRegression.ps1 -Fixture SceneObjectReferenceRegression` covers canonical numeric Object Product references, legacy `p:` aliases, explicit scene-Unit handles, overlapping UID pools, prototype/exact targeting and command behavior. It also verifies `sorv=2` migration/idempotence, nested scene extras, and actual legacy/new event/global save-load round trips without rewriting source files.
+
+`Run-MapRuntimeRegression.ps1 -Fixture SceneBehaviourTriggerRegression` checks the scene-unit trigger list and pool reuse, protected inherited prefixes, editable/deletable local suffixes, duplicate-index selection, row-local history capture, Form round-trip, live prototype changes, cache invalidation, stale callback rejection and normal Story-window editing after pool reuse. The shared TriggerEventChoose Model renders inherited/local variable groups plus New, chooses Any or a stable global UID, reuses Scene parameter rename validation and serializes local create/rename/event edits/deletes without mutating inherited groups. It rejects renaming onto an inherited binding, preserves variable confirmation across same-owner refresh, rejects choices after owner replacement/hide/deletion, verifies immediate manager activation and releases its pooled rows and owned window. The parameter fixture matches the actual label-inside-edit-Button hierarchy, checking readable variable names, editable local parameters and disabled inherited parameters. Native Canvas/GraphicRaycaster checks cover TouchPass parent hits, underlying blocking UI, nested normal Buttons, disabled markers and preserved UGUI close clicks. Uses real production controllers in an isolated Unity project; actual prefab layout still needs an Editor smoke check.
+
+`Run-MapRuntimeRegression.ps1 -Fixture SceneEventChooseListRegression` exercises the real scene-event Model controllers and UiContainer pooling: the fixed eleven trigger rows, refresh/reopen instance reuse, minimap filtering without saved-data loss, current event-window binding, single click registration, and rejection of stale trigger-type callbacks after switching Product dictionaries. Actual prefab layout and mouse/touch raycasts still need an Editor smoke test.
+
 Product reference checks run in independent temporary Unity projects:
 
 - `Run-MapRuntimeRegression.ps1 -Fixture CharacterReferenceRegression`: Character constant registration/typed chooser metadata and literal compilation, exact/runtime versus prototype Character resolution, current-scene snapshots, unique singleton, invalid references, recycled Data identity, team/current remapping and independent skill copies. In Mod's event editor, manually select a `character` argument, choose the basic `Character` constant, select a Story Character, then Apply/reopen to confirm the quoted `$ch$ProductUid$ch$` persists; canceling must preserve the prior argument.
 - `Run-MapRuntimeRegression.ps1 -Fixture CharacterPartyRegression`: five Character party commands, command metadata/default compilation, prototype recruitment and fan-out, unique Characters, team/active/current invariants, idempotence, current-character fallback, deliberate reserve-only save reload versus legacy invalid-UID repair, invalid/omitted references, HUD/trigger null safety and existing team-slot UI entry points. Test actual HUD refresh/player switching in Play mode too.
 - `Run-MapRuntimeRegression.ps1 -Fixture CharacterRemovalRegression`: real legacy `DestroyCharacter` execution through Product and scene-Unit references for unique/non-unique Characters. Checks synchronous instance/registry/index/interaction cleanup, repeated deletion, preserved unique Product/parameter identities and party references, recreating a scene instance from that Product, and rejection of stale Data after Unit UID reuse. This focused fixture has no old Renderer API dependencies and never loads a story or save. Success is `CHARACTER_REMOVAL_REGRESSION_PASS`; actual scene UI and Player behavior still need a smoke check.
-- `Run-MapRuntimeRegression.ps1 -Fixture UnifiedDestroyRegression`: checks canonical `Destroy` metadata/scene Lab and both legacy aliases; Character/Object prototype fan-out and exact references; Item Product/scene references; unique Character preservation; registry, instance, interaction and owned-event/task cleanup; malformed/mismatched/Tile no-ops and reentrant UID reuse. Item destruction removes matching scene drops, never backpack entries or Item Products. Uses the real command and removal owners without loading a story/save. Success is `UNIFIED_DESTROY_REGRESSION_PASS`; real scene/Player smoke checks remain separate.
+- `Run-MapRuntimeRegression.ps1 -Fixture UnifiedDestroyRegression`: checks canonical `Destroy` metadata/scene Lab and both legacy aliases; Character/Object prototype fan-out and exact references; Item Product/scene references; unique Character preservation; registry, instance, interaction and owned-event/task cleanup; malformed/mismatched/Tile no-ops and reentrant UID reuse. Pre-destruction hooks cover still-live `param1`/GetPosition, prototype-before-local order, asynchronous completion before removal/caller continuation, nested Pause ownership, recursive self/mutual destruction, cancellation/reset cleanup and reused-UID protection. Item destruction removes matching scene drops, never backpack entries or Item Products. Uses the real command and removal owners without loading a story/save. Success is `UNIFIED_DESTROY_REGRESSION_PASS`; real scene/Player smoke checks remain separate.
 - `Run-MapRuntimeRegression.ps1 -Fixture ObjectProductRuntimeRegression`: legacy `mof` and wrapper `oprf` migration, full Product-owned model/events/animation/collision/params, transient MapObject rows, all-scene copies without scene provenance, idempotence, Mod memory-only loading, unvisited Core upgrades on explicit save, replacement-table round trips and reset.
 - `Run-MapRuntimeRegression.ps1 -Fixture SceneObjectReferenceRegression`: discriminated Unit/Product/template IDs, legacy `$sop$` compatibility, `IsSameObject` prototype comparisons and interpreter calls, parameter fan-out and saved cached values, unloaded Product reads/writes, malformed refs and actual multi-instance removal. Prototype comparison covers exact prototypes, sibling/self Products, different/zero prototypes, both invalid argument positions, unloaded Products and recycled Unit IDs.
 - `Run-MapRuntimeRegression.ps1 -Fixture SceneProductCommandRegression`: Character/Object template versus exact position/move/rotation, independent relative starts, bounded time, legacy duration aliases, original Data identity and all-target completion. It does not compile the unrelated renderer probes in the broad map fixture.
@@ -381,16 +411,36 @@ refilling the BFS budget. That synthetic graph has no physical Tiles/obstacles,
 so it does not replace collision/Trigger or real Player timing checks; replay
 the normal movement smoke checks and confirm frame-time in the target scene
 separately.
-The fixture also retains the former navigation-endpoint query cases without the
-large legacy fixture's renderer dependencies: blocked/missing/null/pass-restricted
-starts, retained escape centers and large-character clearance; blocked or
-pass-restricted destinations, graph movement before the final direct leg, same-cell
-target following, independent endpoint phases, and a closest geometric but
-unreachable anchor. Both an exhausted depth limit and an unfinished frame budget
-must not grant a direct segment; changing target cells invalidates old direct
-results and prevents an obsolete pending round from publishing its final leg.
-The actual Character check also verifies endpoint permission scope cleanup and
-teleport invalidation of its full cached route.
+Even-sized Character queries also carry explicit logical size. Size 2 must use
+the lower-right Tile as junction anchor and return that Tile's upper-left corner
+as the world waypoint. Tests cross two-cell-wide corridors in both orientations,
+steer from an off-center broad room into/out of the passage while the full body
+stays on supported cells, reject a one-cell corridor, and retain size-1 centers
+and size-4 clearance. Pass requirements use the right-down Tile consistently;
+size/parity changes invalidate cached coordinates without refilling the budget.
+A real scaled Sphere Character executes the same path through Move/ApplyMove.
+Sphere navigation radius must match the physical collision radius at every yaw,
+including world coordinates near 500 and sizes 1 through 4; rotated six-point
+samples are not world-axis sphere bounds. A real size-2 Character replays near
+and distant pursuit with target updates every 30 frames and alternating command
+and movement facing, retaining its cached route without backward realignment
+and without refilling the search budget.
+The fixture covers blocked/missing/pass-restricted starts and retained escape
+centers separately from target selection. An invalid destination is replaced
+BEFORE BFS by the first footprint/pass-safe point in increasing world Euclidean
+distance; equal-distance choices are arbitrary. Tests distinguish Euclidean from
+square rings, expand beyond three cells, compare different height layers, and
+verify size=2 clearance. Pending target lookup must spend at most ten work items
+per frame and leave the BFS visit table empty. Arrival stops at the replacement,
+including same-cell motion of the original blocked coordinate; disconnected
+chosen candidates retain normal BFS failure behavior. Start escape permissions,
+manual pass restrictions and teleport reset remain covered.
+A fixed 1,600-cell grid compares size=1/2 startup, edge targets, blocked starts
+and fresh queries after Reset. Tests reuse only the shared map geometry, while
+checking live obstacle changes. Real Tile prefabs verify Build/Rebuild index and
+bounds publication, stable graph/node identity, terrain/cell-size invalidation,
+and irregular-center fallback. Logged frame counts describe deterministic search
+latency, not measured Player frame time.
 Small open-grid checks retain center-line-only pass requirements on smoothed
 diagonals, immediate cached-raw fallback when a target's within-cell offset would
 cross a restricted neighbour, completion without repeated waits, and adoption of
@@ -763,14 +813,13 @@ in empty camera layers, sparse-column nearest-lower ownership, retained world
 height/rotation, immediate display, duplicate no-ops and local undo/redo/rebinding.
 Above-only or empty columns must reject without Form/history/redo changes. Map-cell
 dimensions and the existing logical-coordinate conversion remain authoritative.
-Object-picking checks drive actual pointer clicks in normal/Event mode with a
-lower owner but raised physical Collider and padded Trigger. They verify rejection
-continues to the lower ray hit, equality and height switching, child centers,
-rotation/scaling, multipart/disabled/inactive bodies, Trigger-only and Sphere
-prefabs, and higher-owner filtering without history operations. Empty-click
-fallback checks cover multiple raised Objects in overhead/side view, current-height
-priority, highest-to-lowest ray hits, Trigger-only/higher-owner fallback and truly
-empty clicks. Event Tile selection prevents fallback; normal mode ignores Tiles.
+Object-picking checks drive actual pointer Down/Up clicks through near-to-far,
+Unit-deduplicated ray candidates in normal/Event mode and overhead/side view.
+Repeated clicks advance from the current selected Unit and wrap to the top;
+changed lists, duplicate Colliders, single candidates and empty rays retain
+consistent behavior without editing-height/Collider-height prioritization.
+Event mode includes Tiles in the cycle; normal mode omits them. The focused
+ItemPicking entry also retains gameplay-collision-scale and pool-reuse checks.
 Full-occlusion checks require only an occludable Tile directly above the player,
 including zero, one or two cardinal neighbours; an absent/kept-visible center does
 not trigger full hiding. Preserve projected-height/front exceptions, keep full
@@ -803,10 +852,10 @@ The EditMode fixture explicitly registers/initializes child Forms because runtim
 registration callbacks do not run there. It never edits user story/save directories.
 Interaction argument checks invoke the real UiAction button listener and execute
 its event program. Character `param1` must carry its Product UID as `$ch$`, Object
-`param1` its scene Unit UID as `$so$`; `param2` remains the player Product. Scene
+`param1` its Product UID as `$so$`; `param2` remains the player Product. Scene
 event ownership still uses the emitting Unit/Data identity. Missing player or empty
-pooled row data must not launch an event. Existing BoundaryTouch references remain
-unchanged.
+pooled row data must not launch an event. BoundaryTouch keeps its scene-Unit
+identity for Characters through explicit `$so$u:UnitUid$so$` handles.
 Current-layer covered-roof checks also hide elevated Objects when one covers the
 player's exact Tile, extending through cardinal Tiles with elevated Object coverage.
 Foreign owners may seed/bridge the component; changing only belongTile preserves
@@ -924,13 +973,19 @@ no production story or save is loaded or changed. Success marker:
 Exercises the actual `SetGlobalVar` command, change event, Story trigger listener,
 queued event interpreter and normal LateUpdate scheduling in an isolated project.
 Bindings use the global UID (`onGlobalVarChangeEvent$UID`), or the empty Any suffix.
-Trigger arguments are `param1 = name`, `param2 = old value`, `param3 = new value`.
+Scene arguments are `param1 = name`, `param2 = old value`, `param3 = new value`.
+Unit arguments are `param1 = exact owner reference`, `param2 = name`,
+`param3 = old value`, `param4 = new value`, including the `格挡1` regression.
 Checks include deep equality and type changes, rename-stable matching, independent
 handler snapshots, same-value reassignments, scene/Mod/Leave guards and Scene JSON
 round trips. The actual Scene configuration builder and chooser callbacks also
 cover Any/UID selection, unused New keys, duplicate-target rejection and stale
 Scene/global-record protection. No production scene, UI or save is loaded. Success marker:
 `GLOBAL_VARIABLE_SCENE_TRIGGER_REGRESSION_PASS`.
+The same fixture checks global bindings on Object/Character/Item Products and
+Tile main textures, prototype-before-instance execution, scene-owner cancellation,
+and deletion from live bindings and nested unloaded-map JSON without removing Any
+or unrelated saved fields.
 
 ## ModStory typed defaults and global-variable editor
 

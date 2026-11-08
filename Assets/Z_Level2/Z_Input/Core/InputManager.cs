@@ -70,6 +70,11 @@ namespace Z_Input
         public float delta;
     }
 
+    // Implemented by higher-layer UI components without referencing their assembly.
+    public interface IInputUiPassThrough
+    {
+        bool passInputThrough { get; }
+    }
 
     [DefaultExecutionOrder(-100)]
     public class InputManager : Z_MonoManager<InputManager>
@@ -314,6 +319,9 @@ namespace Z_Input
             {
                 if (result.gameObject.layer == 5)
                 {
+                    var handler = ExecuteEvents.GetEventHandler<IPointerDownHandler>(result.gameObject);
+                    if (handler != null && handler.GetComponent<IInputUiPassThrough>()?.passInputThrough == true)
+                        continue;
                     return result.gameObject;
                 }
             }

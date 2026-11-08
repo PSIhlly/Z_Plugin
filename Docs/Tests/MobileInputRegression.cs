@@ -4,7 +4,7 @@
 namespace UnityEngine
 {
     public class DefaultExecutionOrder : Attribute { public DefaultExecutionOrder(int value) {} }
-    public class GameObject { public int layer = 5; public string name; public bool activeSelf=true; public bool activeInHierarchy=>activeSelf; public GameObject(string name = "") { this.name = name; } public void SetActive(bool value) {activeSelf=value;} }
+    public class GameObject { public int layer = 5; public string name; public object component; public bool activeSelf=true; public bool activeInHierarchy=>activeSelf; public GameObject(string name = "") { this.name = name; } public void SetActive(bool value) {activeSelf=value;} public T GetComponent<T>() where T:class => component as T; }
     public class Sprite {}
     public static class Time { public static float unscaledTime; }
     public struct Color { public float r,g,b,a; public Color(float r,float g,float b,float a) {this.r=r;this.g=g;this.b=b;this.a=a;} }
@@ -62,6 +62,8 @@ namespace UnityEngine
     public class Camera { public static Camera main = new Camera(); public float orthographicSize=5, aspect=1.5f; }
     namespace EventSystems
     {
+        public interface IPointerDownHandler {}
+        public static class ExecuteEvents { public static GameObject GetEventHandler<T>(GameObject go) => go; }
         public class PointerEventData { public Vector2 position; public PointerEventData(EventSystem system) {} }
         public struct RaycastResult { public GameObject gameObject; }
         public class EventSystem

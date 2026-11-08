@@ -21,7 +21,7 @@ namespace Z_DataSystem.Form
     {
         public partial class Data
         {
-            public void Play(MediaPlayer player, Action onComplete)
+            public UnityAction<MediaPlayer, MediaPlayerEvent.EventType, ErrorCode> Play(MediaPlayer player, Action onComplete)
             {
                 player.OpenMedia(new MediaPath(path, MediaPathType.AbsolutePathOrURL), true);
                 UnityAction<MediaPlayer, MediaPlayerEvent.EventType, ErrorCode> handler = null;
@@ -34,6 +34,7 @@ namespace Z_DataSystem.Form
                     }
                 };
                 player.Events.AddListener(handler);
+                return handler;
             }
         }
     }

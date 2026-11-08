@@ -31,6 +31,42 @@ namespace Z_Code
             // Capture all targets before any removal callback can change the
             // registries, Product references, or another target's identity.
             var targets = Snapshot(prm[0].str);
+            var controller = GameManager.instance.evtCtrl;
+            targets.RemoveAll(target => !SceneUnitCommand.IsLive(target.unit, target.data)
+                || !controller.BeginUnitDestroy(target.data));
+            if (targets.Count == 0) return true;
+            var operation = new PendingDestroy(controller, targets);
+            try
+            {
+                bool pending = false;
+                foreach (var target in targets)
+                {
+                    var trigger = target.unit.GetEvt("onDestroyEvent");
+                    if (trigger?.evt == null || trigger.evt.Count == 0) continue;
+                    target.executions = new List<EventInterpretDataForm.Data>();
+                    controller.TriggerEventExecute(trigger, target.data.uid, new Dictionary<string, BoxDataForm.Data>
+                    {
+                        { "param1", CodeHelper.CreateBoxByStr(GlobalEventHelper.GetSceneUnitReference(target.data.uid)) }
+                    }, copyDefaultHeap: true, executions: target.executions, blockingParent: GameEventController.RootEvent(asyncTask));
+                    pending |= target.executions.Count > 0;
+                }
+                if (!pending)
+                {
+                    operation.Commit();
+                    return true;
+                }
+                controller.StartTask(asyncTask, () => operation.Update(asyncTask), operation.Cancel);
+                return false;
+            }
+            catch
+            {
+                operation.Cancel();
+                throw;
+            }
+        }
+
+        private static void RemoveTargets(List<Target> targets)
+        {
             var removedCharacterProducts = new List<CharacterProductForm.Data>();
             foreach (var target in targets)
             {
@@ -56,7 +92,6 @@ namespace Z_Code
                 if (CharacterProductForm.DataByUid.TryGetValue(product.uid, out var registered)
                     && ReferenceEquals(registered, product) && !product.unique)
                     CharacterProductForm.RemoveData(product.uid);
-            return true;
         }
 
         private sealed class Target
@@ -65,6 +100,66 @@ namespace Z_Code
             public UnitForm.Data data;
             public CharacterProductForm.Data characterProduct;
             public bool preserveCharacterProduct;
+            public List<EventInterpretDataForm.Data> executions;
+        }
+
+        private sealed class PendingDestroy
+        {
+            private readonly GameEventController controller;
+            private readonly List<Target> targets;
+            private readonly SceneForm.Data scene;
+            private bool finished, committing;
+
+            public PendingDestroy(GameEventController controller, List<Target> targets)
+            {
+                this.controller = controller;
+                this.targets = targets;
+                scene = GameManager.instance.curScene;
+            }
+
+            public bool Update(InterpretAsyncTask task)
+            {
+                if (finished) return true;
+                if (!ReferenceEquals(GameManager.instance.curScene, scene)
+                    || GameManager.instance.curProgress.eventState == EventState.Leave)
+                {
+                    Cancel();
+                    task.Cancel();
+                    return true;
+                }
+                foreach (var target in targets)
+                    if (target.executions != null)
+                        foreach (var execution in target.executions)
+                            if (GameEventController.IsPendingEvent(execution)) return false;
+                Commit();
+                task.Complete();
+                return true;
+            }
+
+            public void Commit()
+            {
+                if (finished) return;
+                committing = true;
+                try { RemoveTargets(targets); }
+                finally { committing = false; Release(); }
+            }
+
+            public void Cancel()
+            {
+                // Removal of the caller's own Unit can cancel its task during
+                // Commit. Keep all reservations until that removal batch ends.
+                if (finished || committing) return;
+                finished = true;
+                foreach (var target in targets)
+                    if (target.executions != null) controller.CancelTriggerEvents(target.executions);
+                Release();
+            }
+
+            private void Release()
+            {
+                finished = true;
+                foreach (var target in targets) controller.EndUnitDestroy(target.data);
+            }
         }
 
         private static List<Target> Snapshot(string reference)

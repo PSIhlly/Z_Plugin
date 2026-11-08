@@ -166,6 +166,7 @@ public class ModSceneController : Z_Controller<ModManager>, InternalModSceneCont
 
     public void Begin(int id)
     {
+        selectedUnit = null;
         CommitPendingOperation();
         history?.Clear();
         history = new ModSceneHistory(mapMgr, id);
@@ -211,6 +212,7 @@ public class ModSceneController : Z_Controller<ModManager>, InternalModSceneCont
         history?.Clear();
         history = null;
         ResetPointer();
+        selectedUnit = null;
         enable = false;
         NotifyObjectMarkVisibility();
         NotifyManager.instance.ClearAll();
@@ -233,47 +235,25 @@ public class ModSceneController : Z_Controller<ModManager>, InternalModSceneCont
         return default(T);
     }
 
-    private static bool CanSelectObject(MapInstance ins, Collider hitCollider, float tileHeight)
+    private UnitForm.Data selectedUnit;
+
+    private MapInstance GetClickedInstance(List<RaycastHit> hits, bool includeTiles)
     {
-        if (!(ins is ObjectInstance obj))
-            return true;
-
-        const float heightTolerance = 0.0001f;
-        if (obj.unit.belongTile != null && obj.unit.belongTile.data.pos.y > tileHeight + heightTolerance)
-            return false;
-
-        // Ownership may remain on a lower Tile after raising the root/model.
-        // Use live physical bounds (including fitted/rotated child Colliders),
-        // not the padded picking Trigger or the Object root position.
-        bool hasBody = false;
-        foreach (var collider in obj.GetComponentsInChildren<Collider>())
-        {
-            if (!collider.enabled || collider.isTrigger)
-                continue;
-            hasBody = true;
-            if (collider.bounds.min.y <= tileHeight + heightTolerance)
-                return true;
-        }
-        // Trigger-only prefabs still use their actual picking bounds.
-        return !hasBody && hitCollider.bounds.min.y <= tileHeight + heightTolerance;
-    }
-
-    private static MapInstance GetClickedInstance(List<RaycastHit> hits, float tileHeight, bool includeTiles)
-    {
-        MapInstance fallback = null;
-        // Hits are sorted near-to-far: keep the original top-down picking order
-        // as a fallback, but prefer any target allowed at the editing height.
+        var candidates = new List<MapInstance>();
+        var owners = new HashSet<UnitForm.Data>();
         foreach (var hit in hits)
         {
             var ins = hit.transform.GetComponentInParent<MapInstance>();
             if (ins == null || (!includeTiles && !(ins is ObjectInstance || ins is ItemInstance || ins is CharacterInstance)))
                 continue;
-            if (CanSelectObject(ins, hit.collider, tileHeight))
-                return ins;
-            if (fallback == null)
-                fallback = ins;
+            var data = ins.unit?.data;
+            if (data != null && owners.Add(data)) candidates.Add(ins);
         }
-        return fallback;
+        if (candidates.Count == 0) return null;
+        int current = candidates.FindIndex(ins => ReferenceEquals(ins.unit.data, selectedUnit));
+        var chosen = candidates[(current + 1) % candidates.Count];
+        selectedUnit = chosen.unit.data;
+        return chosen;
     }
 
     public void OnMouse(bool click, Vector3 pos, Vector3 dir)
@@ -300,7 +280,8 @@ public class ModSceneController : Z_Controller<ModManager>, InternalModSceneCont
         }
         hits.Sort((a, b) =>
         {
-            return a.distance.CompareTo(b.distance);
+            int distance = a.distance.CompareTo(b.distance);
+            return distance != 0 ? distance : a.collider.GetInstanceID().CompareTo(b.collider.GetInstanceID());
         });
         Vector3 worldPosition;
         if (curData != null)
@@ -554,7 +535,7 @@ public class ModSceneController : Z_Controller<ModManager>, InternalModSceneCont
                     //click
                     if (click)
                     {
-                        var ins = GetClickedInstance(hits, CameraInstance.instance.tarTrs.position.y, false);
+                        var ins = GetClickedInstance(hits, false);
                         if (ins != null)
                         {
                             UiManager.instance.ShowUi<UiModSceneUnitCtrl>(new UiModSceneUnitParam()
@@ -579,7 +560,7 @@ public class ModSceneController : Z_Controller<ModManager>, InternalModSceneCont
                 //click
                 if (click)
                 {
-                    var ins = GetClickedInstance(hits, CameraInstance.instance.tarTrs.position.y, true);
+                    var ins = GetClickedInstance(hits, true);
                     if (ins != null)
                     {
                         UiManager.instance.ShowUi<UiModSceneBehaviourUnitCtrl>(new UiModSceneBehaviourUnitParam()

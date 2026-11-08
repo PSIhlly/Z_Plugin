@@ -39,7 +39,7 @@ namespace Z_Map.Analysis
     public interface NaviComponent
     {
         public Vector3 GetNextDir(Vector3 cur, Vector3 tar, int maxStep, float agentRadius,
-            IReadOnlyCollection<int> passTypes, NavigationEndpointState endpointState = null);
+            IReadOnlyCollection<int> passTypes, NavigationEndpointState endpointState = null, int agentSize = 1);
     }
 
     /// <summary>每个角色独立保存搜索进度、完整已完成路线与端点直线段。</summary>
@@ -48,9 +48,11 @@ namespace Z_Map.Analysis
         internal NavigationController controller;
         internal Vector3 destination;
         internal float radius;
+        internal int agentSize = 1;
+        internal Vector3 navigationOffset;
+        internal Vector3 localMoveTarget;
         internal readonly HashSet<int> passTypes = new HashSet<int>();
         internal NavUnit escapeAnchor;
-        internal bool finalApproach;
         internal Bfs.SearchState searchState;
         public bool isSearching { get; internal set; }
         public bool hasResult { get; internal set; }
@@ -66,33 +68,24 @@ namespace Z_Map.Analysis
             hasResult = false;
             controller = null;
             escapeAnchor = null;
-            finalApproach = false;
             directEndpoint = false;
             passTypes.Clear();
         }
 
         internal void Prepare(NavigationController current, Vector3 target, float agentRadius,
-            IReadOnlyCollection<int> allowedTypes)
+            IReadOnlyCollection<int> allowedTypes, int size, Vector3 offset)
         {
-            bool changedCell = controller == current && !destination.Equals(target)
-                && current.RealPos2MapPosInt(destination) != current.RealPos2MapPosInt(target);
-            if (controller != current || Mathf.Abs(radius - agentRadius) > 0.0001f
+            if (controller != current || agentSize != size || navigationOffset != offset
+                || Mathf.Abs(radius - agentRadius) > 0.0001f
                 || (allowedTypes == null ? passTypes.Count != 0 : !passTypes.SetEquals(allowedTypes)))
             {
                 Reset();
                 controller = current;
                 radius = agentRadius;
+                agentSize = size;
+                navigationOffset = offset;
                 if (allowedTypes != null)
                     passTypes.UnionWith(allowedTypes);
-            }
-            else if (changedCell)
-            {
-                // Moving targets must not starve a multi-frame round. Retain
-                // its snapshot and ordinary waypoint, but never extend an old
-                // blocked-target direct leg into another cell.
-                finalApproach = false;
-                if (searchState != null && searchState.resultDirect && searchState.resultFollowsTarget)
-                    hasResult = false;
             }
             destination = target;
             directEndpoint = false;
@@ -160,6 +153,31 @@ namespace Z_Map.Analysis
         private bool navCellLayoutInitialized;
         private int navCellLayoutCount;
         private int navCellLayoutHash;
+        private Dictionary<(int, int, int), NavUnit> columnIndexGraph;
+        private int columnIndexLayoutVersion, columnIndexCount;
+        private Vector3 columnIndexCellSize;
+        private Vector2Int columnIndexMin, columnIndexMax;
+
+        internal bool TryGetColumnBounds(out Vector2Int min, out Vector2Int max)
+        {
+            min = columnIndexMin; max = columnIndexMax;
+            return CanSearchNearbyColumns;
+        }
+
+        internal bool CanSearchNearbyColumns => columnIndexGraph != null && columnIndexGraph == navUnits
+            && columnIndexLayoutVersion == LayoutVersion && columnIndexCount == navUnits.Count
+            && columnIndexCellSize == _super.data.mainData.mapUnitSize;
+
+        internal bool TryGetColumnHeights(int x, int z, out SortedSet<int> heights) =>
+            _super.data.mapXZ2Y.TryGetValue((x, z), out heights);
+
+        private void PublishColumnIndex(bool regularCenters)
+        {
+            columnIndexGraph = regularCenters ? navUnits : null;
+            columnIndexLayoutVersion = LayoutVersion;
+            columnIndexCount = navUnits.Count;
+            columnIndexCellSize = _super.data.mainData.mapUnitSize;
+        }
         // Resolve each prefab name once per full pass, not four times per Tile.
         private readonly Dictionary<string, GameObject> groundPrefabs = new Dictionary<string, GameObject>();
 
@@ -212,6 +230,9 @@ namespace Z_Map.Analysis
 
         IEnumerator RebuildInternal(int step)
         {
+            bool regularCenters = true;
+            var columnMin = new Vector2Int(int.MaxValue, int.MaxValue);
+            var columnMax = new Vector2Int(int.MinValue, int.MinValue);
             int times = step == int.MaxValue ? 0 : step;
             int currentNavCellLayoutCount = 0;
             int currentNavCellLayoutHash = 17;
@@ -236,6 +257,8 @@ namespace Z_Map.Analysis
                 if (!TileUnitForm.DataByUid.ContainsKey(map.uid))
                     continue;
                 currentNavCellLayoutCount++;
+                columnMin = Vector2Int.Min(columnMin, new Vector2Int(map.mapPos.x, map.mapPos.z));
+                columnMax = Vector2Int.Max(columnMax, new Vector2Int(map.mapPos.x, map.mapPos.z));
                 unchecked
                 {
                     currentNavCellLayoutHash = currentNavCellLayoutHash * 31 + map.uid;
@@ -255,6 +278,13 @@ namespace Z_Map.Analysis
 
                 navUnit.realPos = map.pos;
                 navUnit.pos = map.mapPos;
+                var expectedCenter = MapPos2RealPos(map.mapPos);
+                if (Mathf.Abs(map.pos.x - expectedCenter.x) > 0.0001f
+                    || Mathf.Abs(map.pos.z - expectedCenter.z) > 0.0001f)
+                {
+                    regularCenters = false;
+                    columnIndexGraph = null;
+                }
                 navUnit.isNull = map.scale == Vector3.zero;
                 navUnit.objectBlocked = false;
                 navUnit.objectBlockedDirections = 0;
@@ -385,6 +415,8 @@ namespace Z_Map.Analysis
             }
             mapGroundBlocked.Clear();
             mapGroundBlocked.UnionWith(blocked);
+            columnIndexMin = columnMin; columnIndexMax = columnMax;
+            PublishColumnIndex(regularCenters && navUnits.Count == currentNavCellLayoutCount);
         }
 
         public void RefreshObjectTiles(IEnumerable<TileUnit> tiles)
@@ -452,6 +484,7 @@ namespace Z_Map.Analysis
         {
             if (navUnits == null || !_super.enable)
                 return;
+            columnIndexGraph = null;
             var keys = new HashSet<(int, int, int)>();
             var sources = new HashSet<int>();
             foreach (var pos in positions)
@@ -947,23 +980,29 @@ namespace Z_Map.Analysis
         private readonly Dictionary<(int, int), List<Vector2Int>> clearanceOffsetCache =
             new Dictionary<(int, int), List<Vector2Int>>();
 
-        public IReadOnlyList<Vector2Int> GetClearanceOffsets(float agentRadius)
+        public Vector3 GetNavigationOffset(int agentSize) => (agentSize & 1) == 0
+            ? new Vector3(-_super.data.mainData.mapUnitSize.x * .5f, 0f,
+                _super.data.mainData.mapUnitSize.z * .5f) : Vector3.zero;
+
+        public IReadOnlyList<Vector2Int> GetClearanceOffsets(float agentRadius, int agentSize = 1)
         {
             Vector3 cellSize = _super.data.mainData.mapUnitSize;
             float cellX = Mathf.Max(0.0001f, Mathf.Abs(cellSize.x));
             float cellZ = Mathf.Max(0.0001f, Mathf.Abs(cellSize.z));
-            int radiusX = agentRadius <= cellX * 0.5f + 0.0001f
-                ? 0
-                : Mathf.CeilToInt((agentRadius - cellX * 0.5f) / cellX);
-            int radiusZ = agentRadius <= cellZ * 0.5f + 0.0001f
-                ? 0
-                : Mathf.CeilToInt((agentRadius - cellZ * 0.5f) / cellZ);
-            var key = (radiusX, radiusZ);
+            agentSize = Mathf.Max(1, agentSize);
+            bool corner = (agentSize & 1) == 0;
+            int widthX = Mathf.Max(agentSize, corner
+                ? 2 * Mathf.CeilToInt(agentRadius / cellX - .0001f)
+                : 2 * Mathf.Max(0, Mathf.CeilToInt(agentRadius / cellX - .5f - .0001f)) + 1);
+            int widthZ = Mathf.Max(agentSize, corner
+                ? 2 * Mathf.CeilToInt(agentRadius / cellZ - .0001f)
+                : 2 * Mathf.Max(0, Mathf.CeilToInt(agentRadius / cellZ - .5f - .0001f)) + 1);
+            var key = (widthX, widthZ);
             if (!clearanceOffsetCache.TryGetValue(key, out var offsets))
             {
                 offsets = new List<Vector2Int>();
-                for (int x = -radiusX; x <= radiusX; x++)
-                for (int z = -radiusZ; z <= radiusZ; z++)
+                for (int x = -widthX / 2; x <= (widthX - 1) / 2; x++)
+                for (int z = -(widthZ - 1) / 2; z <= widthZ / 2; z++)
                     offsets.Add(new Vector2Int(x, z));
                 clearanceOffsetCache[key] = offsets;
             }
@@ -1002,7 +1041,8 @@ namespace Z_Map.Analysis
             if (!_super.enable || _super.data == null || navUnits == null || !(bfs is Bfs search))
                 return;
 
-            var offsets = GetClearanceOffsets(character == null ? 0f : character.GetNavigationRadius());
+            var offsets = GetClearanceOffsets(character == null ? 0f : character.GetNavigationRadius(),
+                character == null ? 1 : character.GetNavigationSize());
             var halfSize = _super.data.mainData.mapUnitSize * 0.5f;
             float halfX = Mathf.Abs(halfSize.x), halfZ = Mathf.Abs(halfSize.z);
             var previousColor = Gizmos.color;
@@ -1048,19 +1088,30 @@ namespace Z_Map.Analysis
 #endif
 
         public Vector3 GetNextDir(Vector3 cur, Vector3 tar, int maxStep, float agentRadius,
-            IReadOnlyCollection<int> passTypes, NavigationEndpointState endpointState = null)
+            IReadOnlyCollection<int> passTypes, NavigationEndpointState endpointState = null, int agentSize = 1)
         {
-            var res = bfs.GetNextDir(cur, tar, maxStep, agentRadius, passTypes, endpointState);
+            var res = bfs.GetNextDir(cur, tar, maxStep, agentRadius, passTypes, endpointState, agentSize);
             res.y = 0;
             return res;
         }
 
         public bool TryGetGroundUnit(Vector3 position, out NavUnit unit)
+            => TryGetNavigationGroundUnit(position, false, out unit);
+
+        internal Vector3Int RealPos2NavigationPosInt(Vector3 position, bool corner)
+        {
+            if (!corner) return RealPos2MapPosInt(position);
+            var pos = _super.utilCtrl.RealPos2MapPos(position);
+            return new Vector3Int(Mathf.FloorToInt(pos.x + .00001f), Mathf.RoundToInt(pos.y),
+                Mathf.CeilToInt(pos.z - .00001f));
+        }
+
+        internal bool TryGetNavigationGroundUnit(Vector3 position, bool corner, out NavUnit unit)
         {
             unit = null;
             if (navUnits == null)
                 return false;
-            var pos = RealPos2MapPosInt(position);
+            var pos = RealPos2NavigationPosInt(position, corner);
             if (navUnits.TryGetValue((pos.x, pos.y, pos.z), out unit) && !unit.isNull)
                 return true;
 

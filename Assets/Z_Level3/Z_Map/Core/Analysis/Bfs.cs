@@ -13,6 +13,13 @@ namespace Z_Map.Analysis
         private readonly NavigationEndpointState scratchEndpointState = new NavigationEndpointState();
         protected virtual int SearchFrame => Time.frameCount;
 
+        internal struct EndpointCandidate
+        {
+            internal NavUnit unit;
+            internal Vector2Int column;
+            internal float distance;
+        }
+
         // Growing buffers belong to the Character, never to the shared Bfs.
         internal sealed class SearchState
         {
@@ -24,21 +31,28 @@ namespace Z_Map.Analysis
             // a whole route synchronously or clear it when a new search starts.
             internal List<NavUnit> route = new List<NavUnit>();
             internal int routeIndex = -1;
-            internal bool routeReachesTarget, routeFinalApproach;
+            internal bool routeReachesTarget;
             internal Dictionary<NavUnit, int> pathIndices = new Dictionary<NavUnit, int>();
             internal Dictionary<NavUnit, int> routeIndices = new Dictionary<NavUnit, int>();
             internal readonly List<NavUnit> fromFootprint = new List<NavUnit>();
             internal Dictionary<(int, int, int), NavUnit> graph;
             internal IEnumerator routine;
             internal int layoutVersion, graphCount, maxStep, lastFrame = -1, work;
-            internal Vector3 current, roundDestination, resultTarget, resultDestination;
+            internal Vector3 current, resultTarget, resultDestination;
             internal bool resultDirect, resultFollowsTarget, resultStationary;
+            internal NavUnit nearest;
+            internal readonly List<EndpointCandidate> endpointHeap = new List<EndpointCandidate>();
+            internal readonly HashSet<Vector2Int> endpointColumns = new HashSet<Vector2Int>();
+            internal Vector3 roundRouteDestination;
+            internal bool roundTargetAdjusted, resultTargetAdjusted;
 
             internal void Cancel()
             {
                 (routine as System.IDisposable)?.Dispose();
                 routine = null;
                 steps.Clear(); pre.Clear(); queue.Clear(); path.Clear(); pathIndices.Clear(); fromFootprint.Clear();
+                nearest = null;
+                endpointHeap.Clear(); endpointColumns.Clear();
             }
 
             internal void Reset()
@@ -55,7 +69,7 @@ namespace Z_Map.Analysis
                 route.Clear();
                 routeIndices.Clear();
                 routeIndex = -1;
-                routeReachesTarget = routeFinalApproach = false;
+                routeReachesTarget = false;
             }
         }
 
@@ -67,10 +81,14 @@ namespace Z_Map.Analysis
         /// Callers sharing a Bfs must supply their own endpointState.
         /// </summary>
         public Vector3 GetNextDir(Vector3 cur, Vector3 tar, int maxStep, float agentRadius,
-            IReadOnlyCollection<int> passTypes, NavigationEndpointState endpointState = null)
+            IReadOnlyCollection<int> passTypes, NavigationEndpointState endpointState = null, int agentSize = 1)
         {
+            agentSize = Mathf.Max(1, agentSize);
             var state = endpointState ?? scratchEndpointState;
-            state.Prepare(nc, tar, agentRadius, passTypes);
+            var navigationOffset = nc.GetNavigationOffset(agentSize);
+            state.Prepare(nc, tar, agentRadius, passTypes, agentSize, navigationOffset);
+            cur -= navigationOffset;
+            tar -= navigationOffset;
             var search = state.searchState ?? (state.searchState = new SearchState());
             search.current = cur;
             if (nc.navUnits == null || nc.navUnits.Count == 0)
@@ -79,7 +97,8 @@ namespace Z_Map.Analysis
                 search.ClearRoute();
                 state.isSearching = false;
                 state.hasResult = false;
-                state.moveTarget = cur;
+                state.localMoveTarget = cur;
+                state.moveTarget = cur + navigationOffset;
                 state.directEndpoint = false;
                 return Vector3.zero;
             }
@@ -107,8 +126,7 @@ namespace Z_Map.Analysis
                 search.work = 0;
                 if (search.routine == null)
                 {
-                    search.roundDestination = tar;
-                    search.routine = Search(cur, tar, maxStep, nc.GetClearanceOffsets(agentRadius), state, search);
+                    search.routine = Search(cur, tar, maxStep, nc.GetClearanceOffsets(agentRadius, agentSize), state, search);
                 }
                 state.isSearching = true;
                 if (!search.routine.MoveNext())
@@ -122,7 +140,9 @@ namespace Z_Map.Analysis
             }
             else if (!state.hasResult)
                 state.isSearching = true;
-            return ReadResult(cur, tar, state, search);
+            var direction = ReadResult(cur, tar, state, search);
+            state.moveTarget = state.localMoveTarget + navigationOffset;
+            return direction;
         }
 
         private Vector3 ReadResult(Vector3 cur, Vector3 tar, NavigationEndpointState state, SearchState search)
@@ -135,11 +155,11 @@ namespace Z_Map.Analysis
                     search.routeIndex--;
 
                 var node = search.route[search.routeIndex];
-                var offsets = nc.GetClearanceOffsets(state.radius);
+                var offsets = nc.GetClearanceOffsets(state.radius, state.agentSize);
                 Vector3 routeTarget = search.routeIndex == 0 && search.routeReachesTarget
-                    ? (SameCell(search.resultDestination, tar) ? tar : search.resultDestination) : node.realPos;
+                    ? (!search.resultTargetAdjusted && SameCell(search.resultDestination, tar) ? tar : search.resultDestination) : node.realPos;
                 bool valid = CanFollowRoute(cur, node, routeTarget, offsets, state.passTypes);
-                if (!valid && nc.TryGetGroundUnit(cur, out var current)
+                if (!valid && TryGetGroundUnit(cur, offsets, out var current)
                     && search.routeIndices.TryGetValue(current, out int rawIndex) && rawIndex > search.routeIndex)
                 {
                     // A shortcut may no longer be safe while the completed raw
@@ -148,7 +168,7 @@ namespace Z_Map.Analysis
                     int nextIndex = AtRoutePoint(cur, current.realPos) ? rawIndex - 1 : rawIndex;
                     var next = search.route[nextIndex];
                     Vector3 nextTarget = nextIndex == 0 && search.routeReachesTarget
-                        ? (SameCell(search.resultDestination, tar) ? tar : search.resultDestination) : next.realPos;
+                        ? (!search.resultTargetAdjusted && SameCell(search.resultDestination, tar) ? tar : search.resultDestination) : next.realPos;
                     if (CanFollowRoute(cur, next, nextTarget, offsets, state.passTypes))
                     {
                         search.routeIndex = nextIndex;
@@ -161,32 +181,17 @@ namespace Z_Map.Analysis
                     search.ClearRoute();
                     state.hasResult = false;
                 }
-                else if (search.routeIndex == 0 && search.routeFinalApproach
-                    && SameCell(search.resultDestination, tar) && IsAtAnchor(cur, node)
-                    && (!nc.TryGetGroundUnit(tar, out var target) || !IsWalkable(target, offsets, state.passTypes)))
-                {
-                    // This end was proven closest-reachable by a completed
-                    // search, not by an exhausted frame/depth allowance.
-                    search.ClearRoute();
-                    // A round captured before entering this final phase must
-                    // not later publish its old anchor and pull the actor back.
-                    search.Cancel();
-                    search.resultTarget = tar;
-                    search.resultDirect = search.resultFollowsTarget = true;
-                    state.finalApproach = true;
-                    state.isSearching = false;
-                }
                 else
                 {
                     search.resultTarget = search.routeIndex == 0 && search.routeReachesTarget
                         ? search.resultDestination : node.realPos;
-                    search.resultFollowsTarget = search.routeIndex == 0 && search.routeReachesTarget;
+                    search.resultFollowsTarget = search.routeIndex == 0 && search.routeReachesTarget && !search.resultTargetAdjusted;
                 }
             }
-            state.moveTarget = !state.hasResult || search.resultStationary ? cur
+            state.localMoveTarget = !state.hasResult || search.resultStationary ? cur
                 : search.resultFollowsTarget && SameCell(search.resultDestination, tar) ? tar : search.resultTarget;
             state.directEndpoint = state.hasResult && search.resultDirect && !search.resultStationary;
-            return nc.GetNormalWithoutY(state.moveTarget - cur);
+            return nc.GetNormalWithoutY(state.localMoveTarget - cur);
         }
 
         private static bool AtRoutePoint(Vector3 current, Vector3 target)
@@ -199,7 +204,7 @@ namespace Z_Map.Analysis
             IReadOnlyCollection<int> passTypes)
         {
             if (!IsRegistered(target) || !IsWalkable(target, offsets, passTypes)
-                || !nc.TryGetGroundUnit(position, out var current) || !IsWalkable(current, offsets, passTypes))
+                || !TryGetGroundUnit(position, offsets, out var current) || !IsWalkable(current, offsets, passTypes))
                 return false;
             if (current == target) return true;
             if (Mathf.Abs(target.pos.x - current.pos.x) + Mathf.Abs(target.pos.z - current.pos.z) <= 1)
@@ -225,7 +230,7 @@ namespace Z_Map.Analysis
             Vector3 delta = worldTarget - position;
             delta.y = 0f;
             Vector3 step = delta.normalized * Mathf.Min(nc.MaxRouteMoveStep, delta.magnitude);
-            if (!nc.TryGetGroundUnit(position + step, out var entered) || !IsWalkable(entered, offsets, passTypes))
+            if (!TryGetGroundUnit(position + step, offsets, out var entered) || !IsWalkable(entered, offsets, passTypes))
                 return false;
             if (entered.pos.x != current.pos.x && entered.pos.z != current.pos.z)
             {
@@ -242,12 +247,8 @@ namespace Z_Map.Analysis
 
         private void Publish(NavigationEndpointState state, SearchState search, Vector3 target,
             bool direct = false, bool followsTarget = false, bool stationary = false,
-            NavUnit escape = null, bool finalApproach = false, int routeIndex = -1,
-            bool routeReachesTarget = false, bool routeFinalApproach = false)
+            NavUnit escape = null, int routeIndex = -1, bool routeReachesTarget = false)
         {
-            // A completed ordinary route to the snapshot is still useful, but
-            // an obsolete blocked-target direct leg must never become active.
-            if (finalApproach && !SameCell(search.roundDestination, state.destination)) return;
             if (routeIndex >= 0)
             {
                 var previous = search.route;
@@ -258,17 +259,16 @@ namespace Z_Map.Analysis
                 search.pathIndices = previousIndices;
                 search.routeIndex = routeIndex;
                 search.routeReachesTarget = routeReachesTarget;
-                search.routeFinalApproach = routeFinalApproach;
             }
             else
                 search.ClearRoute();
             search.resultTarget = target;
-            search.resultDestination = search.roundDestination;
+            search.resultDestination = search.roundRouteDestination;
+            search.resultTargetAdjusted = search.roundTargetAdjusted;
             search.resultDirect = direct;
-            search.resultFollowsTarget = followsTarget;
+            search.resultFollowsTarget = followsTarget && !search.roundTargetAdjusted;
             search.resultStationary = stationary;
             state.escapeAnchor = escape;
-            state.finalApproach = finalApproach;
             state.hasResult = true;
         }
 
@@ -277,31 +277,27 @@ namespace Z_Map.Analysis
         {
             search.pre.Clear(); search.steps.Clear(); search.queue.Clear();
             search.path.Clear(); search.pathIndices.Clear();
+            search.roundRouteDestination = tar;
+            search.roundTargetAdjusted = false;
             var passTypes = state.passTypes;
-            nc.TryGetGroundUnit(cur, out var first);
-            nc.TryGetGroundUnit(tar, out var requestedEnd);
-            bool targetWalkable = IsWalkable(requestedEnd, offsets, passTypes);
-            if (state.finalApproach && !targetWalkable)
-            {
-                Publish(state, search, tar, true, true, finalApproach: true);
-                yield break;
-            }
+            TryGetGroundUnit(cur, offsets, out var first);
+            TryGetGroundUnit(tar, offsets, out var requestedEnd);
 
             bool startWalkable = IsWalkable(first, offsets, passTypes);
             var escape = state.escapeAnchor;
+            // Even-sized agents first align with the corner represented by
+            // their lower-right Tile, then consume ordinary cached graph legs.
+            if ((state.agentSize & 1) == 0 && escape == null && !state.hasResult
+                && startWalkable && !IsAtAnchor(cur, first))
+                escape = first;
             if (escape != null && (!nc.navUnits.TryGetValue((escape.pos.x, escape.pos.y, escape.pos.z), out var registered)
                 || registered != escape || !IsWalkable(escape, offsets, passTypes)))
                 escape = null;
             if (escape == null && !startWalkable)
             {
-                // Finding the nearest legal start is budgeted too.
-                foreach (var pair in nc.navUnits)
-                {
-                    if (search.work >= CellsPerFrame) yield return null;
-                    search.work++;
-                    if (IsCloser(pair.Value, escape, cur) && IsWalkable(pair.Value, offsets, passTypes))
-                        escape = pair.Value;
-                }
+                using (var nearest = FindStartAnchor(cur, offsets, passTypes, search))
+                    while (nearest.MoveNext()) yield return nearest.Current;
+                escape = search.nearest;
             }
             if (escape != null)
             {
@@ -318,18 +314,39 @@ namespace Z_Map.Analysis
                 Publish(state, search, cur, stationary: true);
                 yield break;
             }
-            if (targetWalkable && first == requestedEnd)
+            if (!IsWalkable(requestedEnd, offsets, passTypes))
+            {
+                // Select a walkable target by Euclidean distance BEFORE BFS.
+                // Reachability is the following BFS's responsibility.
+                using (var nearest = FindTarget(tar, offsets, passTypes, search))
+                    while (nearest.MoveNext()) yield return nearest.Current;
+                requestedEnd = search.nearest;
+                if (requestedEnd == null)
+                {
+                    Publish(state, search, cur, stationary: true);
+                    yield break;
+                }
+                tar = requestedEnd.realPos;
+                search.roundRouteDestination = tar;
+                search.roundTargetAdjusted = true;
+            }
+            if ((state.agentSize & 1) == 0)
+            {
+                search.roundTargetAdjusted = true;
+                tar = requestedEnd.realPos;
+                search.roundRouteDestination = tar;
+            }
+            if (first == requestedEnd)
             {
                 Publish(state, search, tar, followsTarget: true);
                 yield break;
             }
 
-            var end = targetWalkable ? requestedEnd : null;
+            var end = requestedEnd;
             NavUnit minUnit = first;
             float minDis2 = (first.realPos - tar).sqrMagnitude;
             search.queue.Enqueue(first);
             search.steps[first] = 0;
-            bool searchLimited = false;
             bool reachedTarget = false;
             while (search.queue.Count > 0 && !reachedTarget)
             {
@@ -353,22 +370,24 @@ namespace Z_Map.Analysis
                         || !CanPassLinked(next, offsets, passTypes, search.fromFootprint)) continue;
                     if (step >= maxStep)
                     {
-                        searchLimited = true;
                         continue;
                     }
                     search.steps[next] = step + 1;
                     search.pre[next] = now;
                     search.queue.Enqueue(next);
-                    if (next == end) { reachedTarget = true; break; }
+                    if (next == end)
+                    {
+                        reachedTarget = true;
+                        break;
+                    }
                 }
             }
 
-            // A live target changing eligibility must not publish a stale
-            // endpoint leg. Retry on the next round while keeping the old result.
-            if (IsWalkable(requestedEnd, offsets, passTypes) != targetWalkable) yield break;
+            // Recheck the selected point after the multi-frame graph search.
+            if (!IsWalkable(requestedEnd, offsets, passTypes)) yield break;
             if (!reachedTarget)
             {
-                if (targetWalkable && minDis2 > 4f)
+                if (minDis2 > 4f)
                 {
                     Publish(state, search, cur, stationary: true);
                     yield break;
@@ -376,12 +395,7 @@ namespace Z_Map.Analysis
                 end = minUnit;
                 if (end == first)
                 {
-                    if (targetWalkable || searchLimited)
-                        Publish(state, search, cur, stationary: true);
-                    else if (!IsAtAnchor(search.current, end))
-                        Publish(state, search, end.realPos);
-                    else
-                        Publish(state, search, tar, true, true, finalApproach: true);
+                    Publish(state, search, cur, stationary: true);
                     yield break;
                 }
             }
@@ -405,19 +419,20 @@ namespace Z_Map.Analysis
 
             // Movement continues on the previous completed route. Rebase the
             // new route to the actor's current cell, never back to its old start.
-            if (!nc.TryGetGroundUnit(search.current, out var current)
+            if (!TryGetGroundUnit(search.current, offsets, out var current)
                 || !search.pathIndices.TryGetValue(current, out int startIndex)) yield break;
             if (startIndex == 0)
             {
                 Publish(state, search, reachedTarget ? tar : end.realPos, followsTarget: reachedTarget);
                 yield break;
             }
-            int radiusX = 1, radiusZ = 1;
+            int minX = 0, maxX = 0, minZ = 0, maxZ = 0;
             for (int o = 0; o < offsets.Count; o++)
             {
-                radiusX = Mathf.Max(radiusX, Mathf.Abs(offsets[o].x));
-                radiusZ = Mathf.Max(radiusZ, Mathf.Abs(offsets[o].y));
+                minX = Mathf.Min(minX, offsets[o].x); maxX = Mathf.Max(maxX, offsets[o].x);
+                minZ = Mathf.Min(minZ, offsets[o].y); maxZ = Mathf.Max(maxZ, offsets[o].y);
             }
+            if (offsets.Count == 1) { minX = minZ = -1; maxX = maxZ = 1; }
             var origin = current.pos;
             float groundY = current.realPos.y;
             int left = origin.x, right = origin.x, back = origin.z, forward = origin.z;
@@ -433,12 +448,12 @@ namespace Z_Map.Analysis
                 if (candidate.z > forward) { forward = candidate.z; checkForward = checkBack = forward; }
                 if (candidate.z < back) { back = candidate.z; checkForward = checkBack = back; }
                 bool valid = true;
-                for (int x = checkLeft - radiusX; x <= checkRight + radiusX && valid; x++)
-                for (int z = checkBack - radiusZ; z <= checkForward + radiusZ; z++)
+                for (int x = checkLeft + minX; x <= checkRight + maxX && valid; x++)
+                for (int z = checkBack + minZ; z <= checkForward + maxZ; z++)
                 {
                     if (search.work >= CellsPerFrame) yield return null;
                     search.work++;
-                    if (!CheckCell(x, z, origin.y, groundY, checkRight + radiusX, checkForward + radiusZ, out var cell))
+                    if (!CheckCell(x, z, origin.y, groundY, checkRight + maxX, checkForward + maxZ, out var cell))
                     { valid = false; break; }
                     if (!HasAllPassTypes(cell, passTypes)) rectanglePassTypesClear = false;
                 }
@@ -469,7 +484,7 @@ namespace Z_Map.Analysis
                     break;
                 }
             }
-            if (!nc.TryGetGroundUnit(search.current, out current)
+            if (!TryGetGroundUnit(search.current, offsets, out current)
                 || !search.pathIndices.TryGetValue(current, out int latestIndex)) yield break;
             if (latestIndex == 0)
             {
@@ -480,23 +495,23 @@ namespace Z_Map.Analysis
             if (!CanPass(current, search.path[latestIndex - 1], offsets, passTypes)) yield break;
             bool toRequestedTarget = reachedTarget && waypointIndex == 0 && smoothedToEnd;
             Vector3 nextTarget = toRequestedTarget ? tar : search.path[waypointIndex].realPos;
-            if (state.hasResult && search.routeIndex >= 0 && !AtRoutePoint(search.current, state.moveTarget))
+            if (state.hasResult && search.routeIndex >= 0 && !AtRoutePoint(search.current, state.localMoveTarget))
             {
                 // Entering a rounded cell does not mean its turn-center was
                 // reached. Retain that center instead of cutting its corner.
-                Vector3 oldDirection = state.moveTarget - search.current;
+                Vector3 oldDirection = state.localMoveTarget - search.current;
                 Vector3 newDirection = nextTarget - search.current;
                 oldDirection.y = newDirection.y = 0f;
                 if (Vector3.Dot(oldDirection.normalized, newDirection.normalized) < 0.9999f)
                 {
-                    if (AtRoutePoint(state.moveTarget, current.realPos))
+                    if (AtRoutePoint(state.localMoveTarget, current.realPos))
                     {
                         waypointIndex = latestIndex;
                         nextTarget = current.realPos;
                         toRequestedTarget = false;
                     }
                     else if (SameCell(search.resultDestination, tar)
-                        && CanFollowRoute(search.current, search.route[search.routeIndex], state.moveTarget, offsets, passTypes))
+                        && CanFollowRoute(search.current, search.route[search.routeIndex], state.localMoveTarget, offsets, passTypes))
                     {
                         // A same-target refresh must not reverse a still-valid
                         // smoothed leg. New targets or a blocked leg may reroute.
@@ -505,8 +520,164 @@ namespace Z_Map.Analysis
                 }
             }
             Publish(state, search, nextTarget,
-                followsTarget: toRequestedTarget, routeIndex: waypointIndex, routeReachesTarget: reachedTarget,
-                routeFinalApproach: !targetWalkable && !searchLimited);
+                followsTarget: toRequestedTarget, routeIndex: waypointIndex, routeReachesTarget: reachedTarget);
+        }
+
+        private static void PushEndpoint(SearchState search, EndpointCandidate candidate)
+        {
+            var heap = search.endpointHeap;
+            int at = heap.Count;
+            heap.Add(candidate);
+            while (at > 0)
+            {
+                int parent = (at - 1) / 2;
+                if (heap[parent].distance <= candidate.distance) break;
+                heap[at] = heap[parent]; at = parent;
+            }
+            heap[at] = candidate;
+        }
+
+        private static EndpointCandidate PopEndpoint(SearchState search)
+        {
+            var heap = search.endpointHeap;
+            var result = heap[0]; var last = heap[heap.Count - 1];
+            heap.RemoveAt(heap.Count - 1);
+            int at = 0;
+            while (at * 2 + 1 < heap.Count)
+            {
+                int child = at * 2 + 1;
+                if (child + 1 < heap.Count && heap[child + 1].distance < heap[child].distance) child++;
+                if (heap[child].distance >= last.distance) break;
+                heap[at] = heap[child]; at = child;
+            }
+            if (heap.Count > 0) heap[at] = last;
+            return result;
+        }
+
+        private void QueueEndpointColumn(SearchState search, Vector3 position, int x, int z,
+            Vector2Int min, Vector2Int max)
+        {
+            if (x < min.x || x > max.x || z < min.y || z > max.y) return;
+            var column = new Vector2Int(x, z);
+            if (!search.endpointColumns.Add(column)) return;
+            var center = nc.MapPos2RealPos(new Vector3Int(x, 0, z));
+            float dx = Mathf.Max(0f, Mathf.Abs(center.x - position.x) - .0002f);
+            float dz = Mathf.Max(0f, Mathf.Abs(center.z - position.z) - .0002f);
+            PushEndpoint(search, new EndpointCandidate { column = column, distance = dx * dx + dz * dz });
+        }
+
+        private IEnumerator<object> FindTarget(Vector3 position, IReadOnlyList<Vector2Int> offsets,
+            IReadOnlyCollection<int> passTypes, SearchState search)
+        {
+            search.nearest = null;
+            search.endpointHeap.Clear(); search.endpointColumns.Clear();
+            if (nc.TryGetColumnBounds(out var min, out var max))
+            {
+                var center = nc.RealPos2MapPosInt(position);
+                QueueEndpointColumn(search, position, Mathf.Clamp(center.x, min.x, max.x),
+                    Mathf.Clamp(center.z, min.y, max.y), min, max);
+                int columns = 0;
+                bool fallback = false;
+                while (search.endpointHeap.Count > 0)
+                {
+                    if (search.work >= CellsPerFrame) yield return null;
+                    search.work++;
+                    if (!nc.CanSearchNearbyColumns || columns > Mathf.Max(32, nc.navUnits.Count))
+                    { fallback = true; break; }
+                    var candidate = PopEndpoint(search);
+                    if (candidate.unit != null)
+                    {
+                        if (IsRegistered(candidate.unit) && IsWalkable(candidate.unit, offsets, passTypes))
+                        { search.nearest = candidate.unit; yield break; }
+                        continue;
+                    }
+                    columns++;
+                    int x = candidate.column.x, z = candidate.column.y;
+                    if (nc.TryGetColumnHeights(x, z, out var heights))
+                        foreach (int y in heights)
+                        {
+                            if (search.work >= CellsPerFrame) yield return null;
+                            search.work++;
+                            if (nc.navUnits.TryGetValue((x, y, z), out var node))
+                                PushEndpoint(search, new EndpointCandidate { unit = node,
+                                    distance = (node.realPos - position).sqrMagnitude });
+                        }
+                    QueueEndpointColumn(search, position, x + 1, z, min, max);
+                    QueueEndpointColumn(search, position, x - 1, z, min, max);
+                    QueueEndpointColumn(search, position, x, z + 1, min, max);
+                    QueueEndpointColumn(search, position, x, z - 1, min, max);
+                }
+                if (!fallback) yield break;
+            }
+            // Irregular centers or very sparse bounds: order actual nodes by
+            // Euclidean distance instead of expanding an enormous empty area.
+            search.endpointHeap.Clear(); search.endpointColumns.Clear();
+            foreach (var node in nc.navUnits.Values)
+            {
+                if (search.work >= CellsPerFrame) yield return null;
+                search.work++;
+                PushEndpoint(search, new EndpointCandidate { unit = node,
+                    distance = (node.realPos - position).sqrMagnitude });
+            }
+            while (search.endpointHeap.Count > 0)
+            {
+                if (search.work >= CellsPerFrame) yield return null;
+                search.work++;
+                var node = PopEndpoint(search).unit;
+                if (IsRegistered(node) && IsWalkable(node, offsets, passTypes))
+                { search.nearest = node; yield break; }
+            }
+        }
+
+        private IEnumerator<object> FindStartAnchor(Vector3 position, IReadOnlyList<Vector2Int> offsets,
+            IReadOnlyCollection<int> passTypes, SearchState search)
+        {
+            search.nearest = null;
+            if (nc.CanSearchNearbyColumns)
+            {
+                var center = nc.RealPos2MapPosInt(position);
+                // Reuse the map's cached height-column index. Near an edge or
+                // small obstacle, a few columns suffice to prove the global
+                // nearest point, including candidates on other height layers.
+                for (int ring = 0; ring <= 3; ring++)
+                {
+                    for (int x = center.x - ring; x <= center.x + ring; x++)
+                    for (int z = center.z - ring; z <= center.z + ring; z++)
+                    {
+                        if (ring > 0 && x > center.x - ring && x < center.x + ring
+                            && z > center.z - ring && z < center.z + ring) continue;
+                        if (!nc.TryGetColumnHeights(x, z, out var heights) || heights.Count == 0)
+                        {
+                            if (search.work >= CellsPerFrame) yield return null;
+                            search.work++;
+                            continue;
+                        }
+                        foreach (int y in heights)
+                        {
+                            if (search.work >= CellsPerFrame) yield return null;
+                            search.work++;
+                            if (nc.navUnits.TryGetValue((x, y, z), out var candidate)
+                                && IsCloser(candidate, search.nearest, position)
+                                && IsWalkable(candidate, offsets, passTypes)) search.nearest = candidate;
+                        }
+                    }
+                    var low = nc.MapPos2RealPos(new Vector3Int(center.x - ring - 1, 0, center.z - ring - 1));
+                    var high = nc.MapPos2RealPos(new Vector3Int(center.x + ring + 1, 0, center.z + ring + 1));
+                    float gap = Mathf.Min(Mathf.Min(Mathf.Abs(low.x - position.x), Mathf.Abs(high.x - position.x)),
+                        Mathf.Min(Mathf.Abs(low.z - position.z), Mathf.Abs(high.z - position.z))) - .0002f;
+                    if (search.nearest != null && gap > 0f
+                        && (search.nearest.realPos - position).sqrMagnitude + .000001f < gap * gap)
+                        yield break;
+                }
+            }
+            // An unproven start anchor retains the exhaustive nearest lookup.
+            foreach (var pair in nc.navUnits)
+            {
+                if (search.work >= CellsPerFrame) yield return null;
+                search.work++;
+                if (IsCloser(pair.Value, search.nearest, position)
+                    && IsWalkable(pair.Value, offsets, passTypes)) search.nearest = pair.Value;
+            }
         }
 
         private static bool IsAtAnchor(Vector3 cur, NavUnit unit)
@@ -514,6 +685,12 @@ namespace Z_Map.Analysis
             var delta = cur - unit.realPos;
             delta.y = 0f;
             return delta.sqrMagnitude <= 0.05f * 0.05f;
+        }
+
+        private bool TryGetGroundUnit(Vector3 position, IReadOnlyList<Vector2Int> offsets, out NavUnit unit)
+        {
+            bool corner = offsets.Count > 0 && offsets[0].x + offsets[offsets.Count - 1].x != 0;
+            return nc.TryGetNavigationGroundUnit(position, corner, out unit);
         }
 
         private bool IsRegistered(NavUnit unit) => unit != null

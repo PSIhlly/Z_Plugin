@@ -1,0 +1,14 @@
+[
+  {
+    "uid": 1,
+    "name": "格挡1",
+    "data": {
+      "uid": -1,
+      "str": null,
+      "valName": null,
+      "num": 0.0,
+      "dic": null
+    },
+    "sorv": 2
+  }
+]

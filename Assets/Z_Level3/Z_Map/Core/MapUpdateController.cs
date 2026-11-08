@@ -1131,9 +1131,9 @@ namespace Z_Map
                 _super.navigationCtrl.RefreshObjectTiles(tiles);
         }
         public Vector3 GetNavDir(Vector3 cur, Vector3 tar, int maxStep = 99999, float agentRadius = 0f,
-            IReadOnlyCollection<int> passTypes = null, NavigationEndpointState endpointState = null)
+            IReadOnlyCollection<int> passTypes = null, NavigationEndpointState endpointState = null, int agentSize = 1)
         {
-            return _super.navigationCtrl.GetNextDir(cur, tar, maxStep, agentRadius, passTypes, endpointState);
+            return _super.navigationCtrl.GetNextDir(cur, tar, maxStep, agentRadius, passTypes, endpointState, agentSize);
         }
         public void ResetView()
         {

@@ -50,19 +50,24 @@ namespace Z_Map
     {
         public static string evtKey = "events";
         private Dictionary<string, EventTriggerForm.Data> _evtSet;
+        private string _evtExtra;
+        private Dictionary<string, EventTriggerForm.Data> combinedEvents;
         public Dictionary<string, EventTriggerForm.Data> evtDic
         {
             get
             {
-                if (_evtSet == null)
+                if (_evtSet == null || _evtExtra != data.extra)
                 {
+                    _evtExtra = data.extra;
+                    combinedEvents?.Clear();
                     _evtSet = new Dictionary<string, EventTriggerForm.Data>();
                     if (!string.IsNullOrEmpty(data.extra))
                     {
                         var jo = JObject.Parse(data.extra);
                         if (jo != null && jo[evtKey] != null)
                         {
-                            _evtSet = jo.Get<Dictionary<string, EventTriggerForm.Data>>(evtKey);
+                            _evtSet = jo.Get<Dictionary<string, EventTriggerForm.Data>>(evtKey)
+                                ?? new Dictionary<string, EventTriggerForm.Data>();
                         }
                     }
 
@@ -84,32 +89,52 @@ namespace Z_Map
                 }
                 data.extra = jo.ToString();
                 _evtSet = value;
+                _evtExtra = data.extra;
+                combinedEvents?.Clear();
             }
 
         }
+        public Dictionary<string, EventTriggerForm.Data> GetPrototypeEvents()
+        {
+            if (this is CharacterUnit chU && CharacterProductForm.DataByUid.TryGetValue(chU.productInfo.Item1, out var ch))
+                return ch.events;
+            if (this is ObjectUnit oU && ObjectProductForm.GetProduct(oU.data) is ObjectProductForm.Data ob)
+                return ob.events;
+            if (this is ItemUnit iU && ItemProductForm.DataByUid.TryGetValue(iU.productInfo.Item1, out var it))
+                return it.events;
+            if (this is TileUnit tile && tile.data.texDic.TryGetValue(0, out int textureId)
+                && MapTextureForm.DataById.TryGetValue(textureId, out var texture))
+                return texture.events;
+            return null;
+        }
+        public EventTriggerForm.Data GetPrototypeEvt(string name) => GetPrototypeEvents()?.GetDv(name, null);
+
         public EventTriggerForm.Data GetEvt(string name)
         {
-            EventTriggerForm.Data trigger = null;
-            if (evtDic.ContainsKey(name) && evtDic[name].evt.Count > 0)
+            var prototype = GetPrototypeEvt(name);
+            evtDic.TryGetValue(name, out var local);
+            if (local?.evt == null || local.evt.Count == 0)
+                return prototype;
+            if (prototype?.evt == null)
+                return local;
+
+            // Retain a runtime-only merged trigger; never put inherited IDs into extra.
+            if (combinedEvents == null)
+                combinedEvents = new Dictionary<string, EventTriggerForm.Data>();
+            if (!combinedEvents.TryGetValue(name, out var combined))
+                combinedEvents[name] = combined = GameEventController.CreateTrigger(name);
+            combined.type = prototype.type;
+            bool unchanged = combined.evt.Count == prototype.evt.Count + local.evt.Count;
+            for (int i = 0; unchanged && i < combined.evt.Count; i++)
+                unchanged = combined.evt[i] == (i < prototype.evt.Count
+                    ? prototype.evt[i] : local.evt[i - prototype.evt.Count]);
+            if (!unchanged)
             {
-                trigger = evtDic[name];
+                var events = new List<int>(prototype.evt);
+                events.AddRange(local.evt);
+                combined.evt = events;
             }
-            else
-            {
-                if (this is CharacterUnit chU && CharacterProductForm.DataByUid.TryGetValue(chU.productInfo.Item1, out var ch) && ch.events.ContainsKey(name))
-                {
-                    trigger = ch.events[name];
-                }
-                else if (this is ObjectUnit oU && ObjectProductForm.GetProduct(oU.data) is ObjectProductForm.Data ob && ob.events.ContainsKey(name))
-                {
-                    trigger = ob.events[name];
-                }
-                else if (this is ItemUnit iU && ItemProductForm.DataByUid.TryGetValue(iU.productInfo.Item1, out var it) && it.events.ContainsKey(name))
-                {
-                    trigger = it.events[name];
-                }
-            }
-            return trigger;
+            return combined;
         }
         public bool ExecuteEvt(string name, Dictionary<string, BoxDataForm.Data> defaultHeap)
         {

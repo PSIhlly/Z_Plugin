@@ -1,17 +1,7 @@
 using Form;
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using Unity.VisualScripting;
+using System.Globalization;
 using UnityEngine;
-using UnityEngine.Rendering;
 using Z_Code.Form;
-using Z_DesignStyle;
-using Z_Map;
-using Z_Text;
-using Z_Ui.Dialog;
-using Z_Ui.Notify;
-using Z_UnitSystem.Form;
 
 namespace Z_Code
 {
@@ -26,19 +16,99 @@ namespace Z_Code
         public override CmdBase GetNew() => new UseSkillCmd();
         protected override bool ExecuteInternal(BoxDataForm.Data[] prm, InterpretAsyncTask asyncTask)
         {
-            foreach (var ch in CharacterProductForm.ResolveReferences(prm[0].str))
-            {
-                var data = SkillProductForm.GetByEvtName(prm[1].str, ch.uid);
-                if (data != null)
-                {
-                    PlayManager.instance.infoCtrl.UseSkill(ch.uid, data.uid,  prm[2].num == 1);
-                }
-            }
-
-
-
-
+            CharacterSkillCommand.Use(prm[0].str, prm[1].str, null, ignoreCd: true);
             return true;
+        }
+    }
+
+    public abstract class UseCharacterSlotSkillCmd : CmdBase
+    {
+        protected abstract SkillType Slot { get; }
+
+        protected override bool ExecuteInternal(BoxDataForm.Data[] prm, InterpretAsyncTask asyncTask)
+        {
+            CharacterSkillCommand.Use(prm[0].str, null, Slot, prm[1].num == 1f);
+            return true;
+        }
+    }
+
+    public sealed class UseCharacterLightAttackCmd : UseCharacterSlotSkillCmd
+    {
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterAssembliesLoaded)]
+        private static void Init() => Register(new UseCharacterLightAttackCmd());
+        public override string GetName() => "UseCharacterLightAttack";
+        public override CmdBase GetNew() => new UseCharacterLightAttackCmd();
+        protected override SkillType Slot => SkillType.LightAttack;
+    }
+
+    public sealed class UseCharacterHeavyAttackCmd : UseCharacterSlotSkillCmd
+    {
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterAssembliesLoaded)]
+        private static void Init() => Register(new UseCharacterHeavyAttackCmd());
+        public override string GetName() => "UseCharacterHeavyAttack";
+        public override CmdBase GetNew() => new UseCharacterHeavyAttackCmd();
+        protected override SkillType Slot => SkillType.HeavyAttack;
+    }
+
+    public sealed class UseCharacterESkillCmd : UseCharacterSlotSkillCmd
+    {
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterAssembliesLoaded)]
+        private static void Init() => Register(new UseCharacterESkillCmd());
+        public override string GetName() => "UseCharacterESkill";
+        public override CmdBase GetNew() => new UseCharacterESkillCmd();
+        protected override SkillType Slot => SkillType.E;
+    }
+
+    public sealed class UseCharacterQSkillCmd : UseCharacterSlotSkillCmd
+    {
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterAssembliesLoaded)]
+        private static void Init() => Register(new UseCharacterQSkillCmd());
+        public override string GetName() => "UseCharacterQSkill";
+        public override CmdBase GetNew() => new UseCharacterQSkillCmd();
+        protected override SkillType Slot => SkillType.Q;
+    }
+
+    internal static class CharacterSkillCommand
+    {
+        public static void Use(string character, string reference, SkillType? slot, bool ignoreCd)
+        {
+            var info = PlayManager.instance.infoCtrl;
+            if (info == null || GameManager.instance.curProgress == null)
+                return;
+            // Skill events dispatch synchronously. A previous target's callback
+            // must not redirect a later target to a replacement using its UID.
+            foreach (var data in CharacterProductForm.ResolveReferences(character))
+            {
+                if (!CharacterProductForm.DataByUid.TryGetValue(data.uid, out var current)
+                    || !ReferenceEquals(current, data))
+                    continue;
+                SkillProductForm.Data skill;
+                if (slot.HasValue)
+                {
+                    if (data.skill == null || !data.skill.TryGetValue(slot.Value, out int uid)
+                        || !SkillProductForm.DataByUid.TryGetValue(uid, out skill) || skill == null)
+                        continue;
+                }
+                else
+                {
+                    skill = ResolveSpecified(data, reference);
+                    if (skill == null)
+                        continue;
+                }
+                info.UseSkill(data.uid, skill.uid, ignoreCd);
+            }
+        }
+
+        private static SkillProductForm.Data ResolveSpecified(CharacterProductForm.Data character, string reference)
+        {
+            const string marker = "$sk$";
+            if (string.IsNullOrEmpty(reference) || !GlobalEventHelper.IsAsset(reference, marker)
+                || !int.TryParse(reference.Substring(marker.Length, reference.Length - marker.Length * 2),
+                    NumberStyles.Integer, CultureInfo.InvariantCulture, out int uid) || uid == 0)
+                return null;
+            if (character.skill != null)
+                return SkillProductForm.GetByEvtName(reference, character.uid);
+            return uid > 0 && SkillProductForm.DataByUid.TryGetValue(uid, out var skill) ? skill : null;
         }
     }
 }

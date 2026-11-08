@@ -43,6 +43,9 @@ namespace Ui.DialogMain
             }
             public override void OnShow()
             {
+                // Pooled players retain their media and resume state while hidden.
+                view.mp_.Pause();
+                view.mp_.CloseMedia();
                 TimeManager.instance.CancelTimer(model.wordTimer);
                 TimeManager.instance.CancelTimer(model.overTimer);
                 model.isDisplaying = false;
@@ -66,6 +69,8 @@ namespace Ui.DialogMain
             }
             public override void OnHide()
             {
+                view.mp_.Pause();
+                view.mp_.CloseMedia();
                 TimeManager.instance.CancelTimer(model.wordTimer);
                 TimeManager.instance.CancelTimer(model.overTimer);
                 model.isDisplaying = false;

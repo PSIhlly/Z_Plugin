@@ -1,6 +1,6 @@
 param([string]$ProjectRoot = (Resolve-Path (Join-Path $PSScriptRoot '../..')).Path)
 $ErrorActionPreference = 'Stop'
-function Read-Source([string]$relative) { Get-Content -LiteralPath (Join-Path $ProjectRoot $relative) -Raw }
+function Read-Source([string]$relative) { Get-Content -LiteralPath (Join-Path $ProjectRoot $relative) -Raw -Encoding UTF8 }
 function Without-Usings([string]$source) { [regex]::Replace($source, '(?m)^using [^\r\n]+;\r?\n', '') }
 $manager = Read-Source 'Assets/Z_Level3/Z_UI/Core/Module/Dialog/DialogManager.cs'
 $start = $manager.IndexOf('    public class Settings')
@@ -11,6 +11,12 @@ $code = $fixture + "`n" + (Without-Usings (Read-Source 'Assets/Z_Level0/Z_Design
 foreach ($name in @('MainText', 'Options')) {
     $code += "`n" + (Without-Usings (Read-Source "Assets/Z_Level3/Z_UI/Ui/Dialog/UiDialogMainCtrl.$name.cs"))
 }
+$code += "`n" + (Without-Usings (Read-Source 'Assets/Z_Level3/Z_UI/Ui/Dialog/UiDialogBgCtrl.cs'))
+$videoSource = Read-Source 'Assets/Z_Level2/Z_DataSystem/Core/VideoController.cs'
+$videoStart = $videoSource.IndexOf('namespace Z_DataSystem.Form')
+$videoEnd = [regex]::Match($videoSource, '(?m)^namespace Z_DataSystem\r?$').Index
+if ($videoStart -lt 0 -or $videoEnd -le $videoStart) { throw 'Video playback source boundaries missing.' }
+$code += "`n" + $videoSource.Substring($videoStart, $videoEnd - $videoStart)
 # Actual partial controller/settings/event-bus source, isolated timer/UI spies.
 # Does not open or modify any Unity scene, Form, asset or save.
 Add-Type -TypeDefinition $code

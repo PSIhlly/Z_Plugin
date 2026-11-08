@@ -73,7 +73,8 @@
     ],
     "isConsume": true,
     "paramDicCharacter": [],
-    "minimapIcon": 210000
+    "minimapIcon": 210000,
+    "sorv": 2
   },
   {
     "uid": 77,
@@ -149,6 +150,7 @@
     ],
     "isConsume": true,
     "paramDicCharacter": [],
-    "minimapIcon": 210000
+    "minimapIcon": 210000,
+    "sorv": 2
   }
 ]

@@ -18,6 +18,7 @@ using Z_Map.Form;
 using Z_String;
 using Z_Text;
 using Z_UnitSystem;
+using Z_UnitSystem.Form;
 using Z_Ui;
 using Z_Ui.Notify;
 using static UnityEngine.Rendering.DebugUI.MessageBox;
@@ -138,6 +139,24 @@ public class ModAssetCtrl : Z_Controller<ModManager>
         // Retire bindings before returning this UID to the Form's reusable pool.
         foreach (var scene in SceneForm.DataByUid.Values)
             scene.events?.Remove($"onGlobalVarChangeEvent${uid}");
+        var key = $"onGlobalVarChangeEvent${uid}";
+        foreach (var data in CharacterProductForm.DataByUid?.Values.AsEnumerable() ?? Enumerable.Empty<CharacterProductForm.Data>()) data?.events?.Remove(key);
+        foreach (var data in ObjectProductForm.DataByUid?.Values.AsEnumerable() ?? Enumerable.Empty<ObjectProductForm.Data>()) data?.events?.Remove(key);
+        foreach (var data in ItemProductForm.DataByUid?.Values.AsEnumerable() ?? Enumerable.Empty<ItemProductForm.Data>()) data?.events?.Remove(key);
+        foreach (var data in MapTextureForm.DataById?.Values.AsEnumerable() ?? Enumerable.Empty<MapTextureForm.Data>()) data?.events?.Remove(key);
+        foreach (var data in UnitForm.DataByUid?.Values.AsEnumerable() ?? Enumerable.Empty<UnitForm.Data>())
+            if (data?.unit is MapUnit && GlobalVariableTriggerBindings.RemoveFromJson(data.extra, key, out var extra)) data.extra = extra;
+        // Scene instance additions can belong to an unloaded authored map too.
+        if (_super != null && GameManager.instance.curStory != null)
+        {
+            var folder = _super.GetStoryCoreFolder();
+            foreach (var scene in SceneForm.DataByUid.Values)
+            {
+                var path = folder + Main2StoryManager.GetSceneFileNameById(scene.uid);
+                if (SaveAndLoad.Exist(path) && GlobalVariableTriggerBindings.RemoveFromJson(
+                    SaveAndLoad.Load<string>(path), key, out var json)) SaveAndLoad.Save(path, json);
+            }
+        }
         EventGlobalVariableForm.RemoveData(uid);
     }
 

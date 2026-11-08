@@ -30,8 +30,13 @@ namespace Ui.ModStory.ModStoryMapObject.ModStoryMapObjectTexture.ModStoryMapObje
     public partial class UiModStoryMapObjectTextureConfigCtrl
     {
 
+        private EventChoose.UiSceneEventChooseList eventChooseList;
+        private TriggerEventChoose.GlobalVariableTriggerList globalTriggers;
+
         public override void OnCreate()
         {
+            eventChooseList = new EventChoose.UiSceneEventChooseList(this, view.go_eventChoose);
+            globalTriggers = new TriggerEventChoose.GlobalVariableTriggerList(this, view.go_triggerEventChoose);
             view.btn_isWangTile.onClick.AddListener(() =>
             {
                 model.data.isWangTile = !model.data.isWangTile;
@@ -67,6 +72,12 @@ namespace Ui.ModStory.ModStoryMapObject.ModStoryMapObjectTexture.ModStoryMapObje
             model.data = param.data;
             Refresh();
         }
+        public override void OnHide()
+        {
+            eventChooseList?.Clear();
+            globalTriggers?.Clear();
+        }
+
         public void Refresh()
         {
             view.sta_isWangTile.ChangeState(model.data.isWangTile ? 1 : 0);
@@ -81,15 +92,11 @@ namespace Ui.ModStory.ModStoryMapObject.ModStoryMapObjectTexture.ModStoryMapObje
                     ? "Unrestricted"
                     : PassTypeForm.DataById[model.data.passType].name;
             }
-            view.model_EventChooseCharacterTouch.Set(new EventChoose.UiEventChooseParam() { dic = model.data.events, key = "onCharacterTouchEvent" });
-            view.model_EventChooseCharacterLeave.Set(new EventChoose.UiEventChooseParam() { dic = model.data.events, key = "onCharacterLeaveEvent" });
-            view.model_EventChooseObjectTouch.Set(new EventChoose.UiEventChooseParam() { dic = model.data.events, key = "onObjectTouchEvent" });
-            view.model_EventChooseObjectLeave.Set(new EventChoose.UiEventChooseParam() { dic = model.data.events, key = "onObjectLeaveEvent" });
-            view.model_EventChooseTileTouch.Set(new EventChoose.UiEventChooseParam() { dic = model.data.events, key = "onTileTouchEvent" });
-            view.model_EventChooseShow.Set(new EventChoose.UiEventChooseParam() { dic = model.data.events, key = "onShowEvent" });
-            view.model_EventChoosePerSecond.Set(new EventChoose.UiEventChooseParam() { dic = model.data.events, key = "onPerSecondEvent" });
-            view.model_EventChooseInteract.Set(new EventChoose.UiEventChooseParam() { dic = model.data.events, key = "onInteractEvent" });
-            view.model_EventChooseLeaveScene.Set(new EventChoose.UiEventChooseParam() { dic = model.data.events, key = "onLeaveSceneEvent" });
+            eventChooseList.Render(model.data.events, GameManager.instance.curProgress.enableMinimap);
+            var data = model.data;
+            var events = data.events;
+            globalTriggers.Render(events, () => ReferenceEquals(model.data, data) && ReferenceEquals(data.events, events)
+                && MapTextureForm.DataById.TryGetValue(data.id, out var current) && ReferenceEquals(current, data));
 
             UiManager.Rebuild(gameObject, true);
         }

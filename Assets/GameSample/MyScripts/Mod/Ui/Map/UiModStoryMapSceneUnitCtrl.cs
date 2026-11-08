@@ -18,7 +18,6 @@ using Z_Text;
 using Z_Ui.Notify;
 using Z_Ui.Loading;
 using Ui.ModStoryEventTriggerWindow;
-using System.Globalization;
 
 namespace Ui.ModStory.ModStoryMap.ModStoryMapScene.ModStoryMapSceneUnit
 {
@@ -34,7 +33,6 @@ namespace Ui.ModStory.ModStoryMap.ModStoryMapScene.ModStoryMapSceneUnit
     }
     public partial class UiModStoryMapSceneUnitCtrl : IZ_Listener<AssetEvent>, IZ_Listener<EventModifyEvent>
     {
-        private const string GlobalVarTriggerPrefix = "onGlobalVarChangeEvent$";
 
         Dictionary<string, EventTriggerForm.Data> dic => model.data.events;
         public override void OnCreate()
@@ -235,101 +233,9 @@ namespace Ui.ModStory.ModStoryMap.ModStoryMapScene.ModStoryMapSceneUnit
         {
             var scene = model.data;
             var events = scene?.events;
-            return new UiEventCustomTriggerParam
-            {
-                dic = events,
-                defaultKey = GlobalVarTriggerPrefix,
-                newKeyFunc = () =>
-                {
-                    if (!IsCurrentGlobalVarScene(scene, events))
-                        return null;
-                    if (!events.ContainsKey(GlobalVarTriggerPrefix))
-                        return GlobalVarTriggerPrefix;
-                    foreach (var variable in EventGlobalVariableForm.DataByUid.Values.OrderBy(data => data.uid))
-                    {
-                        var key = GlobalVarTriggerKey(variable.uid);
-                        if (!events.ContainsKey(key))
-                            return key;
-                    }
-                    return null;
-                },
-                configs = new List<TriggerConfig>
-                {
-                    new TriggerConfig
-                    {
-                        GetNameFunc = GetGlobalVarTriggerName,
-                        prmChangeAct = trigger => ChooseGlobalVarTrigger(scene, events, trigger)
-                    }
-                }
-            };
-        }
-
-        private static string GlobalVarTriggerKey(int uid) =>
-            GlobalVarTriggerPrefix + uid.ToString(CultureInfo.InvariantCulture);
-
-        private static string GetGlobalVarTriggerName(string key)
-        {
-            if (key == null || !key.StartsWith(GlobalVarTriggerPrefix, StringComparison.Ordinal))
-                return key ?? string.Empty;
-            var suffix = key.Substring(GlobalVarTriggerPrefix.Length);
-            if (suffix.Length == 0)
-                return TextManager.instance.GetTxt("Any");
-            return int.TryParse(suffix, NumberStyles.None, CultureInfo.InvariantCulture, out var uid)
-                && EventGlobalVariableForm.DataByUid.TryGetValue(uid, out var variable)
-                ? variable.name : suffix;
-        }
-
-        private bool IsCurrentGlobalVarScene(SceneForm.Data scene, Dictionary<string, EventTriggerForm.Data> events) =>
-            scene != null && events != null && ReferenceEquals(model.data, scene)
-            && ReferenceEquals(scene.events, events)
-            && SceneForm.DataByUid.TryGetValue(scene.uid, out var current) && ReferenceEquals(current, scene);
-
-        private void ChooseGlobalVarTrigger(SceneForm.Data scene,
-            Dictionary<string, EventTriggerForm.Data> events, EventTriggerForm.Data trigger)
-        {
-            var oldKey = trigger?.name;
-            if (!IsCurrentGlobalVarScene(scene, events) || oldKey == null
-                || !events.TryGetValue(oldKey, out var current) || !ReferenceEquals(current, trigger))
-                return;
-
-            var items = new EntryItem();
-            var any = new EntryItem { content = TextManager.instance.GetTxt("Any"), parent = items, deepth = 1, id = 0 };
-            items.subs.Add(string.Empty, any);
-            var choices = new Dictionary<EntryItem, EventGlobalVariableForm.Data>();
-            foreach (var variable in EventGlobalVariableForm.DataByUid.Values.OrderBy(data => data.uid))
-            {
-                var item = new EntryItem { content = variable.name, parent = items, deepth = 1, id = variable.uid };
-                // Internal keys are identities, so a user-authored name matching Any stays selectable.
-                items.subs.Add(variable.uid.ToString(CultureInfo.InvariantCulture), item);
-                choices.Add(item, variable);
-            }
-
-            NotifyManager.instance.AddChoose(TextManager.instance.GetTxt("Choose param"), true, selected =>
-            {
-                if (!IsCurrentGlobalVarScene(scene, events) || trigger.name != oldKey
-                    || !events.TryGetValue(oldKey, out var original) || !ReferenceEquals(original, trigger))
-                    return true;
-
-                var key = GlobalVarTriggerPrefix;
-                if (!ReferenceEquals(selected, any))
-                {
-                    if (selected == null || !choices.TryGetValue(selected, out var variable)
-                        || !EventGlobalVariableForm.DataByUid.TryGetValue(variable.uid, out var registered)
-                        || !ReferenceEquals(registered, variable))
-                        return true;
-                    key = GlobalVarTriggerKey(variable.uid);
-                }
-                if (events.TryGetValue(key, out var duplicate) && !ReferenceEquals(duplicate, trigger))
-                    return false;
-                if (key == oldKey)
-                    return true;
-
-                events.Remove(oldKey);
-                trigger.name = key;
-                events.Add(key, trigger);
-                Z_EventHelper.Invoke(new EventModifyEvent());
-                return true;
-            }, items);
+            return TriggerEventChoose.GlobalVariableTriggerEditor.Create(events, () => scene != null && events != null
+                && ReferenceEquals(model.data, scene) && ReferenceEquals(scene.events, events)
+                && SceneForm.DataByUid.TryGetValue(scene.uid, out var current) && ReferenceEquals(current, scene));
         }
 
         public void OnEvent(EventModifyEvent evt)

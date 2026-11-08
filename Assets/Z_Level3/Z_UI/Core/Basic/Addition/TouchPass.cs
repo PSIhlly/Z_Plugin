@@ -4,9 +4,11 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 
 public class TouchPass : MonoBehaviour,
+    Z_Input.IInputUiPassThrough,
     IPointerDownHandler, IPointerUpHandler, IPointerClickHandler,
     IInitializePotentialDragHandler, IBeginDragHandler, IDragHandler, IEndDragHandler
 {
+    public bool passInputThrough => isActiveAndEnabled;
     PointerEventData pointerDownEvent;
     GameObject pointerDownTarget;
     private static List<RaycastResult> resultCache = new List<RaycastResult>();

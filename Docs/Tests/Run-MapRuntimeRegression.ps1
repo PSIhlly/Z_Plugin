@@ -1,7 +1,7 @@
 param(
     [string]$ProjectRoot = (Resolve-Path (Join-Path $PSScriptRoot "../..")).Path,
     [string]$UnityEditor = "D:/WorkSoftWare/Unity/2022.3.61t4/Editor/Tuanjie.exe",
-    [ValidateSet('MapRuntimeRegression', 'MapRelatedUnitRefreshRegression', 'NavigationRouteCacheRegression', 'MissionRuntimeRegression', 'GlobalVariableRegression', 'GlobalVariableSceneTriggerRegression', 'ModStoryVariableEditorRegression', 'MinimapRuntimeRegression', 'MapTextureRuntimeRegression', 'WangTileStoryCacheRegression', 'FadeCommandsRegression', 'TileFrontVisibilityRegression', 'WangTileSlopeNeighbourRegression', 'DisFadeRoutingRegression', 'DisFadeBatchingRegression', 'InstancePoolNameRegression', 'ModSceneHistoryRuntimeRegression', 'MapFadeShaderRegression', 'MapShadowBiasRegression', 'MapShadowReceiverRegression', 'MapEdgeTransitionRegression', 'StoryPackageImportRegression', 'CodeInterpreterRuntimeRegression', 'CharacterReferenceRegression', 'CharacterPartyRegression', 'CharacterRemovalRegression', 'UnifiedDestroyRegression', 'ObjectProductRuntimeRegression', 'ObjectDirectionGeometryRegression', 'AssetPickerSelectionRegression', 'SceneObjectReferenceRegression', 'SceneProductCommandRegression', 'ObjectProductEditorRegression', 'StoryTargetSelectionRegression')]
+    [ValidateSet('MapRuntimeRegression', 'MapRelatedUnitRefreshRegression', 'NavigationRouteCacheRegression', 'MissionRuntimeRegression', 'GlobalVariableRegression', 'GlobalVariableSceneTriggerRegression', 'ModStoryVariableEditorRegression', 'MinimapRuntimeRegression', 'MapTextureRuntimeRegression', 'WangTileStoryCacheRegression', 'FadeCommandsRegression', 'TileFrontVisibilityRegression', 'WangTileSlopeNeighbourRegression', 'DisFadeRoutingRegression', 'DisFadeBatchingRegression', 'InstancePoolNameRegression', 'ModSceneHistoryRuntimeRegression', 'MapFadeShaderRegression', 'MapShadowBiasRegression', 'MapShadowReceiverRegression', 'MapEdgeTransitionRegression', 'StoryPackageImportRegression', 'CodeInterpreterRuntimeRegression', 'CharacterReferenceRegression', 'CharacterPartyRegression', 'CharacterRemovalRegression', 'UnifiedDestroyRegression', 'ObjectProductRuntimeRegression', 'ObjectDirectionGeometryRegression', 'AssetPickerSelectionRegression', 'SceneObjectReferenceRegression', 'SceneProductCommandRegression', 'ObjectProductEditorRegression', 'StoryTargetSelectionRegression', 'SceneEventChooseListRegression', 'SceneBehaviourTriggerRegression', 'CameraCommandsRegression', 'SkillUseCommandsRegression')]
     [string]$Fixture = 'MapRuntimeRegression',
     [switch]$CharacterPlayLifecycle,
     [switch]$SceneCommands,
@@ -43,7 +43,11 @@ $missingSources = @(@($bindingRelative,
     'Assets/GameSample/MyScripts/Main/Event/Cmd/Scene/IsSameObjectCmd.cs',
     'Assets/GameSample/MyScripts/Main/Event/Cmd/Scene/FadeInCmd.cs',
     'Assets/GameSample/MyScripts/Main/Event/Cmd/Scene/FadeOutCmd.cs',
-    'Assets/GameSample/MyScripts/Play/Ui/UiPlayEffectCtrl.cs') |
+    'Assets/GameSample/MyScripts/Main/Event/Cmd/Scene/CameraCommands.cs',
+    'Assets/GameSample/MyScripts/Main/Event/SkillCommandMigration.cs',
+    'Assets/GameSample/MyScripts/Play/Ui/UiPlayEffectCtrl.cs',
+    'Assets/GameSample/MyScripts/Mod/Ui/Event/UiTriggerEventChooseCtrl.cs',
+    'Assets/GameSample/UiBase/UiTriggerEventChooseBase.cs') |
     Where-Object { $_ -notin $includedSources })
 $buildArguments = @('build', $runtimeProjectPath, '--no-restore', '--nologo', '-v:quiet', '-m:1',
     '-p:BuildInParallel=false', '-p:UseSharedCompilation=false')
@@ -191,7 +195,7 @@ else { & {
     }
 } }
 $logPath = Join-Path $testProject "regression.log"
-$graphicsArguments = if ($Fixture -in @('MapFadeShaderRegression', 'MapShadowBiasRegression', 'MapShadowReceiverRegression', 'DisFadeBatchingRegression')) { '-force-d3d11' } else { '-nographics' }
+$graphicsArguments = if ($Fixture -in @('MapFadeShaderRegression', 'MapShadowBiasRegression', 'MapShadowReceiverRegression', 'DisFadeBatchingRegression', 'SceneBehaviourTriggerRegression')) { '-force-d3d11' } else { '-nographics' }
 $entryPoint = if ($ItemPicking -and $Fixture -eq 'ModSceneHistoryRuntimeRegression') { 'RunItemPicking' }
     elseif ($CharacterPlayLifecycle -and $Fixture -eq 'MapTextureRuntimeRegression') { 'RunCharacterPlayLifecycle' }
     elseif ($SceneCommands -and $Fixture -eq 'MapRuntimeRegression') { 'RunSceneCommands' } else { 'Run' }
@@ -218,6 +222,8 @@ $successMarker = switch ($Fixture) {
     'NavigationRouteCacheRegression' { 'NAVIGATION_ROUTE_CACHE_REGRESSION_PASS' }
     'SceneObjectReferenceRegression' { 'SCENE_OBJECT_REFERENCE_REGRESSION_PASS' }
     'SceneProductCommandRegression' { 'SCENE_PRODUCT_COMMAND_REGRESSION_PASS' }
+    'SceneEventChooseListRegression' { 'SCENE_EVENT_CHOOSE_LIST_REGRESSION_PASS' }
+    'SceneBehaviourTriggerRegression' { 'SCENE_BEHAVIOUR_TRIGGER_REGRESSION_PASS' }
     'StoryTargetSelectionRegression' { 'STORY_TARGET_SELECTION_REGRESSION_PASS' }
     'ObjectProductEditorRegression' { 'OBJECT_PRODUCT_EDITOR_REGRESSION_PASS' }
     'AssetPickerSelectionRegression' { 'ASSET_PICKER_SELECTION_REGRESSION_PASS' }
@@ -227,6 +233,8 @@ $successMarker = switch ($Fixture) {
     'MapTextureRuntimeRegression' { 'MAP_TEXTURE_RUNTIME_REGRESSION_PASS' }
     'WangTileStoryCacheRegression' { 'WANG_TILE_STORY_CACHE_REGRESSION_PASS' }
     'FadeCommandsRegression' { 'FADE_COMMANDS_REGRESSION_PASS' }
+    'CameraCommandsRegression' { 'CAMERA_COMMANDS_REGRESSION_PASS' }
+    'SkillUseCommandsRegression' { 'SKILL_USE_COMMANDS_REGRESSION_PASS' }
     'TileFrontVisibilityRegression' { 'TILE_FRONT_VISIBILITY_REGRESSION_PASS' }
     'WangTileSlopeNeighbourRegression' { 'WANG_TILE_SLOPE_NEIGHBOUR_REGRESSION_PASS' }
     'DisFadeRoutingRegression' { 'DIS_FADE_ROUTING_REGRESSION_PASS' }

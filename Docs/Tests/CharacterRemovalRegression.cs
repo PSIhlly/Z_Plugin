@@ -181,7 +181,7 @@ public static class CharacterRemovalRegression
         var hp = parameters["RemovalHp"];
         var unit = Unit(product);
         var instance = unit.unit.ins;
-        string handle = sceneReference ? "$so$" + unit.uid + "$so$" : "$ch$" + product.uid + "$ch$";
+        string handle = sceneReference ? GlobalEventHelper.GetSceneUnitReference(unit.uid) : "$ch$" + product.uid + "$ch$";
         Check(scene.GetCharacterUnit(product.uid) == unit && unit.unit.isVising, "test Character is live and visible");
         if (unique)
         {

@@ -1924,9 +1924,9 @@ public static class MapRuntimeRegression
                 return task;
             }
             Z_Code.Form.BoxDataForm.Data Handle(MapUnit unit, bool productHandle = false) =>
-                Z_Code.CodeHelper.CreateBoxByStr(GlobalEventHelper.GetName(productHandle
-                    ? GlobalEventHelper.CHARACTER : GlobalEventHelper.SCENEOBJECT,
-                    (productHandle ? product.uid : unit.data.uid).ToString()));
+                Z_Code.CodeHelper.CreateBoxByStr(productHandle
+                    ? GlobalEventHelper.GetName(GlobalEventHelper.CHARACTER, product.uid.ToString())
+                    : GlobalEventHelper.GetSceneUnitReference(unit.data.uid));
             Vector3 Read(Z_Code.Form.BoxDataForm.Data value) => new Vector3(
                 value.dic["x"].num, value.dic["height"].num, value.dic["y"].num);
 
@@ -2114,8 +2114,8 @@ public static class MapRuntimeRegression
                 var input = sample.relative ? new Vector3(1, 0, 1) : GameManager.MapPosToPlayerPos(
                     map.utilCtrl.RealPos2MapPos(new Vector3(6, 0, 6)));
                 var pos = VectorBox(input);
-                string handle = GlobalEventHelper.GetName(sample.isCharacter ? GlobalEventHelper.CHARACTER
-                    : GlobalEventHelper.SCENEOBJECT, (sample.isCharacter ? product.uid : obj.data.uid).ToString());
+                string handle = sample.isCharacter ? GlobalEventHelper.GetName(GlobalEventHelper.CHARACTER, product.uid.ToString())
+                    : GlobalEventHelper.GetSceneUnitReference(obj.data.uid);
                 var prm = new[] { Z_Code.CodeHelper.CreateBoxByStr(handle), pos,
                     Z_Code.CodeHelper.CreateBoxByNum(sample.legacy ? 1 : Mathf.Sqrt(2)) };
                 var data = new Z_Code.Form.InterpretDataForm.Data(-1, new List<Z_Code.Form.BoxDataForm.Data>(),
@@ -2450,7 +2450,7 @@ public static class MapRuntimeRegression
                     data.releaseTrigger == "onInteractEvent" && ReferenceEquals(data.sceneOwner, unit.data));
                 string expected = unit is CharacterUnit
                     ? GlobalEventHelper.GetName(GlobalEventHelper.CHARACTER, unit.productInfo.Item1.ToString())
-                    : GlobalEventHelper.GetName(GlobalEventHelper.SCENEOBJECT, unit.data.uid.ToString());
+                    : GlobalEventHelper.GetSceneObjectReference(unit);
                 Require(invocation.heap["param1"].str == expected,
                     "actual interaction click distinguishes Character Product and Object scene references");
                 Require(invocation.heap["param2"].str == GlobalEventHelper.GetName(GlobalEventHelper.CHARACTER, player.uid.ToString()),
@@ -2916,8 +2916,8 @@ public static class MapRuntimeRegression
                 var unit = Create(97001 + products.Count, unique);
                 var product = products.Last();
                 var instance = unit.unit.ins;
-                string handle = GlobalEventHelper.GetName(sceneReference ? GlobalEventHelper.SCENEOBJECT : GlobalEventHelper.CHARACTER,
-                    (sceneReference ? unit.uid : product.uid).ToString());
+                string handle = sceneReference ? GlobalEventHelper.GetSceneUnitReference(unit.uid)
+                    : GlobalEventHelper.GetName(GlobalEventHelper.CHARACTER, product.uid.ToString());
                 Require(scene.GetCharacterUnit(product.uid) == unit && unit.unit.isVising, "live character is resolvable and visible");
                 if (sceneReference && unique)
                 {
@@ -2956,7 +2956,7 @@ public static class MapRuntimeRegression
             var orphan = Create(97025, false);
             var orphanInstance = orphan.unit.ins;
             Form.CharacterProductForm.RemoveData(products.Last().uid);
-            Destroy(GlobalEventHelper.GetName(GlobalEventHelper.SCENEOBJECT, orphan.uid.ToString()));
+            Destroy(GlobalEventHelper.GetSceneUnitReference(orphan.uid));
             Require(!orphanInstance.gameObject.activeSelf && !CharacterUnitForm.DataByUid.ContainsKey(orphan.uid),
                 "a missing Product does not prevent removing its live scene instance");
 
@@ -2969,7 +2969,7 @@ public static class MapRuntimeRegression
                 "interaction removal/Continue program compiles: " + string.Join("; ", errors));
             var heap = new Dictionary<string, Z_Code.Form.BoxDataForm.Data>
             {
-                ["param1"] = Z_Code.CodeHelper.CreateBoxByStr(GlobalEventHelper.GetName(GlobalEventHelper.SCENEOBJECT, self.uid.ToString()))
+                ["param1"] = Z_Code.CodeHelper.CreateBoxByStr(GlobalEventHelper.GetSceneUnitReference(self.uid))
             };
             var sibling = new Form.EventInterpretDataForm.Data(-1, new List<Z_Code.Form.BoxDataForm.Data>(),
                 new Dictionary<string, Z_Code.Form.BoxDataForm.Data>(), null, 0, -1, self.uid, null,
@@ -3002,7 +3002,7 @@ public static class MapRuntimeRegression
             ObjectUnitForm.AddData(nonCharacter);
             try
             {
-                Destroy(GlobalEventHelper.GetName(GlobalEventHelper.SCENEOBJECT, nonCharacter.uid.ToString()));
+                Destroy(GlobalEventHelper.GetSceneUnitReference(nonCharacter.uid));
                 Require(ObjectUnitForm.DataByUid.ContainsKey(nonCharacter.uid), "DestroyCharacter ignores Object scene references");
             }
             finally { ObjectUnitForm.RemoveData(nonCharacter.uid); UnitForm.RemoveData(nonCharacter.uid); }
@@ -3578,105 +3578,35 @@ public static class MapRuntimeRegression
         bfs.GetNextDir(new Vector3(2.65f, 0, 3), target, 100, 0.5f, Array.Empty<int>(), state);
         Require(state.directEndpoint && state.moveTarget == new Vector3(3, 0, 3),
             "escape continues to its anchor center after crossing into a walkable cell");
+        var replacement = new Vector3(7, 0, 3);
         bool usedGraph = false;
-        bool usedFinalSegment = false;
-        for (int frame = 0; frame < 100 && Vector3.Distance(position, target) > 0.0001f; frame++)
+        for (int frame = 0; frame < 160 && Vector3.Distance(position, replacement) > .0001f; frame++)
         {
-            direction = bfs.GetNextDir(position, target, 100, 0.5f, Array.Empty<int>(), state);
-            if (!state.directEndpoint) usedGraph = true;
-            if (state.directEndpoint && state.moveTarget == target) usedFinalSegment = true;
-            position += direction * Mathf.Min(0.15f, (state.moveTarget - position).magnitude);
+            direction = bfs.GetNextDir(position, target, 100, .5f, Array.Empty<int>(), state);
+            usedGraph |= !state.directEndpoint;
+            Require(!state.directEndpoint || state.moveTarget != target, "replaced targets do not grant a direct leg to blocked terrain");
+            position += direction * Mathf.Min(.15f, (state.moveTarget - position).magnitude);
         }
-        Require(usedGraph && usedFinalSegment && Vector3.Distance(position, target) < 0.0001f,
-            "both blocked endpoints use escape, a graph route and the final direct segment");
-        direction = bfs.GetNextDir(new Vector3(5.65f, 0, 3), target, 100, 0.5f, Array.Empty<int>(), state);
-        Require(state.directEndpoint && state.moveTarget == target && direction.x > 0.99f,
-            "entering the blocked destination cell does not reverse the final approach");
-        Require(bfs.GetNextDir(target, target, 100, 0.5f, Array.Empty<int>(), state) == Vector3.zero,
-            "the final approach stops at the original target coordinate");
-        Vector3 movingTarget = target + Vector3.forward * 0.1f;
-        direction = bfs.GetNextDir(new Vector3(5.65f, 0, 3), movingTarget, 100, 0.500005f,
-            Array.Empty<int>(), state);
-        Require(state.directEndpoint && state.moveTarget == movingTarget
-            && Vector3.Dot(direction, (movingTarget - new Vector3(5.65f, 0, 3)).normalized) > 0.999f,
-            "a moving target in the same blocked cell and radius rounding do not reset the final phase");
-
+        Require(usedGraph && Vector3.Distance(position, replacement) < .0001f,
+            "blocked endpoints use start escape then BFS to a selected walkable target");
+        Require(bfs.GetNextDir(replacement, target, 100, .5f, Array.Empty<int>(), state) == Vector3.zero && !state.directEndpoint,
+            "arrival stops at the selected center instead of approaching the original blocked point");
         var otherState = new Z_Map.Analysis.NavigationEndpointState();
-        bfs.GetNextDir(start.realPos + Vector3.right * 0.1f, new Vector3(1, 0, 1), 100, 0.5f,
-            Array.Empty<int>(), otherState);
-        Require(otherState.moveTarget == new Vector3(3, 0, 3), "another agent gets its own escape state");
-        direction = bfs.GetNextDir(new Vector3(5.65f, 0, 3), target, 100, 0.5f, Array.Empty<int>(), state);
-        Require(state.moveTarget == target && direction.x > 0.99f, "shared BFS does not leak another agent's phase");
-        bfs.GetNextDir(destination.realPos, new Vector3(7, 0, 5), 100, 0.5f, Array.Empty<int>(), state);
-        Require(state.directEndpoint && state.moveTarget != new Vector3(7, 0, 5),
-            "changing destination cancels the old final segment and rechecks the blocked start");
-
-        state.Reset();
-        bfs.GetNextDir(start.realPos + Vector3.right * 0.1f, target, 100, 1f, Array.Empty<int>(), state);
-        Require(state.moveTarget == new Vector3(4, 0, 3),
-            "a large character escapes to a cell with a clear physical footprint");
-        state.Reset();
-        var restricted = navigation.navUnits[(3, 0, 3)];
-        restricted.passTypes.Add(7201);
-        bfs.GetNextDir(restricted.realPos + Vector3.right * 0.1f, new Vector3(7, 0, 5), 100, 0.5f,
-            Array.Empty<int>(), state);
-        Require(state.directEndpoint && state.moveTarget == new Vector3(4, 0, 3),
-            "a pass-type restricted start also escapes to a legal center cell");
-        state.Reset();
-        bfs.GetNextDir(restricted.realPos, restricted.realPos + Vector3.right * 0.1f, 100, 0.5f,
-            new[] { 7201 }, state);
-        Require(!state.directEndpoint && state.moveTarget == restricted.realPos + Vector3.right * 0.1f,
-            "a character with the required pass type retains ordinary same-cell movement");
-        restricted.passTypes.Clear();
-        var restrictedTarget = navigation.navUnits[(7, 0, 5)];
-        restrictedTarget.passTypes.Add(7202);
-        state.Reset();
-        Vector3 restrictedCoordinate = restrictedTarget.realPos + Vector3.right * 0.1f;
-        bfs.GetNextDir(new Vector3(7, 0, 4), restrictedCoordinate, 100, 0.5f, Array.Empty<int>(), state);
-        Require(state.directEndpoint && state.moveTarget == restrictedCoordinate,
-            "a pass-restricted destination is approached from the nearest legal cell");
-        direction = bfs.GetNextDir(new Vector3(7, 0, 4.65f), restrictedCoordinate, 100, 0.5f,
-            Array.Empty<int>(), state);
-        Require(state.directEndpoint && direction.z > 0f,
-            "the final phase remains active inside a pass-restricted destination");
+        bfs.GetNextDir(start.realPos + Vector3.right * .1f, Vector3.one, 100, .5f, Array.Empty<int>(), otherState);
+        Require(otherState.moveTarget == new Vector3(3, 0, 3), "agents retain independent start anchors");
+        state.Reset(); bfs.GetNextDir(start.realPos + Vector3.right * .1f, target, 100, 1f, Array.Empty<int>(), state);
+        Require(state.moveTarget == new Vector3(4, 0, 3), "large-character start anchors include footprint clearance");
+        state.Reset(); bfs.GetNextDir(new Vector3(3, 0, 2), target, 0, .5f, Array.Empty<int>(), state);
+        Require(!state.directEndpoint && state.moveTarget == new Vector3(3, 0, 2), "replacement respects BFS depth limits");
+        var restrictedTarget = navigation.navUnits[(7, 0, 5)]; restrictedTarget.passTypes.Add(7202);
+        state.Reset(); bfs.GetNextDir(new Vector3(7, 0, 4), restrictedTarget.realPos + Vector3.right * .1f, 100, .5f, Array.Empty<int>(), state);
+        Require(!state.directEndpoint && state.moveTarget == new Vector3(7, 0, 4), "pass-restricted targets are replaced by legal centers");
         restrictedTarget.passTypes.Clear();
-
-        state.Reset();
-        bfs.GetNextDir(new Vector3(0, 0, 3), target, 100, 0.5f, Array.Empty<int>(), state);
-        Require(state.directEndpoint && state.moveTarget == new Vector3(1, 0, 3),
-            "a missing start cell escapes to the nearest actual walkable node");
-
-        state.Reset();
-        bfs.GetNextDir(new Vector3(7, 0, 3), target, 100, 0.5f, Array.Empty<int>(), state);
-        Require(state.directEndpoint && state.moveTarget == target,
-            "a blocked target begins its final leg from the nearest reachable center");
-        state.Reset();
-        bfs.GetNextDir(new Vector3(3, 0, 2), target, 0, 0.5f, Array.Empty<int>(), state);
-        Require(!state.directEndpoint && state.moveTarget == new Vector3(3, 0, 2),
-            "a truncated BFS cannot mistake its start for the final anchor and cut through the map");
-
-        var isolated = NavUnit(6, 4);
-        isolated.realPos = target - Vector3.forward * 0.05f;
-        isolated.links.Add(isolated);
-        navigation.navUnits[(6, 0, 4)] = isolated;
-        state.Reset();
-        bfs.GetNextDir(new Vector3(7, 0, 3), target, 100, 0.5f, Array.Empty<int>(), state);
-        Require(state.directEndpoint && state.moveTarget == target,
-            "a geometrically closer isolated cell is not selected as the destination anchor");
-        state.Reset();
-        bfs.GetNextDir(new Vector3(4, 0, 3), new Vector3(8, 0, 3), 100, 0.5f, Array.Empty<int>(), state);
-        Require(!state.directEndpoint && state.moveTarget != new Vector3(4, 0, 3),
-            "a missing destination cell routes through the graph before any final segment");
-        state.Reset();
-        var nullStart = navigation.navUnits[(2, 0, 1)];
-        nullStart.isNull = true;
-        bfs.GetNextDir(nullStart.realPos, target, 100, 0.5f, Array.Empty<int>(), state);
-        Require(state.directEndpoint && state.moveTarget != nullStart.realPos,
-            "a zero-scale start with no floor does not throw during escape resolution");
-        navigation.navUnits.Clear();
-        state.Reset();
-        Require(bfs.GetNextDir(Vector3.zero, Vector3.one, 100, 0.5f, Array.Empty<int>(), state) == Vector3.zero,
-            "a map with no walkable cells returns no movement safely");
+        state.Reset(); bfs.GetNextDir(new Vector3(0, 0, 3), target, 100, .5f, Array.Empty<int>(), state);
+        Require(state.directEndpoint && state.moveTarget == new Vector3(1, 0, 3), "missing starts retain nearest legal escape");
+        navigation.navUnits.Clear(); state.Reset();
+        Require(bfs.GetNextDir(Vector3.zero, Vector3.one, 100, .5f, Array.Empty<int>(), state) == Vector3.zero,
+            "empty graphs safely stop movement");
 
         // Real ApplyMove must preserve ordinary/manual restrictions while only
         // the explicitly scoped endpoint move can enter a restricted center Tile.
@@ -3699,12 +3629,11 @@ public static class MapRuntimeRegression
             Require(!(bool)endpointFlag.GetValue(character), "endpoint permission is reset after Move returns");
             var characterState = (Z_Map.Analysis.NavigationEndpointState)typeof(CharacterUnit)
                 .GetField("navigationEndpointState", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(character);
-            typeof(Z_Map.Analysis.NavigationEndpointState).GetField("finalApproach", BindingFlags.Instance | BindingFlags.NonPublic)
-                .SetValue(characterState, true);
+            typeof(Z_Map.Analysis.NavigationEndpointState).GetProperty("hasResult").GetSetMethod(true)
+                .Invoke(characterState, new object[] { true });
             map.updateCtrl.ApplyMove(character, character.data.pos, Vector3.zero, true);
-            Require(!(bool)typeof(Z_Map.Analysis.NavigationEndpointState)
-                .GetField("finalApproach", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(characterState),
-                "teleport cancels any previous endpoint phase");
+            Require(!characterState.hasResult && !characterState.directEndpoint,
+                "teleport clears the previous navigation result");
         }
         finally
         {

@@ -58,7 +58,7 @@ public static class ModSceneHistoryRuntimeRegression
             component.orthographicSize = 5.2f;
             typeof(CameraInstance).GetField("_cam", PrivateInstance).SetValue(camera, component);
             CreateManager<InputManager>().screenSize = new Vector2(800, 600);
-            ObjectSelectionRespectsColliderHeight(onlyItemPicking: true);
+            ObjectSelectionCyclesRayCandidates();
             Debug.Log("MOD_SCENE_ITEM_PICKING_REGRESSION_PASS checks=" + checks);
             EditorApplication.Exit(0);
         }
@@ -86,7 +86,7 @@ public static class ModSceneHistoryRuntimeRegression
             TextureEraseUpdatesPassTypesImmediately();
             PlacementRotationAndImmediateAppearance();
             RaisedObjectPlacementUsesLowerOwner();
-            ObjectSelectionRespectsColliderHeight();
+            ObjectSelectionCyclesRayCandidates();
             ObjectWangTileHistoryNeighbours();
             LargeMapIncrementalHistory();
             ClearAndSceneReplacement();
@@ -301,242 +301,113 @@ public static class ModSceneHistoryRuntimeRegression
         }
     }
 
-    private static void ObjectSelectionRespectsColliderHeight(bool onlyItemPicking = false)
+    private static void ObjectSelectionCyclesRayCandidates()
     {
         var mod = ModManager.instance;
         var previousController = mod.sceneCtrl;
-        var controller = new ModSceneController(mod);
-        mod.sceneCtrl = controller;
+        var controller = new ModSceneController(mod); mod.sceneCtrl = controller;
         typeof(ModSceneController).GetField("enable", PrivateInstance).SetValue(controller, true);
-        var camera = CameraInstance.instance;
-        var cam = camera.cam;
-        Vector3 previousCameraPosition = cam.transform.position;
+        var camera = CameraInstance.instance; var cam = camera.cam;
+        Vector3 previousCameraPosition = cam.transform.position, previousTarget = camera.tarTrs.position;
         Quaternion previousCameraRotation = cam.transform.rotation;
-        Vector3 previousTarget = camera.tarTrs.position;
         var ui = UiManager.instance;
         var probes = new Dictionary<DesignType, SelectionProbe>();
         foreach (var mode in new[] { DesignType.MapObject, DesignType.Event })
         {
             string key = mode == DesignType.MapObject ? nameof(UiModSceneUnitCtrl) : nameof(UiModSceneBehaviourUnitCtrl);
-            var go = new GameObject("selection-probe-" + key);
-            go.SetActive(false);
+            var go = new GameObject("selection-probe-" + key); go.SetActive(false);
             var holder = go.AddComponent<UiHolder>();
-            var probe = new SelectionProbe { uiHolder = holder, inited = true };
-            holder.ctrl = probe;
-            probes.Add(mode, probe);
-            ui.uiCtrlName2Uis.Add(key, new List<UiHolder> { holder });
+            var probe = new SelectionProbe { uiHolder = holder, inited = true }; holder.ctrl = probe;
+            probes.Add(mode, probe); ui.uiCtrlName2Uis.Add(key, new List<UiHolder> { holder });
         }
-        var elevatedPrefab = Prefab<ObjectInstance>("selection-elevated-object");
-        AddBody(elevatedPrefab, Vector3.up * 2, Vector3.one);
-        var pick = elevatedPrefab.AddComponent<BoxCollider>();
-        pick.isTrigger = true;
-        pick.center = Vector3.up;
-        pick.size = new Vector3(.8f, 4, .8f);
-        pool.AddPool(elevatedPrefab);
-        var lowerPrefab = Prefab<ObjectInstance>("selection-lower-object");
-        AddBody(lowerPrefab, Vector3.up * .5f, Vector3.one);
-        var lowerPick = lowerPrefab.AddComponent<BoxCollider>();
-        lowerPick.isTrigger = true;
-        lowerPick.center = Vector3.up * .5f;
-        lowerPick.size = new Vector3(.8f, 1, .8f);
-        pool.AddPool(lowerPrefab);
-        var lower = map.AddObject("selectable lower object", new Vector3(10, 0, 10), lowerPrefab.name);
-        var elevated = map.AddObject("raised collider, lower owner", new Vector3(10, 0, 10), elevatedPrefab.name);
-        lower.unit.Show();
-        elevated.unit.Show();
-        // Fixture managers are intentionally inactive. Expose only these live
-        // instances so this test really exercises Physics.RaycastAll.
-        lower.unit.ins.transform.SetParent(map.mainGo.transform, true);
-        elevated.unit.ins.transform.SetParent(map.mainGo.transform, true);
-        // The root is the picking Trigger; the physical body is its child.
-        var body = elevated.unit.ins.transform.GetChild(0).GetComponent<BoxCollider>();
-        var livePick = elevated.unit.ins.GetComponent<BoxCollider>();
-        GameObject secondBody = null;
-        SphereCollider sphere = null;
-        TileUnitForm.Data upper = null;
-        ObjectUnitForm.Data higher = null;
-        BoxCollider tilePick = null;
+        ObjectUnitForm.Data Add(string name, float height)
+        {
+            var prefab = Prefab<ObjectInstance>(name);
+            AddBody(prefab, Vector3.up * 2, Vector3.one);
+            var pick = prefab.AddComponent<BoxCollider>(); pick.isTrigger = true;
+            pick.center = Vector3.up; pick.size = new Vector3(.8f, 2, 14);
+            pool.AddPool(prefab);
+            var data = map.AddObject(name, new Vector3(10, height, 10), prefab.name);
+            data.unit.Show(); data.unit.ins.transform.SetParent(map.mainGo.transform, true); return data;
+        }
+        var lower = Add("cycle-lower", 0); var upper = Add("cycle-upper", 2); var highest = Add("cycle-highest", 4);
+        var duplicate = highest.unit.ins.gameObject.AddComponent<BoxCollider>(); duplicate.isTrigger = true;
+        duplicate.center = Vector3.up; duplicate.size = new Vector3(.7f, 2, 14);
+        var selected = typeof(ModSceneController).GetField("selectedUnit", PrivateInstance);
+        void ResetSelection() => selected.SetValue(controller, null);
         UnitForm.Data Click(float height, DesignType mode, float pitch = 90)
         {
-            controller.designType = mode;
-            camera.tarTrs.position = new Vector3(10, height, 10);
+            controller.designType = mode; camera.tarTrs.position = new Vector3(10, height, 10);
             cam.transform.eulerAngles = Vector3.right * pitch;
-            cam.transform.position = camera.tarTrs.position - cam.transform.forward * 10;
+            cam.transform.position = camera.tarTrs.position - cam.transform.forward * 12;
             Physics.SyncTransforms();
-            Vector3 screen = cam.WorldToScreenPoint(new Vector3(10, height, 10));
-            probes[mode].selected = null;
+            Vector3 screen = cam.WorldToScreenPoint(new Vector3(10, height, 10)); probes[mode].selected = null;
             controller.OnEvent(new InputMouseDownEvent { id = 0, pos = screen });
-            controller.OnEvent(new InputMouseUpEvent { id = 0, pos = screen });
-            return probes[mode].selected;
+            controller.OnEvent(new InputMouseUpEvent { id = 0, pos = screen }); return probes[mode].selected;
         }
-        string HitDetails()
-        {
-            Vector3 screen = cam.WorldToScreenPoint(new Vector3(10, camera.tarTrs.position.y, 10));
-            return string.Join("; ", Physics.RaycastAll(cam.ScreenPointToRay(screen), 100,
-                Physics.DefaultRaycastLayers, QueryTriggerInteraction.Collide)
-                .Select(hit => hit.collider.name + ":" + hit.collider.isTrigger + ":" + hit.collider.bounds.min.y))
-                + "; lower active=" + lower.unit.ins.gameObject.activeInHierarchy
-                + "; body min=" + body.bounds.min.y + "; selected=" + probes[controller.designType].selected?.name;
-        }
+        BoxCollider tilePick = null; var ground = Tile(10, 10).unit;
+        bool groundWasShowing = ground.isVising; Transform groundParent = null;
         try
         {
-            Check(elevated.unit.belongTile == Tile(10, 10).unit && elevated.pos.y == 0,
-                "selection fixture has a current-layer root/owner but an elevated physical body");
-            if (onlyItemPicking)
-            {
-                foreach (var mode in new[] { DesignType.MapObject, DesignType.Event })
-                    Check(Click(0, mode) == lower, "Object selection retains current-height priority: " + mode);
-                elevated.unit.ins.gameObject.SetActive(false);
-                lower.unit.ins.gameObject.SetActive(false);
-                ItemSelectionWithGameplayColliderScale((mode, pitch) => Click(0, mode, pitch));
-                Check(history.undoCount == 0 && history.redoCount == 0, "Item selection does not create history operations");
-                return;
-            }
+            foreach (float pitch in new[] { 90f, 45f })
             foreach (var mode in new[] { DesignType.MapObject, DesignType.Event })
             {
-                Check(Click(0, mode) == lower, "raised physical body is skipped despite padded Trigger reaching current layer: " + mode + "; " + HitDetails());
-                Check(Click(1.5f, mode) == elevated, "Collider bottom touching current editing plane remains selectable: " + mode);
-                Check(Click(2, mode) == elevated, "raising editing plane permits an Object still owned by a lower Tile: " + mode);
-                body.center = Vector3.down * 1.5f;
-                Check(Click(0, mode) == elevated, "actual Collider center offset reaching current layer remains selectable: " + mode);
-                body.center = Vector3.zero;
-                body.transform.localPosition = Vector3.up * .5f;
-                Check(Click(0, mode) == elevated, "lowering child model without changing root/owner updates selection immediately: " + mode);
-                body.transform.localPosition = Vector3.up * 2;
-                body.transform.localScale = new Vector3(1, 3, 1);
-                Check(Click(0, mode) == lower, "scaled physical bottom above plane is still excluded: " + mode);
-                body.transform.localScale = new Vector3(1, 1, 4);
-                body.transform.localEulerAngles = Vector3.right * 90;
-                Check(Click(0, mode) == elevated, "rotation brings actual body bottom to plane: " + mode);
-                body.transform.localEulerAngles = Vector3.zero;
-                body.transform.localScale = Vector3.one;
+                ResetSelection();
+                Check(Click(0, mode, pitch) == highest, "initial click uses the nearest hit regardless of editing height: " + mode + "/" + pitch);
+                Check(Click(0, mode, pitch) == upper, "repeated click advances past all duplicate Colliders of the selected Unit");
+                Check(Click(0, mode, pitch) == lower, "the next click reaches the lowest candidate");
+                Check(Click(0, mode, pitch) == highest, "the last candidate wraps to the nearest/top candidate");
+                highest.unit.ins.gameObject.SetActive(false);
+                Check(Click(0, mode, pitch) == upper, "a selected Unit absent from new hits starts at the new first candidate");
+                highest.unit.ins.gameObject.SetActive(true);
+                Check(Click(0, mode, pitch) == lower, "when the selected Unit moves within the candidate list, selection follows its new index");
+                highest.unit.ins.gameObject.SetActive(false); upper.unit.ins.gameObject.SetActive(false);
+                Check(Click(0, mode, pitch) == lower && Click(0, mode, pitch) == lower, "a single candidate selects itself on every click");
+                lower.unit.ins.gameObject.SetActive(false);
+                Check(Click(0, mode, pitch) == null && ReferenceEquals(selected.GetValue(controller), lower),
+                    "empty clicks leave the displayed Unit selection unchanged");
+                highest.unit.ins.gameObject.SetActive(true); upper.unit.ins.gameObject.SetActive(true); lower.unit.ins.gameObject.SetActive(true);
+                Check(Click(0, mode, pitch) == highest, "the prior last candidate wraps after an empty ray without losing selection");
             }
-
-            higher = map.AddObject("highest fallback object", new Vector3(10, 3, 10), elevatedPrefab.name);
-            higher.unit.Show();
-            higher.unit.ins.transform.SetParent(map.mainGo.transform, true);
-            var highestPick = higher.unit.ins.GetComponent<BoxCollider>();
-            var liveLowerPick = lower.unit.ins.GetComponent<BoxCollider>();
-            // Broad picking Triggers keep all three Objects on the same ray in
-            // both overhead and side view; physical heights still decide priority.
-            livePick.size = new Vector3(.8f, 4, 14);
-            highestPick.size = new Vector3(.8f, 4, 14);
-            liveLowerPick.size = new Vector3(.8f, 1, 14);
-            foreach (float pitch in new[] { 90f, 45f })
-                foreach (var mode in new[] { DesignType.MapObject, DesignType.Event })
-                {
-                    Check(Click(0, mode, pitch) == lower, "current-height target wins over multiple higher hits: " + mode + "/" + pitch);
-                    lower.unit.ins.gameObject.SetActive(false);
-                    Check(Click(0, mode, pitch) == higher, "no current-height target falls back to highest ray hit: " + mode + "/" + pitch);
-                    higher.unit.ins.gameObject.SetActive(false);
-                    Check(Click(0, mode, pitch) == elevated, "next lower elevated hit remains selectable as fallback: " + mode + "/" + pitch);
-                    elevated.unit.ins.gameObject.SetActive(false);
-                    Check(Click(0, mode, pitch) == null, "empty click stays empty rather than reusing previous selection: " + mode + "/" + pitch);
-                    elevated.unit.ins.gameObject.SetActive(true);
-                    higher.unit.ins.gameObject.SetActive(true);
-                    lower.unit.ins.gameObject.SetActive(true);
-                }
-
-            // Event mode still permits Tile selection: a valid Tile means the
-            // click is not empty and must not trigger the higher-Object fallback.
-            var ground = Tile(10, 10).unit;
-            bool groundWasShowing = ground.isVising;
-            ground.Show();
-            var groundParent = ground.ins.transform.parent;
+            // Tile hits join the same cycle in Event mode; ordinary mode keeps
+            // its original Object/Character/Item-only candidate types.
+            ground.Show(); groundParent = ground.ins.transform.parent;
             ground.ins.transform.SetParent(map.mainGo.transform, true);
-            tilePick = ground.ins.gameObject.AddComponent<BoxCollider>();
-            tilePick.isTrigger = true;
-            tilePick.center = Vector3.up * .05f;
-            tilePick.size = new Vector3(.9f, .1f, .9f);
-            lower.unit.ins.gameObject.SetActive(false);
-            Check(Click(0, DesignType.Event) == ground.data, "Event Tile selection prevents higher-Object fallback");
-            Check(Click(0, DesignType.MapObject) == higher, "normal mode ignores Tiles before selecting the high fallback");
-            Object.DestroyImmediate(tilePick);
-            tilePick = null;
-            ground.ins.transform.SetParent(groundParent, true);
-            if (!groundWasShowing) ground.Hide();
-            lower.unit.ins.gameObject.SetActive(true);
-            map.RemoveObject(higher);
-            higher = null;
-            livePick.size = new Vector3(.8f, 4, .8f);
-            liveLowerPick.size = new Vector3(.8f, 1, .8f);
-
-            secondBody = new GameObject("second-selection-body");
-            secondBody.transform.SetParent(elevated.unit.ins.transform, false);
-            secondBody.transform.localPosition = Vector3.up * .25f;
-            var second = secondBody.AddComponent<BoxCollider>();
-            second.size = Vector3.one * .5f;
-            Check(Click(0, DesignType.MapObject) == elevated, "one lower physical body keeps a multipart Object selectable");
-            second.enabled = false;
-            Check(Click(0, DesignType.MapObject) == lower, "disabled lower body cannot bypass elevated-body filtering");
-            second.enabled = true;
-            secondBody.SetActive(false);
-            Check(Click(0, DesignType.Event) == lower, "inactive lower body cannot bypass elevated-body filtering");
-            secondBody.SetActive(true);
-            second.isTrigger = true;
-            Check(Click(0, DesignType.Event) == lower, "additional lower Trigger cannot bypass a physical body above the plane");
-            secondBody.SetActive(false);
-
-            body.enabled = false;
-            livePick.center = Vector3.up * 2;
-            livePick.size = new Vector3(.8f, 1, .8f);
-            Check(Click(0, DesignType.MapObject) == lower, "Trigger-only Object above editing plane is excluded");
-            lower.unit.ins.gameObject.SetActive(false);
-            Check(Click(0, DesignType.MapObject) == elevated, "Trigger-only Object is a fallback when nothing lower is selected");
-            lower.unit.ins.gameObject.SetActive(true);
-            livePick.center = Vector3.up;
-            livePick.size = new Vector3(.8f, 4, .8f);
-            Check(Click(0, DesignType.Event) == elevated, "Trigger-only prefab touching editing plane remains selectable");
-            sphere = body.gameObject.AddComponent<SphereCollider>();
-            sphere.radius = 1;
-            body.transform.localEulerAngles = new Vector3(35, 20, 15);
-            Check(Click(0, DesignType.MapObject) == lower, "rotated Sphere actual lower bound above plane is excluded");
-            body.transform.localScale = Vector3.one * 2;
-            Check(Click(0, DesignType.Event) == elevated, "scaled Sphere touches plane and remains selectable");
-            sphere.enabled = false;
-            body.enabled = true;
-            body.transform.localScale = Vector3.one;
-            body.transform.localEulerAngles = Vector3.zero;
-
-            upper = map.AddTile(new Vector3Int(10, 2, 10));
-            map.updateCtrl.ApplyMove(elevated.unit, new Vector3(10, 2, 10), Vector3.zero, true);
-            body.transform.localPosition = Vector3.down * 1.5f;
-            Check(elevated.unit.belongTile == upper.unit, "upper-owner fixture actually belongs to a higher Tile");
-            Check(Click(0, DesignType.MapObject) == lower, "higher owner is excluded even when child Collider extends down");
-            lower.unit.ins.gameObject.SetActive(false);
-            Check(Click(0, DesignType.MapObject) == elevated, "higher owner remains selectable as an empty-click fallback");
-            lower.unit.ins.gameObject.SetActive(true);
-            Check(Click(2, DesignType.Event) == elevated, "higher Object is selectable after switching editing height");
-            elevated.unit.ins.gameObject.SetActive(false);
-            lower.unit.ins.gameObject.SetActive(false);
+            tilePick = ground.ins.gameObject.AddComponent<BoxCollider>(); tilePick.isTrigger = true;
+            tilePick.center = Vector3.up * .05f; tilePick.size = new Vector3(.9f, .1f, .9f);
+            ResetSelection();
+            Check(Click(0, DesignType.Event) == highest && Click(0, DesignType.Event) == upper
+                && Click(0, DesignType.Event) == lower && Click(0, DesignType.Event) == ground.data
+                && Click(0, DesignType.Event) == highest, "Event mode cycles through all Objects and the Tile before wrapping");
+            ResetSelection();
+            Check(Click(0, DesignType.MapObject) == highest && Click(0, DesignType.MapObject) == upper
+                && Click(0, DesignType.MapObject) == lower && Click(0, DesignType.MapObject) == highest,
+                "normal mode excludes Tiles from the cycle");
+            Object.DestroyImmediate(tilePick); tilePick = null;
+            ground.ins.transform.SetParent(groundParent, true); if (!groundWasShowing) ground.Hide();
+            highest.unit.ins.gameObject.SetActive(false); upper.unit.ins.gameObject.SetActive(false); lower.unit.ins.gameObject.SetActive(false);
+            ResetSelection();
             ItemSelectionWithGameplayColliderScale((mode, pitch) => Click(0, mode, pitch));
-            Check(history.undoCount == 0 && history.redoCount == 0, "selection does not create history operations");
+            Check(history.undoCount == 0 && history.redoCount == 0, "cycling selection creates no history operations");
         }
         finally
         {
             controller.CommitPendingOperation();
-            controller.Unregister<InputKeyEvent>();
-            controller.Unregister<InputMouseEvent>();
-            controller.Unregister<InputMouseDownEvent>();
-            controller.Unregister<InputMouseUpEvent>();
-            controller.Unregister<InputMouseScrollEvent>();
-            controller.Unregister<TileEvent>();
-            controller.Unregister<ObjectEvent>();
-            if (secondBody != null) Object.DestroyImmediate(secondBody);
-            if (sphere != null) Object.DestroyImmediate(sphere);
+            controller.Unregister<InputKeyEvent>(); controller.Unregister<InputMouseEvent>();
+            controller.Unregister<InputMouseDownEvent>(); controller.Unregister<InputMouseUpEvent>();
+            controller.Unregister<InputMouseScrollEvent>(); controller.Unregister<InputPointEvent>();
+            controller.Unregister<InputPointDownEvent>(); controller.Unregister<InputPointUpEvent>();
+            controller.Unregister<TileEvent>(); controller.Unregister<ObjectEvent>();
             if (tilePick != null) Object.DestroyImmediate(tilePick);
-            if (higher != null) map.RemoveObject(higher);
-            map.RemoveObject(elevated);
-            map.RemoveObject(lower);
-            if (upper != null) map.RemoveTile(upper);
+            if (groundParent != null && ground.ins != null) ground.ins.transform.SetParent(groundParent, true);
+            if (!groundWasShowing) ground.Hide();
+            map.RemoveObject(highest); map.RemoveObject(upper); map.RemoveObject(lower);
             foreach (var pair in probes)
             {
                 string key = pair.Key == DesignType.MapObject ? nameof(UiModSceneUnitCtrl) : nameof(UiModSceneBehaviourUnitCtrl);
-                ui.uiCtrlName2Uis.Remove(key);
-                Object.DestroyImmediate(pair.Value.gameObject);
+                ui.uiCtrlName2Uis.Remove(key); Object.DestroyImmediate(pair.Value.gameObject);
             }
-            camera.tarTrs.position = previousTarget;
-            cam.transform.SetPositionAndRotation(previousCameraPosition, previousCameraRotation);
+            camera.tarTrs.position = previousTarget; cam.transform.SetPositionAndRotation(previousCameraPosition, previousCameraRotation);
             mod.sceneCtrl = previousController;
         }
     }
@@ -1293,9 +1164,7 @@ public static class ModSceneHistoryRuntimeRegression
 
     private static Texture ShownTexture(MapInstance instance)
     {
-        var block = new MaterialPropertyBlock();
-        instance.renderers[0].GetPropertyBlock(block);
-        return block.GetTexture("_Tex");
+        return instance.GetComponentInChildren<Renderer>(true).sharedMaterial.GetTexture("_Tex");
     }
 
     private static void PlacementRotationAndImmediateAppearance()

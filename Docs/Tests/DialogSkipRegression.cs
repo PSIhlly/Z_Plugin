@@ -6,6 +6,8 @@ using Z_Ui.Base;
 using Z_Ui.Dialog;
 using Z_Ui.Form;
 using Z_DataSystem.Form;
+using RenderHeads.Media.AVProVideo;
+using UnityEngine.Events;
 
 namespace UnityEngine
 {
@@ -31,17 +33,80 @@ namespace Z_Ui.Base
     }
     public class Sta { public int state; public void ChangeState(int value) { state = value; } public void ChangeState() { state = 1 - state; } }
     public class Txt { private string value; public int writes; public string text { get => value; set { writes++; this.value = value; } } }
-    public class MediaPlayer { public int stops; public void Stop() { stops++; } }
 }
-namespace Z_Ui.Form { public class ClipForm { public class Data { public string mainText; public int mainAudio, mainVideo; } } }
+namespace UnityEngine.Events { public delegate void UnityAction<T1, T2, T3>(T1 a, T2 b, T3 c); }
+namespace RenderHeads.Media.AVProVideo
+{
+    public enum ErrorCode { None }
+    public enum MediaPathType { AbsolutePathOrURL }
+    public class MediaPath { public string path; public MediaPath(string value, MediaPathType type) { path = value; } }
+    public class MediaPlayerEvent
+    {
+        public enum EventType { FinishedPlaying, Closing }
+        private UnityAction<MediaPlayer, EventType, ErrorCode> listeners;
+        public int count => listeners == null ? 0 : listeners.GetInvocationList().Length;
+        public void AddListener(UnityAction<MediaPlayer, EventType, ErrorCode> action) { listeners += action; }
+        public void RemoveListener(UnityAction<MediaPlayer, EventType, ErrorCode> action) { listeners -= action; }
+        public void Invoke(MediaPlayer player, EventType type, ErrorCode error) { listeners?.Invoke(player, type, error); }
+    }
+    // Models AVPro's distinct disable/pause, close and enable/resume states.
+    public class MediaPlayer
+    {
+        public int stops;
+        public bool opened, playing, wasPlayingOnPause;
+        public string path;
+        public GameObject gameObject = new GameObject();
+        public MediaPlayerEvent Events = new MediaPlayerEvent();
+        public bool OpenMedia(MediaPath media, bool autoPlay)
+        {
+            CloseMedia(); path = media.path;
+            opened = path != "missing"; playing = opened && autoPlay; return opened;
+        }
+        public void Pause() { playing = false; wasPlayingOnPause = false; }
+        public void CloseMedia()
+        {
+            if (opened) Events.Invoke(this, MediaPlayerEvent.EventType.Closing, ErrorCode.None);
+            opened = playing = false; path = null;
+        }
+        public void Stop() { stops++; playing = false; }
+        public void Disable() { if (playing) { Pause(); wasPlayingOnPause = true; } }
+        public void Enable() { if (wasPlayingOnPause && opened) playing = true; wasPlayingOnPause = false; }
+        public void Finish() { playing = false; Events.Invoke(this, MediaPlayerEvent.EventType.FinishedPlaying, ErrorCode.None); }
+    }
+}
+namespace Z_Ui.Form { public class ClipForm { public class Data { public string mainText; public int mainAudio, mainVideo, mainPicture; } } }
 namespace Z_DataSystem.Form
 {
     public class AudioAssetForm
     {
-        public class Data { public void Play(MediaPlayer player) { } }
-        public class Table { public Data GetDv(int id, Data fallback) => fallback; }
+        public class Data { public string path; public void Play(MediaPlayer player) { player.OpenMedia(new MediaPath(path, MediaPathType.AbsolutePathOrURL), true); } }
+        public class Table : Dictionary<int, Data> { public Data GetDv(int id, Data fallback) => TryGetValue(id, out var value) ? value : fallback; }
         public static Table DataById = new Table();
     }
+    public partial class VideoAssetForm
+    {
+        public partial class Data { public string path; }
+        public class Table : Dictionary<int, Data> { public Data GetDv(int id, Data fallback) => TryGetValue(id, out var value) ? value : fallback; }
+        public static Table DataById = new Table();
+    }
+    public class TexAssetForm
+    {
+        public class Table { public object GetDk(int id, int fallback) => null; }
+        public static Table DataById = new Table();
+    }
+}
+public static class GlobalDefaultHelper { public static int DefaultTexId; }
+namespace Ui.DialogBg
+{
+    public class TestImage { public void BindTexData(object data) { } }
+    public class TestView { public MediaPlayer mp_ = new MediaPlayer(); public TestImage img_ = new TestImage(); }
+    public partial class UiDialogBgCtrl : UiCtrl
+    {
+        public UiDialogBgModel model = new UiDialogBgModel();
+        public UiDialogBgParam param;
+        public TestView view = new TestView();
+    }
+    public partial class UiDialogBgModel { }
 }
 namespace Z_Time
 {
@@ -107,9 +172,9 @@ namespace Ui.DialogMain.Options
 }
 public class DialogSkipRegression : IZ_Listener<ClipPlayEvent>
 {
-    private int advances;
+    private int advances, videoEnds;
     private static int checks;
-    public void OnEvent(ClipPlayEvent evt) { if (evt.playType == PlayType.ClipOver) advances++; }
+    public void OnEvent(ClipPlayEvent evt) { if (evt.playType == PlayType.ClipOver) advances++; if (evt.playType == PlayType.ClipVideoOver) videoEnds++; }
     private static void Check(bool result, string text) { checks++; if (!result) throw new Exception(text); }
     private static void Show(Ui.DialogMain.MainText.UiMainTextCtrl main, Ui.DialogMain.Options.UiOptionsCtrl options, string text, int video = 0)
     {
@@ -189,6 +254,44 @@ public class DialogSkipRegression : IZ_Listener<ClipPlayEvent>
         Check(settings.skipping && main.view.txt_.text == "同帧连续对话", "deferred hide cleanup does not cancel a continuous shown dialog");
         options.view.btn_skip.onClickUp();
         Check(!settings.skipping && main.model.overTimer.cancel, "continuous-dialog release still stops skipping");
+
+        AudioAssetForm.DataById[1] = new AudioAssetForm.Data { path = "voice-a" };
+        main.param = new Ui.DialogMain.MainText.UiMainTextParam { clip = new ClipForm.Data { mainAudio = 1 } };
+        main.OnShow();
+        Check(main.view.mp_.playing && main.view.mp_.path == "voice-a", "new voice still starts normally");
+        Show(main, options, "无配音");
+        Check(!main.view.mp_.opened && !main.view.mp_.playing, "silent clip closes previous voice on active-panel reuse");
+        main.param.clip.mainAudio = 1; main.OnShow();
+        main.view.mp_.Disable(); main.OnHide(); main.view.mp_.Enable();
+        Check(!main.view.mp_.opened && !main.view.mp_.playing && !main.view.mp_.wasPlayingOnPause, "hide closes voice and clears the disabled player's resume flag");
+        main.param.clip.mainAudio = 99; main.OnShow();
+        Check(!main.view.mp_.opened, "missing audio record leaves the player closed on reopen");
+
+        var bg = new Ui.DialogBg.UiDialogBgCtrl();
+        VideoAssetForm.DataById[1] = new VideoAssetForm.Data { path = "video-a" };
+        VideoAssetForm.DataById[2] = new VideoAssetForm.Data { path = "video-b" };
+        VideoAssetForm.DataById[3] = new VideoAssetForm.Data { path = "missing" };
+        int externalEvents = 0;
+        bg.view.mp_.Events.AddListener((mp, type, error) => externalEvents++);
+        bg.param = new Ui.DialogBg.UiDialogBgParam { clip = new ClipForm.Data { mainVideo = 1 } };
+        bg.OnShow();
+        Check(bg.view.mp_.playing && bg.view.mp_.Events.count == 2, "video starts with its own and unrelated listeners");
+        bg.param.clip.mainVideo = 2; bg.OnShow();
+        Check(bg.view.mp_.playing && bg.view.mp_.path == "video-b" && bg.view.mp_.Events.count == 2, "replacing an unfinished video releases only its completion listener");
+        int videoEnds = observer.videoEnds;
+        bg.view.mp_.Finish();
+        Check(observer.videoEnds == videoEnds + 1 && bg.view.mp_.Events.count == 1 && externalEvents > 0, "only the current video's completion advances dialog; other listeners survive");
+        bg.param.clip.mainVideo = 1; bg.OnShow();
+        bg.view.mp_.Disable(); bg.OnHide(); bg.view.mp_.Enable();
+        Check(!bg.view.mp_.opened && !bg.view.mp_.playing && !bg.view.mp_.wasPlayingOnPause && bg.view.mp_.Events.count == 1, "hide closes video, clears resume and releases its listener");
+        bg.param.clip.mainVideo = 0; bg.OnShow();
+        Check(!bg.view.mp_.opened && !bg.view.mp_.gameObject.activeSelf, "clip without video keeps the reused player closed and hidden");
+        bg.param.clip.mainVideo = 3; bg.OnShow();
+        Check(!bg.view.mp_.opened, "failed native video open leaves no media playing");
+        bg.param.clip.mainVideo = 2; bg.OnShow();
+        videoEnds = observer.videoEnds; bg.view.mp_.Finish();
+        Check(observer.videoEnds == videoEnds + 1 && bg.view.mp_.Events.count == 1, "failed-open callback cannot fire for the next successful video");
+        bg.OnHide(); main.OnHide();
         return checks;
     }
 }

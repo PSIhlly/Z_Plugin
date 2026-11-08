@@ -40,6 +40,11 @@ public static class NavigationRouteCacheRegression
             };
             map.utilCtrl = new MapUtilController(map);
             Check(Bfs.CellsPerFrame == 10, "the search work allowance remains ten cells");
+            RotatingCharacterKeepsNavigationRadius();
+            LargeCharacterStartup();
+            ColumnIndexLifecycle();
+            EvenSizedCornerNavigation();
+            TargetRingSelection();
             ContinuousMovementAtSix();
             ConsumePublishedRouteWhileSearchIsSuspended();
             TwoCharactersDoNotSharePublishedRoutes();
@@ -74,6 +79,464 @@ public static class NavigationRouteCacheRegression
         protected override int SearchFrame => frame;
         public ControlledBfs(NavigationController controller) : base(controller) { }
         public void Advance() { frame++; }
+    }
+
+    private static void RotatingCharacterKeepsNavigationRadius()
+    {
+        var poolGo = new GameObject("rotating-character-pool"); owned.Add(poolGo); poolGo.SetActive(false);
+        pool = poolGo.AddComponent<InstancePoolManager>();
+        typeof(Z_MonoSingleton<InstancePoolManager>).GetField("_instance", BindingFlags.Static | BindingFlags.NonPublic)
+            .SetValue(null, pool);
+        pool.pools = new Dictionary<string, InstancePool>(StringComparer.Ordinal); pool.defaultRoot = poolGo.transform;
+        var prefab = new GameObject("rotating-character"); owned.Add(prefab); prefab.SetActive(false);
+        var body = prefab.AddComponent<SphereCollider>(); body.radius = .4f; body.center = Vector3.up * .4f;
+        var trigger = prefab.AddComponent<SphereCollider>(); trigger.radius = 10f; trigger.isTrigger = true;
+        pool.AddPool(prefab);
+        var data = new CharacterUnitForm.Data(98701, true, Vector3.zero, 6, 999, 999, true, "", prefab.name,
+            Vector3.zero, Vector3.zero, Vector3.one * 2, UpdateType.Always, new List<int>(), "", false, 0, new List<int>());
+        var character = data.unit;
+        var radiusMethod = typeof(CharacterUnit).GetMethod("GetNavigationRadius", BindingFlags.Instance | BindingFlags.NonPublic);
+        float Radius() => (float)radiusMethod.Invoke(character, null);
+        foreach (int size in new[] { 1, 2, 3, 4 })
+        foreach (var position in new[] { Vector3.zero, new Vector3(507.1035f, 498.8025f, 417.5f) })
+        foreach (float yaw in new[] { 0f, 45f, 90f, 96.621f, 135f, 180f, 225f, 270f, 315f })
+        {
+            data.scale = Vector3.one * size; data.pos = position; data.euler = Vector3.up * yaw;
+            Check(Mathf.Abs(Radius() - size * .4f) < .0001f,
+                "a physical Sphere keeps its radius when turning or moving, excluding its Trigger: size="
+                + size + " yaw=" + yaw + " pos=" + position + " radius=" + Radius());
+        }
+
+        var previousNavigation = map.navigationCtrl; var previousUpdate = map.updateCtrl;
+        bool oldEnabled = map.enable, oldPause = DynamicGlobalSettings.pauseNav, oldDrop = DynamicGlobalSettings.allowDrop;
+        try
+        {
+            map.enable = false; DynamicGlobalSettings.pauseNav = false; DynamicGlobalSettings.allowDrop = true;
+            var navigation = new NavigationController(map) { step = .5f,
+                navUnits = new Dictionary<(int, int, int), NavUnit>() };
+            for (int x = 500; x < 540; x++)
+            for (int z = 414; z < 422; z++)
+            {
+                var p = new Vector3Int(x, 499, z);
+                navigation.navUnits[(x, 499, z)] = new NavUnit { pos = p, realPos = p,
+                    links = new List<NavUnit>(), passTypes = new HashSet<int>(), dirMaxY = new float[4], dirGroundY = new float[4] };
+            }
+            foreach (var node in navigation.navUnits.Values)
+            foreach (var delta in new[] { Vector3Int.right, Vector3Int.left, Vector3Int.forward, Vector3Int.back })
+                if (navigation.navUnits.TryGetValue((node.pos.x + delta.x, 499, node.pos.z + delta.z), out var next))
+                    node.links.Add(next);
+            var bfs = new ControlledBfs(navigation);
+            typeof(NavigationController).GetField("bfs", BindingFlags.Instance | BindingFlags.NonPublic).SetValue(navigation, bfs);
+            map.navigationCtrl = navigation; map.updateCtrl = new MapUpdateController(map);
+            var state = (NavigationEndpointState)typeof(CharacterUnit)
+                .GetField("navigationEndpointState", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(character);
+            var move = typeof(CharacterUnit).GetMethod("MoveAlongNavigation", BindingFlags.Instance | BindingFlags.NonPublic);
+            foreach (float distance in new[] { 3f, 18f })
+            {
+                data.scale = Vector3.one * 2; data.pos = new Vector3(505.5f, 499, 416.5f);
+                data.destination = data.pos + Vector3.right * distance; data.euler = Vector3.up * 90f;
+                state.Reset();
+                for (int frame = 0; frame < 1500 && !state.hasResult; frame++)
+                {
+                    bfs.Advance();
+                    map.updateCtrl.GetNavDir(data.pos, data.destination, 999, Radius(), NoTypes, state, 2);
+                }
+                Check(state.hasResult && !state.directEndpoint, "the rotating Character starts with a completed regular route");
+                Vector3 start = data.pos;
+                for (int frame = 1; frame <= 240; frame++)
+                {
+                    if (frame % 30 == 0) data.destination += Vector3.right;
+                    // Replay the observed command-facing versus movement-facing changes.
+                    data.euler = Vector3.up * (frame % 30 < 15 ? 96.621f : 90f);
+                    bfs.Advance();
+                    var direction = map.updateCtrl.GetNavDir(data.pos, data.destination, 999, Radius(), NoTypes, state, 2);
+                    Check(state.hasResult && !state.directEndpoint && direction.x >= -.0001f,
+                        "turning and retargeting every 30 frames retain the route without backward corner alignment: frame="
+                        + frame + " distance=" + distance + " pos=" + data.pos + " target=" + state.moveTarget);
+                    Vector3 before = data.pos;
+                    move.Invoke(character, new object[] { .06f, direction });
+                    Check(data.pos.x >= before.x - .0001f && Mathf.Abs(data.pos.z - start.z) < .0001f,
+                        "the real size=2 Character moves forward without twitching in open terrain");
+                    Check(state.searchedCellsThisFrame <= Bfs.CellsPerFrame,
+                        "rotation and periodic target changes do not refill the search budget");
+                }
+                Check(data.pos.x - start.x > 10f, "near and distant pursuit both make sustained progress while turning");
+            }
+        }
+        finally
+        {
+            map.navigationCtrl = previousNavigation; map.updateCtrl = previousUpdate; map.enable = oldEnabled;
+            DynamicGlobalSettings.pauseNav = oldPause; DynamicGlobalSettings.allowDrop = oldDrop;
+        }
+    }
+
+    private static void LargeCharacterStartup()
+    {
+        var navigation = new NavigationController(map) { step = .5f,
+            navUnits = new Dictionary<(int, int, int), NavUnit>() };
+        for (int x = 0; x < 40; x++)
+        for (int z = 0; z < 40; z++)
+            navigation.navUnits[(x, 0, z)] = new NavUnit { pos = new Vector3Int(x, 0, z),
+                realPos = new Vector3(x, 0, z), links = new List<NavUnit>(), passTypes = new HashSet<int>(),
+                dirGroundY = new float[4], dirMaxY = new float[4] };
+        foreach (var node in navigation.navUnits.Values)
+        foreach (var offset in new[] { Vector3Int.right, Vector3Int.left, Vector3Int.forward, Vector3Int.back })
+            if (navigation.navUnits.TryGetValue((node.pos.x + offset.x, 0, node.pos.z + offset.z), out var next))
+                node.links.Add(next);
+        var bfs = new ControlledBfs(navigation);
+        int Await(Vector3 start, Vector3 target, float radius, out NavigationEndpointState state, int maxStep = 999)
+        {
+            state = new NavigationEndpointState();
+            for (int frame = 1; frame < 3000; frame++)
+            {
+                bfs.Advance();
+                bfs.GetNextDir(start, target, maxStep, radius, NoTypes, state);
+                Check(state.searchedCellsThisFrame <= Bfs.CellsPerFrame, "large-character startup retains the frame budget");
+                if (state.hasResult) return frame;
+            }
+            throw new InvalidOperationException("large-character startup did not finish");
+        }
+        var origin = new Vector3(12, 0, 12);
+        int ordinary = Await(origin, new Vector3(24, 0, 12), .4f, out _);
+        int large = Await(origin, new Vector3(24, 0, 12), .8f, out _);
+        var target = new Vector3(0, 0, 12);
+        int edge = Await(origin, target, .8f, out var reference);
+        Vector3 expectedAnchor = reference.moveTarget;
+        int escape = Await(target, origin, .8f, out _);
+        int reentered = Await(origin, target, .8f, out _);
+        var previousColumns = map.data.mapXZ2Y;
+        map.data.mapXZ2Y = new Dictionary<(int, int), SortedSet<int>>();
+        foreach (var node in navigation.navUnits.Values)
+            map.data.mapXZ2Y[(node.pos.x, node.pos.z)] = new SortedSet<int> { 0 };
+        void Index(bool regular = true)
+        {
+            typeof(NavigationController).GetField("columnIndexMin", BindingFlags.Instance | BindingFlags.NonPublic).SetValue(navigation, Vector2Int.zero);
+            typeof(NavigationController).GetField("columnIndexMax", BindingFlags.Instance | BindingFlags.NonPublic).SetValue(navigation, new Vector2Int(39, 39));
+            typeof(NavigationController).GetMethod("PublishColumnIndex", BindingFlags.Instance | BindingFlags.NonPublic).Invoke(navigation, new object[] { regular });
+        }
+        try
+        {
+            Index();
+            int fastEdge = Await(origin, target, .8f, out var optimized);
+            Check(fastEdge <= ordinary + 3 && fastEdge < edge / 2 && optimized.moveTarget == expectedAnchor,
+                "size=2 edge targeting reaches the same anchor without exhausting the entire open graph");
+            int fastEscape = Await(target, origin, .8f, out optimized);
+            Check(fastEscape <= 2 && optimized.directEndpoint && optimized.moveTarget == new Vector3(1, 0, 12),
+                "nearest size=2 escape uses cached height columns instead of scanning all 1600 cells");
+            optimized.Reset();
+            Check(!optimized.hasResult && !optimized.isSearching, "explicit navigation stop still clears the route");
+            Index(); // Publishing an unchanged periodic refresh preserves the spatial index.
+            int fastReentered = Await(origin, target, .8f, out optimized);
+            Check(fastReentered == fastEdge && optimized.moveTarget == expectedAnchor,
+                "a fresh query after stop/reentry reuses the map index, without retaining its old route");
+            Await(origin, target, .8f, out optimized, maxStep: 0);
+            Check(!optimized.directEndpoint && optimized.moveTarget == origin,
+                "nearest geometric candidate never bypasses the graph-depth limit");
+
+            var nearest = navigation.navUnits[(1, 0, 12)];
+            nearest.links.Clear();
+            foreach (var node in navigation.navUnits.Values) node.links.Remove(nearest);
+            Index(false);
+            Await(origin, target, .8f, out reference);
+            Index();
+            Await(origin, target, .8f, out optimized);
+            Check(optimized.moveTarget == reference.moveTarget && optimized.directEndpoint == reference.directEndpoint,
+                "an unreachable nearest candidate falls back to the same graph-reachable anchor as exhaustive BFS");
+
+            nearest.objectBlocked = true;
+            Index(false); Await(origin, target, .8f, out reference);
+            Index(); Await(origin, target, .8f, out optimized);
+            Check(optimized.moveTarget == reference.moveTarget,
+                "live obstacle changes are reflected even though the cached column geometry is unchanged");
+            Debug.Log($"LARGE_CHARACTER_NAV_STARTUP frames ordinary={ordinary} size2={large} edgeTarget={edge}->{fastEdge} blockedStart={escape}->{fastEscape} reentered={reentered}->{fastReentered}");
+        }
+        finally { map.data.mapXZ2Y = previousColumns; }
+    }
+
+    private static void ColumnIndexLifecycle()
+    {
+        var oldData = map.data; var oldUpdate = map.updateCtrl; var oldNavigation = map.navigationCtrl;
+        bool oldEnabled = map.enable;
+        var rows = new List<TileUnitForm.Data>();
+        var poolGo = new GameObject("nav-column-index-pool"); owned.Add(poolGo); poolGo.SetActive(false);
+        pool = poolGo.AddComponent<InstancePoolManager>();
+        typeof(Z_MonoSingleton<InstancePoolManager>).GetField("_instance", BindingFlags.Static | BindingFlags.NonPublic)
+            .SetValue(null, pool);
+        pool.pools = new Dictionary<string, InstancePool>(StringComparer.Ordinal); pool.defaultRoot = poolGo.transform;
+        var prefab = new GameObject("MapPrefab$nav-column-floor"); owned.Add(prefab); prefab.SetActive(false);
+        prefab.AddComponent<TileInstance>();
+        var box = prefab.AddComponent<BoxCollider>(); box.center = Vector3.down * .05f; box.size = new Vector3(1, .1f, 1);
+        pool.AddPool(prefab);
+        try
+        {
+            map.data = new MapInfo { mainData = new MapMainForm.Data(98600, Vector3.one,
+                new Vector3Int(10, 3, 10), new Vector3Int(5, 3, 5), "", "", "", ""),
+                maps = new Dictionary<(int, int, int), TileUnitForm.Data>(),
+                mapXZ2Y = new Dictionary<(int, int), SortedSet<int>>() };
+            map.enable = true; map.updateCtrl = new MapUpdateController(map);
+            UnitForm.InitInternal(); TileUnitForm.InitInternal(); ObjectUnitForm.InitInternal();
+            for (int x = 0; x < 5; x++)
+            for (int z = 0; z < 5; z++)
+            {
+                var pos = new Vector3Int(x, 0, z);
+                var data = new TileUnitForm.Data(98601 + rows.Count, "floor", new Dictionary<int, int>(), pos,
+                    prefab.name, pos, Vector3.zero, Vector3.one, UpdateType.ShowOnly, new List<int>(), "", false, false, new List<int>());
+                TileUnitForm.AddData(data); rows.Add(data);
+                map.data.maps[(x, 0, z)] = data; map.data.mapXZ2Y[(x, z)] = new SortedSet<int> { 0 };
+            }
+            var navigation = new NavigationController(map); map.navigationCtrl = navigation;
+            var ready = typeof(NavigationController).GetProperty("CanSearchNearbyColumns", BindingFlags.Instance | BindingFlags.NonPublic);
+            bool IsReady() => (bool)ready.GetValue(navigation);
+            navigation.Build();
+            Check(IsReady(), "real scene Build publishes the existing complete height-column index");
+            var graph = navigation.navUnits; var center = graph[(2, 0, 2)];
+            navigation.RebuildNow();
+            Check(IsReady() && ReferenceEquals(graph, navigation.navUnits) && ReferenceEquals(center, graph[(2, 0, 2)]),
+                "an unchanged periodic rebuild retains graph/node identities and usable column indexing");
+            map.data.mainData.mapUnitSize = Vector3.one * 2;
+            Check(!IsReady(), "changed map cell dimensions cannot reuse a stale spatial proof");
+            map.data.mainData.mapUnitSize = Vector3.one;
+            navigation.RefreshTerrainTiles(new[] { new Vector3Int(2, 0, 2) });
+            Check(!IsReady(), "an explicit terrain refresh retires its previous column-index proof");
+            navigation.RebuildNow(); Check(IsReady(), "completed terrain rebuilding restores the column index");
+            rows[0].pos += Vector3.right * .1f;
+            navigation.RebuildNow();
+            Check(!IsReady(), "non-grid Tile centers fall back to exhaustive nearest search");
+            rows[0].pos -= Vector3.right * .1f;
+            navigation.RebuildNow(); Check(IsReady(), "restored regular terrain can use the index again");
+        }
+        finally
+        {
+            foreach (var row in rows) TileUnitForm.RemoveData(row.uid);
+            map.data = oldData; map.updateCtrl = oldUpdate; map.navigationCtrl = oldNavigation; map.enable = oldEnabled;
+        }
+    }
+
+    private static void TargetRingSelection()
+    {
+        var oldColumns = map.data.mapXZ2Y;
+        NavigationController Grid(int extent, out ControlledBfs bfs)
+        {
+            var nav = new NavigationController(map) { step = .5f, navUnits = new Dictionary<(int, int, int), NavUnit>() };
+            map.data.mapXZ2Y = new Dictionary<(int, int), SortedSet<int>>();
+            for (int x = 0; x <= extent; x++)
+            for (int z = 0; z <= extent; z++)
+            {
+                nav.navUnits[(x, 0, z)] = new NavUnit { pos = new Vector3Int(x, 0, z), realPos = new Vector3(x, 0, z),
+                    links = new List<NavUnit>(), passTypes = new HashSet<int>(), dirMaxY = new float[4], dirGroundY = new float[4] };
+                map.data.mapXZ2Y[(x, z)] = new SortedSet<int> { 0 };
+            }
+            foreach (var node in nav.navUnits.Values)
+            foreach (var dir in new[] { Vector3Int.right, Vector3Int.left, Vector3Int.forward, Vector3Int.back })
+                if (nav.navUnits.TryGetValue((node.pos.x + dir.x, 0, node.pos.z + dir.z), out var next)) node.links.Add(next);
+            typeof(NavigationController).GetField("columnIndexMin", BindingFlags.Instance | BindingFlags.NonPublic).SetValue(nav, Vector2Int.zero);
+            typeof(NavigationController).GetField("columnIndexMax", BindingFlags.Instance | BindingFlags.NonPublic).SetValue(nav, new Vector2Int(extent, extent));
+            typeof(NavigationController).GetMethod("PublishColumnIndex", BindingFlags.Instance | BindingFlags.NonPublic).Invoke(nav, new object[] { true });
+            bfs = new ControlledBfs(nav); return nav;
+        }
+        try
+        {
+            var nav = Grid(4, out var bfs);
+            foreach (var node in nav.navUnits.Values) node.objectBlocked = true;
+            nav.navUnits[(3, 0, 3)].objectBlocked = false;
+            nav.navUnits[(4, 0, 0)].objectBlocked = false;
+            var state = new NavigationEndpointState();
+            AwaitEndpointRound(bfs, new Vector3(4, 0, 0), Vector3.zero, state, radius: .4f);
+            Check(SelectedTarget(state) == new Vector3(4, 0, 0) && state.moveTarget == new Vector3(4, 0, 0),
+                "Euclidean rings select distance 4 before the square-ring-3 diagonal at sqrt(18)");
+
+            nav = Grid(20, out bfs);
+            var original = new Vector3(10, 0, 10);
+            foreach (var node in nav.navUnits.Values) node.objectBlocked = (node.realPos - original).sqrMagnitude < 16f;
+            state = new NavigationEndpointState(); bfs.Advance();
+            EndpointStep(bfs, new Vector3(5, 0, 10), original, state, radius: .4f);
+            var search = typeof(NavigationEndpointState).GetField("searchState", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(state);
+            var steps = (System.Collections.IDictionary)search.GetType().GetField("steps", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(search);
+            Check(state.isSearching && !state.hasResult && steps.Count == 0,
+                "BFS does not expand any node before budgeted target selection has finished");
+            AwaitEndpointRound(bfs, new Vector3(5, 0, 10), original, state, radius: .4f);
+            Check(Mathf.Abs((SelectedTarget(state) - original).sqrMagnitude - 16f) < .0001f,
+                "target search expands beyond three cells and may choose any legal equal-distance point");
+            var selected = SelectedTarget(state);
+            Check(AwaitEndpointRound(bfs, selected, original, state, radius: .4f) == Vector3.zero && !state.directEndpoint,
+                "the selected target remains the final endpoint even when the original destination stays blocked");
+            state.Reset(); AwaitEndpointRound(bfs, new Vector3(5, 0, 10), original, state, radius: .8f);
+            var large = nav.RealPos2MapPosInt(SelectedTarget(state));
+            bool clearance = true;
+            for (int x = -1; x <= 1; x++)
+            for (int z = -1; z <= 1; z++)
+                clearance &= nav.navUnits.TryGetValue((large.x + x, 0, large.z + z), out var footprint) && !footprint.objectBlocked;
+            Check(clearance, "size=2 ring candidates include the entire physical footprint");
+
+            nav = Grid(4, out bfs);
+            foreach (var node in nav.navUnits.Values) node.objectBlocked = true;
+            nav.navUnits[(3, 0, 2)].objectBlocked = false;
+            var upper = new NavUnit { pos = new Vector3Int(2, 5, 2), realPos = new Vector3(2, 5, 2),
+                links = new List<NavUnit>(), passTypes = new HashSet<int>() };
+            nav.navUnits[(2, 5, 2)] = upper; map.data.mapXZ2Y[(2, 2)].Add(5);
+            typeof(NavigationController).GetMethod("PublishColumnIndex", BindingFlags.Instance | BindingFlags.NonPublic).Invoke(nav, new object[] { true });
+            state = new NavigationEndpointState();
+            AwaitEndpointRound(bfs, new Vector3(3, 0, 2), new Vector3(2, 0, 2), state, radius: .4f);
+            Check(SelectedTarget(state) == new Vector3(3, 0, 2),
+                "full Euclidean distance chooses a nearby lower point before a high point in the same column");
+        }
+        finally { map.data.mapXZ2Y = oldColumns; }
+    }
+
+    private static void EvenSizedCornerNavigation()
+    {
+        NavigationController Graph(int width, bool horizontal, out ControlledBfs bfs)
+        {
+            var nav = new NavigationController(map) { step = .5f, navUnits = new Dictionary<(int, int, int), NavUnit>() };
+            for (int x = 0; x < 6; x++)
+            for (int z = 0; z < 13; z++)
+            {
+                if (z >= 4 && z <= 8 && (x < 2 || x >= 2 + width)) continue;
+                var p = horizontal ? new Vector3Int(z, 0, x) : new Vector3Int(x, 0, z);
+                nav.navUnits[(p.x, 0, p.z)] = new NavUnit { pos = p, realPos = p,
+                    links = new List<NavUnit>(), passTypes = new HashSet<int>(), dirMaxY = new float[4], dirGroundY = new float[4] };
+            }
+            foreach (var node in nav.navUnits.Values)
+            foreach (var d in new[] { Vector3Int.right, Vector3Int.left, Vector3Int.forward, Vector3Int.back })
+                if (nav.navUnits.TryGetValue((node.pos.x + d.x, 0, node.pos.z + d.z), out var next)) node.links.Add(next);
+            bfs = new ControlledBfs(nav); return nav;
+        }
+        Vector3 Await(ControlledBfs bfs, Vector3 position, Vector3 target, NavigationEndpointState state, int size)
+        {
+            int before = state.completedSearchCount;
+            for (int frame = 0; frame < 1500; frame++)
+            {
+                bfs.Advance();
+                var direction = bfs.GetNextDir(position, target, 999, size * .4f, NoTypes, state, size);
+                Check(state.searchedCellsThisFrame <= 10, "corner anchoring retains the per-agent frame budget");
+                if (state.hasResult && state.completedSearchCount > before) return direction;
+            }
+            throw new InvalidOperationException("corner route never completed");
+        }
+        var nav = Graph(2, false, out var search);
+        var footprint = nav.GetClearanceOffsets(.8f, 2);
+        Check(footprint.Count == 4 && footprint[0] == new Vector2Int(-1, 0)
+            && footprint[3] == new Vector2Int(0, 1), "size=2 covers the 2x2 block around its lower-right anchor Tile");
+        Check(nav.GetNavigationOffset(2) == new Vector3(-.5f, 0, .5f)
+            && nav.GetNavigationOffset(3) == Vector3.zero && nav.GetClearanceOffsets(1.6f, 4).Count == 16,
+            "even sizes use top-left corners, odd sizes keep centers, and size=4 retains four-cell clearance");
+        foreach (bool horizontal in new[] { false, true })
+        {
+            nav = Graph(2, horizontal, out search);
+            Vector3 start = horizontal ? new Vector3(1.5f, 0, 2.5f) : new Vector3(2.5f, 0, 1.5f);
+            Vector3 target = horizontal ? new Vector3(10.5f, 0, 2.5f) : new Vector3(2.5f, 0, 10.5f);
+            var state = new NavigationEndpointState(); Vector3 position = start;
+            Await(search, position, target, state, 2);
+            for (int frame = 0; frame < 500 && (position - target).sqrMagnitude > 1e-8f; frame++)
+            {
+                search.Advance();
+                Vector3 direction = search.GetNextDir(position, target, 999, .8f, NoTypes, state, 2);
+                position += direction * Mathf.Min(.15f, (state.moveTarget - position).magnitude);
+                float side = horizontal ? position.z : position.x;
+                Check(Mathf.Abs(side - 2.5f) < .0001f && side - .8f > 1.5f && side + .8f < 3.5f,
+                    "the physical diameter fits both sides of the two-cell passage throughout navigation");
+            }
+            Check((position - target).sqrMagnitude < 1e-8f, "size=2 crosses a two-cell corridor in either orientation");
+            Check(Await(search, position, target, state, 2) == Vector3.zero && state.moveTarget == target,
+                "arrival remains at the anchor Tile's top-left corner");
+        }
+        nav = Graph(2, false, out search);
+        var turning = new NavigationEndpointState(); var turnPosition = new Vector3(.5f, 0, 1.5f);
+        var turnTarget = new Vector3(4.5f, 0, 10.5f);
+        Await(search, turnPosition, turnTarget, turning, 2);
+        for (int frame = 0; frame < 600 && (turnPosition - turnTarget).sqrMagnitude > 1e-8f; frame++)
+        {
+            search.Advance(); var direction = search.GetNextDir(turnPosition, turnTarget, 999, .8f, NoTypes, turning, 2);
+            turnPosition += direction * Mathf.Min(.1f, (turning.moveTarget - turnPosition).magnitude);
+            bool fits = true;
+            for (int x = Mathf.FloorToInt(turnPosition.x - .8f + .50001f); x <= Mathf.FloorToInt(turnPosition.x + .8f + .49999f); x++)
+            for (int z = Mathf.FloorToInt(turnPosition.z - .8f + .50001f); z <= Mathf.FloorToInt(turnPosition.z + .8f + .49999f); z++)
+                fits &= nav.navUnits.ContainsKey((x, 0, z));
+            Check(fits, "the full body stays inside the broad room and narrow entrance while turning: " + turnPosition);
+        }
+        Check((turnPosition - turnTarget).sqrMagnitude < 1e-8f, "an off-center room start steers into the half-cell corridor centerline");
+        nav = Graph(4, false, out search);
+        var four = new NavigationEndpointState(); var fourPosition = new Vector3(3.5f, 0, 1.5f);
+        var fourTarget = new Vector3(3.5f, 0, 10.5f);
+        Await(search, fourPosition, fourTarget, four, 4);
+        for (int frame = 0; frame < 300 && (fourPosition - fourTarget).sqrMagnitude > 1e-8f; frame++)
+        {
+            search.Advance(); var direction = search.GetNextDir(fourPosition, fourTarget, 999, 1.6f, NoTypes, four, 4);
+            fourPosition += direction * Mathf.Min(.15f, (four.moveTarget - fourPosition).magnitude);
+        }
+        Check((fourPosition - fourTarget).sqrMagnitude < 1e-8f, "size=4 uses the same corner convention with a four-cell-wide footprint");
+        nav = Graph(1, false, out search);
+        var blocked = new NavigationEndpointState(); var blockedStart = new Vector3(2.5f, 0, 1.5f);
+        Await(search, blockedStart, new Vector3(2.5f, 0, 10.5f), blocked, 2);
+        Check(blocked.moveTarget == blockedStart, "size=2 still rejects a one-cell-wide corridor");
+        var small = new NavigationEndpointState(); Vector3 smallPosition = new Vector3(2, 0, 1), smallTarget = new Vector3(2, 0, 11);
+        Await(search, smallPosition, smallTarget, small, 1);
+        for (int frame = 0; frame < 500 && (smallPosition - smallTarget).sqrMagnitude > 1e-8f; frame++)
+        {
+            search.Advance(); var direction = search.GetNextDir(smallPosition, smallTarget, 999, .4f, NoTypes, small, 1);
+            smallPosition += direction * Mathf.Min(.15f, (small.moveTarget - smallPosition).magnitude);
+        }
+        Check((smallPosition - smallTarget).sqrMagnitude < 1e-8f, "size=1 retains center navigation through a one-cell passage");
+        nav = Graph(2, false, out search);
+        var corner = new Vector3(2.5f, 0, 5.5f); var anchor = nav.navUnits[(3, 0, 5)];
+        var same = new NavigationEndpointState(); Await(search, corner, anchor.realPos, same, 2);
+        Check(same.moveTarget == corner && !same.directEndpoint, "a Tile-center target resolves to that Tile's top-left corner");
+        anchor.passTypes.Add(7901);
+        same.Reset(); Await(search, corner, corner, same, 2);
+        Check(same.directEndpoint && same.moveTarget != corner, "the exact junction uses its lower-right Tile's pass requirement");
+        same.Reset();
+        for (int frame = 0; frame < 20 && !same.hasResult; frame++)
+        { search.Advance(); search.GetNextDir(corner, corner, 999, .8f, new[] { 7901 }, same, 2); }
+        Check(same.moveTarget == corner && !same.directEndpoint, "a capable even-sized actor stands at the same junction");
+        anchor.passTypes.Clear();
+        int previousWork = same.searchedCellsThisFrame;
+        search.GetNextDir(corner, corner, 999, .8f, new[] { 7901 }, same, 1);
+        Check(!same.hasResult && same.searchedCellsThisFrame == previousWork,
+            "changing size/parity invalidates cached coordinates without replenishing the same-frame budget");
+        Await(search, corner, corner, same, 2);
+        previousWork = same.searchedCellsThisFrame;
+        var cellSize = map.data.mainData.mapUnitSize;
+        try
+        {
+            map.data.mainData.mapUnitSize = new Vector3(2, 1, 1);
+            search.GetNextDir(corner, corner, 999, .8f, NoTypes, same, 2);
+            Check(!same.hasResult && same.searchedCellsThisFrame == previousWork,
+                "changed half-cell offset retires cached coordinates without granting more work");
+        }
+        finally { map.data.mainData.mapUnitSize = cellSize; }
+
+        // Exercise real Character Move/ApplyMove and same-frame substeps with a
+        // scaled physical Sphere; synthetic graph walls above verify clearance.
+        var oldNav = map.navigationCtrl; var oldUpdate = map.updateCtrl; bool oldEnabled = map.enable;
+        bool oldPause = DynamicGlobalSettings.pauseNav, oldDrop = DynamicGlobalSettings.allowDrop;
+        var poolGo = new GameObject("corner-character-pool"); owned.Add(poolGo); poolGo.SetActive(false);
+        pool = poolGo.AddComponent<InstancePoolManager>();
+        typeof(Z_MonoSingleton<InstancePoolManager>).GetField("_instance", BindingFlags.Static | BindingFlags.NonPublic).SetValue(null, pool);
+        pool.pools = new Dictionary<string, InstancePool>(StringComparer.Ordinal); pool.defaultRoot = poolGo.transform;
+        var prefab = new GameObject("corner-character"); owned.Add(prefab); prefab.SetActive(false);
+        var body = prefab.AddComponent<SphereCollider>(); body.radius = .4f; body.center = Vector3.up * .4f; pool.AddPool(prefab);
+        try
+        {
+            map.enable = false; DynamicGlobalSettings.pauseNav = false; DynamicGlobalSettings.allowDrop = true;
+            map.navigationCtrl = nav; map.updateCtrl = new MapUpdateController(map);
+            typeof(NavigationController).GetField("bfs", BindingFlags.Instance | BindingFlags.NonPublic).SetValue(nav, search);
+            var start = new Vector3(2.5f, 0, 1.5f); var target = new Vector3(2.5f, 0, 10.5f);
+            var data = new CharacterUnitForm.Data(98700, true, target, 6, 999, 999, true, "", prefab.name,
+                start, Vector3.zero, Vector3.one * 2, UpdateType.Always, new List<int>(), "", false, 0, new List<int>());
+            var character = data.unit;
+            var state = (NavigationEndpointState)typeof(CharacterUnit).GetField("navigationEndpointState", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(character);
+            var move = typeof(CharacterUnit).GetMethod("MoveAlongNavigation", BindingFlags.Instance | BindingFlags.NonPublic);
+            Await(search, data.pos, target, state, 2);
+            for (int frame = 0; frame < 300 && (data.pos - target).sqrMagnitude > 1e-8f; frame++)
+            {
+                search.Advance(); var direction = map.updateCtrl.GetNavDir(data.pos, target, 999, .8f, NoTypes, state, 2);
+                move.Invoke(character, new object[] { .15f, direction });
+                Check(state.searchedCellsThisFrame <= 10, "real even-sized Character substeps share the frame budget");
+            }
+            Check((data.pos - target).sqrMagnitude < 1e-8f, "the real scaled Character executes the two-cell corridor route");
+        }
+        finally
+        { map.navigationCtrl = oldNav; map.updateCtrl = oldUpdate; map.enable = oldEnabled; DynamicGlobalSettings.pauseNav = oldPause; DynamicGlobalSettings.allowDrop = oldDrop; }
     }
 
     private sealed class Corridor
@@ -449,141 +912,86 @@ public static class NavigationRouteCacheRegression
         var state = new NavigationEndpointState();
         Vector3 position = start.realPos + Vector3.right * .1f;
         Vector3 target = blockedTarget.realPos + Vector3.right * .1f;
-
         bfs.Advance();
         Vector3 direction = EndpointStep(bfs, position, target, state);
-        Check(state.isSearching && !state.hasResult && !state.directEndpoint && direction == Vector3.zero,
-            "a pending nearest-legal-start scan cannot invent an escape or final direct leg");
-        direction = AwaitEndpointRound(bfs, position, target, state);
-        Check(state.directEndpoint && state.moveTarget == new Vector3(3, 0, 3) && direction.x > .999f,
-            "a blocked start escapes to its nearest legal center, not toward the destination");
+        Check(state.isSearching && !state.hasResult && direction == Vector3.zero,
+            "a pending nearest-start scan cannot invent movement");
+        AwaitEndpointRound(bfs, position, target, state);
+        Check(state.directEndpoint && state.moveTarget == new Vector3(3, 0, 3),
+            "blocked starts still escape to their nearest legal center");
         AwaitEndpointRound(bfs, new Vector3(2.65f, 0, 3), target, state);
         Check(state.directEndpoint && state.moveTarget == new Vector3(3, 0, 3),
-            "entering the legal anchor's cell does not skip its center during escape");
-        bool graph = false, final = false;
-        for (int frame = 0; frame < 100 && (position - target).sqrMagnitude > .00000001f; frame++)
+            "escape keeps its center until arrival");
+        var replacement = new Vector3(7, 0, 3);
+        bool graph = false;
+        for (int frame = 0; frame < 160 && (position - replacement).sqrMagnitude > 1e-8f; frame++)
         {
             direction = AwaitEndpointRound(bfs, position, target, state);
-            if (!state.directEndpoint) graph = true;
-            if (state.directEndpoint && state.moveTarget == target) final = true;
+            graph |= !state.directEndpoint;
+            Check(!state.directEndpoint || state.moveTarget != target,
+                "target replacement never grants a direct leg into the blocked original");
             position += direction * Mathf.Min(.15f, (state.moveTarget - position).magnitude);
         }
-        Check(graph && final && (position - target).sqrMagnitude < .00000001f,
-            "two blocked endpoints retain escape, cached graph movement and the proven final direct segment: " + position);
-        direction = AwaitEndpointRound(bfs, new Vector3(5.65f, 0, 3), target, state);
-        Check(state.directEndpoint && state.moveTarget == target && direction.x > .99f,
-            "entering a blocked target never reverses its already-proven final approach");
-        Check(AwaitEndpointRound(bfs, target, target, state) == Vector3.zero,
-            "a final direct leg stops at its original exact coordinate");
-        Vector3 movedTarget = target + Vector3.forward * .1f;
-        direction = AwaitEndpointRound(bfs, new Vector3(5.65f, 0, 3), movedTarget, state,
-            radius: .500005f);
-        Check(state.directEndpoint && state.moveTarget == movedTarget
-            && Vector3.Dot(direction, (movedTarget - new Vector3(5.65f, 0, 3)).normalized) > .999f,
-            "same-blocked-cell target movement and radius tolerance preserve the final phase");
-
+        Check(graph && (position - replacement).sqrMagnitude < 1e-8f,
+            "escape then BFS ends at the preselected walkable target center: " + position);
+        Check(AwaitEndpointRound(bfs, replacement, target, state) == Vector3.zero && !state.directEndpoint,
+            "arriving at the replacement stops instead of continuing to the original target");
+        AwaitEndpointRound(bfs, replacement, target + new Vector3(.1f, 0, .05f), state, radius: .500005f);
+        Check(state.moveTarget == replacement && !state.directEndpoint,
+            "same-cell target motion and radius tolerance cannot overwrite the legal replacement");
         var other = new NavigationEndpointState();
-        AwaitEndpointRound(bfs, start.realPos + Vector3.right * .1f, new Vector3(1, 0, 1), other);
-        Check(other.directEndpoint && other.moveTarget == new Vector3(3, 0, 3),
-            "a second Character has its own escape anchor");
-        AwaitEndpointRound(bfs, new Vector3(5.65f, 0, 3), target, state);
-        Check(state.directEndpoint && state.moveTarget == target,
-            "another Character's escape cannot replace this Character's final phase");
-        Vector3 changedDestination = new Vector3(7, 0, 5);
-        AwaitEndpointRound(bfs, blockedTarget.realPos, changedDestination, state);
-        Check(state.directEndpoint && state.moveTarget != changedDestination && state.moveTarget != target,
-            "a different target cell cancels the old final leg and rechecks its blocked start");
-
+        AwaitEndpointRound(bfs, start.realPos + Vector3.right * .1f, Vector3.one, other);
+        Check(other.directEndpoint && other.moveTarget == new Vector3(3, 0, 3), "each Character retains its own escape");
         state.Reset();
         AwaitEndpointRound(bfs, start.realPos + Vector3.right * .1f, target, state, radius: 1f);
         Check(state.directEndpoint && state.moveTarget == new Vector3(4, 0, 3),
-            "a large Character escapes only to an anchor with a clear physical footprint");
-        var restrictedStart = navigation.navUnits[(3, 0, 3)];
-        restrictedStart.passTypes.Add(7201);
-        state.Reset();
-        AwaitEndpointRound(bfs, restrictedStart.realPos + Vector3.right * .1f, changedDestination, state);
-        Check(state.directEndpoint && state.moveTarget == new Vector3(4, 0, 3),
-            "a pass-restricted start escapes to a legal center");
-        state.Reset();
-        AwaitEndpointRound(bfs, restrictedStart.realPos, restrictedStart.realPos + Vector3.right * .1f,
+            "large Characters escape only to footprint-safe anchors");
+        var restrictedStart = navigation.navUnits[(3, 0, 3)]; restrictedStart.passTypes.Add(7201);
+        state.Reset(); AwaitEndpointRound(bfs, restrictedStart.realPos + Vector3.right * .1f, target, state);
+        Check(state.directEndpoint && state.moveTarget == new Vector3(4, 0, 3), "pass-restricted starts still escape");
+        state.Reset(); AwaitEndpointRound(bfs, restrictedStart.realPos, restrictedStart.realPos + Vector3.right * .1f,
             state, types: new[] { 7201 });
         Check(!state.directEndpoint && state.moveTarget == restrictedStart.realPos + Vector3.right * .1f,
-            "a capable Character uses normal same-cell movement instead of endpoint permission");
+            "capable Characters retain normal exact same-cell targets");
         restrictedStart.passTypes.Clear();
-        var restrictedTarget = navigation.navUnits[(7, 0, 5)];
-        restrictedTarget.passTypes.Add(7202);
-        state.Reset();
-        Vector3 restrictedPosition = restrictedTarget.realPos + Vector3.right * .1f;
-        AwaitEndpointRound(bfs, new Vector3(7, 0, 4), restrictedPosition, state);
-        Check(state.directEndpoint && state.moveTarget == restrictedPosition,
-            "a pass-restricted target approaches from its nearest reachable legal center");
-        direction = AwaitEndpointRound(bfs, new Vector3(7, 0, 4.65f), restrictedPosition, state);
-        Check(state.directEndpoint && direction.z > 0,
-            "entering a pass-restricted target preserves final-approach direction");
+        var restrictedTarget = navigation.navUnits[(7, 0, 5)]; restrictedTarget.passTypes.Add(7202);
+        state.Reset(); AwaitEndpointRound(bfs, new Vector3(7, 0, 4), restrictedTarget.realPos + Vector3.right * .1f, state);
+        Check(!state.directEndpoint && state.moveTarget == new Vector3(7, 0, 4),
+            "a pass-restricted destination is replaced before BFS and does not bypass the restriction");
         restrictedTarget.passTypes.Clear();
-
-        state.Reset();
-        AwaitEndpointRound(bfs, new Vector3(0, 0, 3), target, state);
-        Check(state.directEndpoint && state.moveTarget == new Vector3(1, 0, 3),
-            "a missing start escapes to the nearest actual node");
-        state.Reset();
-        AwaitEndpointRound(bfs, new Vector3(7, 0, 3), target, state);
-        Check(state.directEndpoint && state.moveTarget == target,
-            "a blocked target starts its final leg from the closest reachable center");
-        state.Reset();
-        Vector3 limitedStart = new Vector3(3, 0, 2);
+        state.Reset(); AwaitEndpointRound(bfs, new Vector3(0, 0, 3), target, state);
+        Check(state.directEndpoint && state.moveTarget == new Vector3(1, 0, 3), "missing starts keep nearest-node escape");
+        state.Reset(); var limitedStart = new Vector3(3, 0, 2);
         AwaitEndpointRound(bfs, limitedStart, target, state, maxStep: 0);
-        Check(!state.directEndpoint && state.moveTarget == limitedStart,
-            "an exhausted graph depth never mistakes a truncated route for a final anchor");
-
-        // The closest geometric node is deliberately unreachable. It must not
-        // replace a farther but graph-reachable endpoint anchor.
-        var isolated = new NavUnit
-        {
-            pos = new Vector3Int(6, 0, 4), realPos = target - Vector3.forward * .05f,
-            links = new List<NavUnit>(), passTypes = new HashSet<int>(),
-            dirMaxY = new float[4], dirGroundY = new float[4]
-        };
-        isolated.links.Add(isolated); navigation.navUnits[(6, 0, 4)] = isolated;
-        state.Reset();
-        AwaitEndpointRound(bfs, new Vector3(7, 0, 3), target, state);
-        Check(state.directEndpoint && state.moveTarget == target,
-            "a nearer isolated node cannot become the blocked destination's anchor");
-        state.Reset();
-        Vector3 missingTarget = new Vector3(8, 0, 3), ordinaryStart = new Vector3(4, 0, 3);
-        AwaitEndpointRound(bfs, ordinaryStart, missingTarget, state);
-        Check(!state.directEndpoint && state.moveTarget != ordinaryStart,
-            "a missing destination consumes a graph route before allowing its final segment");
+        Check(!state.directEndpoint && state.moveTarget == limitedStart, "replacement does not bypass BFS depth limits");
+        var isolated = new NavUnit { pos = new Vector3Int(6, 0, 4), realPos = target - Vector3.forward * .05f,
+            links = new List<NavUnit>(), passTypes = new HashSet<int>(), dirMaxY = new float[4], dirGroundY = new float[4] };
+        navigation.navUnits[(6, 0, 4)] = isolated;
+        state.Reset(); AwaitEndpointRound(bfs, replacement, target, state);
+        Check(SelectedTarget(state) == isolated.realPos && !state.directEndpoint,
+            "preprocessing selects geometric walkability; subsequent BFS handles disconnected candidates normally");
+        navigation.navUnits.Remove((6, 0, 4));
+        state.Reset(); AwaitEndpointRound(bfs, new Vector3(4, 0, 3), new Vector3(8, 0, 3), state);
+        Check(SelectedTarget(state) == replacement && !state.directEndpoint, "missing destinations use a legal replacement");
         var nullStart = navigation.navUnits[(2, 0, 1)]; nullStart.isNull = true;
-        state.Reset();
-        AwaitEndpointRound(bfs, nullStart.realPos, target, state);
-        Check(state.directEndpoint && state.moveTarget != nullStart.realPos,
-            "a null/zero-scale start without a floor safely searches for an escape anchor");
-
-        // Change the target while its old blocked-destination round is still
-        // pending. Completing that round cannot publish the obsolete direct leg.
-        state.Reset();
-        Vector3 anchorPosition = new Vector3(7, 0, 3);
-        bfs.Advance();
-        EndpointStep(bfs, anchorPosition, target, state);
-        Check(state.isSearching && !state.hasResult && !state.directEndpoint,
-            "a pending closest-reachable-target scan cannot grant a final segment early");
-        int before = state.completedSearchCount;
+        state.Reset(); AwaitEndpointRound(bfs, nullStart.realPos, target, state);
+        Check(state.directEndpoint && state.moveTarget != nullStart.realPos, "zero-scale starts retain escape");
+        state.Reset(); bfs.Advance(); EndpointStep(bfs, replacement, target, state);
+        Check(state.isSearching && !state.hasResult, "target preprocessing is frame-budgeted");
         Vector3 freshTarget = new Vector3(1, 0, 1);
-        EndpointStep(bfs, anchorPosition, freshTarget, state);
-        for (int frame = 0; frame < 100 && state.completedSearchCount == before; frame++)
-        {
-            bfs.Advance(); EndpointStep(bfs, anchorPosition, freshTarget, state);
-        }
-        Check(state.completedSearchCount > before && !state.directEndpoint && state.moveTarget != target,
-            "an obsolete captured blocked-target round cannot publish its old direct approach");
-        AwaitEndpointRound(bfs, anchorPosition, freshTarget, state);
-        Check(state.hasResult && !state.directEndpoint && state.moveTarget != target,
-            "the next completed round routes to the latest destination normally");
-
+        AwaitEndpointRound(bfs, replacement, freshTarget, state);
+        AwaitEndpointRound(bfs, replacement, freshTarget, state);
+        Check(state.hasResult && !state.directEndpoint && SelectedTarget(state) == freshTarget,
+            "the next round captures the latest target while preserving safe cached movement");
         navigation.navUnits.Clear(); state.Reset(); bfs.Advance();
         Check(EndpointStep(bfs, Vector3.zero, Vector3.one, state) == Vector3.zero && !state.hasResult,
-            "an empty navigation graph safely discards endpoint and cached path state");
+            "empty navigation safely clears endpoint and route state");
+    }
+
+    private static Vector3 SelectedTarget(NavigationEndpointState state)
+    {
+        var search = typeof(NavigationEndpointState).GetField("searchState", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(state);
+        return (Vector3)search.GetType().GetField("roundRouteDestination", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(search);
     }
 
     private static void SmoothedPassTypesAndRetargeting()

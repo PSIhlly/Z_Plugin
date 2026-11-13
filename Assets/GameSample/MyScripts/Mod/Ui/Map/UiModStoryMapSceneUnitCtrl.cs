@@ -227,6 +227,8 @@ namespace Ui.ModStory.ModStoryMap.ModStoryMapScene.ModStoryMapSceneUnit
                 }
             }
             });
+
+            UiManager.Rebuild(gameObject, true);
         }
 
         private UiEventCustomTriggerParam CreateGlobalVarTriggerParam()

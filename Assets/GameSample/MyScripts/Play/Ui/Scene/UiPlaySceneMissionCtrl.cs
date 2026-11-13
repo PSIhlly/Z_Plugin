@@ -27,7 +27,7 @@ public static class MissionGuide
 
     public static Vector3 GetTargetWorldPosition(MissionForm.Data data)
     {
-        return MapManager.instance.utilCtrl.MapPos2RealPos(GameManager.PlayerPosToMapPos(data.targetPos));
+        return GameManager.PlayerPosToMapPos(data.targetPos);
     }
 
     public static float GetDistance(MissionForm.Data data, Vector3 playerWorldPosition)

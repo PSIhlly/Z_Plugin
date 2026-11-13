@@ -177,8 +177,34 @@ public static readonly int autoUidCnt=100;
 
                 public Data Copy(bool sameId = true)
                 {
-        return new Data(sameId? uid:uidChain.GetId(),name,labId,clips==null?new List<List<EffectClipForm.Data>>():new List<List<EffectClipForm.Data>>(clips),ground);
+                    using (DataCopyGuard.Enter(this))
+                    {
+        var copy = new Data(sameId? uid:uidChain.GetId(),name,labId,clips==null?new List<List<EffectClipForm.Data>>():CopyCollection0(clips),ground);
+                        CopyRuntimeStateTo(copy);
+                        return copy;
+                    }
                 }
+
+            protected void CopyRuntimeStateTo(Data copy)
+            {
+                OnCopy(copy);
+            }
+            partial void OnCopy(Data copy);
+
+            private static List<List<EffectClipForm.Data>> CopyCollection0(List<List<EffectClipForm.Data>> source)
+            {
+                var result = new List<List<EffectClipForm.Data>>(source.Count);
+                foreach (var item in source) result.Add(item==null?null:CopyCollection1(item));
+                return result;
+            }
+
+            private static List<EffectClipForm.Data> CopyCollection1(List<EffectClipForm.Data> source)
+            {
+                var result = new List<EffectClipForm.Data>(source.Count);
+                foreach (var item in source) result.Add(item?.Copy());
+                return result;
+            }
+
             
             public virtual  void BeforeGet()
             {

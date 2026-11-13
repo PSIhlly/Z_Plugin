@@ -89,6 +89,12 @@ namespace Ui.PlaySceneMain.PlayerTouchOpt
                     (PlayManager.instance.sceneCtrl.GetCurOptSkill() == null || PlayManager.instance.sceneCtrl.GetCurOptSkill() == SkillType.LightAttack)
 
             });
+            RefreshSkillIcon();
+        }
+
+        public void RefreshSkillIcon()
+        {
+            view.model_attackStick.SetIcon(UiPlaySceneMainCtrl.GetSkillStickIcon(SkillType.LightAttack));
         }
 
         private Vector3 GetDirection(Vector3 dir)

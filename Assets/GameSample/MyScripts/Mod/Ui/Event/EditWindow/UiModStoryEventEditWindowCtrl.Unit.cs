@@ -11,20 +11,20 @@ namespace Ui.ModStoryEventEditWindow
     public partial class UiUnitParam
     {
         public Transform parent;
-        public UiContainer<UiUnitCtrl> con;
+        public UiTreeContainer<UiUnitCtrl> con;
         public SyntaxNode node;
         public string txt;
     }
     public partial class UiUnitModel
     {
         public Transform parent;
-        public UiContainer<UiUnitCtrl> con;
+        public UiTreeContainer<UiUnitCtrl> con;
         public SyntaxNode node;
         public string txt;
     }
-    public partial class UiUnitCtrl
+    public partial class UiUnitCtrl : IUiTreePoolItem
     {
-
+        private UiUnitParam boundParam;
 
         public override void OnCreate()
         {
@@ -33,13 +33,15 @@ namespace Ui.ModStoryEventEditWindow
                 parent.parent.SelUnit(model.node, parent.model.prm.node);
             });
         }
-        public override void OnEnable()
+        public override void OnShow()
         {
             if (param == null)
             {
                 gameObject.SetActive(false);
                 return;
             }
+            if (ReferenceEquals(boundParam, param)) return;
+            boundParam = param;
             model.parent = param.parent;
             model.node = param.node;
             model.txt = param.txt;
@@ -48,11 +50,21 @@ namespace Ui.ModStoryEventEditWindow
             Refresh();
         }
 
+        public void OnTreePoolRelease()
+        {
+            boundParam = null;
+            model.parent = null;
+            model.node = null;
+            model.txt = null;
+            model.con = null;
+            view.txt_.text = string.Empty;
+            view.img_.BindTexData(null);
+        }
+
 
         public void Refresh()
         {
             RefreshSelection();
-            gameObject.transform.parent = model.parent;
             if (model.node == null)
             {
                 view.txt_.text = model.txt;

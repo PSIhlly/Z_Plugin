@@ -248,8 +248,21 @@ namespace Z_Map.Form
 
                 public Data Copy(bool sameId = true)
                 {
-        return new Data(sameId? uid:uidChain.GetId(),name,texDic==null?new Dictionary<int,int>():new Dictionary<int,int>(texDic),mapPos,prefabName,pos,euler,scale,updateType,collidingUnitUid==null?new List<int>():new List<int>(collidingUnitUid),extra,enteredScene,unlock,passType==null?new List<int>():new List<int>(passType));
+                    using (DataCopyGuard.Enter(this))
+                    {
+        var copy = new Data(sameId? uid:uidChain.GetId(),name,texDic==null?new Dictionary<int,int>():new Dictionary<int,int>(texDic),mapPos,prefabName,pos,euler,scale,updateType,collidingUnitUid==null?new List<int>():new List<int>(collidingUnitUid),extra,enteredScene,unlock,passType==null?new List<int>():new List<int>(passType));
+                        CopyRuntimeStateTo(copy);
+                        return copy;
+                    }
                 }
+
+            protected void CopyRuntimeStateTo(Data copy)
+            {
+                base.CopyRuntimeStateTo(copy);
+                OnCopy(copy);
+            }
+            partial void OnCopy(Data copy);
+
             
             public override  void BeforeGet()
             {

@@ -104,8 +104,20 @@ public static readonly int autoUidCnt=1000000;
 
                 public Data Copy(bool sameId = true)
                 {
-        return new Data(sameId? uid:uidChain.GetId(),name);
+                    using (DataCopyGuard.Enter(this))
+                    {
+        var copy = new Data(sameId? uid:uidChain.GetId(),name);
+                        CopyRuntimeStateTo(copy);
+                        return copy;
+                    }
                 }
+
+            protected void CopyRuntimeStateTo(Data copy)
+            {
+                OnCopy(copy);
+            }
+            partial void OnCopy(Data copy);
+
             
             public virtual  void BeforeGet()
             {

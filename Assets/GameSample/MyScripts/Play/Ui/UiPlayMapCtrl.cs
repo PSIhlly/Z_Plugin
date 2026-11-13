@@ -321,7 +321,7 @@ namespace Ui.PlayMap
             if (!hasHeight)
                 return;
 
-            view.txt_curHeight.text = GameManager.MapPosToPlayerPos(model.y).ToString("0.##");
+            view.txt_curHeight.text = GameManager.MapPosToPlayerPos(MapManager.instance.utilCtrl.MapPos2RealPos(new Vector3(0, model.y, 0)).y).ToString("0.##");
             if (displayedSceneUid == model.cur && displayedHeight == model.y)
                 return;
 

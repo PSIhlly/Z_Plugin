@@ -123,8 +123,21 @@ namespace Form
 
                 public Data Copy(bool sameId = true)
                 {
-        return new Data(sameId? id:idChain.GetId(),name,icon,labId,characterUid);
+                    using (DataCopyGuard.Enter(this))
+                    {
+        var copy = new Data(sameId? id:idChain.GetId(),name,icon,labId,characterUid);
+                        CopyRuntimeStateTo(copy);
+                        return copy;
+                    }
                 }
+
+            protected void CopyRuntimeStateTo(Data copy)
+            {
+                base.CopyRuntimeStateTo(copy);
+                OnCopy(copy);
+            }
+            partial void OnCopy(Data copy);
+
             
             public override  void BeforeGet()
             {

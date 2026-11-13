@@ -98,9 +98,11 @@ public class GameEventStoryTriggerController : Z_Controller<GameEventController>
 
         var heap = new Dictionary<string, BoxDataForm.Data>
         {
-            { "param1", CodeHelper.CreateBoxByStr(evt.name) },
-            { "param2", evt.oldValue ?? CodeHelper.CreateBoxByNum(0) },
-            { "param3", evt.newValue ?? CodeHelper.CreateBoxByNum(0) }
+            { "param1", CodeHelper.CreateBoxByNum(0) },
+            { "param2", CodeHelper.CreateBoxByStr(evt.name) },
+            { "param3", CodeHelper.CreateBoxByNum(GetGlobalVariableDelta(evt)) },
+            // Keep the full new-value snapshot available to existing Unit handlers.
+            { "param4", evt.newValue ?? CodeHelper.CreateBoxByNum(0) }
         };
         _super.TriggerEventExecute(scene.events.GetDv("onGlobalVarChangeEvent$", null), 0, heap, copyDefaultHeap: true);
         if (ReferenceEquals(game.curScene, scene))
@@ -113,14 +115,11 @@ public class GameEventStoryTriggerController : Z_Controller<GameEventController>
             if (!ReferenceEquals(game.curScene, scene)) break;
             if (!UnitForm.DataByUid.TryGetValue(data.uid, out var current) || !ReferenceEquals(current, data)) continue;
             var unit = (MapUnit)data.unit;
-            // Unit events keep their exact owner in param1, as other scene-unit
-            // triggers do. Scene-level bindings retain name/old/new in param1..3.
-            var unitHeap = new Dictionary<string, BoxDataForm.Data>
+            // Scene and Unit bindings share name/delta arguments, like parameter
+            // changes. Only param1 changes to the exact Unit that owns the binding.
+            var unitHeap = new Dictionary<string, BoxDataForm.Data>(heap)
             {
-                { "param1", CodeHelper.CreateBoxByStr(GlobalEventHelper.GetSceneUnitReference(data.uid)) },
-                { "param2", heap["param1"] },
-                { "param3", heap["param2"] },
-                { "param4", heap["param3"] }
+                ["param1"] = CodeHelper.CreateBoxByStr(GlobalEventHelper.GetSceneUnitReference(data.uid))
             };
             _super.TriggerEventExecute(unit.GetEvt("onGlobalVarChangeEvent$"), data.uid, unitHeap, copyDefaultHeap: true);
             if (ReferenceEquals(game.curScene, scene) && UnitForm.DataByUid.TryGetValue(data.uid, out current)
@@ -128,6 +127,19 @@ public class GameEventStoryTriggerController : Z_Controller<GameEventController>
                 _super.TriggerEventExecute(unit.GetEvt($"onGlobalVarChangeEvent${evt.uid}"), data.uid, unitHeap, copyDefaultHeap: true);
         }
     }
+
+    private static float GetGlobalVariableDelta(GlobalVariableChangedEvent evt)
+    {
+        // Globals may also hold text/dictionaries. They still trigger, but have
+        // no numeric delta; missing values have the setter's effective zero.
+        var before = evt.oldValue;
+        var after = evt.newValue;
+        if (before?.str != null || after?.str != null
+            || (before?.dic?.Count ?? 0) > 0 || (after?.dic?.Count ?? 0) > 0)
+            return 0;
+        return (after?.num ?? 0) - (before?.num ?? 0);
+    }
+
     public void OnEvent(StoryLifeEvent evt)
     {
         switch (evt.type)

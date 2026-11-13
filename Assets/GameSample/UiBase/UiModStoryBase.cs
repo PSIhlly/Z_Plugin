@@ -762,6 +762,8 @@ namespace ModStoryConfig
             public Sta sta_minimap;
             public Btn btn_largeMap;
             public Sta sta_largeMap;
+            public Btn btn_pauseOnShowUi;
+            public Sta sta_pauseOnShowUi;
             public Btn btn_mission;
             public Sta sta_mission;
             public Btn btn_antiOcclusion ;
@@ -800,21 +802,23 @@ namespace ModStoryConfig
             sta_minimap = uiHolder.elementTrsLst[17].GetComponent<Sta>();
             btn_largeMap = uiHolder.elementTrsLst[18].GetComponent<Btn>();
             sta_largeMap = uiHolder.elementTrsLst[19].GetComponent<Sta>();
-            btn_mission = uiHolder.elementTrsLst[20].GetComponent<Btn>();
-            sta_mission = uiHolder.elementTrsLst[21].GetComponent<Sta>();
-            btn_antiOcclusion  = uiHolder.elementTrsLst[22].GetComponent<Btn>();
-            sta_antiOcclusion  = uiHolder.elementTrsLst[23].GetComponent<Sta>();
-            btn_deleteTeamer = uiHolder.elementTrsLst[24].GetComponent<Btn>();
-            btn_deleteActiveTeamer = uiHolder.elementTrsLst[25].GetComponent<Btn>();
-            btn_deleteItem = uiHolder.elementTrsLst[26].GetComponent<Btn>();
-            txt_mainCharacter = uiHolder.elementTrsLst[27].GetComponent<Txt>();
-            txt_perspective = uiHolder.elementTrsLst[28].GetComponent<Txt>();
-            go_teamer = uiHolder.elementTrsLst[29].gameObject;
-            sub_teamer = (UiTeamerCtrl) uiHolder.elementTrsLst[30].GetComponent<UiHolder>().ctrl;
-            go_activeTeamer = uiHolder.elementTrsLst[31].gameObject;
-            sub_activeTeamer = (UiActiveTeamerCtrl) uiHolder.elementTrsLst[32].GetComponent<UiHolder>().ctrl;
-            go_item = uiHolder.elementTrsLst[33].gameObject;
-            sub_item = (UiItemCtrl) uiHolder.elementTrsLst[34].GetComponent<UiHolder>().ctrl;
+            btn_pauseOnShowUi = uiHolder.elementTrsLst[20].GetComponent<Btn>();
+            sta_pauseOnShowUi = uiHolder.elementTrsLst[21].GetComponent<Sta>();
+            btn_mission = uiHolder.elementTrsLst[22].GetComponent<Btn>();
+            sta_mission = uiHolder.elementTrsLst[23].GetComponent<Sta>();
+            btn_antiOcclusion  = uiHolder.elementTrsLst[24].GetComponent<Btn>();
+            sta_antiOcclusion  = uiHolder.elementTrsLst[25].GetComponent<Sta>();
+            btn_deleteTeamer = uiHolder.elementTrsLst[26].GetComponent<Btn>();
+            btn_deleteActiveTeamer = uiHolder.elementTrsLst[27].GetComponent<Btn>();
+            btn_deleteItem = uiHolder.elementTrsLst[28].GetComponent<Btn>();
+            txt_mainCharacter = uiHolder.elementTrsLst[29].GetComponent<Txt>();
+            txt_perspective = uiHolder.elementTrsLst[30].GetComponent<Txt>();
+            go_teamer = uiHolder.elementTrsLst[31].gameObject;
+            sub_teamer = (UiTeamerCtrl) uiHolder.elementTrsLst[32].GetComponent<UiHolder>().ctrl;
+            go_activeTeamer = uiHolder.elementTrsLst[33].gameObject;
+            sub_activeTeamer = (UiActiveTeamerCtrl) uiHolder.elementTrsLst[34].GetComponent<UiHolder>().ctrl;
+            go_item = uiHolder.elementTrsLst[35].gameObject;
+            sub_item = (UiItemCtrl) uiHolder.elementTrsLst[36].GetComponent<UiHolder>().ctrl;
         }
 
     }
@@ -2423,7 +2427,6 @@ namespace ModStorySkillUnitOverview
             public Ipt ipt_introduction;
             public Btn btn_icon;
             public Img img_icon;
-            public Btn btn_triggerCondition;
             public Btn btn_lightAttack;
             public Sta sta_lightAttack;
             public Btn btn_heavyAttack;
@@ -2433,7 +2436,6 @@ namespace ModStorySkillUnitOverview
             public Btn btn_q;
             public Sta sta_q;
             public Txt txt_label;
-            public Txt txt_triggerCondition;
         public UiModStorySkillUnitOverviewView(UiHolder uiHolder):base(uiHolder)
         {
 
@@ -2445,17 +2447,15 @@ namespace ModStorySkillUnitOverview
             ipt_introduction = uiHolder.elementTrsLst[5].GetComponent<Ipt>();
             btn_icon = uiHolder.elementTrsLst[6].GetComponent<Btn>();
             img_icon = uiHolder.elementTrsLst[7].GetComponent<Img>();
-            btn_triggerCondition = uiHolder.elementTrsLst[8].GetComponent<Btn>();
-            btn_lightAttack = uiHolder.elementTrsLst[9].GetComponent<Btn>();
-            sta_lightAttack = uiHolder.elementTrsLst[10].GetComponent<Sta>();
-            btn_heavyAttack = uiHolder.elementTrsLst[11].GetComponent<Btn>();
-            sta_heavyAttack = uiHolder.elementTrsLst[12].GetComponent<Sta>();
-            btn_e = uiHolder.elementTrsLst[13].GetComponent<Btn>();
-            sta_e = uiHolder.elementTrsLst[14].GetComponent<Sta>();
-            btn_q = uiHolder.elementTrsLst[15].GetComponent<Btn>();
-            sta_q = uiHolder.elementTrsLst[16].GetComponent<Sta>();
-            txt_label = uiHolder.elementTrsLst[17].GetComponent<Txt>();
-            txt_triggerCondition = uiHolder.elementTrsLst[18].GetComponent<Txt>();
+            btn_lightAttack = uiHolder.elementTrsLst[8].GetComponent<Btn>();
+            sta_lightAttack = uiHolder.elementTrsLst[9].GetComponent<Sta>();
+            btn_heavyAttack = uiHolder.elementTrsLst[10].GetComponent<Btn>();
+            sta_heavyAttack = uiHolder.elementTrsLst[11].GetComponent<Sta>();
+            btn_e = uiHolder.elementTrsLst[12].GetComponent<Btn>();
+            sta_e = uiHolder.elementTrsLst[13].GetComponent<Sta>();
+            btn_q = uiHolder.elementTrsLst[14].GetComponent<Btn>();
+            sta_q = uiHolder.elementTrsLst[15].GetComponent<Sta>();
+            txt_label = uiHolder.elementTrsLst[16].GetComponent<Txt>();
         }
 
     }

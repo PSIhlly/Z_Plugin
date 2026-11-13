@@ -497,8 +497,42 @@ namespace Form
 
                 public Data Copy(bool sameId = true)
                 {
-        return new Data(sameId? uid:uidChain.GetId(),name,labId,avatarTex,paramDic==null?new Dictionary<string,CharacterParamForm.Data>():new Dictionary<string,CharacterParamForm.Data>(paramDic),protoUid,animDic==null?new Dictionary<string,CharacterAnimForm.Data>():new Dictionary<string,CharacterAnimForm.Data>(animDic),defaultAnimName==null?new Dictionary<string,string>():new Dictionary<string,string>(defaultAnimName),faceType,speedParamName,hpParamName,events==null?new Dictionary<string,EventTriggerForm.Data>():new Dictionary<string,EventTriggerForm.Data>(events),equips==null?new Dictionary<EquipPartType,int>():new Dictionary<EquipPartType,int>(equips),desc,illustration,unique,skill==null?new Dictionary<SkillType,int>():new Dictionary<SkillType,int>(skill),recoveryTime,enableNav,minimapIcon,size,passType==null?new List<int>():new List<int>(passType));
+                    using (DataCopyGuard.Enter(this))
+                    {
+        var copy = new Data(sameId? uid:uidChain.GetId(),name,labId,avatarTex,paramDic==null?new Dictionary<string,CharacterParamForm.Data>():CopyCollection0(paramDic),protoUid,animDic==null?new Dictionary<string,CharacterAnimForm.Data>():CopyCollection1(animDic),defaultAnimName==null?new Dictionary<string,string>():new Dictionary<string,string>(defaultAnimName),faceType,speedParamName,hpParamName,events==null?new Dictionary<string,EventTriggerForm.Data>():CopyCollection2(events),equips==null?new Dictionary<EquipPartType,int>():new Dictionary<EquipPartType,int>(equips),desc,illustration,unique,skill==null?new Dictionary<SkillType,int>():new Dictionary<SkillType,int>(skill),recoveryTime,enableNav,minimapIcon,size,passType==null?new List<int>():new List<int>(passType));
+                        CopyRuntimeStateTo(copy);
+                        return copy;
+                    }
                 }
+
+            protected void CopyRuntimeStateTo(Data copy)
+            {
+                base.CopyRuntimeStateTo(copy);
+                OnCopy(copy);
+            }
+            partial void OnCopy(Data copy);
+
+            private static Dictionary<string,CharacterParamForm.Data> CopyCollection0(Dictionary<string,CharacterParamForm.Data> source)
+            {
+                var result = new Dictionary<string,CharacterParamForm.Data>(source.Count, source.Comparer);
+                foreach (var pair in source) result.Add(pair.Key, pair.Value?.Copy());
+                return result;
+            }
+
+            private static Dictionary<string,CharacterAnimForm.Data> CopyCollection1(Dictionary<string,CharacterAnimForm.Data> source)
+            {
+                var result = new Dictionary<string,CharacterAnimForm.Data>(source.Count, source.Comparer);
+                foreach (var pair in source) result.Add(pair.Key, pair.Value?.Copy());
+                return result;
+            }
+
+            private static Dictionary<string,EventTriggerForm.Data> CopyCollection2(Dictionary<string,EventTriggerForm.Data> source)
+            {
+                var result = new Dictionary<string,EventTriggerForm.Data>(source.Count, source.Comparer);
+                foreach (var pair in source) result.Add(pair.Key, pair.Value?.Copy());
+                return result;
+            }
+
             
             public override  void BeforeGet()
             {

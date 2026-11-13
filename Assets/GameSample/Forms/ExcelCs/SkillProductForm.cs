@@ -299,8 +299,35 @@ namespace Form
 
                 public Data Copy(bool sameId = true)
                 {
-        return new Data(sameId? uid:uidChain.GetId(),name,desc,labId,protoUid,icon,paramDic==null?new Dictionary<string,SkillParamForm.Data>():new Dictionary<string,SkillParamForm.Data>(paramDic),skillTypes==null?new List<SkillType>():new List<SkillType>(skillTypes),characterUid,cd,lastUseTime,events==null?new Dictionary<string,EventTriggerForm.Data>():new Dictionary<string,EventTriggerForm.Data>(events),triggerConditionUid);
+                    using (DataCopyGuard.Enter(this))
+                    {
+        var copy = new Data(sameId? uid:uidChain.GetId(),name,desc,labId,protoUid,icon,paramDic==null?new Dictionary<string,SkillParamForm.Data>():CopyCollection0(paramDic),skillTypes==null?new List<SkillType>():new List<SkillType>(skillTypes),characterUid,cd,lastUseTime,events==null?new Dictionary<string,EventTriggerForm.Data>():CopyCollection1(events),triggerConditionUid);
+                        CopyRuntimeStateTo(copy);
+                        return copy;
+                    }
                 }
+
+            protected void CopyRuntimeStateTo(Data copy)
+            {
+                base.CopyRuntimeStateTo(copy);
+                OnCopy(copy);
+            }
+            partial void OnCopy(Data copy);
+
+            private static Dictionary<string,SkillParamForm.Data> CopyCollection0(Dictionary<string,SkillParamForm.Data> source)
+            {
+                var result = new Dictionary<string,SkillParamForm.Data>(source.Count, source.Comparer);
+                foreach (var pair in source) result.Add(pair.Key, pair.Value?.Copy());
+                return result;
+            }
+
+            private static Dictionary<string,EventTriggerForm.Data> CopyCollection1(Dictionary<string,EventTriggerForm.Data> source)
+            {
+                var result = new Dictionary<string,EventTriggerForm.Data>(source.Count, source.Comparer);
+                foreach (var pair in source) result.Add(pair.Key, pair.Value?.Copy());
+                return result;
+            }
+
             
             public override  void BeforeGet()
             {

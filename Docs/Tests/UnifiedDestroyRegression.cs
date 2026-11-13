@@ -205,7 +205,7 @@ public static class UnifiedDestroyRegression
     {
         uid = uid > 0 ? uid : nextUnit++;
         string extra = MapUnit.GetProductInfoString(product is ObjectProductForm.Data
-            ? new JObject { [ObjectProductForm.ProductVersionKey] = ObjectProductForm.ProductVersion } : new JObject(),
+            ? new JObject {  } : new JObject(),
             (product.uid, -1));
         MapUnit unit;
         if (product is CharacterProductForm.Data character)

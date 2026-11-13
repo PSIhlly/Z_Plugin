@@ -1,16 +1,9 @@
 using Form;
-using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Ui.PlayAsset;
 using UnityEngine;
-using UnityEngine.Video;
 using Z_DataSystem.Form;
 using Z_DesignStyle;
 using Z_Math;
-using Z_Texture;
 using Z_Time;
 using Z_Ui.Base;
 
@@ -31,7 +24,6 @@ namespace Ui.PlayAsset
     {
 
         UiContainer<UiImageCtrl> imageCon;
-        float time;
         public override void OnCreate()
         {
             imageCon = new UiContainer<UiImageCtrl>(this, view.go_image);
@@ -49,6 +41,8 @@ namespace Ui.PlayAsset
         }
         public void Refresh()
         {
+            if (imageCon == null)
+                return;
             imageCon.Clear();
             foreach (var data in ImageUiItemForm.DataByUid.Values.OrderBy(data => data.uid))
             {
@@ -57,13 +51,13 @@ namespace Ui.PlayAsset
                     data = data
                 });
             }
-            //Debug.Log(ImageUiItemForm.DataByUid.Values.Count + " " + Time.frameCount);
             imageCon.Refresh();
 
         }
         public void OnEvent(PlayAssetEvent evt)
         {
-            Refresh();
+            if (active)
+                Refresh();
         }
 
     }
@@ -78,29 +72,85 @@ namespace Ui.PlayAsset
     }
     public partial class UiImageCtrl
     {
+        private float baseTextFontSize;
+        private bool textFontSizeCaptured;
+
+        public float CurrentOpacity => TryGetData(out var data)
+            ? data.isText ? view.txt_.color.a : view.img_.color.a : 1;
 
         public override void OnCreate()
         {
+            CaptureTextFontSize();
         }
         public override void OnShow()
         {
+            ReleaseData();
+            if (param?.data == null || !ImageUiItemForm.DataByUid.TryGetValue(param.data.uid, out var registered)
+                || !ReferenceEquals(registered, param.data))
+            {
+                ClearGraphics();
+                if (gameObject != null)
+                    gameObject.SetActive(false);
+                return;
+            }
             model.prm = param;
             model.prm.data.ctrl = this;
-            rect.sizeDelta = new Vector2(model.prm.data.size.x, model.prm.data.size.y);
-            view.img_.BindTexData(TexAssetForm.DataById.GetDv(model.prm.data.tex, TexAssetForm.DataById[GlobalDefaultHelper.DefaultEventTexId]));
+            CaptureTextFontSize();
+            var data = model.prm.data;
+            if (data.isText)
+            {
+                view.img_.BindTexDataOrHide(null);
+                float scale = float.IsNaN(data.textScale) || float.IsInfinity(data.textScale)
+                    ? 0 : Mathf.Max(0, data.textScale);
+                view.txt_.fontSize = baseTextFontSize * scale;
+                view.txt_.text = data.text ?? string.Empty;
+                view.txt_.enabled = true;
+                rect.sizeDelta = string.IsNullOrEmpty(data.text) || scale == 0 ? Vector2.zero
+                    : view.txt_.GetPreferredValues(view.txt_.text, float.PositiveInfinity, float.PositiveInfinity);
+            }
+            else
+            {
+                view.txt_.text = string.Empty;
+                view.txt_.enabled = false;
+                rect.sizeDelta = data.size;
+                if (!TexAssetForm.DataById.TryGetValue(data.tex, out var texture) || texture == null)
+                    TexAssetForm.DataById.TryGetValue(GlobalDefaultHelper.DefaultEventTexId, out texture);
+                view.img_.BindTexDataOrHide(texture);
+            }
 
             Refresh();
         }
+        public override void OnHide()
+        {
+            ReleaseData();
+            ClearGraphics();
+        }
         public override void OnUpdate()
         {
-            model.prm.data.posProgress += TimeManager.GetDeltaTime();
+            if (!TryGetData(out var data))
+                return;
+            float deltaTime = TimeManager.GetDeltaTime();
+            data.posProgress += deltaTime;
+            data.eulerProgress += deltaTime;
+            data.opacityProgress += deltaTime;
+            if (data.removeTime < int.MaxValue)
+            {
+                data.removeTime -= deltaTime;
+                if (data.removeTime <= 0)
+                {
+                    // Removing refreshes/reuses the shared container synchronously.
+                    PlayManager.instance.assetCtrl?.Remove(data.uid);
+                    return;
+                }
+            }
             Refresh();
         }
         public void Refresh()
         {
-            var data = model.prm.data;
+            if (!TryGetData(out var data))
+                return;
 
-            if (data.posTime == 0)
+            if (data.posTime <= 0)
             {
                 rect.position = data.tarPos;
             }
@@ -108,34 +158,58 @@ namespace Ui.PlayAsset
             {
                 rect.position = Vector3.Lerp(data.oldPos, data.tarPos, data.posProgress / data.posTime);
             }
-            data.eulerProgress += TimeManager.GetDeltaTime();
-            if (data.eulerTime == 0)
+            if (data.eulerTime <= 0)
             {
                 rect.eulerAngles = rect.eulerAngles.NewSetZ(data.tarEuler);
             }
             else
             {
-                rect.eulerAngles = rect.eulerAngles.NewSetZ(data.oldEuler + (data.tarEuler - data.oldEuler) * Math.Min(1f, data.eulerProgress / data.eulerTime));
+                rect.eulerAngles = rect.eulerAngles.NewSetZ(Mathf.Lerp(data.oldEuler, data.tarEuler, data.eulerProgress / data.eulerTime));
             }
 
-            data.opacityProgress += TimeManager.GetDeltaTime();
-            if (data.opacityTime == 0)
-            {
-                view.img_.color.NewSetA(data.tarOpacity);
-            }
+            float opacity = data.opacityTime <= 0 ? data.tarOpacity
+                : Mathf.Lerp(data.oldOpacity, data.tarOpacity, data.opacityProgress / data.opacityTime);
+            if (data.isText)
+                view.txt_.color = view.txt_.color.NewSetA(opacity);
             else
-            {
-                view.img_.color.NewSetA(data.oldOpacity + (data.tarOpacity - data.oldOpacity) * Math.Min(1f, data.opacityProgress / data.opacityTime));
-            }
-            if (data.removeTime < int.MaxValue)
-            {
-                data.removeTime -= TimeManager.GetDeltaTime();
-                if (data.removeTime <= 0)
-                {
-                    PlayManager.instance.assetCtrl.Remove(data.uid);
-                }
-            }
+                view.img_.color = view.img_.color.NewSetA(opacity);
+        }
 
+        private bool TryGetData(out ImageUiItemForm.Data data)
+        {
+            data = model?.prm?.data;
+            return data != null && ReferenceEquals(data.ctrl, this)
+                && ImageUiItemForm.DataByUid.TryGetValue(data.uid, out var registered)
+                && ReferenceEquals(data, registered);
+        }
+
+        private void ReleaseData()
+        {
+            var data = model?.prm?.data;
+            if (data != null && ReferenceEquals(data.ctrl, this))
+                data.ctrl = null;
+            if (model != null)
+                model.prm = null;
+        }
+
+        private void ClearGraphics()
+        {
+            if (view?.img_ != null)
+                view.img_.BindTexDataOrHide(null);
+            if (view?.txt_ != null)
+            {
+                view.txt_.text = string.Empty;
+                view.txt_.enabled = false;
+            }
+        }
+
+        private void CaptureTextFontSize()
+        {
+            if (!textFontSizeCaptured && view?.txt_ != null)
+            {
+                baseTextFontSize = view.txt_.fontSize;
+                textFontSizeCaptured = true;
+            }
         }
     }
 

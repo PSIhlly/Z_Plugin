@@ -53,13 +53,11 @@ namespace Ui.ModAssetSelectWindow
             {
                 if (model.sel != null)
                 {
-                    if (string.IsNullOrEmpty(model.sel.name))
+                    if (!TryDeleteSelectedAsset())
                     {
                         NotifyManager.instance.AddTip(TextManager.instance.GetTxt("cantDeleteDefaultAsset"));
                         return;
                     }
-                    AssetForm.RemoveData(model.sel.id);
-                    model.sel = null;
                     Refresh();
                 }
             });
@@ -100,7 +98,7 @@ namespace Ui.ModAssetSelectWindow
             });
             view.ipt_name.onFinishInput += (s) =>
             {
-                if (model.sel != null)
+                if (model.sel != null && !GlobalDefaultHelper.IsEmptyAsset(model.sel))
                 {
                     model.sel.name = s;
                     Refresh();
@@ -113,6 +111,16 @@ namespace Ui.ModAssetSelectWindow
             labCon = new UiScrViewContainer<UiLabCtrl>(this, view.go_lab, view.scr_labs);
 
         }
+        public bool TryDeleteSelectedAsset()
+        {
+            var selected = model.sel;
+            if (selected == null || GlobalDefaultHelper.IsEmptyAsset(selected) || string.IsNullOrEmpty(selected.name))
+                return false;
+            AssetForm.RemoveData(selected.id);
+            model.sel = null;
+            return true;
+        }
+
         public override void OnShow()
         {
             StopPreviewAudio();
@@ -222,6 +230,10 @@ namespace Ui.ModAssetSelectWindow
             view.sta_selected.ChangeState(model.sel != null ? 1 : 0);
             view.sta_setLabel.ChangeState(0);
             view.ipt_name.Set(model.sel!=null ? model.sel.name : "");
+            bool emptyAsset = GlobalDefaultHelper.IsEmptyAsset(model.sel);
+            view.ipt_name.gameObject.SetActive(!emptyAsset);
+            view.btn_replace.interactable = model.sel != null && !emptyAsset;
+            view.btn_setLabel.interactable = model.sel != null && !emptyAsset;
             var canEditLab = TryGetCurrentLab(out _);
             view.ipt_labelName.gameObject.SetActive(canEditLab);
             view.btn_labelDelete.gameObject.SetActive(canEditLab);
@@ -428,7 +440,7 @@ namespace Ui.ModAssetSelectWindow
         }
         public void Replace()
         {
-            if (model.sel == null)
+            if (model.sel == null || GlobalDefaultHelper.IsEmptyAsset(model.sel))
                 return;
 
             if (model.prm is UiModAssetSelectTexWindowParam texPrm)
@@ -456,7 +468,7 @@ namespace Ui.ModAssetSelectWindow
 
         void ApplyReplacement(AssetForm.Data source)
         {
-            if (model.sel == null || source == null)
+            if (model.sel == null || source == null || GlobalDefaultHelper.IsEmptyAsset(model.sel))
                 return;
 
             if (model.sel is TexAssetForm.Data texData)
@@ -527,7 +539,7 @@ namespace Ui.ModAssetSelectWindow
         public void ShowSetLabelChoose()
         {
             var selected = model.sel;
-            if (selected == null)
+            if (selected == null || GlobalDefaultHelper.IsEmptyAsset(selected))
                 return;
 
             var targetBelong = GetLabBelong(selected);
@@ -698,6 +710,7 @@ namespace Ui.ModAssetSelectWindow
                 else if (parent.model.prm is UiModAssetSelectVideoWindowParam videoPrm)
                 {
                     view.img_.sprite = TextureHelper.transparentSprite;
+                    view.txt_.text = model.prm.data.name;
                 }
                 view.sta_.ChangeState(parent.model.sel == model.prm.data ? 1 : 0);
 

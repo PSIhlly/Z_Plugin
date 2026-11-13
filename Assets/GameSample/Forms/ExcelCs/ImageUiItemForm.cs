@@ -82,6 +82,12 @@ public static readonly int autoUidCnt=100;
                 
         public static Action<Data,float,float> changeRemovetimeAction;
                 
+        public static Action<Data,bool,bool> changeIstextAction;
+                
+        public static Action<Data,string,string> changeTextAction;
+                
+        public static Action<Data,float,float> changeTextscaleAction;
+                
 
 
         public partial class Data
@@ -375,7 +381,61 @@ public static readonly int autoUidCnt=100;
                  
                      }
                     
-            public Data(int uid,int tex,Vector2 size,Vector2 oldPos,float posProgress,float posTime,Vector2 tarPos,float oldOpacity,float opacityProgress,float opacityTime,float tarOpacity,float oldEuler,float eulerProgress,float eulerTime,float tarEuler,float removeTime)
+                    private bool  _isText;
+                    /// <summary>
+                    ///是否文本
+                    ///</summary>
+                    public bool  isText{
+                                get{return _isText;}
+ set{
+
+                    if(_DataByUid!=null&&_DatasHashSet.Contains(this))
+                    {
+                       ChangeIstext(this,_isText,value); 
+                    }
+        
+                _isText = value;
+                }
+                 
+                     }
+                    
+                    private string  _text;
+                    /// <summary>
+                    ///文本内容
+                    ///</summary>
+                    public string  text{
+                                get{return _text;}
+ set{
+
+                    if(_DataByUid!=null&&_DatasHashSet.Contains(this))
+                    {
+                       ChangeText(this,_text,value); 
+                    }
+        
+                _text = value;
+                }
+                 
+                     }
+                    
+                    private float  _textScale;
+                    /// <summary>
+                    ///文本缩放
+                    ///</summary>
+                    public float  textScale{
+                                get{return _textScale;}
+ set{
+
+                    if(_DataByUid!=null&&_DatasHashSet.Contains(this))
+                    {
+                       ChangeTextscale(this,_textScale,value); 
+                    }
+        
+                _textScale = value;
+                }
+                 
+                     }
+                    
+            public Data(int uid,int tex,Vector2 size,Vector2 oldPos,float posProgress,float posTime,Vector2 tarPos,float oldOpacity,float opacityProgress,float opacityTime,float tarOpacity,float oldEuler,float eulerProgress,float eulerTime,float tarEuler,float removeTime,bool isText,string text,float textScale)
             {
 
              this.uid = uid;
@@ -394,6 +454,9 @@ public static readonly int autoUidCnt=100;
              this.eulerTime = eulerTime;
              this.tarEuler = tarEuler;
              this.removeTime = removeTime;
+             this.isText = isText;
+             this.text = text;
+             this.textScale = textScale;
 
             }
             public void Reset(Data data)
@@ -415,12 +478,27 @@ public static readonly int autoUidCnt=100;
              this.eulerTime = data.eulerTime;
              this.tarEuler = data.tarEuler;
              this.removeTime = data.removeTime;
+             this.isText = data.isText;
+             this.text = data.text;
+             this.textScale = data.textScale;
             }
 
                 public Data Copy(bool sameId = true)
                 {
-        return new Data(sameId? uid:uidChain.GetId(),tex,size,oldPos,posProgress,posTime,tarPos,oldOpacity,opacityProgress,opacityTime,tarOpacity,oldEuler,eulerProgress,eulerTime,tarEuler,removeTime);
+                    using (DataCopyGuard.Enter(this))
+                    {
+        var copy = new Data(sameId? uid:uidChain.GetId(),tex,size,oldPos,posProgress,posTime,tarPos,oldOpacity,opacityProgress,opacityTime,tarOpacity,oldEuler,eulerProgress,eulerTime,tarEuler,removeTime,isText,text,textScale);
+                        CopyRuntimeStateTo(copy);
+                        return copy;
+                    }
                 }
+
+            protected void CopyRuntimeStateTo(Data copy)
+            {
+                OnCopy(copy);
+            }
+            partial void OnCopy(Data copy);
+
             
             public virtual  void BeforeGet()
             {
@@ -429,7 +507,7 @@ public static readonly int autoUidCnt=100;
             }
         }
 
-                   private static Data _defaultData=new Data(0,0,default,default,0f,0f,default,0f,0f,0f,0f,0f,0f,0f,0f,999999f);
+                   private static Data _defaultData=new Data(0,0,default,default,0f,0f,default,0f,0f,0f,0f,0f,0f,0f,0f,999999f,false,"",1f);
                    public static Data defaultData=>_defaultData.Copy();
 
 
@@ -533,7 +611,13 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
 
                 jo.SelectToken("tarEuler")==null?defaultData.tarEuler:jo.Get<float>("tarEuler"),
 
-                jo.SelectToken("removeTime")==null?defaultData.removeTime:jo.Get<float>("removeTime")
+                jo.SelectToken("removeTime")==null?defaultData.removeTime:jo.Get<float>("removeTime"),
+
+                jo.SelectToken("isText")==null?defaultData.isText:jo.Get<bool>("isText"),
+
+                jo.SelectToken("text")==null?defaultData.text:jo.Get<string>("text"),
+
+                jo.SelectToken("textScale")==null?defaultData.textScale:jo.Get<float>("textScale")
                     );
 
             return data;
@@ -577,6 +661,12 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
             jo.Set<float>("tarEuler",data.tarEuler);
 
             jo.Set<float>("removeTime",data.removeTime);
+
+            jo.Set<bool>("isText",data.isText);
+
+            jo.Set<string>("text",data.text);
+
+            jo.Set<float>("textScale",data.textScale);
 
             return jo;
         }
@@ -818,6 +908,36 @@ foreach(var k in _DataByUid.Keys){ uidChain.PopId(k); }
                 {
 
                 changeRemovetimeAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeIstext(Data superData,bool oldV,bool newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeIstextAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeText(Data superData,string oldV,string newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeTextAction?.Invoke(data,oldV,newV);
+                }
+                    
+            }
+            
+            public static void ChangeTextscale(Data superData,float oldV,float newV)
+            {
+                if(superData is Data data)
+                {
+
+                changeTextscaleAction?.Invoke(data,oldV,newV);
                 }
                     
             }

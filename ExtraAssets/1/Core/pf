@@ -39,15 +39,14 @@
     "largeMap": 210000,
     "curMissionId": 0,
     "targetScene": {
-      "item1": 2,
-      "item2": "17|0|-81"
+      "item1": 3,
+      "item2": "-2|0|-30"
     },
     "banSceneChange": false,
     "eventState": 0,
     "antiOcclusion": false,
     "lightIntensity": -1.0,
     "allowDrop": false,
-    "edgeTransition": true,
-    "sorv": 2
+    "edgeTransition": true
   }
 ]

@@ -179,7 +179,7 @@ public class ModSceneController : Z_Controller<ModManager>, InternalModSceneCont
         _designType = DesignType.MapObject;
         eventLayerBrushTipShown = false;
         CameraInstance.instance.Register(Vector3.zero, Z_Math.Graph.ElementwiseMultiply(mapMgr.sizeLimit, mapMgr.data.mainData.mapUnitSize), MapCameraOrthographicSizeMin, MapCameraOrthographicSizeMax, MapCameraOrthographicSize);
-        CameraInstance.instance.tarTrs.position = MapManager.instance.utilCtrl.MapPos2RealPos(GameManager.PlayerPosToMapPos(Vector3.zero));
+        CameraInstance.instance.tarTrs.position = GameManager.PlayerPosToMapPos(Vector3.zero);
         switch (DynamicGlobalSettings.cameraMode)
         {
             case CameraMode.Overhead:

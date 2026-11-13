@@ -86,6 +86,8 @@ namespace Ui.EventChoose
             view.txt_onEvent.text = $"{EventProgramDataForm.DataByUid.GetDv(evt.GetDv(0,0), EventProgramDataForm.defaultData).name}({evt.Count})";
 
             view.txt_onEventTrigger.oriText = model.prm.dic.GetDv(model.prm.key, EventTriggerForm.defaultData).type.ToString();
+
+            UiManager.Rebuild(gameObject, true);
         }
 
         public void OnEvent(EventModifyEvent evt)

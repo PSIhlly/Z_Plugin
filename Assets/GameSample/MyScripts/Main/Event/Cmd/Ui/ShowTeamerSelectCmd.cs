@@ -31,6 +31,8 @@ namespace Z_Code
         public override CmdBase GetNew() => new ShowTeamerSelectCmd();
         protected override bool ExecuteInternal(BoxDataForm.Data[] prm, InterpretAsyncTask asyncTask)
         {
+            if (GameManager.instance.curProgress == null)
+                return true;
             UiManager.instance.ShowUi<UiTeamSelectWindowCtrl>();
             GameManager.instance.evtCtrl.StartTask(asyncTask, () =>
             {

@@ -1,12 +1,15 @@
 param(
     [string]$ProjectRoot = (Resolve-Path (Join-Path $PSScriptRoot "../..")).Path,
     [string]$UnityEditor = "D:/WorkSoftWare/Unity/2022.3.61t4/Editor/Tuanjie.exe",
-    [ValidateSet('MapRuntimeRegression', 'MapRelatedUnitRefreshRegression', 'NavigationRouteCacheRegression', 'MissionRuntimeRegression', 'GlobalVariableRegression', 'GlobalVariableSceneTriggerRegression', 'ModStoryVariableEditorRegression', 'MinimapRuntimeRegression', 'MapTextureRuntimeRegression', 'WangTileStoryCacheRegression', 'FadeCommandsRegression', 'TileFrontVisibilityRegression', 'WangTileSlopeNeighbourRegression', 'DisFadeRoutingRegression', 'DisFadeBatchingRegression', 'InstancePoolNameRegression', 'ModSceneHistoryRuntimeRegression', 'MapFadeShaderRegression', 'MapShadowBiasRegression', 'MapShadowReceiverRegression', 'MapEdgeTransitionRegression', 'StoryPackageImportRegression', 'CodeInterpreterRuntimeRegression', 'CharacterReferenceRegression', 'CharacterPartyRegression', 'CharacterRemovalRegression', 'UnifiedDestroyRegression', 'ObjectProductRuntimeRegression', 'ObjectDirectionGeometryRegression', 'AssetPickerSelectionRegression', 'SceneObjectReferenceRegression', 'SceneProductCommandRegression', 'ObjectProductEditorRegression', 'StoryTargetSelectionRegression', 'SceneEventChooseListRegression', 'SceneBehaviourTriggerRegression', 'CameraCommandsRegression', 'SkillUseCommandsRegression')]
+    [ValidateSet('MapRuntimeRegression', 'MapRelatedUnitRefreshRegression', 'NavigationRouteCacheRegression', 'NavigationObjectStateRegression', 'MissionRuntimeRegression', 'GlobalVariableRegression', 'GlobalVariableSceneTriggerRegression', 'ModStoryVariableEditorRegression', 'MinimapRuntimeRegression', 'MapTextureRuntimeRegression', 'WangTileStoryCacheRegression', 'FadeCommandsRegression', 'PauseTasksRegression', 'TileFrontVisibilityRegression', 'WangTileSlopeNeighbourRegression', 'DisFadeRoutingRegression', 'DisFadeBatchingRegression', 'InstancePoolNameRegression', 'ModSceneHistoryRuntimeRegression', 'MapFadeShaderRegression', 'MapShadowBiasRegression', 'MapShadowReceiverRegression', 'MapEdgeTransitionRegression', 'StoryPackageImportRegression', 'CodeInterpreterRuntimeRegression', 'LenCommandRegression', 'InterpreterTimeoutRegression', 'CharacterReferenceRegression', 'CharacterPartyRegression', 'CharacterRemovalRegression', 'UnifiedDestroyRegression', 'ObjectProductRuntimeRegression', 'ObjectCollisionTilesRegression', 'CubeCollisionRegression', 'ObjectDirectionGeometryRegression', 'AssetPickerSelectionRegression', 'EmptyMediaAssetsRegression', 'SceneObjectReferenceRegression', 'SceneProductCommandRegression', 'ObjectProductEditorRegression', 'StoryTargetSelectionRegression', 'StoryProjectileDamageRegression', 'SceneEventChooseListRegression', 'SceneBehaviourTriggerRegression', 'CameraCommandsRegression', 'SkillUseCommandsRegression', 'IsStunCommandRegression', 'PartyHealthRegression', 'GifDecoderRegression', 'GenerateItemRegression', 'PlayAssetTextRegression', 'CanvasToastRegression', 'FormCopyRegression', 'UiTreeContainerRegression')]
     [string]$Fixture = 'MapRuntimeRegression',
     [switch]$CharacterPlayLifecycle,
     [switch]$SceneCommands,
     [switch]$ItemPicking,
-    [switch]$SkipBuild
+    [switch]$LineOfSight,
+    [switch]$SkipBuild,
+    [string]$GifReferenceDirectory,
+    [string]$ProjectileEventDirectory
 )
 $ErrorActionPreference = "Stop"
 $shaderPath = Join-Path $ProjectRoot "Assets/Z_Level0/Z_Shader/Func/DisDark/DisFadeCode.shader"
@@ -28,16 +31,23 @@ $bindingRelative = 'Assets/Z_Level0/Z_Shader/Func/DisDark/DisFadeMaterialBinding
 $includedSources = @($runtimeProject.SelectNodes("//*[local-name()='Compile']") |
     ForEach-Object { $_.Include.Replace('\', '/') })
 $missingSources = @(@($bindingRelative,
+    'Assets/Z_Level3/Z_UI/Core/Basic/Frame/UiTreeContainer.cs',
+    'Assets/Z_Level3/Z_UI/Core/Basic/Frame/UiTreeLayout.cs',
     'Assets/GameSample/Forms/ExcelCs/ObjectProductForm.cs',
-    'Assets/GameSample/MyScripts/Main/ObjectProductForm.Runtime.cs',
     'Assets/GameSample/MyScripts/Main/ObjectUnit.Direction.cs',
+    'Assets/GameSample/MyScripts/Main/ObjectProductForm.SceneUnits.cs',
+    'Assets/GameSample/MyScripts/Main/ObjectProductForm.Reference.cs',
+    'Assets/GameSample/MyScripts/Main/ObjectUnit.Product.cs',
     'Assets/Z_Level3/Z_Map/Core/MapModelColliderGeometry.cs',
     'Assets/GameSample/MyScripts/Main/CharacterProductForm.Reference.cs',
     'Assets/GameSample/MyScripts/Main/Event/Cmd/CharacterCmd.cs',
     'Assets/GameSample/MyScripts/Main/Event/Cmd/CharacterPartyCmd.cs',
+    'Assets/GameSample/MyScripts/Main/Event/Cmd/Character/IsStunCmd.cs',
     'Assets/GameSample/MyScripts/Main/Event/Cmd/GlobalVarCmd.cs',
     'Assets/GameSample/MyScripts/Mod/Ui/Event/UiModStoryGlobalVarCtrl.cs',
     'Assets/GameSample/MyScripts/Main/Event/Cmd/Scene/DestroyCmd.cs',
+    'Assets/GameSample/MyScripts/Main/Event/Cmd/Scene/GenerateItemCmd.cs',
+    'Assets/GameSample/MyScripts/Main/Event/Cmd/Image/ShowTextCmd.cs',
     'Assets/GameSample/MyScripts/Play/PlayInfoController.Party.cs',
     'Assets/GameSample/MyScripts/Main/Event/SceneObjectReference.cs',
     'Assets/GameSample/MyScripts/Main/Event/Cmd/Scene/IsSameObjectCmd.cs',
@@ -51,9 +61,9 @@ $missingSources = @(@($bindingRelative,
     Where-Object { $_ -notin $includedSources })
 $buildArguments = @('build', $runtimeProjectPath, '--no-restore', '--nologo', '-v:quiet', '-m:1',
     '-p:BuildInParallel=false', '-p:UseSharedCompilation=false')
-if ($missingSources.Count -gt 0) {
+if ($missingSources.Count -gt 0 -or 'Assets/GameSample/MyScripts/Main/ObjectProductForm.Runtime.cs' -in $includedSources) {
     # Unity can briefly leave generated project files stale after new source is
-    # added. Inject only that source into this validation build, never edit the
+    # added or removed. Correct only this validation build's source list, never edit the
     # generated .csproj or add Assembly-CSharp source to lower project refs.
     $validationBuildRoot = Join-Path $ProjectRoot ('Temp/MapRegressionBuild-' + [guid]::NewGuid().ToString('N'))
     New-Item -ItemType Directory -Path $validationBuildRoot -Force | Out-Null
@@ -63,6 +73,7 @@ if ($missingSources.Count -gt 0) {
         $absolute = [Security.SecurityElement]::Escape((Join-Path $ProjectRoot $relative))
         $targetSource += '<Compile Include="' + $absolute + '" />'
     }
+    $targetSource += '<Compile Remove="Assets/GameSample/MyScripts/Main/ObjectProductForm.Runtime.cs" />'
     $targetSource += '</ItemGroup></Project>'
     [IO.File]::WriteAllText($validationTargets, $targetSource)
     $buildArguments += '-p:CustomAfterMicrosoftCommonTargets=' + $validationTargets
@@ -84,6 +95,19 @@ if ($Fixture -eq 'StoryTargetSelectionRegression') {
     New-Item -ItemType Directory -Path "$testProject/ExtraAssets/1/Core" -Force | Out-Null
     Copy-Item -LiteralPath (Join-Path $ProjectRoot 'ExtraAssets/1/Core/ef') -Destination "$testProject/ExtraAssets/1/Core/ef"
 }
+if ($Fixture -eq 'StoryProjectileDamageRegression') {
+    $projectileRoot = Join-Path $testProject 'ProjectileEvents'
+    New-Item -ItemType Directory -Path $projectileRoot -Force | Out-Null
+    if ($ProjectileEventDirectory) {
+        $projectileSources = @(Get-ChildItem -LiteralPath $ProjectileEventDirectory -Filter ef -File -Recurse)
+    } else {
+        $projectileSources = @(Get-Item -LiteralPath (Join-Path $ProjectRoot 'ExtraAssets/1/Core/ef'))
+    }
+    if ($projectileSources.Count -eq 0) { throw 'No explicit projectile event fixtures were found.' }
+    for ($projectileIndex = 0; $projectileIndex -lt $projectileSources.Count; $projectileIndex++) {
+        Copy-Item -LiteralPath $projectileSources[$projectileIndex].FullName -Destination (Join-Path $projectileRoot "$projectileIndex.json")
+    }
+}
 if ($Fixture -eq 'CodeInterpreterRuntimeRegression') {
     Copy-Item -LiteralPath (Join-Path $ProjectRoot 'Temp/bin/Debug/Z_Code.Tests.Editor.dll') -Destination "$testProject/Assets/Plugins"
     $nunitPackage = Get-ChildItem -LiteralPath (Join-Path $ProjectRoot 'Library/PackageCache') -Directory -Filter 'com.unity.ext.nunit@*' | Select-Object -First 1
@@ -91,6 +115,20 @@ if ($Fixture -eq 'CodeInterpreterRuntimeRegression') {
     Copy-Item -LiteralPath (Join-Path $nunitPackage.FullName 'net35/unity-custom/nunit.framework.dll') -Destination "$testProject/Assets/Plugins"
     New-Item -ItemType Directory -Path "$testProject/ExtraAssets/2/Core" -Force | Out-Null
     Copy-Item -LiteralPath (Join-Path $ProjectRoot 'ExtraAssets/2/Core/ef') -Destination "$testProject/ExtraAssets/2/Core/ef"
+}
+if ($Fixture -in @('PlayAssetTextRegression', 'CanvasToastRegression', 'UiTreeContainerRegression')) {
+    if ($Fixture -eq 'PlayAssetTextRegression') {
+        # Synthetic holders alone cannot detect a stale saved prefab list.
+        Copy-Item -LiteralPath (Join-Path $ProjectRoot 'Assets/GameSample/Prefabs/Ui/standard/Module/PlayAsset.prefab') -Destination "$testProject/PlayAsset.prefab.txt"
+    }
+    # TMP's C# binary does not carry its material shader. Import only the
+    # native SDF font shader and its local include into this disposable project.
+    $textShaderRoot = Join-Path $testProject 'Assets/PlayAssetTextShaders'
+    New-Item -ItemType Directory -Path $textShaderRoot -Force | Out-Null
+    foreach ($textShader in @('TMP_SDF-Mobile.shader', 'TMPro_Properties.cginc')) {
+        Copy-Item -LiteralPath (Join-Path $ProjectRoot ('Assets/TextMesh Pro/Shaders/' + $textShader)) -Destination $textShaderRoot
+    }
+    Copy-Item -LiteralPath (Join-Path $ProjectRoot 'Assets/TextMesh Pro/Fonts/LiberationSans.ttf') -Destination $textShaderRoot
 }
 if ($Fixture -eq 'MapFadeShaderRegression') {
     $rendererPath = Join-Path $ProjectRoot 'Assets/Samples/Universal RP/13.1.9/URP Package Samples/SharedAssets/Settings/SamplesForwardRenderer.asset'
@@ -115,7 +153,7 @@ if ($Fixture -eq 'MapFadeShaderRegression') {
     Copy-Item -LiteralPath (Join-Path $ProjectRoot 'Assets/Z_Level0/Z_Shader/Func/DisDark/DisFadeRenderRouting.cs') -Destination "$testProject/Assets/DisFadeRenderRouting.cs"
     Copy-Item -LiteralPath (Join-Path $ProjectRoot $bindingRelative) -Destination "$testProject/Assets/DisFadeMaterialBinding.cs"
 }
-if ($Fixture -in @('MapFadeShaderRegression', 'MapShadowBiasRegression', 'MapShadowReceiverRegression', 'MapTextureRuntimeRegression', 'TileFrontVisibilityRegression', 'DisFadeRoutingRegression', 'DisFadeBatchingRegression', 'ObjectDirectionGeometryRegression')) {
+if ($Fixture -in @('MapFadeShaderRegression', 'MapShadowBiasRegression', 'MapShadowReceiverRegression', 'MapTextureRuntimeRegression', 'TileFrontVisibilityRegression', 'DisFadeRoutingRegression', 'DisFadeBatchingRegression', 'ObjectDirectionGeometryRegression', 'GenerateItemRegression')) {
     Copy-Item -LiteralPath $shaderPath -Destination "$testProject/Assets/DisFadeCode.shader"
     # Copy only cached shader headers into isolated embedded packages. No package
     # downloads, production package edits or duplicate runtime C# assemblies.
@@ -194,9 +232,17 @@ else { & {
         finally { $runtimeAssembly.Dispose(); $resolver.Dispose() }
     }
 } }
+if ($Fixture -eq 'GifDecoderRegression' -and $GifReferenceDirectory) {
+    $referenceRoot = Join-Path $testProject 'GifReferences'
+    New-Item -ItemType Directory -Path $referenceRoot -Force | Out-Null
+    Get-ChildItem -LiteralPath $GifReferenceDirectory -File |
+        Where-Object { $_.Extension -in @('.gif', '.rgba') } |
+        ForEach-Object { Copy-Item -LiteralPath $_.FullName -Destination $referenceRoot }
+}
 $logPath = Join-Path $testProject "regression.log"
 $graphicsArguments = if ($Fixture -in @('MapFadeShaderRegression', 'MapShadowBiasRegression', 'MapShadowReceiverRegression', 'DisFadeBatchingRegression', 'SceneBehaviourTriggerRegression')) { '-force-d3d11' } else { '-nographics' }
-$entryPoint = if ($ItemPicking -and $Fixture -eq 'ModSceneHistoryRuntimeRegression') { 'RunItemPicking' }
+$entryPoint = if ($LineOfSight -and $Fixture -eq 'StoryTargetSelectionRegression') { 'RunLineOfSight' }
+    elseif ($ItemPicking -and $Fixture -eq 'ModSceneHistoryRuntimeRegression') { 'RunItemPicking' }
     elseif ($CharacterPlayLifecycle -and $Fixture -eq 'MapTextureRuntimeRegression') { 'RunCharacterPlayLifecycle' }
     elseif ($SceneCommands -and $Fixture -eq 'MapRuntimeRegression') { 'RunSceneCommands' } else { 'Run' }
 $argumentLine = '-batchmode ' + $graphicsArguments + ' -projectPath "' + $testProject + '" -executeMethod ' + $Fixture + '.' + $entryPoint + ' -logFile "' + $logPath + '"'
@@ -211,30 +257,46 @@ if ($process.ExitCode -ne 0) {
 $successMarker = switch ($Fixture) {
     'CharacterReferenceRegression' { 'CHARACTER_REFERENCE_REGRESSION_PASS' }
     'CharacterPartyRegression' { 'CHARACTER_PARTY_REGRESSION_PASS' }
+    'PartyHealthRegression' { 'PARTY_HEALTH_REGRESSION_PASS' }
+    'GenerateItemRegression' { 'GENERATE_ITEM_REGRESSION_PASS' }
+    'PlayAssetTextRegression' { 'PLAY_ASSET_TEXT_REGRESSION_PASS' }
+    'CanvasToastRegression' { 'CANVAS_TOAST_REGRESSION_PASS' }
     'CharacterRemovalRegression' { 'CHARACTER_REMOVAL_REGRESSION_PASS' }
     'UnifiedDestroyRegression' { 'UNIFIED_DESTROY_REGRESSION_PASS' }
     'GlobalVariableRegression' { 'GLOBAL_VARIABLE_REGRESSION_PASS' }
     'GlobalVariableSceneTriggerRegression' { 'GLOBAL_VARIABLE_SCENE_TRIGGER_REGRESSION_PASS' }
     'ModStoryVariableEditorRegression' { 'MOD_STORY_VARIABLE_EDITOR_REGRESSION_PASS' }
     'ObjectProductRuntimeRegression' { 'OBJECT_PRODUCT_RUNTIME_REGRESSION_PASS' }
+    'ObjectCollisionTilesRegression' { 'OBJECT_COLLISION_TILES_REGRESSION_PASS' }
+    'CubeCollisionRegression' { 'CUBE_COLLISION_REGRESSION_PASS' }
     'ObjectDirectionGeometryRegression' { 'OBJECT_DIRECTION_GEOMETRY_REGRESSION_PASS' }
     'MapRelatedUnitRefreshRegression' { 'MAP_RELATED_UNIT_REFRESH_REGRESSION_PASS' }
     'NavigationRouteCacheRegression' { 'NAVIGATION_ROUTE_CACHE_REGRESSION_PASS' }
+    'NavigationObjectStateRegression' { 'NAVIGATION_OBJECT_STATE_REGRESSION_PASS' }
     'SceneObjectReferenceRegression' { 'SCENE_OBJECT_REFERENCE_REGRESSION_PASS' }
     'SceneProductCommandRegression' { 'SCENE_PRODUCT_COMMAND_REGRESSION_PASS' }
     'SceneEventChooseListRegression' { 'SCENE_EVENT_CHOOSE_LIST_REGRESSION_PASS' }
     'SceneBehaviourTriggerRegression' { 'SCENE_BEHAVIOUR_TRIGGER_REGRESSION_PASS' }
-    'StoryTargetSelectionRegression' { 'STORY_TARGET_SELECTION_REGRESSION_PASS' }
+    'StoryTargetSelectionRegression' { if ($LineOfSight) { 'LINE_OF_SIGHT_WORLD_UNITS_REGRESSION_PASS' } else { 'STORY_TARGET_SELECTION_REGRESSION_PASS' } }
+    'StoryProjectileDamageRegression' { 'STORY_PROJECTILE_DAMAGE_REGRESSION_PASS' }
     'ObjectProductEditorRegression' { 'OBJECT_PRODUCT_EDITOR_REGRESSION_PASS' }
     'AssetPickerSelectionRegression' { 'ASSET_PICKER_SELECTION_REGRESSION_PASS' }
+    'EmptyMediaAssetsRegression' { 'EMPTY_MEDIA_ASSETS_REGRESSION_PASS' }
     'CodeInterpreterRuntimeRegression' { 'CODE_INTERPRETER_RUNTIME_REGRESSION_PASS' }
+    'LenCommandRegression' { 'LEN_COMMAND_REGRESSION_PASS' }
+    'InterpreterTimeoutRegression' { 'INTERPRETER_TIMEOUT_REGRESSION_PASS' }
     'MissionRuntimeRegression' { 'MISSION_RUNTIME_REGRESSION_PASS' }
     'MinimapRuntimeRegression' { 'MINIMAP_RUNTIME_REGRESSION_PASS' }
+    'UiTreeContainerRegression' { 'UI TREE CONTAINER REGRESSION PASS' }
+    'FormCopyRegression' { 'FORM_COPY_REGRESSION_PASS' }
+    'GifDecoderRegression' { 'GIF_DECODER_REGRESSION_PASS' }
     'MapTextureRuntimeRegression' { 'MAP_TEXTURE_RUNTIME_REGRESSION_PASS' }
     'WangTileStoryCacheRegression' { 'WANG_TILE_STORY_CACHE_REGRESSION_PASS' }
     'FadeCommandsRegression' { 'FADE_COMMANDS_REGRESSION_PASS' }
+    'PauseTasksRegression' { 'PAUSE_TASKS_REGRESSION_PASS' }
     'CameraCommandsRegression' { 'CAMERA_COMMANDS_REGRESSION_PASS' }
     'SkillUseCommandsRegression' { 'SKILL_USE_COMMANDS_REGRESSION_PASS' }
+    'IsStunCommandRegression' { 'IS_STUN_COMMAND_REGRESSION_PASS' }
     'TileFrontVisibilityRegression' { 'TILE_FRONT_VISIBILITY_REGRESSION_PASS' }
     'WangTileSlopeNeighbourRegression' { 'WANG_TILE_SLOPE_NEIGHBOUR_REGRESSION_PASS' }
     'DisFadeRoutingRegression' { 'DIS_FADE_ROUTING_REGRESSION_PASS' }

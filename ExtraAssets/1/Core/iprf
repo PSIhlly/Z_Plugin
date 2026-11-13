@@ -1,9 +1,9 @@
 [
   {
-    "uid": 7,
-    "name": "血瓶",
+    "uid": 86,
+    "name": "大血瓶",
     "labId": 0,
-    "iconTexName": 49,
+    "iconTexName": 877,
     "paramDic": [],
     "protoUid": 0,
     "model": {
@@ -20,14 +20,14 @@
       ],
       "subPrefabUnitScale": [
         {
-          "v": "0.4|0.4|0.4"
+          "v": "1|0.6|1"
         }
       ],
       "subUnitTexsName": [
         {
           "v": [
             {
-              "v": 49
+              "v": 877
             }
           ]
         }
@@ -36,22 +36,22 @@
       "isObstacle": false,
       "colliderScale": 0.0
     },
-    "desc": "加50点血",
+    "desc": "加500点HP",
     "amount": 1,
     "maxAmountPer": 99,
     "equip": 0,
     "styleTex": [
       {
         "k": 0,
-        "v": 49
+        "v": 210000
       },
       {
         "k": 1,
-        "v": 49
+        "v": 210000
       },
       {
         "k": 2,
-        "v": 49
+        "v": 210000
       }
     ],
     "price": 0,
@@ -64,7 +64,7 @@
           "name": "onUseEvent",
           "evt": [
             {
-              "v": 16
+              "v": 47
             }
           ],
           "type": 0
@@ -73,12 +73,163 @@
     ],
     "isConsume": true,
     "paramDicCharacter": [],
-    "minimapIcon": 210000,
-    "sorv": 2
+    "minimapIcon": 210000
   },
   {
-    "uid": 77,
-    "name": "攻击晶石",
+    "uid": 85,
+    "name": "敏捷晶石",
+    "labId": 0,
+    "iconTexName": 875,
+    "paramDic": [],
+    "protoUid": 0,
+    "model": {
+      "id": 0,
+      "subPrefabUnitName": [
+        {
+          "v": 125049
+        }
+      ],
+      "subPrefabUnitPos": [
+        {
+          "v": "0|0|0"
+        }
+      ],
+      "subPrefabUnitScale": [
+        {
+          "v": "0.5|0.3|0.5"
+        }
+      ],
+      "subUnitTexsName": [
+        {
+          "v": [
+            {
+              "v": 876
+            }
+          ]
+        }
+      ],
+      "animTimeInterval": 0.0,
+      "isObstacle": false,
+      "colliderScale": 0.0
+    },
+    "desc": "增加1点速度",
+    "amount": 1,
+    "maxAmountPer": 99,
+    "equip": 0,
+    "styleTex": [
+      {
+        "k": 0,
+        "v": 316
+      },
+      {
+        "k": 1,
+        "v": 316
+      },
+      {
+        "k": 2,
+        "v": 316
+      }
+    ],
+    "price": 0,
+    "canEquipe": false,
+    "events": [
+      {
+        "k": "onUseEvent",
+        "v": {
+          "uid": -1,
+          "name": "onUseEvent",
+          "evt": [
+            {
+              "v": 50
+            }
+          ],
+          "type": 0
+        }
+      }
+    ],
+    "isConsume": true,
+    "paramDicCharacter": [],
+    "minimapIcon": 210000
+  },
+  {
+    "uid": 84,
+    "name": "防御晶石",
+    "labId": 0,
+    "iconTexName": 317,
+    "paramDic": [],
+    "protoUid": 0,
+    "model": {
+      "id": 0,
+      "subPrefabUnitName": [
+        {
+          "v": 125049
+        }
+      ],
+      "subPrefabUnitPos": [
+        {
+          "v": "0|0|0"
+        }
+      ],
+      "subPrefabUnitScale": [
+        {
+          "v": "0.5|0.3|0.5"
+        }
+      ],
+      "subUnitTexsName": [
+        {
+          "v": [
+            {
+              "v": 317
+            }
+          ]
+        }
+      ],
+      "animTimeInterval": 0.0,
+      "isObstacle": false,
+      "colliderScale": 0.0
+    },
+    "desc": "增加5点防御",
+    "amount": 1,
+    "maxAmountPer": 99,
+    "equip": 0,
+    "styleTex": [
+      {
+        "k": 0,
+        "v": 316
+      },
+      {
+        "k": 1,
+        "v": 316
+      },
+      {
+        "k": 2,
+        "v": 316
+      }
+    ],
+    "price": 0,
+    "canEquipe": false,
+    "events": [
+      {
+        "k": "onUseEvent",
+        "v": {
+          "uid": -1,
+          "name": "onUseEvent",
+          "evt": [
+            {
+              "v": 48
+            }
+          ],
+          "type": 0
+        }
+      }
+    ],
+    "isConsume": true,
+    "paramDicCharacter": [],
+    "minimapIcon": 210000
+  },
+  {
+    "uid": 83,
+    "name": "生命晶石",
     "labId": 0,
     "iconTexName": 316,
     "paramDic": [],
@@ -105,6 +256,82 @@
           "v": [
             {
               "v": 316
+            }
+          ]
+        }
+      ],
+      "animTimeInterval": 0.0,
+      "isObstacle": false,
+      "colliderScale": 0.0
+    },
+    "desc": "增加20点HP上限",
+    "amount": 1,
+    "maxAmountPer": 99,
+    "equip": 0,
+    "styleTex": [
+      {
+        "k": 0,
+        "v": 316
+      },
+      {
+        "k": 1,
+        "v": 316
+      },
+      {
+        "k": 2,
+        "v": 316
+      }
+    ],
+    "price": 0,
+    "canEquipe": false,
+    "events": [
+      {
+        "k": "onUseEvent",
+        "v": {
+          "uid": -1,
+          "name": "onUseEvent",
+          "evt": [
+            {
+              "v": 49
+            }
+          ],
+          "type": 0
+        }
+      }
+    ],
+    "isConsume": true,
+    "paramDicCharacter": [],
+    "minimapIcon": 210000
+  },
+  {
+    "uid": 77,
+    "name": "攻击晶石",
+    "labId": 0,
+    "iconTexName": 876,
+    "paramDic": [],
+    "protoUid": 0,
+    "model": {
+      "id": 0,
+      "subPrefabUnitName": [
+        {
+          "v": 125049
+        }
+      ],
+      "subPrefabUnitPos": [
+        {
+          "v": "0|0|0"
+        }
+      ],
+      "subPrefabUnitScale": [
+        {
+          "v": "0.5|0.3|0.5"
+        }
+      ],
+      "subUnitTexsName": [
+        {
+          "v": [
+            {
+              "v": 876
             }
           ]
         }
@@ -150,7 +377,82 @@
     ],
     "isConsume": true,
     "paramDicCharacter": [],
-    "minimapIcon": 210000,
-    "sorv": 2
+    "minimapIcon": 210000
+  },
+  {
+    "uid": 7,
+    "name": "血瓶",
+    "labId": 0,
+    "iconTexName": 49,
+    "paramDic": [],
+    "protoUid": 0,
+    "model": {
+      "id": 0,
+      "subPrefabUnitName": [
+        {
+          "v": 125049
+        }
+      ],
+      "subPrefabUnitPos": [
+        {
+          "v": "0|0|0"
+        }
+      ],
+      "subPrefabUnitScale": [
+        {
+          "v": "0.4|0.4|0.4"
+        }
+      ],
+      "subUnitTexsName": [
+        {
+          "v": [
+            {
+              "v": 49
+            }
+          ]
+        }
+      ],
+      "animTimeInterval": 0.0,
+      "isObstacle": false,
+      "colliderScale": 0.0
+    },
+    "desc": "加50点HP",
+    "amount": 1,
+    "maxAmountPer": 99,
+    "equip": 0,
+    "styleTex": [
+      {
+        "k": 0,
+        "v": 49
+      },
+      {
+        "k": 1,
+        "v": 49
+      },
+      {
+        "k": 2,
+        "v": 49
+      }
+    ],
+    "price": 0,
+    "canEquipe": false,
+    "events": [
+      {
+        "k": "onUseEvent",
+        "v": {
+          "uid": -1,
+          "name": "onUseEvent",
+          "evt": [
+            {
+              "v": 16
+            }
+          ],
+          "type": 0
+        }
+      }
+    ],
+    "isConsume": true,
+    "paramDicCharacter": [],
+    "minimapIcon": 210000
   }
 ]

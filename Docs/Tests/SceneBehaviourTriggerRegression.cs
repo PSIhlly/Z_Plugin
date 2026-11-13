@@ -77,8 +77,7 @@ public static class SceneBehaviourTriggerRegression
             ObjectProductForm.AddData(prototype);
             var data = ObjectUnitForm.GetDataByJo(new JObject());
             data.uid = 92002; data.name = "scene instance";
-            data.extra = new JObject { [ObjectProductForm.ProductVersionKey] = ObjectProductForm.ProductVersion,
-                [MapUnit.productKey] = new JArray(prototype.uid, -1), ["custom"] = "preserved" }.ToString();
+            data.extra = new JObject {                 [MapUnit.productKey] = new JArray(prototype.uid, -1), ["custom"] = "preserved" }.ToString();
             ObjectUnitForm.AddData(data);
             var unit = data.unit;
             var panel = Panel();

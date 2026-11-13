@@ -22,6 +22,11 @@ namespace Z_DataSystem.Form
         {
             public void Play(MediaPlayer player, bool loop = false)
             {
+                if (string.IsNullOrEmpty(path))
+                {
+                    player?.CloseMedia();
+                    return;
+                }
                 player.OpenMedia(new MediaPath(path, MediaPathType.AbsolutePathOrURL), true);
                 player.Loop = loop;
             }
@@ -32,6 +37,7 @@ namespace Z_DataSystem
 {
     public class AudioController : Z_Controller<AssetManager>, IAssetController
     {
+        public int emptyAssetId { get; set; } = -1;
         public bool IsAsset(string name)
         {
             var parts = name.Split(GetMark());
@@ -39,7 +45,7 @@ namespace Z_DataSystem
         }
         public virtual string GetName(int id=-1)
         {
-            return $"{GetMark()}{id}{GetMark()}";
+            return $"{GetMark()}{(id > 0 ? id.ToString() : string.Empty)}{GetMark()}";
         }
         public int GetId(string name = "")
         {
@@ -50,6 +56,8 @@ namespace Z_DataSystem
             {
                 return id;
             }
+            if (parts.Length == 3 && parts[0].Length == 0 && parts[1].Length == 0 && parts[2].Length == 0)
+                return emptyAssetId;
             return -1;
         }
         public string GetMark() => AssetDefines.AUDIO_MARK;

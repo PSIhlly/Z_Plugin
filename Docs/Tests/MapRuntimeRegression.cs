@@ -894,7 +894,7 @@ public static class MapRuntimeRegression
             // config and must not silently follow subsequent prototype edits.
             foreach (var data in ObjectUnitForm.DataByUid.Values)
             {
-                var target = Form.ObjectProductForm.GetProduct(data);
+                var target = data.unit.product;
                 if (target == null || Form.ObjectProductForm.GetTemplateUid(target) != product.uid || target == product)
                     continue;
                 int uid = target.uid, protoUid = target.protoUid;
@@ -1969,8 +1969,8 @@ public static class MapRuntimeRegression
                             var original = Read(input);
                             var task = Invoke(relative ? (Z_Code.CmdBase)new Z_Code.SetCharacterNavigateRelativeCmd()
                                 : new Z_Code.SetCharacterNavigateCmd(), Handle(character, true), input);
-                            var destination = relative ? start + Vector3.forward * 4 * cellSize.z
-                                : map.utilCtrl.MapPos2RealPos(new Vector3(6, 0, 6));
+                            var destination = relative ? start + Vector3.forward * 4
+                                : new Vector3(6, 0, 6);
                             Require(task.IsComplete() && string.IsNullOrEmpty(task.error)
                                 && character.data.speed == binding.expected,
                                 "both navigation commands preserve speed for missing bindings and honor valid/zero parameters");
@@ -2015,7 +2015,7 @@ public static class MapRuntimeRegression
                     && copiedCharacters[1].data.pos == start + Vector3.right * 2 + Vector3.forward,
                     "template-relative Set changes every matching unit from its own initial position");
                 Require(Read(Invoke(new Z_Code.GetPositionCmd(), templateReference).res[0])
-                    == GameManager.MapPosToPlayerPos(map.utilCtrl.RealPos2MapPos(character.data.pos)),
+                    == GameManager.MapPosToPlayerPos(character.data.pos),
                     "template getters keep the deterministic first scalar/vector result");
                 var exactReference = Z_Code.CodeHelper.CreateBoxByStr(GlobalEventHelper.GetName(
                     GlobalEventHelper.CHARACTER, copiedProducts[0].uid.ToString()));
@@ -2243,23 +2243,23 @@ public static class MapRuntimeRegression
                         var handle = Handle(unit, productHandle);
                         var absolute = GameManager.MapPosToPlayerPos(new Vector3(6, 0, 6));
                         Invoke(new Z_Code.SetPositionCmd(), handle, VectorBox(absolute));
-                        Require(Vector3.Distance(unit.data.pos, new Vector3(12, 0, 24)) < .00001f
+                        Require(Vector3.Distance(unit.data.pos, new Vector3(6, 0, 6)) < .00001f
                             && Read(Invoke(new Z_Code.GetPositionCmd(), handle).res[0]) == absolute,
                             "Get/Set absolute round trip for both references and nonuniform map dimensions");
                         Invoke(new Z_Code.SetPositionRelativeCmd(), handle, VectorBox(new Vector3(-1, 0, -1)));
-                        Require(Vector3.Distance(unit.data.pos, new Vector3(10, 0, 20)) < .00001f,
-                            "relative Set scales world-axis offsets without the absolute 500 shift");
-                        var args = new object[] { unit, new Vector3(12, 0, 20), 2f, .5f, .1f };
+                        Require(Vector3.Distance(unit.data.pos, new Vector3(5, 0, 5)) < .00001f,
+                            "relative Set uses world-axis offsets without scaling or the absolute 500 shift");
+                        var args = new object[] { unit, new Vector3(7, 0, 5), 2f, .5f, .1f };
                         advance.Invoke(null, args);
-                        Require(Vector3.Distance(unit.data.pos, new Vector3(10.08f, 0, 20)) < .00001f,
-                            "supplied speed counts logical tiles rather than world metres");
+                        Require(Vector3.Distance(unit.data.pos, new Vector3(5.04f, 0, 5)) < .00001f,
+                            "supplied speed counts world metres independent of cell size");
                     }
                 obj.data.pos = new Vector3(10, 0, 20);
                 character.data.pos = new Vector3(12, 3, 28);
                 Require(Read(Invoke(new Z_Code.GetPositionRelativeCmd(), Handle(character, true), Handle(obj)).res[0])
-                    == new Vector3(1, 1, 2), "relative Get returns target minus origin in map-unit coordinates");
+                    == new Vector3(2, 3, 8), "relative Get returns target minus origin in world coordinates");
                 Require(Read(Invoke(new Z_Code.GetPositionRelativeCmd(), Handle(obj), Handle(character)).res[0])
-                    == new Vector3(-1, -1, -2), "relative Get supports mixed object/character scene handles");
+                    == new Vector3(-2, -3, -8), "relative Get supports mixed object/character scene handles");
                 Require(Read(Invoke(new Z_Code.GetPositionRelativeCmd(), Handle(obj), Handle(obj)).res[0]) == Vector3.zero,
                     "relative Get of self is zero");
             }
@@ -3668,9 +3668,9 @@ public static class MapRuntimeRegression
         var distantGround = distant.dirGroundY;
         var distantHeights = distant.dirMaxY;
         var distantPassTypes = distant.passTypes;
-        var first = new ObjectUnitForm.Data(25001, false, "", source.name, tile.data.pos,
+        var first = new ObjectUnitForm.Data(25001, true, "", source.name, tile.data.pos,
             Vector3.zero, Vector3.one, UpdateType.ShowOnly, new List<int>(), "", false, 0).unit;
-        var second = new ObjectUnitForm.Data(25002, false, "", source.name, tile.data.pos,
+        var second = new ObjectUnitForm.Data(25002, true, "", source.name, tile.data.pos,
             Vector3.zero, Vector3.one, UpdateType.ShowOnly, new List<int>(), "", false, 0).unit;
 
         map.updateCtrl.RefreshObjectOverlap(first);
@@ -3703,7 +3703,7 @@ public static class MapRuntimeRegression
             && map.navigationCtrl.navUnits[(11, 0, 12)].passTypes.SetEquals(new[] { 7002 }),
             "removing the last covering Object restores terrain pass type in Tile and Nav");
 
-        var rotated = new ObjectUnitForm.Data(25003, false, "", source.name,
+        var rotated = new ObjectUnitForm.Data(25003, true, "", source.name,
             new Vector3(11.4f, 0f, 12.4f), new Vector3(0f, 45f, 0f), Vector3.one,
             UpdateType.ShowOnly, new List<int>(), "", false, 0).unit;
         map.updateCtrl.RefreshObjectOverlap(rotated);
@@ -3790,7 +3790,7 @@ public static class MapRuntimeRegression
         model.localPosition = new Vector3(0, -0.3f + 0.5f, 0);
         model.localScale = new Vector3(2, 0.1f, 1);
         pool.AddPool(prefab);
-        var saved = new ObjectUnitForm.Data(26020, false, "bridge 1", prefab.name,
+        var saved = new ObjectUnitForm.Data(26020, true, "bridge 1", prefab.name,
             new Vector3(516, 750, 497), Vector3.zero, Vector3.one,
             UpdateType.ShowOnly, new List<int>(), "", false, 0);
         var bridge = ObjectUnitForm.GetDataByJo(ObjectUnitForm.GetJoByData(saved));
@@ -3860,7 +3860,7 @@ public static class MapRuntimeRegression
         model.SetParent(prefab.transform, false);
         model.localScale = new Vector3(1, 0.1f, 1);
         pool.AddPool(prefab);
-        var obj = new ObjectUnitForm.Data(26030, false, "", prefab.name, tile.data.pos,
+        var obj = new ObjectUnitForm.Data(26030, true, "", prefab.name, tile.data.pos,
             Vector3.zero, Vector3.one, UpdateType.ShowOnly, new List<int>(), "", false, 0);
         foreach (var sample in new[]
         {
@@ -3899,7 +3899,7 @@ public static class MapRuntimeRegression
         var abovePrefab = Go("probe-above-physical-body");
         abovePrefab.AddComponent<BoxCollider>().center = Vector3.up * 0.5f;
         pool.AddPool(abovePrefab);
-        var above = new ObjectUnitForm.Data(26031, false, "", abovePrefab.name,
+        var above = new ObjectUnitForm.Data(26031, true, "", abovePrefab.name,
             tile.data.pos + Vector3.up * 0.99f, Vector3.zero, new Vector3(4, 0.02f, 1),
             UpdateType.ShowOnly, new List<int>(), "", false, 0);
         var neighbour = map.utilCtrl.GetTile(9, 0, 10);
@@ -4591,7 +4591,7 @@ public static class MapRuntimeRegression
         inactiveBody.SetActive(false);
         prefab.SetActive(false);
         pool.AddPool(prefab);
-        var obj = new ObjectUnitForm.Data(28001, false, "", prefab.name, tile.data.pos,
+        var obj = new ObjectUnitForm.Data(28001, true, "", prefab.name, tile.data.pos,
             Vector3.zero, Vector3.one, UpdateType.ShowOnly, new List<int>(), "", false, 0);
         ObjectUnitForm.AddData(obj);
         var character = new CharacterUnitForm.Data(28002, false, Vector3.zero, 1, 1, 1, false, "",
@@ -4664,7 +4664,7 @@ public static class MapRuntimeRegression
         sphereTrigger.isTrigger = true;
         spherePrefab.SetActive(false);
         pool.AddPool(spherePrefab);
-        var sphere = new ObjectUnitForm.Data(28003, false, "", spherePrefab.name, tile.data.pos,
+        var sphere = new ObjectUnitForm.Data(28003, true, "", spherePrefab.name, tile.data.pos,
             Vector3.zero, Vector3.one, UpdateType.ShowOnly, new List<int>(), "", false, 0);
         ObjectUnitForm.AddData(sphere);
         tile.SetPassTypes(new[] { 7101 });
@@ -4777,9 +4777,9 @@ public static class MapRuntimeRegression
             foreach (var size in new[] { Vector3.one, new Vector3(2, 1.5f, 3) })
             {
                 map.data.mainData.mapUnitSize = size;
-                var world = map.utilCtrl.MapPos2RealPos(GameManager.PlayerPosToMapPos(mission.targetPos));
+                var world = GameManager.PlayerPosToMapPos(mission.targetPos);
                 Require(MissionGuide.GetTargetWorldPosition(mission) == world,
-                    "mission target converts player coordinates with origin offset and map cell size");
+                    "mission target retains the origin offset independently of map cell size");
                 Require(Mathf.Abs(MissionGuide.GetDistance(mission, world)) < 0.0001f,
                     "standing at mission destination displays zero distance");
                 Require(Mathf.Abs(MissionGuide.GetDistance(mission, world + new Vector3(3, 4, 0)) - 5) < 0.0001f,

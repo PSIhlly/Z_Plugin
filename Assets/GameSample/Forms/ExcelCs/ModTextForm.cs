@@ -101,8 +101,21 @@ namespace Form
 
                 public Data Copy(bool sameId = true)
                 {
-        return new Data(sameId? id:idChain.GetId(),key,contentEn,contentCn);
+                    using (DataCopyGuard.Enter(this))
+                    {
+        var copy = new Data(sameId? id:idChain.GetId(),key,contentEn,contentCn);
+                        CopyRuntimeStateTo(copy);
+                        return copy;
+                    }
                 }
+
+            protected void CopyRuntimeStateTo(Data copy)
+            {
+                base.CopyRuntimeStateTo(copy);
+                OnCopy(copy);
+            }
+            partial void OnCopy(Data copy);
+
             
             public override  void BeforeGet()
             {
@@ -911,6 +924,16 @@ namespace Form
 
                 {1000390,new Data(1000390,"onDestroyEvent","On destruction","销毁触发")},
 
+                {1000391,new Data(1000391,"IsStun","Is character stunned","角色是否眩晕")},
+
+                {1000392,new Data(1000392,"GetDeployedCharacters","Get deployed characters","获取出战角色列表")},
+
+                {1000393,new Data(1000393,"GetTeamCharacters","Get team characters","获取队伍角色列表")},
+
+                {1000394,new Data(1000394,"GenerateItem","Generate item","生成道具")},
+
+                {1000395,new Data(1000395,"ShowText","Show text","显示文本")},
+
                 };
                 _DatasHashSet=new HashSet<Data>();
                 
@@ -1673,6 +1696,16 @@ namespace Form
                         {"UseCharacterQSkill",_DataById[1000389]},
     
                         {"onDestroyEvent",_DataById[1000390]},
+    
+                        {"IsStun",_DataById[1000391]},
+    
+                        {"GetDeployedCharacters",_DataById[1000392]},
+    
+                        {"GetTeamCharacters",_DataById[1000393]},
+    
+                        {"GenerateItem",_DataById[1000394]},
+    
+                        {"ShowText",_DataById[1000395]},
     
                     
                     };

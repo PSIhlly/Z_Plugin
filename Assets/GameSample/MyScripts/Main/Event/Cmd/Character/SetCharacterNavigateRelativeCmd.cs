@@ -35,7 +35,7 @@ namespace Z_Code
                 data.speed = SetCharacterNavigateCmd.GetNavigationSpeed(productData, data.speed);
                 data.pathDis = 999;
                 data.alertDis = 999;
-                data.destination = data.pos + MapManager.instance.utilCtrl.MapPos2RealPos(new Vector3(prm[1].dic["x"].num, prm[1].dic["height"].num, prm[1].dic["y"].num));
+                data.destination = data.pos + new Vector3(prm[1].dic["x"].num, prm[1].dic["height"].num, prm[1].dic["y"].num);
 
                 productData.enableNav = true;
             }

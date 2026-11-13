@@ -321,8 +321,28 @@ namespace Form
 
                 public Data Copy(bool sameId = true)
                 {
-        return new Data(sameId? id:idChain.GetId(),name,icon,animTimeInterval,texs==null?new List<int>():new List<int>(texs),labId,events==null?new Dictionary<string,EventTriggerForm.Data>():new Dictionary<string,EventTriggerForm.Data>(events),isWangTile,WangTileDic==null?new Dictionary<int,int>():new Dictionary<int,int>(WangTileDic),passType,enableFrontPart,frontPartTexs==null?new List<int>():new List<int>(frontPartTexs),frontIsWangTile,FrontWangTileDic==null?new Dictionary<int,int>():new Dictionary<int,int>(FrontWangTileDic));
+                    using (DataCopyGuard.Enter(this))
+                    {
+        var copy = new Data(sameId? id:idChain.GetId(),name,icon,animTimeInterval,texs==null?new List<int>():new List<int>(texs),labId,events==null?new Dictionary<string,EventTriggerForm.Data>():CopyCollection0(events),isWangTile,WangTileDic==null?new Dictionary<int,int>():new Dictionary<int,int>(WangTileDic),passType,enableFrontPart,frontPartTexs==null?new List<int>():new List<int>(frontPartTexs),frontIsWangTile,FrontWangTileDic==null?new Dictionary<int,int>():new Dictionary<int,int>(FrontWangTileDic));
+                        CopyRuntimeStateTo(copy);
+                        return copy;
+                    }
                 }
+
+            protected void CopyRuntimeStateTo(Data copy)
+            {
+                base.CopyRuntimeStateTo(copy);
+                OnCopy(copy);
+            }
+            partial void OnCopy(Data copy);
+
+            private static Dictionary<string,EventTriggerForm.Data> CopyCollection0(Dictionary<string,EventTriggerForm.Data> source)
+            {
+                var result = new Dictionary<string,EventTriggerForm.Data>(source.Count, source.Comparer);
+                foreach (var pair in source) result.Add(pair.Key, pair.Value?.Copy());
+                return result;
+            }
+
             
             public override  void BeforeGet()
             {

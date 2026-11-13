@@ -78,7 +78,7 @@ namespace Z_Code
         }
 
         public static Vector3 WorldPosition(Vector3 position) =>
-            MapManager.instance.utilCtrl.MapPos2RealPos(GameManager.PlayerPosToMapPos(position));
+            GameManager.PlayerPosToMapPos(position);
 
         public static void Move(MapUnit unit, Vector3 step)
         {

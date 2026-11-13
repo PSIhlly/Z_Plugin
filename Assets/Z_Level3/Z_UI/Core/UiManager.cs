@@ -1,5 +1,4 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
@@ -29,6 +28,11 @@ namespace Z_Ui
         private static readonly List<RectTransform> rectTemp = new List<RectTransform>();
         private static readonly List<TMP_InputField> tmpInputFieldTemp = new List<TMP_InputField>();
         private static readonly List<TMP_Text> tmpTextTemp = new List<TMP_Text>();
+        private static readonly List<Behaviour> layoutActivationTemp = new List<Behaviour>();
+        private static Dictionary<GameObject, bool> pendingActivationLayouts = new Dictionary<GameObject, bool>();
+        private static Dictionary<GameObject, bool> activationLayoutsToRebuild = new Dictionary<GameObject, bool>();
+        private static bool activationLayoutCallbackRegistered;
+        private static bool rebuildingActivationLayouts;
         protected override void Awake()
         {
             base.Awake();
@@ -172,6 +176,23 @@ namespace Z_Ui
             if (!rt)
                 return;
 
+            // UiHolder.OnEnable can run before enabled UGUI components have
+            // joined Unity's active manager. ForceRebuildLayoutImmediate filters
+            // those components out; finish this request before the first Canvas
+            // submission, after the activation callbacks have completed.
+            if (recursion) go.GetComponentsInChildren(false, layoutActivationTemp);
+            else go.GetComponents(layoutActivationTemp);
+            for (int i = 0; i < layoutActivationTemp.Count; i++)
+            {
+                var behaviour = layoutActivationTemp[i];
+                if (behaviour.enabled && !behaviour.isActiveAndEnabled
+                    && (behaviour is ILayoutElement || behaviour is ILayoutController))
+                {
+                    QueueActivationLayout(go, recursion);
+                    break;
+                }
+            }
+            layoutActivationTemp.Clear();
             tmpInputFieldTemp.Clear();
             go.GetComponentsInChildren(false, tmpInputFieldTemp);
             for (int i = 0; i < tmpInputFieldTemp.Count; i++)
@@ -194,11 +215,99 @@ namespace Z_Ui
                 {
                     LayoutRebuilder.ForceRebuildLayoutImmediate(rectTemp[i]);
                 }
+
+                // Parents have now assigned widths. Flexible Grids behind plain
+                // RectTransform wrappers may not have received a new vertical
+                // calculation, so rebuild them at that width and propagate their
+                // corrected preferred height back through the containing layouts.
+                for (int i = rectTemp.Count - 1; i >= 0; i--)
+                {
+                    var gridRect = rectTemp[i];
+                    if (!gridRect.TryGetComponent<GridLayoutGroup>(out var grid) || !grid.isActiveAndEnabled)
+                        continue;
+                    // A corrected height can also toggle an expanding ScrollRect's
+                    // scrollbar and change the width again. Settle that dependency
+                    // synchronously, with a bound for inconsistent authored layouts.
+                    for (int pass = 0; pass < 3; pass++)
+                    {
+                        float width = gridRect.rect.width;
+                        LayoutRebuilder.ForceRebuildLayoutImmediate(gridRect);
+                        if (gridRect != rt)
+                        {
+                            for (var parent = gridRect.parent as RectTransform;
+                                parent != null && (parent == rt || parent.IsChildOf(rt)); parent = parent.parent as RectTransform)
+                            {
+                                LayoutRebuilder.ForceRebuildLayoutImmediate(parent);
+                                if (parent == rt)
+                                    break;
+                            }
+                        }
+                        if (Mathf.Approximately(width, gridRect.rect.width))
+                            break;
+                    }
+                }
             }
             else
             {
                 LayoutRebuilder.ForceRebuildLayoutImmediate(rt);
             }
+        }
+
+        private static void QueueActivationLayout(GameObject root, bool recursion)
+        {
+            pendingActivationLayouts.TryGetValue(root, out bool recursive);
+            pendingActivationLayouts[root] = recursive || recursion;
+            if (activationLayoutCallbackRegistered)
+                return;
+            activationLayoutCallbackRegistered = true;
+            Canvas.preWillRenderCanvases += RebuildActivatedLayouts;
+        }
+
+        private static void RebuildActivatedLayouts()
+        {
+            if (rebuildingActivationLayouts)
+                return;
+            Canvas.preWillRenderCanvases -= RebuildActivatedLayouts;
+            activationLayoutCallbackRegistered = false;
+            rebuildingActivationLayouts = true;
+            var ready = pendingActivationLayouts;
+            pendingActivationLayouts = activationLayoutsToRebuild;
+            activationLayoutsToRebuild = ready;
+            try
+            {
+                foreach (var request in ready)
+                {
+                    if (!request.Key || !request.Key.activeInHierarchy)
+                        continue;
+                    bool covered = false;
+                    foreach (var parent in ready)
+                    {
+                        if (parent.Value && parent.Key && parent.Key != request.Key && parent.Key.activeInHierarchy
+                            && request.Key.transform.IsChildOf(parent.Key.transform))
+                        {
+                            covered = true;
+                            break;
+                        }
+                    }
+                    if (!covered) Rebuild(request.Key, request.Value);
+                }
+            }
+            finally
+            {
+                ready.Clear();
+                rebuildingActivationLayouts = false;
+            }
+        }
+
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+        private static void ResetActivationLayouts()
+        {
+            Canvas.preWillRenderCanvases -= RebuildActivatedLayouts;
+            activationLayoutCallbackRegistered = false;
+            rebuildingActivationLayouts = false;
+            pendingActivationLayouts.Clear();
+            activationLayoutsToRebuild.Clear();
+            layoutActivationTemp.Clear();
         }
 
     }

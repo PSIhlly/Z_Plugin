@@ -52,6 +52,13 @@ namespace Form
         public partial class Data
         {
             BoxDataForm.Data _boxValue;
+            partial void OnCopy(Data copy)
+            {
+                // v may lag behind script changes. Generated child Copy methods
+                // call the parent hook too; keep each copied live Box independent.
+                copy._boxValue = _boxValue?.DeepCopy();
+            }
+
             public BoxDataForm.Data GetValue()
             {
                 return Get(ref _boxValue, v);
@@ -135,6 +142,13 @@ public static class GlobalDefaultHelper
     public static string GetRuntimeMapItemPrefabName(int mapItemId) => GetRuntimePrefabName("item$" + mapItemId);
     public static int DefaultTexId;
     public static int ExternDefaultTexId;
+    public static int DefaultAudioId;
+    public static int DefaultVideoId;
+
+    public static bool IsEmptyAsset(AssetForm.Data data) => data != null && data.id > 0
+        && (data is TexAssetForm.Data && data.id == DefaultTexId
+            || data is AudioAssetForm.Data && data.id == DefaultAudioId
+            || data is VideoAssetForm.Data && data.id == DefaultVideoId);
 
     public static string GetDefaultVideoName(string name = "") => "reservedV$" + name;
     public static string GetExternDefaultVideoName(string name = "") => AssetManager.instance.videoCtrl.GetName();
@@ -215,16 +229,7 @@ public class GameManager : Z_MonoManager<GameManager>
 
         Application.targetFrameRate = 100;//先锁100帧
                                           //default Assets
-        var data = AssetManager.instance.texCtrl.CreateDataByBytes(TextureHelper.GetTextureByte(TextureHelper.transparentTexture), "");
-        data.id=AssetForm.autoIdCnt + 200000;
-        saveCtrl.AddStoryTex(ref data);
-        GlobalDefaultHelper.DefaultTexId = data.id;
-        GlobalDefaultHelper.DefaultStoryTexId = data.id;
-        GlobalDefaultHelper.DefaultEventTexId = data.id;
-        GlobalDefaultHelper.DefaultCharacterTexId = data.id;
-        GlobalDefaultHelper.DefaultItemTexId = data.id;
-        GlobalDefaultHelper.DefaultModelTexId = data.id;
-        GlobalDefaultHelper.ExternDefaultTexId = data.id;
+        saveCtrl.EnsureEmptyAssets();
 
 
 
@@ -311,6 +316,8 @@ public class GameManager : Z_MonoManager<GameManager>
 
     }
     private static int playerPosToMapPosOffset = 500;
+    // These legacy names convert the player-facing origin only. Both sides use
+    // world units; grid/cell size is handled separately by MapUtilController.
     public static float PlayerPosToMapPos(float v)
     {
         return (v + playerPosToMapPosOffset);

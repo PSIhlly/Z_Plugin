@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using Z_Code;
 using Z_Code.Form;
+using Z_DesignStyle;
 namespace Z_Code.Form
 {
     public static partial class BoxDataForm
@@ -32,14 +33,17 @@ namespace Z_Code.Form
 
             public Data DeepCopy(bool sameId = true)
             {
-                Dictionary<string, BoxDataForm.Data> tmpDic = null;
-                if (dic != null)
+                using (DataCopyGuard.Enter(this))
                 {
-                    tmpDic = new Dictionary<string, BoxDataForm.Data>(dic.Count);
-                    foreach (var pair in dic)
-                        tmpDic[pair.Key] = pair.Value.DeepCopy();
+                    Dictionary<string, BoxDataForm.Data> tmpDic = null;
+                    if (dic != null)
+                    {
+                        tmpDic = new Dictionary<string, BoxDataForm.Data>(dic.Count);
+                        foreach (var pair in dic)
+                            tmpDic[pair.Key] = pair.Value?.DeepCopy();
+                    }
+                    return new Data(sameId ? uid : uidChain.GetId(), str, valName, num, tmpDic);
                 }
-                return new Data(sameId ? uid : uidChain.GetId(), str, valName, num, tmpDic);
             }
             public override string ToString()
             {

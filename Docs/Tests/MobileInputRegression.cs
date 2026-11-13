@@ -4,7 +4,7 @@
 namespace UnityEngine
 {
     public class DefaultExecutionOrder : Attribute { public DefaultExecutionOrder(int value) {} }
-    public class GameObject { public int layer = 5; public string name; public object component; public bool activeSelf=true; public bool activeInHierarchy=>activeSelf; public GameObject(string name = "") { this.name = name; } public void SetActive(bool value) {activeSelf=value;} public T GetComponent<T>() where T:class => component as T; }
+    public class GameObject { public int layer = 5; public string name; public object component; public RectTransform transform; public bool activeSelf=true; public bool activeInHierarchy=>activeSelf; public GameObject(string name = "") { this.name = name; } public void SetActive(bool value) {activeSelf=value;} public T GetComponent<T>() where T:class => component as T; }
     public class Sprite {}
     public static class Time { public static float unscaledTime; }
     public struct Color { public float r,g,b,a; public Color(float r,float g,float b,float a) {this.r=r;this.g=g;this.b=b;this.a=a;} }
@@ -38,7 +38,7 @@ namespace UnityEngine
         public override bool Equals(object obj) => obj is Vector3 v && this==v;
         public override int GetHashCode() => HashCode.Combine(x,y,z);
     }
-    public class RectTransform { public GameObject gameObject = new GameObject(); public Vector3 position; public Vector2 size = new Vector2(100,100); public UI.Graphic graphic=new UI.Graphic(); public T GetComponent<T>() where T:class => graphic as T; }
+    public class RectTransform { public GameObject gameObject = new GameObject(); public RectTransform parent; public Vector3 position; public Vector2 size = new Vector2(100,100); public UI.Graphic graphic=new UI.Graphic(); public RectTransform() {gameObject.transform=this;} public T GetComponent<T>() where T:class => graphic as T; }
     public enum TouchPhase { Began, Moved, Stationary, Ended, Canceled }
     public struct Touch { public int fingerId; public Vector2 position; public TouchPhase phase; }
     public enum KeyCode { W,S,A,D,E,Q,Alpha1,Alpha2,Alpha3,Alpha4 }
@@ -87,8 +87,14 @@ namespace Z_Math
 }
 namespace Ui.Stick
 {
-    public class ImageSpy { public Sprite sprite; }
-    public class UiStickView { public RectTransform rtf_area=new RectTransform(),rtf_stick=new RectTransform(); public ImageSpy img_stick=new ImageSpy(); }
+    public class ImageSpy { public Sprite sprite,overrideSprite; public bool enabled=true; public RectTransform rectTransform=new RectTransform(); public void UnbindTexData() {} }
+    public class UiStickView
+    {
+        public GameObject go_stick;
+        public RectTransform rtf_area=new RectTransform(),rtf_stick=new RectTransform();
+        public ImageSpy img_=new ImageSpy();
+        public UiStickView() {var root=new RectTransform();go_stick=root.gameObject;rtf_area.parent=root;rtf_stick.parent=root;img_.rectTransform.parent=new RectTransform{parent=rtf_stick};}
+    }
     public partial class UiStickCtrl : UiCtrl
     {
         public UiStickView view=new UiStickView(); public UiStickModel model=new UiStickModel(); public UiStickParam param=new UiStickParam();
@@ -104,6 +110,19 @@ namespace Form
     {
         public class Data { public int uid; public Dictionary<SkillType,int> skill=new Dictionary<SkillType,int>(); }
         public static Dictionary<int,Data> DataByUid = new Dictionary<int,Data>();
+    }
+    public static class SkillProductForm
+    {
+        public class Data { public int uid,icon; }
+        public static Dictionary<int,Data> DataByUid=new Dictionary<int,Data>();
+    }
+}
+namespace Z_DataSystem.Form
+{
+    public static class TexAssetForm
+    {
+        public class Data { public Sprite sprite; public Sprite GetSprite()=>sprite; }
+        public static Dictionary<int,Data> DataById=new Dictionary<int,Data>();
     }
 }
 public static class DictionaryFixtureExtension { public static V GetDv<K,V>(this Dictionary<K,V> values,K key,V fallback) => values.TryGetValue(key,out var value) ? value : fallback; }
@@ -137,6 +156,11 @@ public class StickSlotSpy
     public UiStickParam Param;
     public UiStickModel model => Ctrl.model;
     public void SetShow(bool show,UiStickParam param) { Param=param; if(Ctrl!=null) { Ctrl.param=param; Ctrl.OnShow(); } }
+    public void SetIcon(Sprite icon) {Ctrl?.SetIcon(icon);}
+}
+namespace Ui.PlaySceneMain
+{
+    public static class UiPlaySceneMainCtrl {internal static Sprite GetSkillStickIcon(SkillType type)=>SkillButtonFixture.GetSkillStickIcon(type);}
 }
 namespace Ui.PlaySceneMain.PlayerTouchOpt
 {
@@ -179,7 +203,7 @@ public class ModPointerFixture : IZ_Listener<InputPointDownEvent>,IZ_Listener<In
 __MOD_COMMIT_METHOD__
 __MOD_POINTER_METHODS__
 }
-public class SkillButtonsViewSpy { public UiStickCtrl model_eStick,model_qStick; }
+public class SkillButtonsViewSpy { public UiStickCtrl model_eStick,model_qStick; public Ui.PlaySceneMain.PlayerTouchOpt.UiPlayerTouchOptCtrl page_PlayerTouchOpt=new Ui.PlaySceneMain.PlayerTouchOpt.UiPlayerTouchOptCtrl(); }
 public class SkillButtonFixture
 {
     public SkillButtonsViewSpy view=new SkillButtonsViewSpy();
@@ -227,7 +251,7 @@ public static class MobileInputRegression
     static InputPointUpEvent PU(int id,bool canceled=false) => new InputPointUpEvent{id=id,pos=new Vector3(100,100),canceled=canceled};
     public static int Run()
     {
-        checks=0; TouchRouting(); StickRouting(); FloatingSticks(); PlayerFixedSticks(); PlayerGates(); PlayerFacing(); SkillButtons(); ModPointers(); return checks;
+        checks=0; TouchRouting(); StickRouting(); FloatingSticks(); PlayerFixedSticks(); PlayerGates(); PlayerFacing(); SkillButtons(); SkillIcons(); ModPointers(); return checks;
     }
     static void TouchRouting()
     {
@@ -427,6 +451,60 @@ public static class MobileInputRegression
         Time.unscaledTime=100;move.OnUpdate();Check(scene.Rotations==0,"Android attack timeout must not affect desktop movement later either.");
 #endif
         move.OnHide();attack.OnHide();
+    }
+    static void SkillIcons()
+    {
+        Reset();GameManager.instance=new GameManager();PlayManager.instance=new PlayManager();
+        CharacterProductForm.DataByUid.Clear();SkillProductForm.DataByUid.Clear();TexAssetForm.DataById.Clear();
+        var first=new CharacterProductForm.Data{uid=1};var second=new CharacterProductForm.Data{uid=2};
+        var sprites=new Dictionary<int,Sprite>();
+        foreach(var character in new[]{first,second})
+        {
+            CharacterProductForm.DataByUid[character.uid]=character;
+            foreach(var type in new[]{SkillType.LightAttack,SkillType.E,SkillType.Q})
+            {
+                int uid=character.uid*100+(int)type+1;var sprite=new Sprite();sprites[uid]=sprite;
+                character.skill[type]=uid;SkillProductForm.DataByUid[uid]=new SkillProductForm.Data{uid=uid,icon=uid};
+                TexAssetForm.DataById[uid]=new TexAssetForm.Data{sprite=sprite};
+            }
+        }
+        GameManager.instance.curProgress.characterUid=1;
+        var main=new SkillButtonFixture();main.InitializeCallbacks();var e=Stick(300);var q=Stick(500);main.Bind(e,q);
+        var move=Stick(100);var attack=Stick(700);var touch=main.view.page_PlayerTouchOpt;
+        touch.view.model_moveStick.Ctrl=move;touch.view.model_attackStick.Ctrl=attack;touch.OnShow();
+        var moveIcon=new Sprite();move.SetIcon(moveIcon);main.RefreshButtons();
+        Check(e.view.img_.sprite==sprites[first.skill[SkillType.E]] && q.view.img_.sprite==sprites[first.skill[SkillType.Q]]
+            && attack.view.img_.sprite==sprites[first.skill[SkillType.LightAttack]],"Only LightAttack, E and Q bind their current equipped SkillProduct icon.");
+        Check(move.view.img_.sprite==moveIcon && move.view.rtf_stick.gameObject.activeSelf,"Skill refresh leaves the movement stick untouched.");
+        e.OnUpdate();
+        Check(e.model.stickRect==e.view.rtf_stick && e.model.stickRect!=e.view.go_stick.transform,
+            "The new nested icon binding resolves the original moving knob, not the whole root input area.");
+        e.model.curId=83;e.model.lastPos=new Vector3(.4f,0);attack.model.curId=84;int shows=e.ShowCalls;
+        GameManager.instance.curProgress.characterUid=2;main.RefreshButtons();
+        Check(e.view.img_.sprite==sprites[second.skill[SkillType.E]] && q.view.img_.sprite==sprites[second.skill[SkillType.Q]]
+            && attack.view.img_.sprite==sprites[second.skill[SkillType.LightAttack]],"Character switches refresh all three equipped skill icons.");
+        Check(e.model.curId==83 && e.model.lastPos==new Vector3(.4f,0) && attack.model.curId==84 && e.ShowCalls==shows,
+            "Icon refresh never re-shows or resets an owned aim gesture.");
+        second.skill[SkillType.E]=first.skill[SkillType.E];main.RefreshButtons();
+        Check(e.view.img_.sprite==sprites[first.skill[SkillType.E]],"Equipment changes refresh an already visible icon.");
+        second.skill.Remove(SkillType.E);main.RefreshButtons();
+        Check(e.view.img_.sprite==null && !e.view.img_.enabled && e.param.icon==null,"Unequipped skills clear old sprites and hide the empty icon.");
+        second.skill[SkillType.Q]=99999;main.RefreshButtons();
+        Check(q.view.img_.sprite==null && !q.view.img_.enabled,"Missing Skill Products do not keep the previous character's icon.");
+        SkillProductForm.DataByUid[second.skill[SkillType.LightAttack]].icon=99999;main.RefreshButtons();
+        Check(attack.view.img_.sprite==null && !attack.view.img_.enabled && attack.view.rtf_stick.gameObject.activeSelf,
+            "Missing textures stay blank without disabling the raycastable center knob.");
+        SkillProductForm.DataByUid[second.skill[SkillType.LightAttack]].icon=0;
+        TexAssetForm.DataById[0]=new TexAssetForm.Data{sprite=new Sprite()};main.RefreshButtons();
+        Check(attack.view.img_.sprite==null && !attack.view.img_.enabled,"An unset icon ID does not display a default white placeholder.");
+        CharacterProductForm.DataByUid.Remove(2);main.RefreshButtons();
+        Check(e.view.img_.sprite==null && q.view.img_.sprite==null && attack.view.img_.sprite==null,"An absent current character clears all skill icons safely.");
+        GameManager.instance.curProgress.characterUid=1;main.RefreshButtons();
+        e.OnHide();e.OnShow();q.OnHide();q.OnShow();touch.OnShow();
+        Check(e.view.img_.sprite==sprites[first.skill[SkillType.E]] && q.view.img_.sprite==sprites[first.skill[SkillType.Q]]
+            && attack.view.img_.sprite==sprites[first.skill[SkillType.LightAttack]],"Hide/reopen retains Q/E icons and rebinds LightAttack after its fresh Param.");
+        GameManager.instance.curProgress=null;
+        Check(SkillButtonFixture.GetSkillStickIcon(SkillType.E)==null,"Missing progress produces no skill icon.");
     }
     static void SkillButtons()
     {

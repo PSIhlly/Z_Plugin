@@ -1034,15 +1034,7 @@ public class ModAssetCtrl : Z_Controller<ModManager>
         }, items);
     }
 
-    public void ChooseTriggerCondition(string title, Action<EntryItem> act)
-    {
-        var items = GameManager.instance.evtCtrl.GetTriggerConditionEntry();
-        NotifyManager.instance.AddMultipleChoose(title, true, (res) =>
-        {
-            act?.Invoke(res);
-            return true;
-        }, items);
-    }
+
     public void ChooseBasicCmd(BoxDataForm.Data box, Action onComplete)
     {
         if (box == null)
@@ -1312,8 +1304,8 @@ public class ModAssetCtrl : Z_Controller<ModManager>
     #region scene placement
     public TileUnitForm.Data AddTile(int x, int y, int height)
     {
-        Vector3 mapPos = GameManager.PlayerPosToMapPos(new Vector3(x, height, y));
-        return AddTile(Vector3Int.RoundToInt(mapPos));
+        Vector3 worldPos = GameManager.PlayerPosToMapPos(new Vector3(x, height, y));
+        return AddTile(MapManager.instance.utilCtrl.RealPos2MapPosInt(worldPos));
     }
 
     public TileUnitForm.Data AddTile(Vector3Int mapPos)

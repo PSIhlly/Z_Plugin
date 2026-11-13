@@ -103,7 +103,6 @@ public static partial class GlobalEventHelper
     public static string CHARACTER = "$ch$";
     public static string ITEM = "$it$";
     public static string SCENEOBJECT = "$so$";
-    public static string SCENEOBJECTPROTO = "$sop$";
     public static string EFFECT = "$ef$";
     public static string UIIMAGE = "$ui$";
     public static string VECTOR = "$vt$";
@@ -179,7 +178,7 @@ public static partial class GlobalEventHelper
             res = "character";
         else if (IsAsset(desc.code, ITEM))
             res = "item";
-        else if (IsAsset(desc.code, SCENEOBJECT) || IsAsset(desc.code, SCENEOBJECTPROTO))
+        else if (IsAsset(desc.code, SCENEOBJECT))
             res = "sceneObject";
         else if (IsAsset(desc.code, EFFECT))
             res = "effect";
@@ -274,6 +273,13 @@ public class GameEventController : Z_Controller<GameManager>
                 Cancel();
                 return true;
             }
+
+            // Async commands must obey the same Pause owner/child-chain rule as
+            // their event bodies, including StartTask's immediate first poll.
+            // Validate cancellation first so paused work can still be released.
+            int blocker = GameManager.instance.curProgress?.blockProgramUid ?? 0;
+            if (!CanRunUnderBlock(eventOwner, blocker))
+                return false;
 
             bool complete = update();
             if (eventOwner != null && (!IsRegisteredEvent(eventOwner) || !IsSceneEventOwnerAlive(eventOwner)))
@@ -790,16 +796,7 @@ public class GameEventController : Z_Controller<GameManager>
         }
         return SortFormEntryChildren(res);
     }
-    public EntryItem GetTriggerConditionEntry()
-    {
-        var res = new EntryItem();
-        foreach (var data in EventTriggerForm.DataByName.Values.OrderBy(data => data.uid))
-        {
-            res.Add(TextManager.instance.GetTxt(data.name.Split("$")[0]), id: data.uid);
 
-        }
-        return res;
-    }
     public EntryItem GetCmdEntry(SceneEventType objectType, string retType, out EntryItem defaultItem)
     {
         defaultItem = null;

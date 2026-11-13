@@ -30,14 +30,13 @@ public static class SceneObjectReferenceRegression
         {
             // RuntimeInitialize hooks do not run automatically in this EditMode fixture.
             foreach (var form in new[] { typeof(ObjectProductForm), typeof(MapModelForm), typeof(EventTriggerForm),
-                typeof(GameParamForm), typeof(MapObjectParamForm),
+                typeof(GameParamForm), typeof(MapObjectParamForm), typeof(EventInterpretDataForm),
                 typeof(GameCmdDataForm), typeof(GameCmdTypeDataForm) })
                 form.GetMethod("Register", BindingFlags.Static | BindingFlags.NonPublic).Invoke(null, null);
             typeof(SceneObjectCmd).GetMethod("Init", BindingFlags.Static | BindingFlags.NonPublic).Invoke(null, null);
             typeof(IsSameObjectCmd).GetMethod("Init", BindingFlags.Static | BindingFlags.NonPublic).Invoke(null, null);
-            Check(CmdBase.TryGetForm("SceneObject", out var canonical) && canonical.name == "SceneObject"
-                && CmdBase.TryGetForm("SceneObjectProto", out var alias) && ReferenceEquals(canonical, alias),
-                "retired constant method resolves canonical metadata without a duplicate chooser entry");
+            Check(CmdBase.TryGetForm("SceneObject", out var canonical) && canonical.name == "SceneObject",
+                "Object constant resolves canonical metadata");
             Check(GameCmdDataForm.DataByName["GenerateObject"].prmTypes[0] == "sceneObject"
                 && !GameCmdTypeDataForm.DataByName.ContainsKey("sceneObjectProto")
                 && GameCmdTypeDataForm.defaultData.name == "void",
@@ -48,6 +47,7 @@ public static class SceneObjectReferenceRegression
                 && sameForm.retNames.Count == 1 && sameForm.retTypes.SequenceEqual(new[] { "num" }),
                 "IsSameObject is registered with two Object arguments and one numeric result");
             var game = CreateManager<GameManager>();
+            game.evtCtrl = new GameEventController(game);
             var map = CreateManager<MapManager>();
             map.data = new MapInfo
             {
@@ -65,6 +65,7 @@ public static class SceneObjectReferenceRegression
             ObjectProductForm.InitInternal();
             ObjectUnitForm.InitInternal();
             UnitForm.InitInternal();
+            EventInterpretDataForm.InitInternal();
             MapObjectParamForm.InitInternal();
             DynamicGlobalSettings.playing = true;
 
@@ -81,8 +82,7 @@ public static class SceneObjectReferenceRegression
             var otherProduct = Product(98113, otherPrototype.uid, otherTemplate.id, 98106, 66);
             var otherUnit = Unit(98106, otherTemplate.id, otherProduct.uid);
             string numeric = GlobalEventHelper.GetSceneUnitReference(collisionId);
-            string authored = GlobalEventHelper.GetSceneObjectTemplateReference(template.id);
-            string legacyTemplate = "$sop$" + template.id + "$sop$";
+            string authored = GlobalEventHelper.GetSceneObjectProductReference(prototype.uid);
             string exact = GlobalEventHelper.GetSceneObjectReference(unitA.unit);
             string prototypeReference = GlobalEventHelper.GetSceneObjectProductReference(prototype.uid);
             string siblingReference = GlobalEventHelper.GetSceneObjectProductReference(productB.uid);
@@ -90,7 +90,7 @@ public static class SceneObjectReferenceRegression
 
             foreach (string first in new[] { exact, numeric })
             {
-                foreach (string second in new[] { authored, legacyTemplate, prototypeReference, siblingReference,
+                foreach (string second in new[] { authored, prototypeReference, siblingReference,
                     GlobalEventHelper.GetSceneUnitReference(unitB.uid) })
                     Check(Same(first, second) == 1f,
                         "Object prototype comparison accepts prototype and sibling references: " + first + "/" + second);
@@ -115,20 +115,18 @@ public static class SceneObjectReferenceRegression
 
             CheckKind(numeric, GlobalEventHelper.ObjectReferenceKind.Unit, collisionId);
             CheckKind("$so$" + collisionId + "$so$", GlobalEventHelper.ObjectReferenceKind.Product, collisionId);
-            CheckKind(authored, GlobalEventHelper.ObjectReferenceKind.Template, template.id);
-            CheckKind(legacyTemplate, GlobalEventHelper.ObjectReferenceKind.Template, template.id);
+            CheckKind(authored, GlobalEventHelper.ObjectReferenceKind.Product, prototype.uid);
             CheckKind(exact, GlobalEventHelper.ObjectReferenceKind.Product, productA.uid);
             Check(exact == "$so$" + productA.uid + "$so$", "new Object references contain only the Product UID");
-            Check(GlobalEventHelper.ResolveSceneObjectUnits("$so$p:" + productA.uid + "$so$")
-                .SequenceEqual(new[] { unitA.unit }), "old p: handles remain exact Product aliases");
+            Check(GlobalEventHelper.ResolveSceneObjectUnits(exact)
+                .SequenceEqual(new[] { unitA.unit }), "canonical Product handles resolve exactly");
             Check(GlobalEventHelper.ResolveSceneObjectUnits(numeric).SequenceEqual(new[] { unitA.unit }),
                 "explicit Unit reference stays exact despite matching template/Product IDs");
-            ReferenceMigration(prototype.uid, template.id, productA.uid);
-            foreach (string templateReference in new[] { authored, legacyTemplate, "$so$p:" + prototype.uid + "$so$" })
+            foreach (string templateReference in new[] { authored, prototypeReference })
             {
                 Check(GlobalEventHelper.ResolveSceneObjectUnits(templateReference)
                     .SequenceEqual(new MapUnit[] { unitA.unit, unitB.unit }),
-                    "new/old template references expand every matching live placement");
+                    "prototype references expand every matching live placement");
                 Check(GlobalEventHelper.ResolveSceneObjectProducts(templateReference)
                     .SequenceEqual(new[] { productA, productB }),
                     "template Product expansion excludes authored prototype and unrelated Products");
@@ -140,10 +138,11 @@ public static class SceneObjectReferenceRegression
                 "exact runtime Product reference never expands to sibling placements");
             Check(GlobalEventHelper.ResolveSceneObjectTemplate(exact) == productA
                 && GlobalEventHelper.ResolveSceneObjectTemplate(numeric) == productA,
-                "GenerateObject obtains actual configuration from precise Product and legacy Unit handles");
+                "GenerateObject obtains actual configuration from precise Product and explicit Unit handles");
+            IndexedSceneLookup(prototype, productA, productB, unitA, unitB, otherUnit);
 
             foreach (string malformed in new[] { null, "", "$so$$so$", "$sop$$sop$", "$so$p:x$so$",
-                "$so$t:0$so$", "$so$p:-1$so$", "$so$98101$so$tail", "$so$99999999999999999999$so$", "$ch$98101$ch$" })
+                "$so$t:0$so$", "$so$p:98101$so$", "$sop$1$sop$", "$so$p:-1$so$", "$so$98101$so$tail", "$so$99999999999999999999$so$", "$ch$98101$ch$" })
             {
                 Check(!GlobalEventHelper.TryGetSceneObjectReference(malformed, out _, out _)
                     && GlobalEventHelper.ResolveSceneObjectUnits(malformed).Count == 0
@@ -191,9 +190,9 @@ public static class SceneObjectReferenceRegression
 
             var emptyTemplate = Template(98114, 81);
             var emptyPrototype = Product(98115, 0, emptyTemplate.id, 0, 81);
-            Check(Get(GlobalEventHelper.GetSceneObjectTemplateReference(emptyTemplate.id)) == 81,
+            Check(Get(GlobalEventHelper.GetSceneObjectProductReference(emptyPrototype.uid)) == 81,
                 "read-only template parameter is available when no runtime copy exists");
-            Set(GlobalEventHelper.GetSceneObjectTemplateReference(emptyTemplate.id), 100);
+            Set(GlobalEventHelper.GetSceneObjectProductReference(emptyPrototype.uid), 100);
             Check(Value(emptyPrototype) == 81,
                 "mutating an uninstantiated template is a no-op");
 
@@ -236,6 +235,62 @@ public static class SceneObjectReferenceRegression
         finally { DynamicGlobalSettings.playing = previousPlaying; }
     }
 
+    private static void IndexedSceneLookup(ObjectProductForm.Data prototype, ObjectProductForm.Data productA,
+        ObjectProductForm.Data productB, ObjectUnitForm.Data unitA, ObjectUnitForm.Data unitB, ObjectUnitForm.Data unrelated)
+    {
+        const BindingFlags hidden = BindingFlags.Static | BindingFlags.NonPublic;
+        var index = (Dictionary<int, List<ObjectUnitForm.Data>>)typeof(ObjectProductForm)
+            .GetField("sceneUnitsByProduct", hidden).GetValue(null);
+        ObjectProductForm.GetSceneUnit(productA.uid);
+        var group = index[productA.uid];
+        string exact = GlobalEventHelper.GetSceneObjectProductReference(productA.uid);
+        string authored = GlobalEventHelper.GetSceneObjectProductReference(prototype.uid);
+        bool correct = true;
+        for (int i = 0; i < 2000; i++)
+            correct &= GlobalEventHelper.ResolveSceneObjectUnit(exact) == unitA.unit
+                && GlobalEventHelper.ResolveSceneObjectUnit(authored) == unitA.unit;
+        Check(correct && ReferenceEquals(group, index[productA.uid]),
+            "warm exact/prototype lookups reuse Product-to-Unit groups");
+
+        var duplicate = Unit(98099, 0, productA.uid);
+        var snapshot = GlobalEventHelper.ResolveSceneObjectUnits(exact);
+        Check(snapshot.SequenceEqual(new MapUnit[] { duplicate.unit, unitA.unit })
+            && GlobalEventHelper.ResolveSceneObjectUnit(exact) == duplicate.unit,
+            "incremental addition preserves multiple placements and minimum-UID scalar selection");
+        ObjectUnitForm.RemoveData(duplicate.uid);
+        Check(ObjectProductForm.GetSceneUnit(productA.uid) == unitA && snapshot.Count == 2,
+            "removal updates the index without mutating earlier snapshots");
+
+        unitA.unit.productInfo = (productB.uid, -1);
+        Check(ObjectProductForm.GetSceneUnit(productA.uid) == null
+            && GlobalEventHelper.ResolveSceneObjectUnits(GlobalEventHelper.GetSceneObjectProductReference(productB.uid))
+                .SequenceEqual(new MapUnit[] { unitA.unit, unitB.unit }), "explicit productInfo rebinding updates both Product groups");
+        unitA.unit.BindProduct(productA);
+        var extra = JObject.Parse(unitA.extra);
+        extra[MapUnit.productKey] = new JArray(productB.uid, -1);
+        unitA.extra = extra.ToString();
+        Check(ObjectProductForm.GetSceneUnit(productA.uid) == null && ObjectProductForm.GetSceneUnit(productB.uid) == unitA,
+            "raw extra replacement also refreshes just the changed Unit's binding");
+        unitA.unit.BindProduct(productA);
+        Check(ObjectProductForm.GetSceneUnit(productA.uid) == unitA && ObjectProductForm.GetSceneUnit(productB.uid) == unitB,
+            "normal assignment restores both indexed groups");
+
+        var lateUnit = Unit(98201, 0, 98200);
+        ObjectProductForm.GetSceneUnit(productA.uid); // Index the not-yet-registered canonical Product UID.
+        var lateProduct = Product(98200, prototype.uid, 0, lateUnit.uid, 12);
+        Check(ObjectProductForm.GetSceneUnit(lateProduct.uid) == lateUnit && lateUnit.unit.product == lateProduct,
+            "a canonical binding loaded before its Product becomes resolvable without rebuilding every Unit");
+        ObjectProductForm.RemoveData(lateProduct.uid);
+        var replacement = Product(98200, prototype.uid, 0, lateUnit.uid, 13);
+        Check(ObjectProductForm.GetSceneUnit(replacement.uid) == lateUnit,
+            "same-UID Product replacement uses the current Product table row");
+        ObjectUnitForm.RemoveData(lateUnit.uid);
+        ObjectProductForm.RemoveData(replacement.uid);
+        ObjectProductForm.ResetSceneUnits();
+        Check(ObjectProductForm.GetSceneUnit(productA.uid) == unitA, "story/reference reset rebuilds scene groups from current bindings");
+
+    }
+
     private static MapObjectForm.Data Template(int id, float value)
     {
         var data = MapObjectForm.defaultData;
@@ -256,8 +311,6 @@ public static class SceneObjectReferenceRegression
         if (protoUid == 0)
         {
             MapObjectForm.DataById[templateId].objectUid = uid;
-            ((Dictionary<int, int>)typeof(ObjectProductForm).GetField("legacyTemplates", BindingFlags.Static | BindingFlags.NonPublic)
-                .GetValue(null))[templateId] = uid;
         }
         return data;
     }
@@ -273,7 +326,7 @@ public static class SceneObjectReferenceRegression
     {
         var data = new ObjectUnitForm.Data(uid, true, "reference-object", "unused-reference-object", Vector3.zero,
             Vector3.zero, Vector3.one, UpdateType.ShowOnly, new List<int>(),
-            MapUnit.GetProductInfoString(new JObject { [ObjectProductForm.ProductVersionKey] = ObjectProductForm.ProductVersion },
+            MapUnit.GetProductInfoString(new JObject(),
                 (productUid, -1)), false, 0);
         ObjectUnitForm.AddData(data);
         return data;
@@ -302,75 +355,6 @@ public static class SceneObjectReferenceRegression
             .Invoke(command, new object[] { arguments, task });
         checks++;
         return task;
-    }
-
-    private static void ReferenceMigration(int prototypeUid, int templateId, int productUid)
-    {
-        string bare = "$so$" + productUid + "$so$";
-        string unit = GlobalEventHelper.GetSceneUnitReference(productUid);
-        var old = new JObject
-        {
-            ["code"] = "Return \"" + bare + "\";",
-            ["zCode"] = new JArray("stale"), ["zCodeMap"] = new JArray(0),
-            ["values"] = new JArray(bare, "$so$p:" + productUid + "$so$", "$so$t:" + templateId + "$so$",
-                "$sop$" + templateId + "$sop$", unit, "$so$p:bad$so$")
-        };
-        Check(GlobalEventHelper.MigrateSceneObjectReferences(old), "unversioned references migrate once");
-        Check((string)old["code"] == "Return \"" + unit + "\";" && !old["zCode"].HasValues && !old["zCodeMap"].HasValues,
-            "legacy numeric Unit literals migrate before event recompilation");
-        Check(old["values"].Values<string>().SequenceEqual(new[] { unit, bare,
-            "$so$" + prototypeUid + "$so$", "$so$" + prototypeUid + "$so$", unit, "$so$p:bad$so$" }),
-            "old Product/template aliases canonicalize without guessing colliding numeric IDs");
-        string migrated = old.ToString();
-        Check(!GlobalEventHelper.MigrateSceneObjectReferences(old) && old.ToString() == migrated,
-            "repeated migration preserves new numeric Product references");
-        var current = GlobalEventHelper.SaveSceneObjectReferences(new JObject { ["value"] = bare,
-            ["oldAlias"] = "$so$p:" + productUid + "$so$" });
-        Check((int)current[GlobalEventHelper.SceneObjectReferenceVersionKey] == 2
-            && (string)current["oldAlias"] == bare && !GlobalEventHelper.MigrateSceneObjectReferences(current)
-            && (string)current["value"] == bare, "save marks canonical references so reloading cannot reinterpret them as Units");
-        var map = new JObject { ["objectJa"] = "[]", ["itemJa"] = new JArray(new JObject
-            { ["extra"] = new JObject { ["unit"] = bare, ["product"] = "$so$p:" + productUid + "$so$" }.ToString() }).ToString() };
-        var mapJson = ObjectProductForm.MigrateSceneJson(map.ToString(), false);
-        var extra = JObject.Parse((string)JArray.Parse((string)JObject.Parse(mapJson)["itemJa"])[0]["extra"]);
-        Check((string)extra["unit"] == unit && (string)extra["product"] == bare
-            && ObjectProductForm.MigrateSceneJson(mapJson, false) == mapJson,
-            "nested scene extra strings migrate once, including scenes without Object placements");
-
-        Check(new DirectoryInfo(Path.GetDirectoryName(Application.dataPath)).Name.StartsWith("MapRuntimeRegression-"),
-            "file round-trip runs only in an isolated project");
-        foreach (var form in new[] { typeof(BoxDataForm), typeof(EventGlobalVariableForm), typeof(ProgramDataForm),
-            typeof(EventProgramDataForm), typeof(LabForm) })
-            form.GetMethod("Register", BindingFlags.Static | BindingFlags.NonPublic)?.Invoke(null, null);
-        string folder = Path.Combine(Path.GetDirectoryName(Application.dataPath), "ReferenceMigrationTest") + "/";
-        var save = new GameSaveController(GameManager.instance);
-        var legacyGlobal = new EventGlobalVariableForm.Data(99101, "reference", CodeHelper.CreateBoxByStr(bare));
-        SaveAndLoad.Save(folder + save.globalVariableFormFileName,
-            new JArray(EventGlobalVariableForm.GetJoByData(legacyGlobal)).ToString());
-        string original = SaveAndLoad.Load<string>(folder + save.globalVariableFormFileName);
-        save.LoadGlobalVariables(folder);
-        Check(EventGlobalVariableForm.DataByName["reference"].data.str == unit
-            && SaveAndLoad.Load<string>(folder + save.globalVariableFormFileName) == original,
-            "actual legacy global load preserves Unit semantics and never rewrites source files");
-        EventGlobalVariableForm.DataByName["reference"].data = CodeHelper.CreateBoxByStr(bare);
-        save.SaveGlobalVariables(folder); save.LoadGlobalVariables(folder);
-        Check(EventGlobalVariableForm.DataByName["reference"].data.str == bare,
-            "actual global save/load retains canonical Product references");
-
-        var legacyProgram = new EventProgramDataForm.Data(99102, "reference-migration", "Return \"" + bare + "\";",
-            new List<string> { "stale" }, new List<int> { 0 }, 0, "string", 0);
-        SaveAndLoad.Save(folder + save.eventFormFileName, new JArray(EventProgramDataForm.GetJoByData(legacyProgram)).ToString());
-        original = SaveAndLoad.Load<string>(folder + save.eventFormFileName);
-        save.LoadEvent(folder);
-        var program = EventProgramDataForm.DataByUid[99102];
-        Check(program.code == "Return \"" + unit + "\";" && program.zCode.Count > 0
-            && program.zCode.Count == program.zCodeMap.Count
-            && SaveAndLoad.Load<string>(folder + save.eventFormFileName) == original,
-            "legacy event load recompiles its migrated source without overwriting authored files");
-        Check(program.TryApplyCode("Return \"" + bare + "\";", out _, out _), "canonical Product literal compiles");
-        save.SaveEvent(folder); save.LoadEvent(folder);
-        Check(EventProgramDataForm.DataByUid[99102].code == "Return \"" + bare + "\";",
-            "actual event save/reload keeps a bare numeric Product UID");
     }
 
     private static void CheckKind(string reference, GlobalEventHelper.ObjectReferenceKind expected, int id)

@@ -12,7 +12,6 @@ namespace Z_Code
         static void Init()
         {
             Register(new SceneObjectCmd());
-            RegisterAlias("SceneObjectProto", new SceneObjectCmd()); // Old authored method-name compatibility.
         }
 
         public override void GetUnitChooseCode(Action<string> act, SyntaxNode cur)

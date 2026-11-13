@@ -287,8 +287,34 @@ public static readonly int autoUidCnt=100;
 
                 public Data Copy(bool sameId = true)
                 {
-        return new Data(sameId? uid:uidChain.GetId(),name,miniMap,pos,unlock,hideInLargeMap,events==null?new Dictionary<string,EventTriggerForm.Data>():new Dictionary<string,EventTriggerForm.Data>(events),triggeringOnceDuringEvts==null?new Dictionary<int,List<string>>():new Dictionary<int,List<string>>(triggeringOnceDuringEvts),triggeredOnceEvts==null?new Dictionary<int,List<string>>():new Dictionary<int,List<string>>(triggeredOnceEvts),notFirstTime);
+                    using (DataCopyGuard.Enter(this))
+                    {
+        var copy = new Data(sameId? uid:uidChain.GetId(),name,miniMap,pos,unlock,hideInLargeMap,events==null?new Dictionary<string,EventTriggerForm.Data>():CopyCollection0(events),triggeringOnceDuringEvts==null?new Dictionary<int,List<string>>():CopyCollection1(triggeringOnceDuringEvts),triggeredOnceEvts==null?new Dictionary<int,List<string>>():CopyCollection1(triggeredOnceEvts),notFirstTime);
+                        CopyRuntimeStateTo(copy);
+                        return copy;
+                    }
                 }
+
+            protected void CopyRuntimeStateTo(Data copy)
+            {
+                OnCopy(copy);
+            }
+            partial void OnCopy(Data copy);
+
+            private static Dictionary<string,EventTriggerForm.Data> CopyCollection0(Dictionary<string,EventTriggerForm.Data> source)
+            {
+                var result = new Dictionary<string,EventTriggerForm.Data>(source.Count, source.Comparer);
+                foreach (var pair in source) result.Add(pair.Key, pair.Value?.Copy());
+                return result;
+            }
+
+            private static Dictionary<int,List<string>> CopyCollection1(Dictionary<int,List<string>> source)
+            {
+                var result = new Dictionary<int,List<string>>(source.Count, source.Comparer);
+                foreach (var pair in source) result.Add(pair.Key, pair.Value==null?null:new List<string>(pair.Value));
+                return result;
+            }
+
             
             public virtual  void BeforeGet()
             {

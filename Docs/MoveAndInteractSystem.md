@@ -205,9 +205,9 @@ Move(dir):
 - **移动队列**：初始方向被墙阻挡后，计算滑行方向重新入队，支持多次重试
 - **首次尝试标记**：`firstTry=true` 时即使 `res=0` 也计算避障；后续迭代要求 `res>0.001` 才滑行，防止无限循环
 - **小步移动**：碰撞截断仍保留 `0.01` 的贴边死区；没有碰撞缩短的完整位移允许小于 `0.01`，只排除不超过 `0.000001` 的近零步，避免高帧率/低速度输入和寻路停止。
-- **邻域遍历**：只检测 `GetNineTile` 返回的有界邻域，且跳过低于当前层的 tile。候选不能再按 Tile 锚点的三维距离排除，跨层 Collider 由 Mesh 的 AABB/SAT 判定实际是否接触
+- **邻域遍历**：Character 按碰撞体移动前后的 swept AABB 查询有界候选；Object 事件按每个 Box/Sphere 的实际扫掠轮廓筛选 Tile 列；Item 事件仍使用 `GetNineTile`。保留现有纵向查找规则，不能按 Tile 锚点的三维距离排除跨层 Collider，实际接触交给 Mesh 碰撞检测。
 - **通行类型**：只检查人物中心所属的逻辑 Tile，不读取 Collider/Trigger，也不因人物尺寸或相邻 Tile 受限而提前拦截。普通手动移动的目标中心落入不满足 `passType` 的 Tile 时，通过带通行类型过滤的最近有效位置搜索，把中心放到距离目标最近的合法 Tile 内；导航端点的直线段使用本节开头的定向例外，正常 BFS 路段仍要求通行类型匹配。
-- **Object 覆盖**：从 `tile.data.pos` 向上探测 `0~1` 世界单位（包含两端），这条竖直线段与 Object 本体相交时，该 Tile 的运行时通行类型暂按 default（无要求）；纹理派生的原始要求保留，最后一个覆盖 Object 离开后恢复。不是单点检测、无限向上射线或仅 X/Z 投影。优先使用 `GetMeshes(CollideOnly)` 的实际 Box/Sphere 本体，考虑 `MapModel.colliderScale`、嵌套变换及 Collider.center，排除放大的 Trigger；Sphere 半径遵循现有物理碰撞换算。池模板根节点 inactive 不影响 Collider 提取，但模板中的 inactive 子节点仍排除。没有支持的物理本体时才回退原有模型/Renderer/锚点盒；组合回退模型中心使用实际 `localPosition`（含拼装 +0.5Y），不能扣掉偏移。精确探测结果单独维护在 `objectPassTypeTileDic`，仅枚举每个本体包围盒向下扩展 1 后的附近 Tile，并用线段/旋转盒 SAT 或线段/球距离确认相交；显示/owner 索引仍不受 colliderScale 影响。Object 增删、移动、旋转或显式尺寸刷新时只更新旧/新视觉、探测及物理导航覆盖 Tile 的并集：复用缓存地形高度，重算附近障碍和通行类型，再更新这些格的出向连接及四邻格（Y 偏移 -1..1）的入向连接。不触发全图重建或重新采样所有 Tile；原有周期重建完成后只补刷其期间发生 Object 变化的覆盖格。
+- **Object 覆盖**：从 `tile.data.pos` 向上探测 `0~1` 世界单位（包含两端），这条竖直线段与 Object 本体相交时，该 Tile 的运行时通行类型暂按 default（无要求）；纹理派生的原始要求保留，最后一个覆盖 Object 离开后恢复。不是单点检测、无限向上射线或仅 X/Z 投影。优先使用 `GetMeshes(CollideOnly)` 的实际 Box/Sphere 本体，考虑 `MapModel.colliderScale`、嵌套变换及 Collider.center，排除放大的 Trigger；Sphere 半径遵循现有物理碰撞换算。池模板根节点 inactive 不影响 Collider 提取，但模板中的 inactive 子节点仍排除。没有支持的物理本体时才回退原有模型/Renderer/锚点盒；组合回退模型中心使用实际 `localPosition`（含拼装 +0.5Y），不能扣掉偏移。精确探测结果单独维护在 `objectPassTypeTileDic`，仅枚举每个本体包围盒向下扩展 1 后的附近 Tile，并用线段/旋转盒 SAT 或线段/球距离确认相交；显示/owner 索引仍不受 colliderScale 影响。仅开启碰撞的 Object 参与通行覆盖和导航阻挡。Object 增删、移动、旋转或显式尺寸刷新时只更新旧/新探测及物理导航覆盖 Tile 的并集，不将纯视觉覆盖格加入导航刷新：复用缓存地形高度，重算附近障碍和通行类型，缓存并比较中央阻挡、四向阻挡、连接高度及实心地块等连边输入，只重建状态真正变化的格及四邻格（Y 偏移 -1..1）的相关连接；关闭碰撞或移除时仍清理旧覆盖，通行类型集合单独同步。不触发全图重建或重新采样所有 Tile；原有周期重建完成后只补刷其期间发生 Object 变化的覆盖格。
 - **Object 导航几何**：从 `GetMeshes(CollideOnly)` 读取实际 Box/Sphere 本体，考虑 collisionScale、嵌套变换和 Collider.center，排除 Trigger。先用 Tile 中心的 `0.8×0.8` 方形判定自身是否可站立（`NavUnit.objectBlocked`）；四向分别用长边贴合整条对应边、向内深 `0.4` 的矩形判定（单位格为 `1×0.4`，包含边角），保存在 `objectBlockedDirections` 的 Right/Left/Forward/Back 四位中。连接要求双方中央都可站立，且出发格对应边和目标格反向边都无阻挡；不因边上有障碍就把两个中央都判为不可走。各区域都求真实物理相交：Box 面用复用数组裁剪，Sphere 求裁切范围内最高相对高度；任一 `isObstacle` Object 在相交处高出该位置地面严格超过 `0.3` 世界单位才阻挡，等于 `0.3` 不阻断（几何容差 `0.0001`）。不是自身厚度、四点采样或 AABB；测试范围以外的全局最高点无关。只接触区域边界、水平尺寸为零、地面以下本体不阻断；薄桥高出地面 `0.25` 仍通行。地面平面复用 `dirGroundY`，不写入 Object 顶面。中央可站立但四边全断的格子仍可站立，不触发起点/终点不可走的直线补偿；实心 mapground 的阻断仍单独检查。BFS 体型 footprint 逐格检查方向连接，直线优化也要求扩展矩形内部的连接存在，不能跨过边界障碍。`objectNavigationTileDic` 继续独立保存物理候选，未启用 `isObstacle` 时也建立；小于 `0.8` 的格尺寸要让候选范围覆盖中央方形。完整/局部更新共用有界枚举，只重算旧/新覆盖格的中央及四向状态，再刷新邻格入向连接；移除一个 Object 时重查其余重叠障碍，删除最后一个后立即恢复。不重建全图，不分配每格临时几何；视觉/owner/passType 覆盖与实体移动碰撞不变。
 - **斜坡连接**：继续检查四方向相向侧地面高度，条件为 `目标侧高度 - 当前侧高度 < step`，不是绝对值；因此连接按方向独立建立，可能只能下坡不能上坡。Object 中央/边界阻挡与该方向高度差条件分开判断，实心 mapground 的 `0.2` 规则也保持不变。
 - **自动朝向**：非玩家角色累计实际水平位移；只有严格超过 `abs(speed) / 3` 才朝本次实际移动方向转向并清零累计值。碰撞未移动、纯 Y 位移和短距离移动均保持旧朝向
@@ -276,7 +276,8 @@ CheckCollide(triggerMesh, unit, dir, type, out avoidDir, out assist)
    - 投影球体和 cube 到轴上
    - CalcTouchTimeAndAvoidTime 计算 touchTime/avoidTime
 6. 最终 touchTime 判定:
-   - fromIn 且球远离 cube → touchTime=1 (可移动)
+   - 球心已嵌入时保留原有脱出规则；球心在外且终点更远时，还必须满足初始方向朝外：Dot(sphereCenter - closestOnCube, dir) >= 0
+   - 不能只比较起终点距离来判断远离；穿过盒子后停在更远的位置仍须保留 SAT 首次碰撞（樱树 LOS 双向漏检回归）
    - touchTime > avoidTime → touchTime=1 (无碰撞)
 7. avoidDir = (contactPos - closestAtContact).normalized
    - contactPos = sphereCenter + dir * touchTime
@@ -509,12 +510,13 @@ ApplyMove(unit, newPos, euler):
        CheckCollideEvent(unit, newPos - oldPos)
 
 CheckCollideEvent(unit, dir):
-  1. 合并角色移动前后的 Collider 覆盖格
+  1. Character 合并移动前后的覆盖格和 swept AABB 候选；Object 按 Collider/Trigger 扫掠轮廓取格；Item 使用 GetNineTile
   2. 对每个候选 Tile 使用 CollideOnly 检测实体接触，并交给 ManageTriggerEvent
   3. 遍历覆盖范围内的所有 Object/Item/Character（Character 查 overlap 索引）
   4. 对每个目标 tar:
        CheckCollide(unit, tar, dir, TriggerOnly, onCast)
        └─ onCast = (tar, res, dis) => ManageTriggerEvent(unit, tar, res)
+  5. Object 对未访问的既有接触 Unit 直接复查，保证离开候选格后仍可退出，不扩大扫掠 Tile 集合
 
 ManageTriggerEvent(a, b, type):
   └─ 在 LateUpdate 中执行:
@@ -587,7 +589,7 @@ ObjectUnit.Move(dir):
 
 ### 工程约定（来自 project_memory）
 
-1. **有界邻域遍历**：Move 系统只检测 `GetNineTile` 返回的附近 Tile，并跳过低于当前层的 Tile
+1. **有界邻域遍历**：Character 检查 swept AABB 覆盖格，Object 事件按每个 Collider/Trigger 的扫掠轮廓筛选 Tile 列，Item 事件保留 GetNineTile；保留原纵向规则。
 2. **跨层 Collider**：不能用 Tile 锚点距离过滤碰撞候选；例如上层 `mapground` 的 Collider 会向下覆盖下一逻辑层，必须进入实际 Mesh 检测
 3. **避障方向合并**：必须用 `MergeAvoidDir/MergeAvoidDirRange`，禁止 `AddRange` 盲目并集
 4. **碰撞避障方向计算**：使用碰撞点处球心到 OBB 最近点的方向，不使用 `GetPushDirByFace`（棱角处错误）

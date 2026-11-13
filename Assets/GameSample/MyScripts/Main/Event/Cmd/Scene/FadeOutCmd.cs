@@ -18,7 +18,11 @@ namespace Z_Code
 
         protected override bool ExecuteInternal(BoxDataForm.Data[] prm, InterpretAsyncTask asyncTask)
         {
-            UiManager.instance.ShowUi<UiPlayEffectCtrl>(new UiPlayEffectParam { fadeOut = true });
+            UiManager.instance.ShowUi<UiPlayEffectCtrl>(new UiPlayEffectParam
+            {
+                fadeOut = true,
+                duration = FadeCommandDuration.Read(prm)
+            });
             return true;
         }
     }

@@ -54,6 +54,7 @@ namespace Z_Audio
         }
         public void Play(string path)
         {
+            if (string.IsNullOrEmpty(path)) return;
             var mp = pool.Get();
             mp.Loop = false;
             mp.OpenMedia(new MediaPath(path, MediaPathType.AbsolutePathOrURL), true);

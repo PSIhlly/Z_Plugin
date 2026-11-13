@@ -32,8 +32,8 @@ namespace Z_Code
             var start = camera.ClampPosition(camera.tarTrs.position);
             // Only absolute coordinates carry the player-facing origin offset.
             var destination = relative
-                ? start + MapManager.instance.utilCtrl.MapPos2RealPos(vector)
-                : MapManager.instance.utilCtrl.MapPos2RealPos(GameManager.PlayerPosToMapPos(vector));
+                ? start + vector
+                : GameManager.PlayerPosToMapPos(vector);
             if (!IsFinite(destination))
                 return true;
             var target = camera.ClampPosition(destination);

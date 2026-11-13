@@ -28,8 +28,10 @@ namespace Z_Code
         public override CmdBase GetNew() => new IsUnobstructedCmd();
         protected override bool ExecuteInternal(BoxDataForm.Data[] prm, InterpretAsyncTask asyncTask)
         {
-            var from = MapManager.instance.utilCtrl.MapPos2RealPos(GameManager.PlayerPosToMapPos(new Vector3(prm[0].dic["x"].num, prm[0].dic["height"].num, prm[0].dic["y"].num)));
-            var to = MapManager.instance.utilCtrl.MapPos2RealPos(GameManager.PlayerPosToMapPos(new Vector3(prm[1].dic["x"].num, prm[1].dic["height"].num, prm[1].dic["y"].num)));
+            var inputFrom = new Vector3(prm[0].dic["x"].num, prm[0].dic["height"].num, prm[0].dic["y"].num);
+            var inputTo = new Vector3(prm[1].dic["x"].num, prm[1].dic["height"].num, prm[1].dic["y"].num);
+            var from = GameManager.PlayerPosToMapPos(inputFrom);
+            var to = GameManager.PlayerPosToMapPos(inputTo);
             var radius = prm[2].num;
             var res = MapManager.instance.utilCtrl.CaptureCast(from, to, radius);
             asyncTask.res = new BoxDataForm.Data[] { CodeHelper.CreateBoxByNum(1) };

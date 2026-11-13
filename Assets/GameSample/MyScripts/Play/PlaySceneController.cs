@@ -76,6 +76,40 @@ public class PlaySceneController : Z_Controller<PlayManager>, InternalPlaySceneC
     private CharacterUnitForm.Data _playerM;
     private CharacterProductForm.Data _playerG;
     private Dictionary<CharacterProductForm.Data, CharacterUnitForm.Data> _characterDic;
+    private readonly Dictionary<CharacterProductForm.Data, List<CharacterUnitForm.Data>> characterUnitGroups =
+        new Dictionary<CharacterProductForm.Data, List<CharacterUnitForm.Data>>();
+    private static int characterLookupVersion;
+    private static bool characterLookupTracking;
+    private int cachedCharacterLookupVersion = -1;
+    private Dictionary<int, CharacterUnitForm.Data> cachedCharacterRows;
+    private Dictionary<int, CharacterProductForm.Data> cachedCharacterProducts;
+    private int cachedCharacterCount;
+    private int cachedCharacterProductCount;
+
+    internal static void InvalidateCharacterLookup() { unchecked { characterLookupVersion++; } }
+    private static void OnCharacterRowChanged(CharacterUnitForm.Data _) => InvalidateCharacterLookup();
+    private static void OnCharacterProductChanged(CharacterProductForm.Data _) => InvalidateCharacterLookup();
+
+    private static void TrackCharacterLookupChanges()
+    {
+        if (characterLookupTracking) return;
+        CharacterUnitForm.addAction += OnCharacterRowChanged;
+        CharacterUnitForm.removeAction += OnCharacterRowChanged;
+        CharacterProductForm.addAction += OnCharacterProductChanged;
+        CharacterProductForm.removeAction += OnCharacterProductChanged;
+        characterLookupTracking = true;
+    }
+
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void ResetCharacterLookupTracking()
+    {
+        CharacterUnitForm.addAction -= OnCharacterRowChanged;
+        CharacterUnitForm.removeAction -= OnCharacterRowChanged;
+        CharacterProductForm.addAction -= OnCharacterProductChanged;
+        CharacterProductForm.removeAction -= OnCharacterProductChanged;
+        characterLookupTracking = false;
+        InvalidateCharacterLookup();
+    }
     private int updateNavFrame;
     #region internal Var
     private string _fileName;
@@ -128,6 +162,8 @@ public class PlaySceneController : Z_Controller<PlayManager>, InternalPlaySceneC
         this.Register<InputMouseMoveEvent>();
         waitForActive = false;
         _characterDic = new Dictionary<CharacterProductForm.Data, CharacterUnitForm.Data>();
+        cachedCharacterLookupVersion = -1;
+        characterUnitGroups.Clear();
         UiManager.instance.ShowUi<UiPlaySceneMainCtrl>();
 
 
@@ -168,7 +204,7 @@ public class PlaySceneController : Z_Controller<PlayManager>, InternalPlaySceneC
         //object correct
         foreach (var data in ObjectUnitForm.DataByUid.Values)
         {
-            var cur = ObjectProductForm.BindUnit(data);
+            var cur = data.unit.BindProduct();
             if (cur != null)
             {
                 data.isObstacle = cur.collision;
@@ -198,6 +234,7 @@ public class PlaySceneController : Z_Controller<PlayManager>, InternalPlaySceneC
 
         _playerM = null;
         _playerG = null;
+        PlayInfoController.RepairCurrentCharacterHealth(GameManager.instance.curProgress);
         RefreshCurrentCharacter();
         var sceneUi = UiManager.instance.GetUi<UiPlaySceneMainCtrl>();
         if (sceneUi != null && sceneUi.active)
@@ -214,6 +251,7 @@ public class PlaySceneController : Z_Controller<PlayManager>, InternalPlaySceneC
             && ReferenceEquals(registered, _playerM) && _playerM.unit != null
             && _playerM.unit.productInfo.Item1 == next.uid)
             return;
+        Vector3? previousEuler = _playerM?.euler;
         setPlayerMove = Vector3.zero;
         setPlayerRot = null;
         curOptSkill = null;
@@ -231,8 +269,12 @@ public class PlaySceneController : Z_Controller<PlayManager>, InternalPlaySceneC
             return;
         }
         _playerM = GetOrNewCharacter(_playerG);
-        // A unique character may already exist in the scene: progress owns player placement.
-        MapManager.instance.updateCtrl.ApplyMove(_playerM.unit, GameManager.instance.curProgress.pos, _playerM.euler, true);
+        // A unique character may already exist: inherit the outgoing player's pose,
+        // not the incoming NPC's old facing or queued rotation.
+        if (previousEuler.HasValue)
+            _playerM.unit.forceEuler = null;
+        MapManager.instance.updateCtrl.ApplyMove(_playerM.unit, GameManager.instance.curProgress.pos,
+            previousEuler ?? _playerM.euler, true);
         GameManager.instance.curProgress.pos = _playerM.pos;
         lastPlayerPos = _playerM.pos;
         SetCamera(lastPlayerPos.x, lastPlayerPos.y, lastPlayerPos.z);
@@ -255,6 +297,11 @@ public class PlaySceneController : Z_Controller<PlayManager>, InternalPlaySceneC
         this.Unregister<InputMouseMoveEvent>();
 
         MapManager.instance.End();
+        _characterDic?.Clear();
+        characterUnitGroups.Clear();
+        cachedCharacterRows = null;
+        cachedCharacterProducts = null;
+        cachedCharacterLookupVersion = -1;
         UiManager.instance.CloseAll();
         GameManager.instance.RegisterInputDefault();
         //UiManager.instance.ShowUi<UiModStoryCtrl>();
@@ -379,8 +426,17 @@ public class PlaySceneController : Z_Controller<PlayManager>, InternalPlaySceneC
 
     public CharacterUnitForm.Data GetCharacterUnit(int productUid)
     {
-        var units = GetCharacterUnits(productUid);
-        return units.Count == 0 ? null : units[0];
+        if (productUid <= 0 || !CharacterProductForm.DataByUid.TryGetValue(productUid, out var source))
+            return null;
+        EnsureCharacterLookup();
+        var result = GetCachedCharacter(source);
+        if (source.protoUid == 0 && CharacterProductForm.DatasByProtouid.TryGetValue(productUid, out var copies))
+            foreach (var copy in copies)
+            {
+                var unit = GetCachedCharacter(copy);
+                if (unit != null && (result == null || unit.uid < result.uid)) result = unit;
+            }
+        return result;
     }
 
     public List<CharacterUnitForm.Data> GetCharacterUnits(int productUid)
@@ -388,18 +444,67 @@ public class PlaySceneController : Z_Controller<PlayManager>, InternalPlaySceneC
         var result = new List<CharacterUnitForm.Data>();
         if (productUid <= 0 || !CharacterProductForm.DataByUid.TryGetValue(productUid, out var source))
             return result;
-        foreach (var unitData in CharacterUnitForm.DataByUid.Values)
-        {
-            if (unitData?.unit == null
-                || !Z_UnitSystem.Form.UnitForm.DataByUid.TryGetValue(unitData.uid, out var registered)
-                || !ReferenceEquals(registered, unitData) || !ReferenceEquals(unitData.unit.data, unitData)
-                || !CharacterProductForm.DataByUid.TryGetValue(unitData.unit.productInfo.Item1, out var product))
-                continue;
-            if (product.uid == productUid || (source.protoUid == 0 && product.protoUid == productUid))
-                result.Add(unitData);
-        }
+        EnsureCharacterLookup();
+        AddCachedCharacters(source, result);
+        if (source.protoUid == 0 && CharacterProductForm.DatasByProtouid.TryGetValue(productUid, out var copies))
+            foreach (var copy in copies) AddCachedCharacters(copy, result);
         result.Sort((left, right) => left.uid.CompareTo(right.uid));
         return result;
+    }
+
+    private static bool IsCurrentCharacter(CharacterUnitForm.Data unit, CharacterProductForm.Data product)
+    {
+        return unit != null && product != null
+            && CharacterProductForm.DataByUid.TryGetValue(product.uid, out var currentProduct)
+            && ReferenceEquals(product, currentProduct)
+            && CharacterUnitForm.DataByUid.TryGetValue(unit.uid, out var currentUnit) && ReferenceEquals(unit, currentUnit)
+            && Z_UnitSystem.Form.UnitForm.DataByUid.TryGetValue(unit.uid, out var registered) && ReferenceEquals(unit, registered)
+            && unit.unit != null && ReferenceEquals(unit.unit.data, unit) && unit.unit.productInfo.Item1 == product.uid;
+    }
+
+    private void EnsureCharacterLookup()
+    {
+        TrackCharacterLookupChanges();
+        var rows = CharacterUnitForm.DataByUid;
+        var products = CharacterProductForm.DataByUid;
+        if (_characterDic != null && cachedCharacterLookupVersion == characterLookupVersion
+            && ReferenceEquals(rows, cachedCharacterRows) && ReferenceEquals(products, cachedCharacterProducts)
+            && cachedCharacterCount == rows.Count && cachedCharacterProductCount == products.Count)
+            return;
+        if (_characterDic == null) _characterDic = new Dictionary<CharacterProductForm.Data, CharacterUnitForm.Data>();
+        else _characterDic.Clear();
+        characterUnitGroups.Clear();
+        foreach (var unit in rows.Values)
+        {
+            if (unit?.unit == null || !products.TryGetValue(unit.unit.productInfo.Item1, out var product)
+                || !IsCurrentCharacter(unit, product)) continue;
+            if (!characterUnitGroups.TryGetValue(product, out var group))
+                characterUnitGroups.Add(product, group = new List<CharacterUnitForm.Data>());
+            group.Add(unit);
+            if (!_characterDic.TryGetValue(product, out var first) || unit.uid < first.uid) _characterDic[product] = unit;
+        }
+        cachedCharacterRows = rows;
+        cachedCharacterProducts = products;
+        cachedCharacterCount = rows.Count;
+        cachedCharacterProductCount = products.Count;
+        cachedCharacterLookupVersion = characterLookupVersion;
+    }
+
+    private CharacterUnitForm.Data GetCachedCharacter(CharacterProductForm.Data product)
+    {
+        if (_characterDic.TryGetValue(product, out var unit) && IsCurrentCharacter(unit, product)) return unit;
+        CharacterUnitForm.Data result = null;
+        if (characterUnitGroups.TryGetValue(product, out var group))
+            foreach (var candidate in group)
+                if (IsCurrentCharacter(candidate, product) && (result == null || candidate.uid < result.uid)) result = candidate;
+        return result;
+    }
+
+    private void AddCachedCharacters(CharacterProductForm.Data product, List<CharacterUnitForm.Data> result)
+    {
+        if (characterUnitGroups.TryGetValue(product, out var group))
+            foreach (var unit in group)
+                if (IsCurrentCharacter(unit, product)) result.Add(unit);
     }
 
     public bool RemoveCharacter(CharacterUnitForm.Data data)
@@ -426,15 +531,8 @@ public class PlaySceneController : Z_Controller<PlayManager>, InternalPlaySceneC
 
     public CharacterUnitForm.Data GetOrNewCharacter(CharacterProductForm.Data data)
     {
-        CharacterUnitForm.Data unitData = null;
-        foreach (var curData in CharacterUnitForm.DataByUid.Values)
-        {
-            if (curData.unit.productInfo.Item1 == data.uid)
-            {
-                unitData = curData;
-                break;
-            }
-        }
+        EnsureCharacterLookup();
+        var unitData = GetCachedCharacter(data);
         if (unitData == null)
         {
             unitData = MapManager.instance.AddCharacter(data.name, GameManager.instance.curProgress.pos, GlobalDefaultHelper.GetRuntimePrefabName("character"), true, MapUnit.GetProductInfoString(new Newtonsoft.Json.Linq.JObject(), (data.uid, -1)), GameMapData.GetCharacterProductSize(data));

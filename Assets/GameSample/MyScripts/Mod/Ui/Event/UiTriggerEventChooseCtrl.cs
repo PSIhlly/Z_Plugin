@@ -126,7 +126,7 @@ namespace Ui.TriggerEventChoose
                 rows.Add(new UiTriggerParam { key = key, owner = settings });
             rows.Add(new UiTriggerParam { owner = settings });
             rows.Refresh();
-            UiManager.Rebuild(gameObject, true);
+            UiManager.Rebuild(gameObject.transform.parent==null?gameObject:gameObject.transform.parent.gameObject, true);
             settings.rebuild?.Invoke();
         }
         internal void Open(UiTriggerParam row)

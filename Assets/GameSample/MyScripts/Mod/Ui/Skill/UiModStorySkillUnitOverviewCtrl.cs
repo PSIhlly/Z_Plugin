@@ -87,15 +87,7 @@ namespace Ui.ModStory.ModStorySkill.ModStorySkillUnit.ModStorySkillUnitOverview
                 SetKillType(SkillType.HeavyAttack);
             });
 
-            view.btn_triggerCondition.onClick.AddListener(() =>
-            {
-                var key = "triggerCondition";
-                ModManager.instance.assetCtrl.ChooseTriggerCondition(TextManager.instance.GetTxt(key), (item) =>
-                {
-                    model.data.triggerConditionUid = item.id;
-                    Refresh();
-                });
-            });
+
 
         }
 
@@ -127,6 +119,7 @@ namespace Ui.ModStory.ModStorySkill.ModStorySkillUnit.ModStorySkillUnitOverview
 
             view.model_EventChoose.Set(new UiEventChooseParam() { dic = model.data.events, key = "invoke" });
 
+            Z_Ui.UiManager.Rebuild(gameObject, true);
         }
 
         private void SetKillType(SkillType tp)

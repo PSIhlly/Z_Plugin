@@ -13,6 +13,7 @@ using Z_Code.Form;
 using Z_String;
 using Z_DataSystem.Form;
 using Z_DesignStyle;
+using Z_Time;
 namespace Ui.ModStory.ModStoryMapObject.ModStoryMapObjectObject.ModStoryMapObjectObjectConfig
 {
 
@@ -62,6 +63,8 @@ namespace Ui.ModStory.ModStoryMapObject.ModStoryMapObjectObject.ModStoryMapObjec
             {
                 model.data.collision = !model.data.collision;
                 Refresh();
+                if (MapManager.instance.data != null)
+                    GameManager.instance.mapCtrl.RefreshObjectWangTileAppearances(model.data.uid);
             });
             view.btn_boundsCollision.onClick.AddListener(() =>
             {

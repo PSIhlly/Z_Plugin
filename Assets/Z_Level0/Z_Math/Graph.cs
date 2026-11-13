@@ -319,6 +319,32 @@ namespace Z_Math
 
 
         #region Intersect
+        public readonly struct CubeSatData
+        {
+            private readonly Vector3 p0, p1, p2, p3, p4, p5, p6, p7;
+            public readonly Vector3 center, normal1, normal2, normal3;
+            public readonly Vector3 avoid1, avoid2, avoid3;
+            public readonly (float min, float max) projection1, projection2, projection3;
+
+            public CubeSatData(Vector3[] points)
+            {
+                p0 = points[0]; p1 = points[1]; p2 = points[2]; p3 = points[3];
+                p4 = points[4]; p5 = points[5]; p6 = points[6]; p7 = points[7];
+                center = (p0 + p7) * .5f;
+                GetFaceNormals(points, out var n1, out var n2, out var n3);
+                normal1 = n1; normal2 = n2; normal3 = n3;
+                // Match CheckAxis's normalization once per geometry update.
+                avoid1 = n1.normalized; avoid2 = n2.normalized; avoid3 = n3.normalized;
+                projection1 = ProjectCubeOntoAxis(points, n1);
+                projection2 = ProjectCubeOntoAxis(points, n2);
+                projection3 = ProjectCubeOntoAxis(points, n3);
+            }
+
+            public bool Matches(Vector3[] points) => p0.Equals(points[0]) && p1.Equals(points[1])
+                && p2.Equals(points[2]) && p3.Equals(points[3]) && p4.Equals(points[4])
+                && p5.Equals(points[5]) && p6.Equals(points[6]) && p7.Equals(points[7]);
+        }
+
         static HashSet<Vector3> exist = new HashSet<Vector3>(10);
         /// <summary>
         /// 立方体与立方体SAT碰撞检测
@@ -327,6 +353,14 @@ namespace Z_Math
         /// 检测轴：A的面法线3个 + B的面法线3个，共6个轴
         /// </summary>
         public static IntersectType CubeIntersectCube(Vector3[] aCubeEightPoints, Vector3[] bCubeEightPoints, Vector3 dir, out float dis, out Vector3 avoidDir)
+        {
+            var a = new CubeSatData(aCubeEightPoints);
+            var b = new CubeSatData(bCubeEightPoints);
+            return CubeIntersectCube(aCubeEightPoints, bCubeEightPoints, in a, in b, dir, out dis, out avoidDir);
+        }
+
+        public static IntersectType CubeIntersectCube(Vector3[] aCubeEightPoints, Vector3[] bCubeEightPoints,
+            in CubeSatData a, in CubeSatData b, Vector3 dir, out float dis, out Vector3 avoidDir)
         {
 #if DEBUG_GRAPH
             string tmp = "";
@@ -343,28 +377,23 @@ namespace Z_Math
 
             float mag = dir.magnitude;
             dis = mag;
-            Vector3 aCenter = (aCubeEightPoints[0] + aCubeEightPoints[7]) * 0.5f;
-            Vector3 bCenter = (bCubeEightPoints[0] + bCubeEightPoints[7]) * 0.5f;
-            exist.Clear();
-
-
-
+            Vector3 aCenter = a.center;
+            Vector3 bCenter = b.center;
+            Span<Vector3> axes = stackalloc Vector3[6];
+            int axisCount = 0;
             float touchTime = 0;
             float avoidTime = 1;
 
-            Vector3 normal1, normal2, normal3;
-            GetFaceNormals(aCubeEightPoints, out normal1, out normal2, out normal3);
-
-            if (AddAxisCheck(normal1, exist)) CheckAxis(aCubeEightPoints, bCubeEightPoints, dir, normal1, ref touchTime, ref avoidTime, ref avoidDir);
-            if (AddAxisCheck(normal2, exist)) CheckAxis(aCubeEightPoints, bCubeEightPoints, dir, normal2, ref touchTime, ref avoidTime, ref avoidDir);
-            if (AddAxisCheck(normal3, exist)) CheckAxis(aCubeEightPoints, bCubeEightPoints, dir, normal3, ref touchTime, ref avoidTime, ref avoidDir);
-
-            GetFaceNormals(bCubeEightPoints, out normal1, out normal2, out normal3);
-
-            if (AddAxisCheck(normal1, exist)) CheckAxis(aCubeEightPoints, bCubeEightPoints, dir, normal1, ref touchTime, ref avoidTime, ref avoidDir);
-            if (AddAxisCheck(normal2, exist)) CheckAxis(aCubeEightPoints, bCubeEightPoints, dir, normal2, ref touchTime, ref avoidTime, ref avoidDir);
-            if (AddAxisCheck(normal3, exist)) CheckAxis(aCubeEightPoints, bCubeEightPoints, dir, normal3, ref touchTime, ref avoidTime, ref avoidDir);
-
+            if (!CheckCubeAxis(bCubeEightPoints, a.normal1, a.avoid1, a.projection1, true, dir, axes, ref axisCount, ref touchTime, ref avoidTime, ref avoidDir)
+                || !CheckCubeAxis(bCubeEightPoints, a.normal2, a.avoid2, a.projection2, true, dir, axes, ref axisCount, ref touchTime, ref avoidTime, ref avoidDir)
+                || !CheckCubeAxis(bCubeEightPoints, a.normal3, a.avoid3, a.projection3, true, dir, axes, ref axisCount, ref touchTime, ref avoidTime, ref avoidDir)
+                || !CheckCubeAxis(aCubeEightPoints, b.normal1, b.avoid1, b.projection1, false, dir, axes, ref axisCount, ref touchTime, ref avoidTime, ref avoidDir)
+                || !CheckCubeAxis(aCubeEightPoints, b.normal2, b.avoid2, b.projection2, false, dir, axes, ref axisCount, ref touchTime, ref avoidTime, ref avoidDir)
+                || !CheckCubeAxis(aCubeEightPoints, b.normal3, b.avoid3, b.projection3, false, dir, axes, ref axisCount, ref touchTime, ref avoidTime, ref avoidDir))
+            {
+                avoidDir = Vector3.zero;
+                return IntersectType.None;
+            }
 
             if (avoidTime < 0)
                 avoidTime = 0;
@@ -399,29 +428,26 @@ namespace Z_Math
             return GetIntersectRes(fromIn, toIn, touchTime < 1);
         }
 
-        private static bool AddAxisCheck(Vector3 axis, HashSet<Vector3> exist)
-        {
-            if (axis.sqrMagnitude <= 0) return false;
-            if (exist.Contains(axis)) return false;
-            exist.Add(axis);
-            return true;
-        }
-
         /// <summary>
         /// 单轴SAT检测：将两个立方体投影到给定轴上，计算碰触时间touchTime和脱出时间avoidTime
         /// 根据投影区间关系确定避障方向avoidDir（+1/-1，表示沿轴正/负方向避让）
         /// </summary>
-        private static void CheckAxis(Vector3[] aCubeEightPoints, Vector3[] bCubeEightPoints, Vector3 dir, Vector3 axis,
+        private static bool CheckCubeAxis(Vector3[] other, Vector3 axis, Vector3 avoidAxis,
+            (float min, float max) ownProjection, bool ownIsA, Vector3 dir, Span<Vector3> axes, ref int axisCount,
             ref float touchTime, ref float avoidTime, ref Vector3 avoidDir)
         {
-            (float aMin, float aMax) = ProjectCubeOntoAxis(aCubeEightPoints, axis);
-            (float bMin, float bMax) = ProjectCubeOntoAxis(bCubeEightPoints, axis);
-
+            if (axis.sqrMagnitude <= 0) return true;
+            for (int i = 0; i < axisCount; i++)
+                if (axes[i].Equals(axis)) return true;
+            axes[axisCount++] = axis;
+            var otherProjection = ProjectCubeOntoAxis(other, axis);
+            var a = ownIsA ? ownProjection : otherProjection;
+            var b = ownIsA ? otherProjection : ownProjection;
             float dirProj = Vector3.Dot(dir, axis);
-
-            if (CalcTouchTimeAndAvoidTime(aMin, aMax, bMin, bMax, dirProj, ref touchTime, ref avoidTime, out var avoid))
-                return;
-            avoidDir += (avoid * axis).normalized;
+            if (CalcTouchTimeAndAvoidTime(a.min, a.max, b.min, b.max, dirProj, ref touchTime, ref avoidTime, out var avoid))
+                return false;
+            avoidDir += avoid * avoidAxis;
+            return true;
         }
 
         /// <summary>
@@ -540,7 +566,10 @@ namespace Z_Math
             }
             if ((fromIn && !newInner) ||
                 (fromIn && newInner && newDisDir.sqrMagnitude < disDir.sqrMagnitude)
-                || (!fromIn && !newInner && newDisDir.sqrMagnitude > disDir.sqrMagnitude))
+                // A sweep can cross the entire box and end farther away. Only
+                // apply the outside escape allowance when initially heading out.
+                || (!fromIn && !newInner && Vector3.Dot(toClosest, dir) >= 0f
+                    && newDisDir.sqrMagnitude > disDir.sqrMagnitude))
             {
                 touchTime = 1;
             }

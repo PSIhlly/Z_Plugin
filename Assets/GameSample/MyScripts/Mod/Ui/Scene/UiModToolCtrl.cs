@@ -62,11 +62,11 @@ namespace Ui.ModSceneMain.ModTool
             set
             {
                 float.TryParse(value, out float v);
-                ModManager.instance.sceneCtrl.posX = v * MapManager.instance.data.mainData.mapUnitSize.x;
+                ModManager.instance.sceneCtrl.posX = v;
             }
             get
             {
-                return (ModManager.instance.sceneCtrl.posX / MapManager.instance.data.mainData.mapUnitSize.x).ToString("0.##");
+                return ModManager.instance.sceneCtrl.posX.ToString("0.##");
             }
         }
         public string posY
@@ -81,11 +81,11 @@ namespace Ui.ModSceneMain.ModTool
                     v = minV;
                     NotifyManager.instance.AddTip(TextManager.instance.GetTxt("minYTip"));
                 }
-                ModManager.instance.sceneCtrl.posY = v * MapManager.instance.data.mainData.mapUnitSize.y;
+                ModManager.instance.sceneCtrl.posY = v;
             }
             get
             {
-                return (ModManager.instance.sceneCtrl.posY / MapManager.instance.data.mainData.mapUnitSize.y).ToString("0.##");
+                return ModManager.instance.sceneCtrl.posY.ToString("0.##");
             }
         }
         public string posZ
@@ -93,11 +93,11 @@ namespace Ui.ModSceneMain.ModTool
             set
             {
                 float.TryParse(value, out float v);
-                ModManager.instance.sceneCtrl.posZ = v * MapManager.instance.data.mainData.mapUnitSize.z;
+                ModManager.instance.sceneCtrl.posZ = v;
             }
             get
             {
-                return (ModManager.instance.sceneCtrl.posZ / MapManager.instance.data.mainData.mapUnitSize.z).ToString("0.##");
+                return ModManager.instance.sceneCtrl.posZ.ToString("0.##");
             }
         }
         public string angle

@@ -142,13 +142,16 @@ public class PlayManager : Z_MonoManager<PlayManager>
             {
                 Main2StoryManager.instance.ChangeScene(GameManager.instance.curProgress.targetScene.Item1, () =>
                 {
-                    GameManager.instance.curProgress.pos = (MapManager.instance.utilCtrl.MapPos2RealPos(GameManager.PlayerPosToMapPos(GameManager.instance.curProgress.targetScene.Item2)));
+                    GameManager.instance.curProgress.pos = (GameManager.PlayerPosToMapPos(GameManager.instance.curProgress.targetScene.Item2));
                 });
                 GameManager.instance.curProgress.eventState = EventState.Normal;
                 return;
             }
         }
 
+        // Direct Box edits may bypass the parameter command; reject a defeated
+        // current player before this frame's map simulation or pending movement.
+        (_infoCtrl as PlayInfoController)?.EnsureCurrentCharacterAlive();
         _sceneCtrl.Update();
         _infoCtrl.Update();
         effectCtrl.Update();
@@ -182,17 +185,17 @@ public class PlayManager : Z_MonoManager<PlayManager>
             {
                 steps.Add(("Load authored Story", () => GameManager.instance.saveCtrl.LoadCoreStory(id)));
                 steps.Add(("Initialize first Play", FirstPlayInit));
-                steps.Add(("Prepare initial Object products", () => ObjectProductForm.PreparePlayStory(GetStoryCacheFolder())));
+                steps.Add(("Prepare initial Object products", () => GameManager.instance.saveCtrl.PrepareObjectProducts(GetStoryCacheFolder())));
                 steps.Add(("Save initial Story", () => GameManager.instance.saveCtrl.SaveSaveStory(id)));
             }
             steps.Add(("Load saved Story", () => GameManager.instance.saveCtrl.LoadSaveStory(id)));
-            steps.Add(("Prepare saved Object products", () => ObjectProductForm.PreparePlayStory(GetStoryCacheFolder())));
+            steps.Add(("Prepare saved Object products", () => GameManager.instance.saveCtrl.PrepareObjectProducts(GetStoryCacheFolder())));
         }
         else
         {
             steps.Add(("Load authored Story", () => GameManager.instance.saveCtrl.LoadCoreStory(id)));
             steps.Add(("Initialize first Play", FirstPlayInit));
-            steps.Add(("Prepare Object products", () => ObjectProductForm.PreparePlayStory(GetStoryCacheFolder())));
+            steps.Add(("Prepare Object products", () => GameManager.instance.saveCtrl.PrepareObjectProducts(GetStoryCacheFolder())));
         }
 
         loading.AddLoadItem("playData", steps.Count);
@@ -212,7 +215,7 @@ public class PlayManager : Z_MonoManager<PlayManager>
             await Main2StoryManager.instance.LoadScenePlayAsync(GameManager.instance.curProgress.targetScene.Item1, () =>
             {
                 if (firstEnter)
-                    GameManager.instance.curProgress.pos = MapManager.instance.utilCtrl.MapPos2RealPos(GameManager.PlayerPosToMapPos(GameManager.instance.curProgress.targetScene.Item2));
+                    GameManager.instance.curProgress.pos = GameManager.PlayerPosToMapPos(GameManager.instance.curProgress.targetScene.Item2);
             });
             sceneStarted = true;
         }

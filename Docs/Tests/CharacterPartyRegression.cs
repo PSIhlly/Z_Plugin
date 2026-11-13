@@ -35,6 +35,7 @@ public static class CharacterPartyRegression
         {
             SetUp();
             CheckMetadata();
+            CheckSelectorMetadata();
             CheckCommands();
             CheckTemplateTargets();
             CheckRecruitment();
@@ -128,6 +129,32 @@ public static class CharacterPartyRegression
                 && restored.zCodeMap.SequenceEqual(program.zCodeMap),
                 command.GetName() + " compiled default survives program serialization");
         }
+    }
+
+    private static void CheckSelectorMetadata()
+    {
+        foreach (var command in new CmdBase[] { new ShowTeamerSelectCmd(), new SelectOneTeamerCmd() })
+        {
+            command.GetType().GetMethod("Init", BindingFlags.Static | BindingFlags.NonPublic).Invoke(null, null);
+            Check(BaseData.cmdDic[command.GetName()].GetType() == command.GetType(),
+                command.GetName() + " has explicit runtime registration");
+            Check(CmdBase.TryGetForm(command.GetName(), out var metadata) && metadata.prmTypes == null,
+                command.GetName() + " has zero-argument metadata");
+            Check(metadata.retTypes.SequenceEqual(new[] { command is SelectOneTeamerCmd ? "character" : "void" }),
+                command.GetName() + " has its separate selection/management return signature");
+            var program = Compile(metadata.defaultCode);
+            var restored = ProgramDataForm.GetDataByJo(ProgramDataForm.GetJoByData(program));
+            Check(restored.code == program.code && restored.zCode.SequenceEqual(program.zCode)
+                && restored.zCodeMap.SequenceEqual(program.zCodeMap),
+                command.GetName() + " default survives compiler/serialization round trip");
+        }
+        var data = new InterpretDataForm.Data(-1, new List<BoxDataForm.Data>(),
+            new Dictionary<string, BoxDataForm.Data>(), Compile("teamer = SelectOneTeamer();"),
+            0, -1, 0, null, new List<BoxDataForm.Data>(), 0);
+        var result = data.Interpret();
+        Check(result.complete && result.errors.Count == 0 && data.stack.Count == 0
+            && data.heap.TryGetValue("teamer", out var value) && value.str == string.Empty,
+            "the actual interpreter receives one empty character result for an empty team, without showing UI");
     }
 
     private static void CheckCommands()

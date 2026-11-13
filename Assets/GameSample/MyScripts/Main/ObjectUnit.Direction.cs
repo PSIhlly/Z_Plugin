@@ -7,7 +7,7 @@ namespace Z_Map
     {
         public override bool TryGetFirstPartTransform(out Vector3 position, out Vector3 scale)
         {
-            var product = ObjectProductForm.GetProduct(data);
+            var product = data.unit.product;
             if (product == null || product.model?.subPrefabUnitName == null
                 || product.model.subPrefabUnitName.Count == 0)
                 return base.TryGetFirstPartTransform(out position, out scale);

@@ -166,6 +166,20 @@ namespace Ui.PlaySceneMain
                 PlayManager.instance.infoCtrl.CanUseSkill(progress.characterUid, type));
             if (stick.active != show)
                 stick.SetShow(show, stickParam);
+            stick.SetIcon(GetSkillStickIcon(type));
+        }
+
+        internal static Sprite GetSkillStickIcon(SkillType type)
+        {
+            var progress = GameManager.instance.curProgress;
+            if (progress == null || progress.characterUid <= 0
+                || !CharacterProductForm.DataByUid.TryGetValue(progress.characterUid, out var character)
+                || character?.skill == null || !character.skill.TryGetValue(type, out int uid) || uid <= 0
+                || !SkillProductForm.DataByUid.TryGetValue(uid, out var skill) || skill == null
+                || skill.icon <= 0
+                || !TexAssetForm.DataById.TryGetValue(skill.icon, out var texture) || texture == null)
+                return null;
+            return texture.GetSprite();
         }
 
         public void OnEvent(StoryCharacterEvent evt)
@@ -260,6 +274,7 @@ namespace Ui.PlaySceneMain
 
             RefreshSkillStick(view.model_eStick, eParam, SkillType.E);
             RefreshSkillStick(view.model_qStick, qParam, SkillType.Q);
+            view.page_PlayerTouchOpt.RefreshSkillIcon();
 
             actCon.Clear();
             if (cur != null)
@@ -403,7 +418,7 @@ namespace Ui.PlaySceneMain
             }
             else if (model.data.unit is ObjectUnit obj)
             {
-                var pd = ObjectProductForm.GetProduct(obj.data);
+                var pd = obj.product;
                 view.txt_.text = pd == null ? model.data.prefabName : pd.name;
             }
             else

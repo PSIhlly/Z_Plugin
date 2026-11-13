@@ -42,9 +42,9 @@ namespace Z_Code
             {
                 if (!SceneUnitCommand.IsLive(unit))
                     continue;
-                if (unit is ObjectUnit obj && ObjectProductForm.GetProduct(obj.data) != null)
+                if (unit is ObjectUnit obj && obj.product != null)
                 {
-                    ObjectProductForm.RefreshUnitParameters(obj.data);
+                    obj.BindObjectProductParameters(obj.GetProductParameters());
                     continue;
                 }
                 // Explicit scene-Unit references also address Items, Tiles and

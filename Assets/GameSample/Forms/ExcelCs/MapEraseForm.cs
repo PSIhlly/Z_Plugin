@@ -176,8 +176,21 @@ private set{
 
                 public Data Copy(bool sameId = true)
                 {
-        return new Data(sameId? id:idChain.GetId(),name,icon,labId,terrain,mObject,item,character,texture);
+                    using (DataCopyGuard.Enter(this))
+                    {
+        var copy = new Data(sameId? id:idChain.GetId(),name,icon,labId,terrain,mObject,item,character,texture);
+                        CopyRuntimeStateTo(copy);
+                        return copy;
+                    }
                 }
+
+            protected void CopyRuntimeStateTo(Data copy)
+            {
+                base.CopyRuntimeStateTo(copy);
+                OnCopy(copy);
+            }
+            partial void OnCopy(Data copy);
+
             
             public override  void BeforeGet()
             {

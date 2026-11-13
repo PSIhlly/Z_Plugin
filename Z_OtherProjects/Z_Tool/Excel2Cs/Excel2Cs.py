@@ -4,6 +4,7 @@ import os
 from formBaseInfo import FormInfo
 from dataAnalysis import get_value
 from collections import defaultdict
+from copyGeneration import CopyEmitter
 file_namespace = "Form"
 file_using=""
 files_root_excels = "Excels/"
@@ -216,6 +217,8 @@ def dic_handle():
 
 def create_data_handle():
     for formInfo in form_info_list:
+        copy_emitter = CopyEmitter()
+        copy_parent = '                base.CopyRuntimeStateTo(copy);\n' if formInfo.extend_data_str else ''
          #类型构造方法设置
         con_extend_str = ':base('
         con_extend_replace_str = ':base('
@@ -224,16 +227,15 @@ def create_data_handle():
         con_copy_str= f'''
                 public Data Copy(bool sameId = true)
                 {{
-        return new Data(sameId? {formInfo.id_str}:{formInfo.id_str}Chain.GetId(),'''
+                    using (DataCopyGuard.Enter(this))
+                    {{
+        var copy = new Data(sameId? {formInfo.id_str}:{formInfo.id_str}Chain.GetId(),'''
         con_set_str = ''
         con_reset_str = ''
 
         for key,val in formInfo.var_type_dic.items():
-            if key is not formInfo.id_str:
-                if val.startswith('List') or val.startswith('Dictionary'):
-                    con_copy_str+=f'{key}==null?new {val}():new {val}({key}),'
-                else:
-                    con_copy_str+=key+','
+            if key != formInfo.id_str:
+                con_copy_str += copy_emitter.expression(val, key, field=True) + ','
             if 'override' in formInfo.var_config_dic[key]:
                 con_extend_str+=key+','
                 con_extend_replace_str+='data.'+key+","
@@ -243,7 +245,17 @@ def create_data_handle():
             con_reset_str+=f'''
              this.{key} = data.{key};'''
         con_copy_str=con_copy_str[0:-1]+f''');
-                }}'''
+                        CopyRuntimeStateTo(copy);
+                        return copy;
+                    }}
+                }}
+
+            protected void CopyRuntimeStateTo(Data copy)
+            {{
+{copy_parent}                OnCopy(copy);
+            }}
+            partial void OnCopy(Data copy);
+{copy_emitter.methods()}'''
         con_extend_str=con_extend_str[0:-1]+')'
         con_extend_replace_str = con_extend_replace_str[0:-1]+')'
 
@@ -477,23 +489,27 @@ def serialize_handle():
 '''           
 
 
-print(f'''start\n''')
-args_handle()
-create_forms()
-var_sub_handle()
-var_normal_handle()
-dic_handle()
-create_data_handle()
-assign_data_handle() 
-add_remove_handle()
-dic_index_handle()               
-serialize_handle()
-           
-# 打印找到的 Excel 文件
-for file in form_info_list:
-    print('处理中：' + file.name)
-    with open(files_root_cs + file.name + 'Form.cs', 'w', encoding='utf-8') as f:
-        f.write(file.get_result())
+def main():
+    print('start\n')
+    args_handle()
+    create_forms()
+    var_sub_handle()
+    var_normal_handle()
+    dic_handle()
+    create_data_handle()
+    assign_data_handle()
+    add_remove_handle()
+    dic_index_handle()
+    serialize_handle()
+
+    for file in form_info_list:
+        print('处理中：' + file.name)
+        with open(files_root_cs + file.name + 'Form.cs', 'w', encoding='utf-8') as f:
+            f.write(file.get_result())
+
+
+if __name__ == '__main__':
+    main()
 
 
 

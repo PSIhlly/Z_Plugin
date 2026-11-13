@@ -170,8 +170,27 @@ public static readonly int autoUidCnt=100;
 
                 public Data Copy(bool sameId = true)
                 {
-        return new Data(sameId? uid:uidChain.GetId(),str,valName,num,dic==null?new Dictionary<string,BoxDataForm.Data>():new Dictionary<string,BoxDataForm.Data>(dic));
+                    using (DataCopyGuard.Enter(this))
+                    {
+        var copy = new Data(sameId? uid:uidChain.GetId(),str,valName,num,dic==null?new Dictionary<string,BoxDataForm.Data>():CopyCollection0(dic));
+                        CopyRuntimeStateTo(copy);
+                        return copy;
+                    }
                 }
+
+            protected void CopyRuntimeStateTo(Data copy)
+            {
+                OnCopy(copy);
+            }
+            partial void OnCopy(Data copy);
+
+            private static Dictionary<string,BoxDataForm.Data> CopyCollection0(Dictionary<string,BoxDataForm.Data> source)
+            {
+                var result = new Dictionary<string,BoxDataForm.Data>(source.Count, source.Comparer);
+                foreach (var pair in source) result.Add(pair.Key, pair.Value?.Copy());
+                return result;
+            }
+
             
             public virtual  void BeforeGet()
             {

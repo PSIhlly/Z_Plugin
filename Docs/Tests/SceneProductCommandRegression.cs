@@ -49,12 +49,10 @@ public static class SceneProductCommandRegression
             objectPrototype.uid = 97601;
             objectPrototype.name = "object-prototype";
             ObjectProductForm.AddData(objectPrototype);
-            ((Dictionary<int, int>)typeof(ObjectProductForm).GetField("legacyTemplates", BindingFlags.Static | BindingFlags.NonPublic)
-                .GetValue(null))[objectTemplate.id] = objectPrototype.uid;
             var objectA = Object(97602, 97611, 97601, objectTemplate.id, new Vector3(5, 0, 7));
             var objectB = Object(97603, 97612, 97601, objectTemplate.id, new Vector3(7, 0, 7));
             CheckGroup("Object", "$so$97601$so$", "$so$97602$so$", new MapUnit[] { objectA, objectB });
-            foreach (string alias in new[] { "$sop$97600$sop$", "$so$p:97601$so$" })
+            foreach (string alias in new[] { "$so$97601$so$" })
             {
                 objectA.data.euler = Vector3.zero;
                 objectB.data.euler = Vector3.zero;
@@ -67,6 +65,10 @@ public static class SceneProductCommandRegression
                 "explicit scene-Unit reference still mutates exactly one Unit");
             Check(Read(Invoke(new GetPositionCmd(), Text("$so$t:999999$so$")).res[0]) == Vector3.zero,
                 "missing template getter remains a zero vector");
+            map.data.mainData.mapUnitSize = new Vector3(2, 3, 4);
+            CheckGroup("nonuniform Character", "$ch$97500$ch$", "$ch$97501$ch$", new MapUnit[] { characterA, characterB });
+            CheckGroup("nonuniform Object", "$so$97601$so$", "$so$97602$so$", new MapUnit[] { objectA, objectB });
+            CheckWorldUnits(characterA, characterB, objectA);
             Debug.Log("SCENE_PRODUCT_COMMAND_REGRESSION_PASS checks=" + checks);
             EditorApplication.Exit(0);
         }
@@ -146,7 +148,7 @@ public static class SceneProductCommandRegression
         ObjectProductForm.AddData(product);
         var data = new ObjectUnitForm.Data(unitUid, true, "scene-command-object", prefabName, pos,
             Vector3.zero, Vector3.one, UpdateType.ShowOnly, new List<int>(),
-            MapUnit.GetProductInfoString(new JObject { [ObjectProductForm.ProductVersionKey] = ObjectProductForm.ProductVersion },
+            MapUnit.GetProductInfoString(new JObject(),
                 (productUid, -1)), false, 0);
         ObjectUnitForm.AddData(data);
         UnitForm.DataByUid[data.uid] = data;
@@ -161,7 +163,7 @@ public static class SceneProductCommandRegression
         for (int i = 0; i < units.Length; i++)
             Equal(units[i].data.pos, initial[i] + Vector3.forward, family + " relative Set keeps each own origin");
         Equal(Read(Invoke(new GetPositionCmd(), Text(template)).res[0]),
-            GameManager.MapPosToPlayerPos(map.utilCtrl.RealPos2MapPos(units[0].data.pos)),
+            GameManager.MapPosToPlayerPos(units[0].data.pos),
             family + " scalar/vector getter selects deterministic first target");
         var second = units[1].data.pos;
         Invoke(new SetPositionRelativeCmd(), Text(exact), Vector(Vector3.right));
@@ -218,6 +220,43 @@ public static class SceneProductCommandRegression
         Check((bool)rotate.Invoke(null, rotateArgs), family + " second bounded rotation step completes");
         Equal(units[0].data.euler, new Vector3(1, 10, 2), family + " rotation reaches the exact final yaw");
         Restore(units, initial);
+    }
+
+    private static void CheckWorldUnits(CharacterUnit character, CharacterUnit other, ObjectUnit obj)
+    {
+        var handle = Text(GlobalEventHelper.GetSceneUnitReference(character.data.uid));
+        var world = new Vector3(8, 1, 8);
+        var authored = GameManager.MapPosToPlayerPos(world);
+        Invoke(new SetPositionCmd(), handle, Vector(authored));
+        Equal(character.data.pos, world, "absolute Set applies only the +500 offset on nonuniform cells");
+        Equal(Read(Invoke(new GetPositionCmd(), handle).res[0]), authored, "absolute Get applies only the -500 offset");
+        var offset = new Vector3(1, 2, 3);
+        Invoke(new SetPositionRelativeCmd(), handle, Vector(offset));
+        Equal(character.data.pos, world + offset, "relative Set keeps world metres on all axes");
+        Equal(Read(Invoke(new GetPositionRelativeCmd(), handle,
+            Text(GlobalEventHelper.GetSceneUnitReference(obj.data.uid))).res[0]), character.data.pos - obj.data.pos,
+            "relative Get keeps world metres on all axes");
+        Equal(Read(Invoke(new GetNormalizedVectorCmd(), Vector(offset)).res[0]), offset.normalized,
+            "normalization does not distort direction using cell dimensions");
+        Check(Mathf.Abs(Invoke(new GetLookAtRotationCmd(), Vector(Vector3.zero),
+            Vector(new Vector3(1, 999, 1))).res[0].num - 45) < .0001f,
+            "yaw uses world X/Z without cell scaling or height");
+
+        map.updateCtrl.ApplyMove(character, new Vector3(5, 0, 5), character.data.euler, true);
+        map.updateCtrl.ApplyMove(other, new Vector3(7, 0, 5), other.data.euler, true);
+        var nearby = Invoke(new GetCharactersInAreaCmd(), Vector(GameManager.MapPosToPlayerPos(character.data.pos)), Number(1.5f));
+        Check(nearby.res[0].dic.Values.Count(value => value.str == "$ch$97501$ch$") == 1
+            && nearby.res[0].dic.Values.All(value => value.str != "$ch$97502$ch$"),
+            "area radius is a world sphere and excludes a Character two metres away");
+        Invoke(new SetCharacterNavigateCmd(), Text("$ch$97501$ch$"), Vector(authored));
+        Equal(character.data.destination, world, "absolute navigation applies only the origin offset");
+        Invoke(new SetCharacterNavigateRelativeCmd(), Text("$ch$97501$ch$"), Vector(offset));
+        Equal(character.data.destination, character.data.pos + offset, "relative navigation uses world displacement");
+        var mission = MissionForm.defaultData;
+        mission.targetPos = authored;
+        Equal(MissionGuide.GetTargetWorldPosition(mission), world, "mission target uses offset world coordinates");
+        Check(Mathf.Abs(MissionGuide.GetDistance(mission, world + new Vector3(3, 4, 0)) - 5) < .0001f,
+            "mission distance remains five world metres across nonuniform cells");
     }
 
     private static void CheckCapturedRemoval(string label, InterpretAsyncTask task, MapUnit[] units)

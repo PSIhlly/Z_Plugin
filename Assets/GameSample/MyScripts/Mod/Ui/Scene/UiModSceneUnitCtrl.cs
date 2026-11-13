@@ -32,7 +32,7 @@ namespace Ui.ModSceneUnit
             {
                 if (!float.TryParse(value, out float v))
                     return;
-                var x = MapManager.instance.utilCtrl.MapPos2RealPos(Vector3.one*GameManager.PlayerPosToMapPos(v)).x;
+                var x = GameManager.PlayerPosToMapPos(v);
                 var newPos = new Vector3(x, data.pos.y, data.pos.z);
                 if (MapManager.instance.utilCtrl.InArea(newPos))
                 {
@@ -41,7 +41,7 @@ namespace Ui.ModSceneUnit
             }
             get
             {
-                return GameManager.MapPosToPlayerPos(MapManager.instance.utilCtrl.RealPos2MapPos(data.pos)).x.ToString("0.##");
+                return GameManager.MapPosToPlayerPos(data.pos).x.ToString("0.##");
             }
         }
         public string posY
@@ -54,14 +54,14 @@ namespace Ui.ModSceneUnit
                 TileUnitForm.Data belongMap = ((MapUnit)data.unit).belongTile.data;
 
 
-                float minV = GameManager.MapPosToPlayerPos(belongMap.mapPos.y);
+                float minV = GameManager.MapPosToPlayerPos(belongMap.pos.y);
 
                 if (v < minV)
                 {
                     v = minV;
                     NotifyManager.instance.AddTip(TextManager.instance.GetTxt("minYTip"));
                 }
-                var newPos = new Vector3(data.pos.x,MapManager.instance.utilCtrl.MapPos2RealPos(Vector3.one*GameManager.PlayerPosToMapPos(v)) .y, data.pos.z);
+                var newPos = new Vector3(data.pos.x,GameManager.PlayerPosToMapPos(v), data.pos.z);
 
                 if (MapManager.instance.utilCtrl.InArea(newPos))
                 {
@@ -70,7 +70,7 @@ namespace Ui.ModSceneUnit
             }
             get
             {
-                return GameManager.MapPosToPlayerPos(MapManager.instance.utilCtrl.RealPos2MapPos(data.pos)).y.ToString("0.##");
+                return GameManager.MapPosToPlayerPos(data.pos).y.ToString("0.##");
             }
         }
         public string posZ
@@ -79,7 +79,7 @@ namespace Ui.ModSceneUnit
             {
                 if (!float.TryParse(value, out float v))
                     return;
-                var z = MapManager.instance.utilCtrl.MapPos2RealPos(Vector3.one*GameManager.PlayerPosToMapPos(v)).z;
+                var z = GameManager.PlayerPosToMapPos(v);
 
                 var newPos = new Vector3(data.pos.x, data.pos.y, z);
                 if (MapManager.instance.utilCtrl.InArea(newPos))
@@ -89,7 +89,7 @@ namespace Ui.ModSceneUnit
             }
             get
             {
-                return GameManager.MapPosToPlayerPos(MapManager.instance.utilCtrl.RealPos2MapPos(data.pos)).z.ToString("0.##");
+                return GameManager.MapPosToPlayerPos(data.pos).z.ToString("0.##");
             }
         }
         public string angle
@@ -208,9 +208,9 @@ namespace Ui.ModSceneUnit
                     return;
                 using (ModManager.instance.sceneCtrl.BeginOperation())
                 {
-                    model.posX = GameManager.MapPosToPlayerPos(tile.data.mapPos.x).ToString();
-                    model.posY = GameManager.MapPosToPlayerPos(tile.data.mapPos.y).ToString();
-                    model.posZ = GameManager.MapPosToPlayerPos(tile.data.mapPos.z).ToString();
+                    model.posX = GameManager.MapPosToPlayerPos(tile.data.pos.x).ToString();
+                    model.posY = GameManager.MapPosToPlayerPos(tile.data.pos.y).ToString();
+                    model.posZ = GameManager.MapPosToPlayerPos(tile.data.pos.z).ToString();
                 }
                 Refresh();
 

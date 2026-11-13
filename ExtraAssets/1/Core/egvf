@@ -8,7 +8,61 @@
       "valName": null,
       "num": 0.0,
       "dic": null
-    },
-    "sorv": 2
+    }
+  },
+  {
+    "uid": 2,
+    "name": "格挡2-1",
+    "data": {
+      "uid": -1,
+      "str": null,
+      "valName": null,
+      "num": 0.0,
+      "dic": null
+    }
+  },
+  {
+    "uid": 3,
+    "name": "格挡2-2",
+    "data": {
+      "uid": -1,
+      "str": null,
+      "valName": null,
+      "num": 0.0,
+      "dic": null
+    }
+  },
+  {
+    "uid": 4,
+    "name": "格挡2-3",
+    "data": {
+      "uid": -1,
+      "str": null,
+      "valName": null,
+      "num": 0.0,
+      "dic": null
+    }
+  },
+  {
+    "uid": 5,
+    "name": "格挡2-4",
+    "data": {
+      "uid": -1,
+      "str": null,
+      "valName": null,
+      "num": 0.0,
+      "dic": null
+    }
+  },
+  {
+    "uid": 6,
+    "name": "格挡2-5",
+    "data": {
+      "uid": -1,
+      "str": null,
+      "valName": null,
+      "num": 0.0,
+      "dic": null
+    }
   }
 ]

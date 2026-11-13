@@ -29,11 +29,45 @@ namespace Z_Map
     {
         public static string productKey = "pdt";
         private (int, int) _productInfo;
+        private string productInfoExtra;
+        private bool productInfoLoaded;
+        private static bool extraCacheInvalidationRegistered;
+
+        internal static void EnsureExtraCacheInvalidation()
+        {
+            if (extraCacheInvalidationRegistered) return;
+            UnitForm.changeExtraAction += OnExtraChanged;
+            extraCacheInvalidationRegistered = true;
+        }
+
+        private static void OnExtraChanged(UnitForm.Data row, string oldValue, string newValue)
+        {
+            if (oldValue == newValue || !(row.unit is MapUnit unit)) return;
+            unit._productInfo = default;
+            unit.productInfoExtra = null;
+            unit.productInfoLoaded = false;
+            unit._paramInfo = null;
+            unit._evtSet = null;
+            unit._evtExtra = null;
+            unit.combinedEvents = null;
+            if (unit is CharacterUnit) PlaySceneController.InvalidateCharacterLookup();
+        }
+
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+        private static void ResetExtraCacheInvalidation()
+        {
+            UnitForm.changeExtraAction -= OnExtraChanged;
+            extraCacheInvalidationRegistered = false;
+        }
+
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterAssembliesLoaded)]
+        private static void RegisterExtraCacheInvalidation() => EnsureExtraCacheInvalidation();
         public (int, int) productInfo
         {
             get
             {
-                if (_productInfo == default)
+                EnsureExtraCacheInvalidation();
+                if (!productInfoLoaded || productInfoExtra != data.extra)
                 {
                     _productInfo = (0, 0);
                     if (!string.IsNullOrEmpty(data.extra))
@@ -45,12 +79,29 @@ namespace Z_Map
                             _productInfo.Item2 = (int)product[1];
                         }
                     }
+                    productInfoLoaded = true;
                 }
+                productInfoExtra = data.extra;
                 return _productInfo;
             }
             set
             {
+                EnsureExtraCacheInvalidation();
+                var extra = string.IsNullOrEmpty(data.extra) ? new JObject() : JObject.Parse(data.extra);
+                var saved = extra[productKey] as JArray;
+                var previous = saved != null && saved.Count >= 2 ? ((int)saved[0], (int)saved[1]) : default;
+                if (previous != value)
+                    data.extra = GetProductInfoString(extra, value);
                 _productInfo = value;
+                productInfoExtra = data.extra;
+                productInfoLoaded = true;
+                if (this is CharacterUnit && previous != value)
+                    PlaySceneController.InvalidateCharacterLookup();
+                if (this is ObjectUnit obj)
+                {
+                    if (previous != value) _paramInfo = null;
+                    ObjectProductForm.NotifySceneUnitBindingChanged(obj.data);
+                }
             }
 
         }
@@ -65,19 +116,30 @@ namespace Z_Map
 
         public static string paramKey = "prm";
         private Dictionary<string, GameParamForm.Data> _paramInfo;
+        // Initial Product binding already owns these values. The public setter
+        // remains responsible for publishing subsequent parameter-key edits.
+        internal void BindObjectProductParameters(Dictionary<string, GameParamForm.Data> parameters)
+        {
+            _paramInfo = parameters;
+        }
+
         public Dictionary<string, GameParamForm.Data> paramInfo
         {
             get
             {
+                EnsureExtraCacheInvalidation();
                 if (_paramInfo == default)
                 {
+                    if (this is ObjectUnit liveObject && DynamicGlobalSettings.playing && liveObject.product != null)
+                        return _paramInfo = liveObject.GetProductParameters();
                     _paramInfo = new Dictionary<string, GameParamForm.Data>();
                     if (!string.IsNullOrEmpty(data.extra))
                     {
                         var jo = JObject.Parse(data.extra);
                         if (jo != null && jo[paramKey] != null)
                         {
-                            _paramInfo = jo.Get<Dictionary<string, GameParamForm.Data>>(paramKey);
+                            _paramInfo = jo.Get<Dictionary<string, GameParamForm.Data>>(paramKey)
+                                ?? new Dictionary<string, GameParamForm.Data>();
                         }
                     }
                     if (this is CharacterUnit ch)
@@ -97,14 +159,14 @@ namespace Z_Map
                     else if (this is ObjectUnit obj)
                     {
                         var productParameters = DynamicGlobalSettings.playing
-                            ? ObjectProductForm.GetUnitParameters(obj.data) : null;
+                            ? obj.GetProductParameters() : null;
                         if (productParameters != null)
                         {
                             _paramInfo = productParameters;
                         }
                         else
                         {
-                            var objp = ObjectProductForm.GetProduct(obj.data);
+                            var objp = obj.product;
                             if (objp?.paramDic != null)
                             {
                                 foreach (var pair in objp.paramDic)
@@ -135,7 +197,7 @@ namespace Z_Map
             set
             {
                 _paramInfo = this is ObjectUnit obj && DynamicGlobalSettings.playing
-                    ? ObjectProductForm.SetUnitParameters(obj.data, value) : value;
+                    ? obj.SetProductParameters(value) : value;
             }
         }
         public static string GetParamInfoString(JObject ori, Dictionary<string, GameParamForm.Data> info)
@@ -153,6 +215,7 @@ public class GameMapController : Z_Controller<GameManager>, IZ_Listener<TileEven
 {
     public GameMapController(GameManager super) : base(super)
     {
+        MapUnit.EnsureExtraCacheInvalidation();
         Z_EventHelper.Register<TileEvent>(this);
         Z_EventHelper.Register<ObjectEvent>(this);
         Z_EventHelper.Register<ItemEvent>(this);
@@ -399,11 +462,12 @@ public class GameMapController : Z_Controller<GameManager>, IZ_Listener<TileEven
             return;
         int templateUid = ObjectProductForm.GetTemplateUid(prototype);
 
-        foreach (ObjectUnitForm.Data objectData in ObjectUnitForm.DataByUid.Values)
+        var units = new List<MapUnit>();
+        ObjectProductForm.CollectSceneUnits(templateUid, units);
+        foreach (ObjectUnit unit in units)
         {
-            ObjectUnit unit = objectData.unit;
-            var data = ObjectProductForm.GetProduct(objectData);
-            if (data == null || ObjectProductForm.GetTemplateUid(data) != templateUid)
+            var data = unit.product;
+            if (data == null)
                 continue;
 
             objectWangTileMasks.Remove(unit);
@@ -547,10 +611,9 @@ public class GameMapController : Z_Controller<GameManager>, IZ_Listener<TileEven
     }
     public void RegisterObject(ObjectUnitForm.Data newObjectData, ObjectProductForm.Data objectData)
     {
-        ObjectProductForm.AssignProduct(newObjectData, objectData);
-
-        if (DynamicGlobalSettings.playing)
-            objectData = ObjectProductForm.BindUnit(newObjectData) ?? objectData;
+        // Select/create the runtime Product before serializing its Unit link.
+        // Binding a prototype first used to write and parse the same link twice.
+        objectData = newObjectData.unit.BindProduct(objectData) ?? objectData;
 
         newObjectData.isObstacle = objectData.collision;
         UpdateObjectWangTileNeighbours(newObjectData.unit, objectData);
@@ -639,7 +702,7 @@ public class GameMapController : Z_Controller<GameManager>, IZ_Listener<TileEven
 
     private static bool HasObjectTemplate(ObjectUnit unit, int templateUid)
     {
-        var product = ObjectProductForm.GetProduct(unit.data);
+        var product = unit.product;
         return product != null && ObjectProductForm.GetTemplateUid(product) == templateUid;
     }
 
@@ -675,7 +738,7 @@ public class GameMapController : Z_Controller<GameManager>, IZ_Listener<TileEven
             {
                 if (!(candidate is ObjectUnit other) || other == unit)
                     continue;
-                var otherData = ObjectProductForm.GetProduct(other.data);
+                var otherData = other.product;
                 if (otherData == null) continue;
                 int otherTemplate = ObjectProductForm.GetTemplateUid(otherData);
                 bool oldProduct = hadOldBounds && otherTemplate == oldState.templateUid;
@@ -717,7 +780,7 @@ public class GameMapController : Z_Controller<GameManager>, IZ_Listener<TileEven
             foreach (MapUnit candidate in objectWangTileNeighbourCandidates)
             {
                 if (!(candidate is ObjectUnit other) || other == unit) continue;
-                var otherData = ObjectProductForm.GetProduct(other.data);
+                var otherData = other.product;
                 if (otherData != null && ObjectProductForm.GetTemplateUid(otherData) == templateUid
                     && TryGetObjectWangTileBounds(other, out Bounds otherBounds)
                     && GetObjectNeighbourBits(otherBounds, oldBounds) != 0)
@@ -857,8 +920,8 @@ public class GameMapController : Z_Controller<GameManager>, IZ_Listener<TileEven
             case MapEventType.Show:
                 {
                     if (DynamicGlobalSettings.playing)
-                        ObjectProductForm.BindUnit(evt.unit.data);
-                    var data = ObjectProductForm.GetProduct(evt.unit.data);
+                        evt.unit.BindProduct();
+                    var data = evt.unit.product;
                     if (data != null)
                     {
                         data.EnsureDirectionData();
@@ -872,7 +935,7 @@ public class GameMapController : Z_Controller<GameManager>, IZ_Listener<TileEven
             case MapEventType.BoundaryTouch:
             case MapEventType.Refresh:
                 {
-                    var data = ObjectProductForm.GetProduct(evt.unit.data);
+                    var data = evt.unit.product;
                     if (data != null)
                     {
                         UpdateObjectWangTileNeighbours(evt.unit, data);
@@ -882,7 +945,7 @@ public class GameMapController : Z_Controller<GameManager>, IZ_Listener<TileEven
                 }
             case MapEventType.Remove:
                 {
-                    var data = ObjectProductForm.GetProduct(evt.unit.data);
+                    var data = evt.unit.product;
                     RemoveObjectWangTileNeighbours(evt.unit, data);
                     if (data != null)
                     {
@@ -892,8 +955,8 @@ public class GameMapController : Z_Controller<GameManager>, IZ_Listener<TileEven
                     }
                     objectCollisionBoundsUnits.Remove(evt.unit);
                     evt.unit.SetFirstPartCollisionBounds(null, 1f);
-                    if (DynamicGlobalSettings.playing)
-                        ObjectProductForm.RemoveForUnit(evt.unit.data);
+                    if (DynamicGlobalSettings.playing && data != null && data.protoUid != 0)
+                        ObjectProductForm.RemoveData(data.uid);
                     break;
                 }
         }
@@ -914,6 +977,8 @@ public class GameMapController : Z_Controller<GameManager>, IZ_Listener<TileEven
     private void RefreshObjectAppearance(ObjectUnit unit, ObjectProductForm.Data data, bool forceCollisionRefresh = false,
         bool restoreCollisionBaseline = false)
     {
+        bool collisionChanged = unit.data.isObstacle != data.collision;
+        unit.data.isObstacle = data.collision;
         var direction = data.GetAnimDirection(unit.data.euler.y);
         Vector3 partPosition = data.GetModelPosition(direction);
         Vector3 partScale = data.GetModelSize(direction);
@@ -931,7 +996,7 @@ public class GameMapController : Z_Controller<GameManager>, IZ_Listener<TileEven
         // ModScene intentionally resets all pool Collider scales to one.
         float colliderScale = fit && DynamicGlobalSettings.playing ? data.model.colliderScale : 1f;
         bool changed = unit.SetFirstPartCollisionBounds(collisionBounds, colliderScale, data.centerCollider);
-        if (changed || geometryChanged || forceCollisionRefresh)
+        if (changed || geometryChanged || forceCollisionRefresh || collisionChanged)
         {
             unit.InvalidateCollisionGeometry();
             MapManager.instance.updateCtrl.RefreshObjectOverlap(unit);

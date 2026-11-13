@@ -191,8 +191,21 @@ namespace Form
 
                 public Data Copy(bool sameId = true)
                 {
-        return new Data(sameId? uid:uidChain.GetId(),name,prmNames==null?new List<string>():new List<string>(prmNames),prmTypes==null?new List<string>():new List<string>(prmTypes),retNames==null?new List<string>():new List<string>(retNames),retTypes==null?new List<string>():new List<string>(retTypes),desc,defaultCode,labId,lowestEditorStyle,allowAsVoid);
+                    using (DataCopyGuard.Enter(this))
+                    {
+        var copy = new Data(sameId? uid:uidChain.GetId(),name,prmNames==null?new List<string>():new List<string>(prmNames),prmTypes==null?new List<string>():new List<string>(prmTypes),retNames==null?new List<string>():new List<string>(retNames),retTypes==null?new List<string>():new List<string>(retTypes),desc,defaultCode,labId,lowestEditorStyle,allowAsVoid);
+                        CopyRuntimeStateTo(copy);
+                        return copy;
+                    }
                 }
+
+            protected void CopyRuntimeStateTo(Data copy)
+            {
+                base.CopyRuntimeStateTo(copy);
+                OnCopy(copy);
+            }
+            partial void OnCopy(Data copy);
+
             
             public override  void BeforeGet()
             {
@@ -477,9 +490,9 @@ namespace Form
 
                 {100118,new Data(100118,"IsSameObject",new List<string>(){"sceneObject1","sceneObject2",},new List<string>(){"sceneObject","sceneObject",},new List<string>(){"same",},new List<string>(){"num",},"scene Object {0} shares the prototype of {1}?","IsSameObject(param1,\"$so$p:0$so$\")",10016,EditorStyle.Rpg,"")},
 
-                {100119,new Data(100119,"FadeIn",null,null,null,new List<string>(){"void",},"Fade to black (1 second)","FadeIn();",10013,EditorStyle.Avg,"")},
+                {100119,new Data(100119,"FadeIn",new List<string>(){"seconds",},new List<string>(){"num",},null,new List<string>(){"void",},"Fade to black ({0} seconds)","FadeIn(1);",10013,EditorStyle.Avg,"")},
 
-                {100120,new Data(100120,"FadeOut",null,null,null,new List<string>(){"void",},"Fade from black (1 second)","FadeOut();",10013,EditorStyle.Avg,"")},
+                {100120,new Data(100120,"FadeOut",new List<string>(){"seconds",},new List<string>(){"num",},null,new List<string>(){"void",},"Fade from black ({0} seconds)","FadeOut(1);",10013,EditorStyle.Avg,"")},
 
                 {100121,new Data(100121,"GetGlobalVar",new List<string>(){"name",},new List<string>(){"string",},new List<string>(){"value",},new List<string>(){"var",},"Get global variable {0}","GetGlobalVar(\"name\")",10001,EditorStyle.AvgAdvanced,"")},
 
@@ -498,6 +511,18 @@ namespace Form
                 {100128,new Data(100128,"UseCharacterESkill",new List<string>(){"character","ignoreCd",},new List<string>(){"character","num",},null,new List<string>(){"void",},"Character {0}: use the current E skill, ignore cooldown? {1} (1 ignores, 0 checks)","UseCharacterESkill(param1,0);",10007,EditorStyle.Rpg,"")},
 
                 {100129,new Data(100129,"UseCharacterQSkill",new List<string>(){"character","ignoreCd",},new List<string>(){"character","num",},null,new List<string>(){"void",},"Character {0}: use the current Q skill, ignore cooldown? {1} (1 ignores, 0 checks)","UseCharacterQSkill(param1,0);",10007,EditorStyle.Rpg,"")},
+
+                {100130,new Data(100130,"IsStun",new List<string>(){"character",},new List<string>(){"character",},new List<string>(){"stun",},new List<string>(){"num",},"Character {0} is stunned?","IsStun(param1)",10007,EditorStyle.Rpg,"")},
+
+                {100131,new Data(100131,"GetDeployedCharacters",null,null,new List<string>(){"list",},new List<string>(){"var",},"Get deployed characters","GetDeployedCharacters()",10007,EditorStyle.Rpg,"")},
+
+                {100132,new Data(100132,"GetTeamCharacters",null,null,new List<string>(){"list",},new List<string>(){"var",},"Get all team characters (including deployed)","GetTeamCharacters()",10007,EditorStyle.Rpg,"")},
+
+                {100133,new Data(100133,"GenerateItem",new List<string>(){"item","pos",},new List<string>(){"item","vector",},new List<string>(){"new Item",},new List<string>(){"sceneObject",},"item {0}: Generate at coordinates({1}):","GenerateItem(\"empty\",NewVector(0,0,0))",10014,EditorStyle.Rpg,"newItem = ")},
+
+                {100134,new Data(100134,"ShowText",new List<string>(){"text","scale","showTime",},new List<string>(){"string","num","num",},new List<string>(){"image",},new List<string>(){"uiImg",},"Show Text:{0} ,scale {1}, last {2} seconds","text = ShowText(\"empty\", 1, 1);",10022,EditorStyle.Avg,"text = ")},
+
+                {100135,new Data(100135,"SelectOneTeamer",null,null,new List<string>(){"teamer",},new List<string>(){"character",},"Select one Teamer","teamer = SelectOneTeamer();",10022,EditorStyle.AvgAdvanced,"teamer = ")},
 
                 };
                 _DatasHashSet=new HashSet<Data>();
@@ -749,6 +774,18 @@ namespace Form
                         {"UseCharacterESkill",_DataByUid[100128]},
     
                         {"UseCharacterQSkill",_DataByUid[100129]},
+    
+                        {"IsStun",_DataByUid[100130]},
+    
+                        {"GetDeployedCharacters",_DataByUid[100131]},
+    
+                        {"GetTeamCharacters",_DataByUid[100132]},
+    
+                        {"GenerateItem",_DataByUid[100133]},
+    
+                        {"ShowText",_DataByUid[100134]},
+    
+                        {"SelectOneTeamer",_DataByUid[100135]},
     
                     
                     };
@@ -1024,6 +1061,18 @@ namespace Form
                     _DatasByLabid[10007].Add(_DataByUid[100128]);
 
                     _DatasByLabid[10007].Add(_DataByUid[100129]);
+
+                    _DatasByLabid[10007].Add(_DataByUid[100130]);
+
+                    _DatasByLabid[10007].Add(_DataByUid[100131]);
+
+                    _DatasByLabid[10007].Add(_DataByUid[100132]);
+
+                    _DatasByLabid[10014].Add(_DataByUid[100133]);
+
+                    _DatasByLabid[10022].Add(_DataByUid[100134]);
+
+                    _DatasByLabid[10022].Add(_DataByUid[100135]);
 
 
             childInitAction?.Invoke();

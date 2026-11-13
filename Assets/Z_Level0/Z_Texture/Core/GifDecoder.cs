@@ -110,12 +110,14 @@ namespace Z_Texture
 
                         // Write current frame pixels
                         int pixelIndex = 0;
+                        int imageY = 0;
+                        int interlacePass = 0;
                         for (int y = 0; y < imgHeight; y++)
                         {
                             for (int x = 0; x < imgWidth; x++)
                             {
                                 int dstX = left + x;
-                                int dstY = top + y;
+                                int dstY = top + imageY;
                                 if (dstX < width && dstY < height)
                                 {
                                     int idx = pixels[pixelIndex];
@@ -126,6 +128,20 @@ namespace Z_Texture
                                     }
                                 }
                                 pixelIndex++;
+                            }
+                            if (!interlaced)
+                                imageY++;
+                            else
+                            {
+                                // Interlaced rows arrive in four passes:
+                                // 0,8,...; 4,12,...; 2,6,...; 1,3,... .
+                                imageY += interlacePass < 2 ? 8 : interlacePass == 2 ? 4 : 2;
+                                // Small images can have entire empty passes.
+                                while (imageY >= imgHeight && interlacePass < 3)
+                                {
+                                    interlacePass++;
+                                    imageY = interlacePass == 1 ? 4 : interlacePass == 2 ? 2 : 1;
+                                }
                             }
                         }
 

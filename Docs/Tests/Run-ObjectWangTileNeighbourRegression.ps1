@@ -57,10 +57,9 @@ public static class Mathf {
 }
 public class ObjectData { public Bounds bounds; public bool hasBounds=true; public ObjectProductForm.Data product; }
 public class MapUnit { public ObjectData data=new ObjectData(); public bool isShowing=true; }
-public class ObjectUnit : MapUnit { public int refreshes,shownMask; }
+public class ObjectUnit : MapUnit { public ObjectProductForm.Data product => data.product; public int refreshes,shownMask; }
 public static class ObjectProductForm {
     public class Data { public int templateUid; public bool isWangTile=true,boundsCollision; }
-    public static Data GetProduct(ObjectData data) => data.product;
     public static int GetTemplateUid(Data data) => data.templateUid;
 }
 public class MapManager {

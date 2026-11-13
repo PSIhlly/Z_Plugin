@@ -1,5 +1,106 @@
 # Map runtime regression
 
+`Run-MapRuntimeRegression.ps1 -Fixture UiTreeContainerRegression` runs native
+Play-mode UiHolder pooling and UGUI/TMP sizing in a disposable project. It covers
+deep dynamic trees, subtree removal, flattening before reuse, stale parameter
+release, ordinary visibility changes, destroyed nodes, 58 ten-argument event rows
+(1218 Units), warm instance reuse, nested operator Units, pooled Line selection,
+actual editor mode switches/Return, and coalesced intrinsic layout requests.
+Success: `UI TREE CONTAINER REGRESSION PASS`. Pair with
+`SceneEventChooseListRegression` for the separate global Grid rebuild contract.
+This does not benchmark the user's live event or an IL2CPP Player.
+
+`python Docs/Tests/test_excel_copy_generation.py` compiles and executes Copy methods emitted by the real Excel2Cs generator in an isolated .NET project. Covers direct Form fields, nested List/Dictionary containers, tuple entries, nulls, ID behavior, shared acyclic rows, two actual mutually referencing objects from different Forms, and copying successfully after a cycle error. It uses temporary test data without changing authored workbooks.
+
+`Run-MapRuntimeRegression.ps1 -Fixture FormCopyRegression` runs native Unity copies of real Object Product/model/event/parameter/Box Forms. Checks independent nested state, inherited live-parameter cache hooks, saved-payload equivalence, dictionary comparers, instance-based self/mutual cycles and exception cleanup, Product binding without JSON, and subsequent parameter-key edits. It reports a warmed 512-copy comparison with the equivalent JSON round trip; allocation assertions require a positive explicit-allocation calibration because the Editor counter can be unavailable. Success is `FORM_COPY_REGRESSION_PASS`. Pair it with `ObjectProductRuntimeRegression` for current-schema placement preparation and save/reload; neither test loads the current game or user saves.
+
+`Run-MapRuntimeRegression.ps1 -Fixture CanvasToastRegression` runs native Play-mode
+Canvas/TMP, bounded frame timers and the real instance pool. Covers multiple
+toasts, Reset/OnDisable with immediate reuse, canceled callbacks, externally
+destroyed text, 20 FPS animation completion versus the former three-second
+recycle, ordinary 60 FPS completion, Character Remove, scene End/reentry and
+external Canvas reuse ownership. No production scene or save is loaded.
+Success: `CANVAS_TOAST_REGRESSION_PASS`.
+
+`pwsh -File Docs/Tests/Run-TeamerSelectRegression.ps1` compiles the actual
+ShowTeamerSelect/SelectOneTeamer commands and TeamSelectWindow controllers against lightweight
+UI/service spies, without launching Unity or reading/modifying stories/saves.
+Checks void management-window metadata/close/replacement behavior, the separate
+generic selector's character return, all team members including deployed members,
+stable duplicate-name rows, empty/dismissed selections, deleted or UID-reused
+Products, lost membership, independent concurrent choices and cancellation.
+This is a controller/command logic regression, not a native UI or Player test.
+Success: `TEAMER_SELECT_REGRESSION_PASS`.
+
+`Run-MapRuntimeRegression.ps1 -Fixture InterpreterTimeoutRegression` checks the
+one-second real execution-time cap per root event per frame, including shared
+subprogram time, same-frame repeated Interpret slices, final instructions and
+async-start yields. It exercises the native monotonic clock with a slow command,
+then deterministic accumulated-tick boundary cases. New frames and Reset release
+the previous time; suspended/external time and unrelated events do not count.
+Checks the normal scheduler's error-popup packet (program, source line/column,
+opcode, elapsed time), event removal, Pause release and task cancellation without
+rendering production UI or opening actual saves. The 4096-instruction yield limit
+is retained. Success: `INTERPRETER_TIMEOUT_REGRESSION_PASS`.
+
+`Run-MapRuntimeRegression.ps1 -Fixture LenCommandRegression` runs the real Len
+command/interpreter with dense, sparse, named/noncanonical, overflowing and
+same-count-mutated dictionary keys, plus randomized legacy-equivalence cases.
+A 1024-element loop reproduction exercises repeated condition calls. It calibrates
+the native allocation counter with a retained allocation and skips allocation-only
+claims if that counter is unavailable. No actual story/save is loaded. Success:
+`LEN_COMMAND_REGRESSION_PASS`.
+
+`Run-MapRuntimeRegression.ps1 -Fixture PlayAssetTextRegression` tests the real
+ShowText/ShowImage commands, PlayAsset controller, generated Image view, native
+TMP/Img siblings and UiContainer pooling. Covers literal multiline and empty
+content, and checks the actual saved PlayAsset prefab's three Image-holder
+references before constructing native test rows (catching stale Generate bindings).
+Also covers
+preferred size, base-font-relative scaling without compounding, shared
+position/angle/opacity/removal handles, actual Graphic alpha, pure Refresh and
+single-step update timers, stale image/controller cleanup and missing images.
+Old image JSON (including untouched-opacity compatibility versus explicit fades)
+and mixed image/text SaveUiItem/LoadUiItem round-trip through a
+fixture-owned temporary directory; no real scene, UI registry or save is edited.
+Checks the exact ShowText default assignment, expression-only argument selection
+and statement insertion without duplicated prefixes/terminators. TMP settings,
+the imported Liberation Sans font and its SDF shader are fixture-owned dependencies.
+Success marker: `PLAY_ASSET_TEXT_REGRESSION_PASS`.
+
+`Run-MapRuntimeRegression.ps1 -Fixture GenerateItemRegression` exercises the real
+`GenerateItem(item,pos)` command, GameUtil prefab composition, pooled appearance,
+nearest-lower Tile support and the Item pickup operations. Covers independent
+Product/model/parameter/event copies, retained quantity, exact Unit handles with
+GetPosition/Destroy, world coordinates on nonuniform cells, invalid input/resource
+rollback and safe pool replacement after Product UID reuse. It runs actual scene
+map save/load in a fixture-owned temporary folder, never a real story/save. The
+production shader is imported for material/texture checks; this is not a GPU test.
+Success marker: `GENERATE_ITEM_REGRESSION_PASS`.
+
+`Run-MapRuntimeRegression.ps1 -Fixture GifDecoderRegression` checks the real GIF decoder and native Texture2D pixels for sequential/interlaced scanlines, short and odd image heights, image-descriptor offsets, canvas orientation, and ordinary animated GIF colors/delays. It also checks first-frame and animation-cache sharing. Optional `-GifReferenceDirectory <directory>` copies `.gif` files and matching `.rgba` reference files into the isolated project: each RGBA file is the independently decoded first frame, four bytes per pixel, rows ordered from bottom to top. These single-frame reference images are checked pixel for pixel through `TexAssetForm.Data`, and decoded PNG previews are written only inside the temporary project. No source artwork, production assets or saves are changed. Success is `GIF_DECODER_REGRESSION_PASS`.
+
+`Run-MapRuntimeRegression.ps1 -Fixture PartyHealthRegression` exercises HP-aware
+current-Character selection through the real party controller and commands. Covers
+immediate HP-parameter changes, paused-frame and scene-entry repair, all-dead
+clearing, idempotent scene-refresh notifications, dead UI/command/prototype switch
+rejection, membership fallback and compatibility with unbound/missing HP. The
+real `GetDeployedCharacters()` and `GetTeamCharacters()` commands retain party
+order and defeated members, omit invalid/duplicate IDs, return independent Box
+snapshots, compile/round-trip and support existing `Len`/index operations. Scene
+refresh uses an interface spy and saved Progress uses an in-memory Form round-trip;
+no current scene, camera, authored story or real save is loaded or modified.
+Success marker: `PARTY_HEALTH_REGRESSION_PASS`.
+
+`Run-MapRuntimeRegression.ps1 -Fixture IsStunCommandRegression` checks the real
+`IsStun(character)` query and its compiled/interpreted use. Covers one-argument
+Character/one-numeric-result metadata, explicit registration, default source and
+Form round-trip, `CharacterStun` timer/reapplication, exact expiration, default-zero
+time, read-only result ownership, concrete/prototype/unique Character references,
+live-scene scalar selection, missing Progress and invalid/removed/wrong-kind
+references. It runs only in a disposable project, not the current scene or saves.
+Success marker: `IS_STUN_COMMAND_REGRESSION_PASS`.
+
 `Run-MapRuntimeRegression.ps1 -Fixture SkillUseCommandsRegression` runs the actual
 two-argument `UseSkill(character,skill)` and four equipped LightAttack/HeavyAttack/E/Q
 commands against `PlayInfoController.UseSkill`. Checks metadata/default compilation,
@@ -24,20 +125,28 @@ camera-child pose/zoom. It never opens a production scene or save. Success marke
 `CAMERA_COMMANDS_REGRESSION_PASS`; actual camera/shake rendering and scene entry
 still need a Mod/Play smoke test.
 
-`Run-MapRuntimeRegression.ps1 -Fixture SceneObjectReferenceRegression` covers canonical numeric Object Product references, legacy `p:` aliases, explicit scene-Unit handles, overlapping UID pools, prototype/exact targeting and command behavior. It also verifies `sorv=2` migration/idempotence, nested scene extras, and actual legacy/new event/global save-load round trips without rewriting source files.
+`Run-MapRuntimeRegression.ps1 -Fixture EmptyMediaAssetsRegression` covers shared preserved IDs, idempotent initialization, all three empty marker references, concrete Story picker selection, default deletion protection after external renaming, replacement guards, normal deletion, silent audio/instant video completion and real command calls without player/Dialog setup. Uses an isolated filesystem root to validate ordinary hashed backing files, default manifests, file-free empty audio/video, reload and Story reset.
+
+`Run-MapRuntimeRegression.ps1 -Fixture NavigationObjectStateRegression` checks that noncolliding Objects affect neither navigation blocking nor pass requirements; disabled/moved/removed footprints clean up immediately. Native List versions verify zero link rebuilds over 100 unchanged-state moves and overlapping blockers. Covers same-cell directional threshold changes, incoming links, pass-only updates, terrain height/solid-volume invalidation, full/local equivalence, new-map state and scene/config Product collision synchronization. Runs in an isolated project without user saves.
+
+`Run-MapRuntimeRegression.ps1 -Fixture ObjectCollisionTilesRegression` covers Object Collider/Trigger sweeps, root size changes, translated cached geometry, rotated center offsets, long and reverse movement, diagonal corner rejection, separated parts, disabled/no meshes, rotated thin Boxes, Sphere capsule footprints, duplicate Tile/Unit indices, real delayed Trigger Enter/Exit and nonuniform cell sizes. It runs without a game scene or user save.
+
+`Run-MapRuntimeRegression.ps1 -Fixture CubeCollisionRegression` compares array and cached Mesh SAT results with the pre-optimization algorithm across 12,000 deterministic random pair directions plus touching, embedded, thin/zero-sized, large-coordinate and mutated-array cases. It validates type/distance/avoidance and prints a warmed timing comparison for identical pair batches. Timings describe the isolated Editor process, not a Player FPS improvement.
+
+`Run-MapRuntimeRegression.ps1 -Fixture SceneObjectReferenceRegression` covers only canonical numeric Object Product references and explicit scene-Unit handles, rejects old alias spellings, and checks overlapping UID pools, prototype/exact targeting and real parameter/destruction commands. Reverse-index cases cover 2,000 warm scalar rounds, duplicate placements/minimum-UID selection, incremental add/remove/productInfo rebind/raw-extra replacement, stable snapshots, late Product registration/replacement and reset. The retired runtime migration/version-cache assertions are removed.
 
 `Run-MapRuntimeRegression.ps1 -Fixture SceneBehaviourTriggerRegression` checks the scene-unit trigger list and pool reuse, protected inherited prefixes, editable/deletable local suffixes, duplicate-index selection, row-local history capture, Form round-trip, live prototype changes, cache invalidation, stale callback rejection and normal Story-window editing after pool reuse. The shared TriggerEventChoose Model renders inherited/local variable groups plus New, chooses Any or a stable global UID, reuses Scene parameter rename validation and serializes local create/rename/event edits/deletes without mutating inherited groups. It rejects renaming onto an inherited binding, preserves variable confirmation across same-owner refresh, rejects choices after owner replacement/hide/deletion, verifies immediate manager activation and releases its pooled rows and owned window. The parameter fixture matches the actual label-inside-edit-Button hierarchy, checking readable variable names, editable local parameters and disabled inherited parameters. Native Canvas/GraphicRaycaster checks cover TouchPass parent hits, underlying blocking UI, nested normal Buttons, disabled markers and preserved UGUI close clicks. Uses real production controllers in an isolated Unity project; actual prefab layout still needs an Editor smoke check.
 
-`Run-MapRuntimeRegression.ps1 -Fixture SceneEventChooseListRegression` exercises the real scene-event Model controllers and UiContainer pooling: the fixed eleven trigger rows, refresh/reopen instance reuse, minimap filtering without saved-data loss, current event-window binding, single click registration, and rejection of stale trigger-type callbacks after switching Product dictionaries. Actual prefab layout and mouse/touch raycasts still need an Editor smoke test.
+`Run-MapRuntimeRegression.ps1 -Fixture SceneEventChooseListRegression` exercises the real scene-event Model controllers and UiContainer pooling: all twelve trigger rows, refresh/reopen instance reuse, minimap filtering without saved-data loss, current event-window binding, single click registration, and rejection of stale trigger-type callbacks after switching Product dictionaries. Native GridLayoutGroup/ContentSizeFitter/ScrollRect fixtures verify correct dimensions as soon as UiManager.Rebuild returns for active components, including a Grid behind a plain RectTransform wrapper, narrow/wide parent transitions, final row spacing and content height, pool reuse, clear and reopen. A native early-OnEnable fixture reproduces enabled layout components that are not yet active, then verifies that the first Canvas submission corrects both Grid height and the enclosing fixed-child-height layout, remains stable on subsequent submissions, skips hidden roots and preserves explicitly disabled components. Activation handling and Grid correction live inside UiManager.Rebuild; event-list controllers own no delayed rebuild. Actual prefab presentation and mouse/touch raycasts still need an Editor smoke test.
 
 Product reference checks run in independent temporary Unity projects:
 
-- `Run-MapRuntimeRegression.ps1 -Fixture CharacterReferenceRegression`: Character constant registration/typed chooser metadata and literal compilation, exact/runtime versus prototype Character resolution, current-scene snapshots, unique singleton, invalid references, recycled Data identity, team/current remapping and independent skill copies. In Mod's event editor, manually select a `character` argument, choose the basic `Character` constant, select a Story Character, then Apply/reopen to confirm the quoted `$ch$ProductUid$ch$` persists; canceling must preserve the prior argument.
+- `Run-MapRuntimeRegression.ps1 -Fixture CharacterReferenceRegression`: Character constant registration/typed chooser metadata and literal compilation, exact/runtime versus prototype Character resolution, current-scene snapshots, unique singleton, invalid references, recycled Data identity, team/current remapping and independent skill copies. Cache checks verify reuse of `_characterDic` and its Unit groups across 2,000 warm exact/prototype/absent-unit query rounds, cached GetOrNewCharacter, duplicate-Product placements with minimum-UID selection, stable plural snapshots, add/remove and productInfo-rebinding invalidation, and same-UID Product replacement. In Mod's event editor, manually select a `character` argument, choose the basic `Character` constant, select a Story Character, then Apply/reopen to confirm the quoted `$ch$ProductUid$ch$` persists; canceling must preserve the prior argument.
 - `Run-MapRuntimeRegression.ps1 -Fixture CharacterPartyRegression`: five Character party commands, command metadata/default compilation, prototype recruitment and fan-out, unique Characters, team/active/current invariants, idempotence, current-character fallback, deliberate reserve-only save reload versus legacy invalid-UID repair, invalid/omitted references, HUD/trigger null safety and existing team-slot UI entry points. Test actual HUD refresh/player switching in Play mode too.
-- `Run-MapRuntimeRegression.ps1 -Fixture CharacterRemovalRegression`: real legacy `DestroyCharacter` execution through Product and scene-Unit references for unique/non-unique Characters. Checks synchronous instance/registry/index/interaction cleanup, repeated deletion, preserved unique Product/parameter identities and party references, recreating a scene instance from that Product, and rejection of stale Data after Unit UID reuse. This focused fixture has no old Renderer API dependencies and never loads a story or save. Success is `CHARACTER_REMOVAL_REGRESSION_PASS`; actual scene UI and Player behavior still need a smoke check.
+- `Run-MapRuntimeRegression.ps1 -Fixture CharacterRemovalRegression`: real legacy `DestroyCharacter` execution through Product and scene-Unit references for unique/non-unique Characters. Checks synchronous instance/registry/index/interaction cleanup, repeated deletion, preserved unique Product/parameter identities and party references, recreating a scene instance from that Product, and rejection of stale Data after Unit UID reuse. Also runs the real current-Character refresh: full rotation/position handoff to existing/new Characters, immediate Instance synchronization, clearing stale pending rotation, unchanged-current idempotence and first/empty-current selection compatibility. This focused fixture has no old Renderer API dependencies and never loads a story or save. Success is `CHARACTER_REMOVAL_REGRESSION_PASS`; actual scene UI and Player behavior still need a smoke check.
 - `Run-MapRuntimeRegression.ps1 -Fixture UnifiedDestroyRegression`: checks canonical `Destroy` metadata/scene Lab and both legacy aliases; Character/Object prototype fan-out and exact references; Item Product/scene references; unique Character preservation; registry, instance, interaction and owned-event/task cleanup; malformed/mismatched/Tile no-ops and reentrant UID reuse. Pre-destruction hooks cover still-live `param1`/GetPosition, prototype-before-local order, asynchronous completion before removal/caller continuation, nested Pause ownership, recursive self/mutual destruction, cancellation/reset cleanup and reused-UID protection. Item destruction removes matching scene drops, never backpack entries or Item Products. Uses the real command and removal owners without loading a story/save. Success is `UNIFIED_DESTROY_REGRESSION_PASS`; real scene/Player smoke checks remain separate.
-- `Run-MapRuntimeRegression.ps1 -Fixture ObjectProductRuntimeRegression`: legacy `mof` and wrapper `oprf` migration, full Product-owned model/events/animation/collision/params, transient MapObject rows, all-scene copies without scene provenance, idempotence, Mod memory-only loading, unvisited Core upgrades on explicit save, replacement-table round trips and reset.
-- `Run-MapRuntimeRegression.ps1 -Fixture SceneObjectReferenceRegression`: discriminated Unit/Product/template IDs, legacy `$sop$` compatibility, `IsSameObject` prototype comparisons and interpreter calls, parameter fan-out and saved cached values, unloaded Product reads/writes, malformed refs and actual multi-instance removal. Prototype comparison covers exact prototypes, sibling/self Products, different/zero prototypes, both invalid argument positions, unloaded Products and recycled Unit IDs.
+- `Run-MapRuntimeRegression.ps1 -Fixture ObjectProductRuntimeRegression`: current-schema Cache placement preparation, independent nested Product state and parameter overrides, idempotence, no Core rewrite or live Unit registration, direct Unit-to-Product lookup, parameter-key publishing, Core/Save filtering, save/reload across unloaded scenes and reset. Extra replacement checks immediate Form-action invalidation of Product, parameter and local/combined event caches, rebuilding from the new Extra, preserved real Product values and write-through Product bindings.
+- `Run-MapRuntimeRegression.ps1 -Fixture SceneObjectReferenceRegression`: canonical numeric Product and explicit Unit IDs, rejection of retired aliases, `IsSameObject` prototype comparisons and interpreter calls, parameter fan-out and saved cached values, unloaded Product reads/writes, malformed refs and actual multi-instance removal. Prototype comparison covers exact prototypes, sibling/self Products, different/zero prototypes, both invalid argument positions, unloaded Products and recycled Unit IDs.
 - `Run-MapRuntimeRegression.ps1 -Fixture SceneProductCommandRegression`: Character/Object template versus exact position/move/rotation, independent relative starts, bounded time, legacy duration aliases, original Data identity and all-target completion. It does not compile the unrelated renderer probes in the broad map fixture.
 - `Run-MapRuntimeRegression.ps1 -Fixture StoryTargetSelectionRegression`: registers and compiles all Story 1 programs, compiling the `vector`-returning `朝向敌人` first, then executes the real compiler/interpreter with deterministic command probes. Covers nearest visible selection across self-first/unsorted/reversed candidates, friendly/occluded exclusion, higher/lower targets, forward fallback, raw query/distance coordinates and explicitly raised LOS endpoints. Executes player shot events, the enemy ranged/Sword chain, the beam's projectile routing, straight movement and homing; checks returned 3D directions, Sword's doubled speed, nonzero height displacement and unchanged movement durations. A real `IsUnobstructed`/`CaptureCast` low-wall case requires unraised endpoints to hit and caller-raised endpoints to pass. Exports the seven changed events (`5`, `6`, `7`, `19`, `20`, `23`, `28`) to `compiled-bullet-events.json` inside the isolated project; actual Play aiming/projectile rendering still requires a smoke check.
 
@@ -65,9 +174,11 @@ and repeated warm calls. The 10,000-call unchanged workload must make zero colum
 queries; this is a deterministic call-count check, not a Player FPS benchmark.
 
 `Run-MapRuntimeRegression.ps1 -Fixture FadeCommandsRegression` checks the actual
-FadeIn/FadeOut commands, generated metadata, black-image start/mid/end alpha,
-one-second unscaled completion and closing, replacement/reopening/Hide cleanup,
-and immediate execution of the following statement by the real interpreter.
+FadeIn/FadeOut commands, numeric-duration metadata, old omitted-argument defaults,
+black-image start/mid/end alpha at custom unscaled durations and immediate closing
+for nonpositive/nonfinite input. Covers independent FadeOut from stale/hidden graphic
+state, first-Canvas timing despite a simulated loading stall, replacement/reopening/
+Hide callback cleanup, and immediate continuation by the real interpreter.
 Visually check the registered PlayEffect prefab in Play too.
 
 `Run-SceneTransitionRegression.ps1` runs the production Play transition/unload
@@ -224,8 +335,10 @@ spies without launching the project or reading stories/saves. It checks stable
 finger IDs/crossings, phase and cancel routing, focus/pause/disable cleanup, independent
 stick ownership, blocked-gameplay continuation, LightAttack self-continuation,
 scene UI-origin filtering, brush termination over UI/cancel, and desktop mouse paths.
-The authored Stick source and Q/E prefab overrides are checked statically for
-sibling center/area layout, a raycast-enabled center and disabled Q/E area Graphic.
+The authored Stick source and Q/E effective prefab flags are checked statically for
+sibling center/area layout, a raycast-enabled center and disabled Q/E area Graphic,
+including inherited flags without redundant instance overrides. The saved nested
+`img_` binding and non-raycastable icon/mask hierarchy are checked too.
 Actual `UiPlaySceneMainCtrl` Q/E callback/setup/refresh helpers are extracted too:
 center press captures zero offset, edge drag maps screen XY to world XZ, Q/E bind
 their own skills, Refresh preserves an owned aim, and blocking/skill-disable/cancel
@@ -238,6 +351,9 @@ Generic floating-mode checks retain idle-hidden knobs, transparent active hit re
 press origins, scaled relative drags, cancellation/block hiding and fixed-mode reuse.
 Android move-facing checks cover initial movement, neutral/long attack holds,
 the 0.1-second release/cancel boundary, renewed input, Q/E priority and desktop exclusion.
+Skill icon checks cover LightAttack/E/Q equipment, character switches, retained
+aim ownership, missing Skill/texture/zero IDs, empty current Character, fresh Params
+and hide/reopen. Icon refresh leaves movement visuals and the raycastable knobs intact.
 Mod Begin/End reset calls are checked statically; real map painting/history and
 Android touch/UI hit testing still require on-device Play/Mod smoke tests.
 
@@ -964,6 +1080,37 @@ clear stale globals. Filesystem checks use only a fixture-owned temporary direct
 no production story or save is loaded or changed. Success marker:
 `GLOBAL_VARIABLE_REGRESSION_PASS`.
 
+## Pause-owned event tasks and remaining Wait
+
+```powershell
+./Docs/Tests/Run-MapRuntimeRegression.ps1 -Fixture PauseTasksRegression
+```
+
+Runs real Pause/Continue, scheduler, interpreter Wait, Progress updates and Object
+movement steps in an isolated map. Checks other events' Wait/countdowns and tasks
+freeze without catch-up, the Pause owner and required child/subprogram tasks keep
+running, immediate first polls cannot bypass blocking, and paused tasks still
+cancel/reset cleanly. Progress.seconds remains frozen while the owner's Wait can
+continue to Continue. No production scene/save is loaded. Success marker:
+`PAUSE_TASKS_REGRESSION_PASS`.
+
+## Story projectile Team/damage snapshots
+
+```powershell
+./Docs/Tests/Run-MapRuntimeRegression.ps1 -Fixture StoryProjectileDamageRegression
+```
+
+Runs migrated Story 1 attack, homing, Character-hit and scenery-hit source through
+the actual compiler/interpreter with deterministic scene-command probes. Checks
+every projectile receives numeric `所属Team` and captured `伤害`, same-Team/self
+contact has no hit or Destroy side effect, defense clamps damage at zero, neutral
+rules remain unchanged, scenery uses the same captured damage, and behavior does
+not dereference a removed shooter or use its later attack/Team changes. An optional
+`-ProjectileEventDirectory` copies only `ef` files beneath an explicit preview
+directory into the disposable project, allowing repository and local-save previews
+to be checked together. No live scene/save is loaded or modified. Success marker:
+`STORY_PROJECTILE_DAMAGE_REGRESSION_PASS`.
+
 ## Scene global-variable change triggers
 
 ```powershell
@@ -973,9 +1120,12 @@ no production story or save is loaded or changed. Success marker:
 Exercises the actual `SetGlobalVar` command, change event, Story trigger listener,
 queued event interpreter and normal LateUpdate scheduling in an isolated project.
 Bindings use the global UID (`onGlobalVarChangeEvent$UID`), or the empty Any suffix.
-Scene arguments are `param1 = name`, `param2 = old value`, `param3 = new value`.
-Unit arguments are `param1 = exact owner reference`, `param2 = name`,
-`param3 = old value`, `param4 = new value`, including the `格挡1` regression.
+Scene-panel and Unit bindings share `param2 = variable name`,
+`param3 = new value - old value` (signed numeric delta, like Character parameter changes).
+`param1` is zero for Scene bindings and the exact owner reference for Unit bindings.
+The full new-value snapshot remains in `param4`; text/dictionary changes still fire,
+with numeric delta zero. Includes simultaneous Scene Any/exact and all four Unit
+types for the `格挡1` regression, decreases and fractional deltas.
 Checks include deep equality and type changes, rename-stable matching, independent
 handler snapshots, same-value reassignments, scene/Mod/Leave guards and Scene JSON
 round trips. The actual Scene configuration builder and chooser callbacks also
@@ -1001,3 +1151,5 @@ global creation/rename/deletion and separate Core defaults versus Save values.
 Filesystem checks use fixture-owned temporary folders only. Success marker:
 `MOD_STORY_VARIABLE_EDITOR_REGRESSION_PASS`. Also retain `GlobalVariableRegression`
 for command execution, deep Box copies and the `egvf` persistence lifecycle.
+
+World-unit coordinate checks: `SceneProductCommandRegression` repeats grouped Character/Object Get/Set/Move with nonuniform `(2,3,4)` cells and checks direct normalization, yaw, area radius, navigation and mission targets. `CameraCommandsRegression` verifies world offsets and absolute +500 positions on nonuniform cells. `Run-MapRuntimeRegression.ps1 -Fixture StoryTargetSelectionRegression -LineOfSight` checks the same real low-wall LOS at tall and short cell sizes without depending on editable Story 1 programs. It also replays the logged cherry-tree pass-through in both directions with radii 0.2/0.3/0.45 and yaw/slope rotations, checks first-contact normals, preserves outward/embedded escape and ground tangency, and exercises real `CaptureCast`/`IsUnobstructed` on the tree. `MapRuntimeRegression -SceneCommands` retains scene/mission coverage with world-unit expectations. Grid indices, Tile geometry and minimap projection remain cell-based internally.

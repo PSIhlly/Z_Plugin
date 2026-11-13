@@ -20,7 +20,7 @@ namespace Z_Code
         public override CmdBase GetNew() => new GetNormalizedVectorCmd();
         protected override bool ExecuteInternal(BoxDataForm.Data[] prm, InterpretAsyncTask asyncTask)
         {
-            var v = MapManager.instance.utilCtrl.MapPos2RealPos(new Vector3(prm[0].dic["x"].num, prm[0].dic["height"].num, prm[0].dic["y"].num)).normalized;
+            var v = new Vector3(prm[0].dic["x"].num, prm[0].dic["height"].num, prm[0].dic["y"].num).normalized;
 
             var box = CodeHelper.CreateBox();
             box.dic["x"] = CodeHelper.CreateBoxByNum(v.x);

@@ -155,8 +155,20 @@ public static readonly int autoUidCnt=100;
 
                 public Data Copy(bool sameId = true)
                 {
-        return new Data(sameId? uid:uidChain.GetId(),equipStyle==null?new Dictionary<EquipPartType,ItemStyle>():new Dictionary<EquipPartType,ItemStyle>(equipStyle),equipTrs==null?new Dictionary<EquipPartType,(float,float,int,float)>():new Dictionary<EquipPartType,(float,float,int,float)>(equipTrs),partTex==null?new Dictionary<BodyPartType,int>():new Dictionary<BodyPartType,int>(partTex));
+                    using (DataCopyGuard.Enter(this))
+                    {
+        var copy = new Data(sameId? uid:uidChain.GetId(),equipStyle==null?new Dictionary<EquipPartType,ItemStyle>():new Dictionary<EquipPartType,ItemStyle>(equipStyle),equipTrs==null?new Dictionary<EquipPartType,(float,float,int,float)>():new Dictionary<EquipPartType,(float,float,int,float)>(equipTrs),partTex==null?new Dictionary<BodyPartType,int>():new Dictionary<BodyPartType,int>(partTex));
+                        CopyRuntimeStateTo(copy);
+                        return copy;
+                    }
                 }
+
+            protected void CopyRuntimeStateTo(Data copy)
+            {
+                OnCopy(copy);
+            }
+            partial void OnCopy(Data copy);
+
             
             public virtual  void BeforeGet()
             {

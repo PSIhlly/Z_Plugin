@@ -1079,7 +1079,7 @@ namespace Z_Map
 
             RefreshUnitColumns(unit);
 
-            var affectedTiles = new HashSet<TileUnit>(objectTileDic.Get(unit));
+            var affectedTiles = new HashSet<TileUnit>();
             if (objectPassTypeTileDic.TryGet(unit, out var oldPassTiles))
                 affectedTiles.UnionWith(oldPassTiles);
             if (objectNavigationTileDic.TryGet(unit, out var oldNavigationTiles))
@@ -1088,19 +1088,19 @@ namespace Z_Map
             objectPassTypeTileDic.Del(unit);
             objectNavigationTileDic.Del(unit);
             foreach (var tile in _super.utilCtrl.GetVisionOverlap(unit.data))
-            {
                 objectTileDic.Add(unit, tile);
-                affectedTiles.Add(tile);
-            }
-            foreach (var tile in _super.utilCtrl.GetObjectPassTypeOverlap(unit.data))
+            if (unit.data.isObstacle)
             {
-                objectPassTypeTileDic.Add(unit, tile);
-                affectedTiles.Add(tile);
-            }
-            foreach (var tile in _super.utilCtrl.GetObjectNavigationOverlap(unit.data))
-            {
-                objectNavigationTileDic.Add(unit, tile);
-                affectedTiles.Add(tile);
+                foreach (var tile in _super.utilCtrl.GetObjectPassTypeOverlap(unit.data))
+                {
+                    objectPassTypeTileDic.Add(unit, tile);
+                    affectedTiles.Add(tile);
+                }
+                foreach (var tile in _super.utilCtrl.GetObjectNavigationOverlap(unit.data))
+                {
+                    objectNavigationTileDic.Add(unit, tile);
+                    affectedTiles.Add(tile);
+                }
             }
             RefreshObjectAffectedTiles(affectedTiles);
         }
@@ -1108,7 +1108,7 @@ namespace Z_Map
         public void RemoveObjectOverlap(ObjectUnit unit)
         {
             ForgetUnitColumns(unit);
-            var affectedTiles = new HashSet<TileUnit>(objectTileDic.Get(unit));
+            var affectedTiles = new HashSet<TileUnit>();
             if (objectPassTypeTileDic.TryGet(unit, out var oldPassTiles))
                 affectedTiles.UnionWith(oldPassTiles);
             if (objectNavigationTileDic.TryGet(unit, out var oldNavigationTiles))
@@ -1119,8 +1119,9 @@ namespace Z_Map
             RefreshObjectAffectedTiles(affectedTiles);
         }
 
-        private void RefreshObjectAffectedTiles(IEnumerable<TileUnit> tiles)
+        private void RefreshObjectAffectedTiles(HashSet<TileUnit> tiles)
         {
+            if (tiles.Count == 0) return;
             foreach (var tile in tiles)
             {
                 bool covered = objectPassTypeTileDic.TryGet(tile, out var objects) && objects.Count > 0;
@@ -1304,14 +1305,13 @@ namespace Z_Map
                 candidateTiles.UnionWith(characterOverlapTileDic.Get(ch));
                 candidateTiles.UnionWith(_super.utilCtrl.GetCharacterCollisionTiles(ch, dir, CollideType.All));
             }
-            else
+            else if (unit is ObjectUnit obj)
             {
-                TileUnit cur = null;
-                if (unit is ObjectUnit obj)
-                    cur = objectTileDic.GetFirst(obj);
-                else if (unit is ItemUnit item)
-                    cur = itemTileDic.GetFirst(item);
-
+                candidateTiles.UnionWith(_super.utilCtrl.GetObjectCollisionTiles(obj, dir, CollideType.All));
+            }
+            else if (unit is ItemUnit item)
+            {
+                var cur = itemTileDic.GetFirst(item);
                 if (cur != null)
                     candidateTiles.UnionWith(_super.utilCtrl.GetNineTile((cur.data.mapPos.x, cur.data.mapPos.y, cur.data.mapPos.z), dir.magnitude));
             }
@@ -1319,6 +1319,7 @@ namespace Z_Map
             HashSet<int> exist = new HashSet<int>() { unit.data.uid };
             foreach (var tile in candidateTiles)
             {
+                exist.Add(tile.data.uid);
                 // TileTouch表示移动单位的实体Collider与地面Tile接触，沿用Unit.OnEnter/OnExit的状态链路。
                 CheckCollide((MapUnit)unit, tile, dir, CollideType.CollideOnly, out _, (target, res, dis) =>
                 {
@@ -1340,6 +1341,18 @@ namespace Z_Map
                     });
                 }
             }
+            if (unit is ObjectUnit)
+                foreach (int uid in unit.data.collidingUnitUid)
+                    if (exist.Add(uid) && UnitForm.DataByUid.TryGetValue(uid, out var row) && row.unit is MapUnit target)
+                    {
+                        // Tight sweep culling can exclude a former contact's Tile.
+                        // Recheck the known pair directly so it can still emit Exit.
+                        CheckCollide((MapUnit)unit, target, dir,
+                            target is TileUnit ? CollideType.CollideOnly : CollideType.TriggerOnly, out _, (other, res, dis) =>
+                            {
+                                ManageTriggerEvent(unit, other, res);
+                            });
+                    }
         }
         private void ManageTriggerEvent(Unit a, Unit b, Graph.IntersectType type)
         {

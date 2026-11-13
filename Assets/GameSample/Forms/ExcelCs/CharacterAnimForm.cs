@@ -199,8 +199,34 @@ public static readonly int autoUidCnt=100;
 
                 public Data Copy(bool sameId = true)
                 {
-        return new Data(sameId? uid:uidChain.GetId(),name,animClip==null?new Dictionary<AnimDirecton,List<CharacterAnimClipForm.Data>>():new Dictionary<AnimDirecton,List<CharacterAnimClipForm.Data>>(animClip),animTimeInterval,scale,partEnable==null?new Dictionary<BodyPartType,bool>():new Dictionary<BodyPartType,bool>(partEnable));
+                    using (DataCopyGuard.Enter(this))
+                    {
+        var copy = new Data(sameId? uid:uidChain.GetId(),name,animClip==null?new Dictionary<AnimDirecton,List<CharacterAnimClipForm.Data>>():CopyCollection0(animClip),animTimeInterval,scale,partEnable==null?new Dictionary<BodyPartType,bool>():new Dictionary<BodyPartType,bool>(partEnable));
+                        CopyRuntimeStateTo(copy);
+                        return copy;
+                    }
                 }
+
+            protected void CopyRuntimeStateTo(Data copy)
+            {
+                OnCopy(copy);
+            }
+            partial void OnCopy(Data copy);
+
+            private static Dictionary<AnimDirecton,List<CharacterAnimClipForm.Data>> CopyCollection0(Dictionary<AnimDirecton,List<CharacterAnimClipForm.Data>> source)
+            {
+                var result = new Dictionary<AnimDirecton,List<CharacterAnimClipForm.Data>>(source.Count, source.Comparer);
+                foreach (var pair in source) result.Add(pair.Key, pair.Value==null?null:CopyCollection1(pair.Value));
+                return result;
+            }
+
+            private static List<CharacterAnimClipForm.Data> CopyCollection1(List<CharacterAnimClipForm.Data> source)
+            {
+                var result = new List<CharacterAnimClipForm.Data>(source.Count);
+                foreach (var item in source) result.Add(item?.Copy());
+                return result;
+            }
+
             
             public virtual  void BeforeGet()
             {

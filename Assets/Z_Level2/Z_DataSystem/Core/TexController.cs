@@ -310,6 +310,8 @@ namespace Z_DataSystem
     public class TexController : Z_Controller<AssetManager>, IAssetController
     {
 
+        public int emptyAssetId { get; set; } = -1;
+
         public bool IsAsset(string name)
         {
             var parts = name.Split(GetMark());
@@ -328,6 +330,8 @@ namespace Z_DataSystem
             {
                 return id;
             }
+            if (parts.Length == 3 && parts[0].Length == 0 && parts[1].Length == 0 && parts[2].Length == 0)
+                return emptyAssetId;
             return -1;
         }
         public string GetMark() => AssetDefines.IMAGE_MARK;

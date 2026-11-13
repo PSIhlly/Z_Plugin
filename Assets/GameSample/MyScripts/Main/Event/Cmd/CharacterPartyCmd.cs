@@ -1,3 +1,6 @@
+using System.Collections.Generic;
+using System.Globalization;
+using Form;
 using UnityEngine;
 using Z_Code.Form;
 
@@ -85,6 +88,58 @@ namespace Z_Code
             if (manager != null)
                 manager.infoCtrl?.SetCurrentCharacter(prm != null && prm.Length > 0 ? prm[0]?.str : string.Empty);
             return true;
+        }
+    }
+
+    public class GetDeployedCharactersCmd : CmdBase
+    {
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterAssembliesLoaded)]
+        private static void Init() => Register(new GetDeployedCharactersCmd());
+
+        public override string GetName() => "GetDeployedCharacters";
+        public override CmdBase GetNew() => new GetDeployedCharactersCmd();
+
+        protected override bool ExecuteInternal(BoxDataForm.Data[] prm, InterpretAsyncTask asyncTask)
+        {
+            asyncTask.res = new[] { PartyListCommand.CreateList(GameManager.instance.curProgress?.teamActive) };
+            return true;
+        }
+    }
+
+    public class GetTeamCharactersCmd : CmdBase
+    {
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterAssembliesLoaded)]
+        private static void Init() => Register(new GetTeamCharactersCmd());
+
+        public override string GetName() => "GetTeamCharacters";
+        public override CmdBase GetNew() => new GetTeamCharactersCmd();
+
+        protected override bool ExecuteInternal(BoxDataForm.Data[] prm, InterpretAsyncTask asyncTask)
+        {
+            asyncTask.res = new[] { PartyListCommand.CreateList(GameManager.instance.curProgress?.team) };
+            return true;
+        }
+    }
+
+    internal static class PartyListCommand
+    {
+        internal static BoxDataForm.Data CreateList(List<int> members)
+        {
+            var result = CodeHelper.CreateBox();
+            if (members == null)
+                return result;
+
+            var seen = new HashSet<int>();
+            foreach (int uid in members)
+            {
+                if (uid <= 0 || !CharacterProductForm.DataByUid.TryGetValue(uid, out var character)
+                    || character == null || !seen.Add(uid))
+                    continue;
+
+                result.dic[result.dic.Count.ToString(CultureInfo.InvariantCulture)] = CodeHelper.CreateBoxByStr(
+                    GlobalEventHelper.GetName(GlobalEventHelper.CHARACTER, uid.ToString(CultureInfo.InvariantCulture)));
+            }
+            return result;
         }
     }
 }

@@ -387,8 +387,42 @@ namespace Form
 
                 public Data Copy(bool sameId = true)
                 {
-        return new Data(sameId? uid:uidChain.GetId(),name,labId,protoUid,icon,model,collision,events==null?new Dictionary<string,EventTriggerForm.Data>():new Dictionary<string,EventTriggerForm.Data>(events),paramDic==null?new Dictionary<string,MapObjectParamForm.Data>():new Dictionary<string,MapObjectParamForm.Data>(paramDic),minimapIcon,faceType,animClip==null?new Dictionary<AnimDirecton,List<int>>():new Dictionary<AnimDirecton,List<int>>(animClip),isWangTile,boundsCollision,centerCollider,modelSizes==null?new Dictionary<AnimDirecton,Vector3>():new Dictionary<AnimDirecton,Vector3>(modelSizes),modelPositions==null?new Dictionary<AnimDirecton,Vector3>():new Dictionary<AnimDirecton,Vector3>(modelPositions));
+                    using (DataCopyGuard.Enter(this))
+                    {
+        var copy = new Data(sameId? uid:uidChain.GetId(),name,labId,protoUid,icon,model?.Copy(),collision,events==null?new Dictionary<string,EventTriggerForm.Data>():CopyCollection0(events),paramDic==null?new Dictionary<string,MapObjectParamForm.Data>():CopyCollection1(paramDic),minimapIcon,faceType,animClip==null?new Dictionary<AnimDirecton,List<int>>():CopyCollection2(animClip),isWangTile,boundsCollision,centerCollider,modelSizes==null?new Dictionary<AnimDirecton,Vector3>():new Dictionary<AnimDirecton,Vector3>(modelSizes),modelPositions==null?new Dictionary<AnimDirecton,Vector3>():new Dictionary<AnimDirecton,Vector3>(modelPositions));
+                        CopyRuntimeStateTo(copy);
+                        return copy;
+                    }
                 }
+
+            protected void CopyRuntimeStateTo(Data copy)
+            {
+                base.CopyRuntimeStateTo(copy);
+                OnCopy(copy);
+            }
+            partial void OnCopy(Data copy);
+
+            private static Dictionary<string,EventTriggerForm.Data> CopyCollection0(Dictionary<string,EventTriggerForm.Data> source)
+            {
+                var result = new Dictionary<string,EventTriggerForm.Data>(source.Count, source.Comparer);
+                foreach (var pair in source) result.Add(pair.Key, pair.Value?.Copy());
+                return result;
+            }
+
+            private static Dictionary<string,MapObjectParamForm.Data> CopyCollection1(Dictionary<string,MapObjectParamForm.Data> source)
+            {
+                var result = new Dictionary<string,MapObjectParamForm.Data>(source.Count, source.Comparer);
+                foreach (var pair in source) result.Add(pair.Key, pair.Value?.Copy());
+                return result;
+            }
+
+            private static Dictionary<AnimDirecton,List<int>> CopyCollection2(Dictionary<AnimDirecton,List<int>> source)
+            {
+                var result = new Dictionary<AnimDirecton,List<int>>(source.Count, source.Comparer);
+                foreach (var pair in source) result.Add(pair.Key, pair.Value==null?null:new List<int>(pair.Value));
+                return result;
+            }
+
             
             public override  void BeforeGet()
             {

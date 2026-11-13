@@ -44,40 +44,40 @@ namespace Ui.ModSceneMain
         {
             set
             {
-                int.TryParse(value, out int v);
-                var x = Mathf.Max(Mathf.Min(GameManager.PlayerPosToMapPos(v), (int)MapManager.instance.sizeLimit.x), 0) * MapManager.instance.data.mainData.mapUnitSize.x;
-                ModManager.instance.sceneCtrl.SetCamera(x, (int)CameraInstance.instance.tarTrs.position.y, (int)CameraInstance.instance.tarTrs.position.z);
+                float.TryParse(value, out float v);
+                var x = Mathf.Clamp(GameManager.PlayerPosToMapPos(v), 0, MapManager.instance.utilCtrl.MapPos2RealPos((Vector3)MapManager.instance.sizeLimit).x);
+                ModManager.instance.sceneCtrl.SetCamera(x, CameraInstance.instance.tarTrs.position.y, CameraInstance.instance.tarTrs.position.z);
             }
             get
             {
-                return GameManager.MapPosToPlayerPos(MapManager.instance.utilCtrl.RealPos2MapPos(new Vector3(CameraInstance.instance.tarTrs.position.x, 0, 0))).x.ToString("0.#");
+                return GameManager.MapPosToPlayerPos(new Vector3(CameraInstance.instance.tarTrs.position.x, 0, 0)).x.ToString("0.#");
             }
         }
         public string viewY
         {
             set
             {
-                int.TryParse(value, out int v);
-                var y = Mathf.Max(Mathf.Min(GameManager.PlayerPosToMapPos(v), (int)MapManager.instance.sizeLimit.y), 0) * MapManager.instance.data.mainData.mapUnitSize.y;
-                ModManager.instance.sceneCtrl.SetCamera((int)CameraInstance.instance.tarTrs.position.x, y, (int)CameraInstance.instance.tarTrs.position.z);
+                float.TryParse(value, out float v);
+                var y = Mathf.Clamp(GameManager.PlayerPosToMapPos(v), 0, MapManager.instance.utilCtrl.MapPos2RealPos((Vector3)MapManager.instance.sizeLimit).y);
+                ModManager.instance.sceneCtrl.SetCamera(CameraInstance.instance.tarTrs.position.x, y, CameraInstance.instance.tarTrs.position.z);
             }
             get
             {
-                return GameManager.MapPosToPlayerPos(MapManager.instance.utilCtrl.RealPos2MapPos(new Vector3(0, CameraInstance.instance.tarTrs.position.y, 0))).y.ToString("0.#");
+                return GameManager.MapPosToPlayerPos(new Vector3(0, CameraInstance.instance.tarTrs.position.y, 0)).y.ToString("0.#");
             }
         }
         public string viewZ
         {
             set
             {
-                int.TryParse(value, out int v);
-                var z = Mathf.Max(Mathf.Min(GameManager.PlayerPosToMapPos(v), (int)MapManager.instance.sizeLimit.z), 0) * MapManager.instance.data.mainData.mapUnitSize.z;
-                ModManager.instance.sceneCtrl.SetCamera((int)CameraInstance.instance.tarTrs.position.x, (int)CameraInstance.instance.tarTrs.position.y, z);
+                float.TryParse(value, out float v);
+                var z = Mathf.Clamp(GameManager.PlayerPosToMapPos(v), 0, MapManager.instance.utilCtrl.MapPos2RealPos((Vector3)MapManager.instance.sizeLimit).z);
+                ModManager.instance.sceneCtrl.SetCamera(CameraInstance.instance.tarTrs.position.x, CameraInstance.instance.tarTrs.position.y, z);
 
             }
             get
             {
-                return GameManager.MapPosToPlayerPos(MapManager.instance.utilCtrl.RealPos2MapPos(new Vector3(0, 0, CameraInstance.instance.tarTrs.position.z))).z.ToString("0.#");
+                return GameManager.MapPosToPlayerPos(new Vector3(0, 0, CameraInstance.instance.tarTrs.position.z)).z.ToString("0.#");
             }
         }
     }
@@ -102,7 +102,7 @@ namespace Ui.ModSceneMain
             });
             view.btn_view.onClick.AddListener(() =>
             {
-                var pos = MapManager.instance.utilCtrl.MapPos2RealPos(GameManager.PlayerPosToMapPos(Vector3.zero));
+                var pos = GameManager.PlayerPosToMapPos(Vector3.zero);
                 ModManager.instance.sceneCtrl.SetCamera(pos.x, pos.y, pos.z);
                 Refresh();
             });

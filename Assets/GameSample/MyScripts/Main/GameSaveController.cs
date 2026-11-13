@@ -24,7 +24,6 @@ public class GameSaveController : Z_Controller<GameManager>
 {
     public string mapTextureFormFileName => "mtf";
     public string mapMaskFormFileName => "mmf";
-    public string mapObjectFormFileName => "mof";
     public string objectProductFormFileName => "oprf";
     public string storyFormFileName => "sf";
     public string characterParamFormFileName => "cpaf";
@@ -50,7 +49,6 @@ public class GameSaveController : Z_Controller<GameManager>
     public string passTypeFormFileName => "ptf";
 
     public string assetFolder => "ast/";
-    private JArray legacyObjectForms;
     public GameSaveController(GameManager super) : base(super)
     {
     }
@@ -390,13 +388,12 @@ public class GameSaveController : Z_Controller<GameManager>
     }
     public void SaveSceneMap(string scenePath, MapInfo data)
     {
-        SaveAndLoad.Save(scenePath, JsonConvert.SerializeObject(GlobalEventHelper.SaveSceneObjectReferences(data.GetJsonData())));
+        SaveAndLoad.Save(scenePath, JsonConvert.SerializeObject(data.GetJsonData()));
     }
     public void SaveSaveStory(int id)
     {
         string path = Main2StoryManager.GetStorySaveFolder(id);
 
-        ObjectProductForm.EnsurePrototypes(); // Create concrete-owned labels before saving lf.
         SaveLab(path);
         SavePassType(path);
         SaveMaterial(path);
@@ -425,7 +422,6 @@ public class GameSaveController : Z_Controller<GameManager>
 
         string path = Main2StoryManager.GetStoryCoreFolder(id);
 
-        ObjectProductForm.EnsurePrototypes();
         SaveLab(path);
         SavePassType(path);
         SaveMaterial(path);
@@ -495,11 +491,6 @@ public class GameSaveController : Z_Controller<GameManager>
 
     public void SaveObjectProducts(string folder, bool includeRuntime)
     {
-        ObjectProductForm.EnsurePrototypes();
-        // An explicit authored save also upgrades unvisited source scenes
-        // before the obsolete MapObject table can be retired.
-        if (!includeRuntime)
-            ObjectProductForm.PrepareModStory(folder);
         var products = new JArray();
         foreach (var product in ObjectProductForm.DataByUid.Values)
             if (includeRuntime || product.protoUid == 0)
@@ -510,9 +501,6 @@ public class GameSaveController : Z_Controller<GameManager>
                 products.Add(ObjectProductForm.GetJoByData(product));
             }
         SaveReferenceForms(folder + "/" + objectProductFormFileName, products);
-        // Delete only this obsolete table after the replacement is saved.
-        if (SaveAndLoad.Exist(folder + "/" + mapObjectFormFileName))
-            SaveAndLoad.Delete(folder + "/" + mapObjectFormFileName);
     }
 
     public void SaveCharacter(string storyCoreFolder)
@@ -647,7 +635,7 @@ public class GameSaveController : Z_Controller<GameManager>
     }
     private string SaveStoryVideo(StoryVideoAssetForm.Data data, string path)
     {
-        if (data == null || GlobalDefaultHelper.IsInnerAssetName(data.id))
+        if (data == null || GlobalDefaultHelper.IsEmptyAsset(data) || GlobalDefaultHelper.IsInnerAssetName(data.id))
             return null;
 
         var name = GetStoryAssetFileName(AssetManager.instance.videoCtrl, data);
@@ -665,7 +653,7 @@ public class GameSaveController : Z_Controller<GameManager>
     }
     private string SaveStoryAudio(StoryAudioAssetForm.Data data, string path)
     {
-        if (data == null || GlobalDefaultHelper.IsInnerAssetName(data.id))
+        if (data == null || GlobalDefaultHelper.IsEmptyAsset(data) || GlobalDefaultHelper.IsInnerAssetName(data.id))
             return null;
 
         var name = GetStoryAssetFileName(AssetManager.instance.audioCtrl, data);
@@ -759,7 +747,6 @@ public class GameSaveController : Z_Controller<GameManager>
 
         DeleteCache(id);
         CopyMapScene(folder, Main2StoryManager.GetStoryCacheFolder(id));
-        ObjectProductForm.PrepareModStory(Main2StoryManager.GetStoryCacheFolder(id));
         LoadAsset(assetFolder);
         RepairMissingCharacterTextureReferences();
     }
@@ -997,28 +984,51 @@ public class GameSaveController : Z_Controller<GameManager>
     }
     public void LoadObject(string folder)
     {
-        MapObjectForm.Clear();
-        legacyObjectForms = null;
-        if (folder == null)
-            return;
-        var path = folder + mapObjectFormFileName;
-        if (!SaveAndLoad.Exist(path))
-            return;
-        legacyObjectForms = ReadReferenceForms(path);
-        MigrateFlatLabIds(legacyObjectForms, nameof(ObjectProductForm), "label");
+        MapObjectForm.Clear(); // Rebuilt chooser rows; configuration lives in oprf.
     }
 
-    // Load last among Product-derived tables: old stories need newly allocated
-    // Object Product IDs only after Character/Skill/Item IDs have been reserved.
     public void LoadObjectProducts(string folder)
     {
         ObjectProductForm.Clear();
-        ObjectProductForm.ResetReferences();
-        if (folder == null)
-            return;
-        var path = folder + objectProductFormFileName;
-        var forms = SaveAndLoad.Exist(path) ? ReadReferenceForms(path) : null;
-        ObjectProductForm.LoadProducts(forms, legacyObjectForms);
+        ObjectProductForm.ResetSceneUnits();
+        if (folder == null || !SaveAndLoad.Exist(folder + objectProductFormFileName)) return;
+        foreach (var product in ObjectProductForm.GetDatasByJa(ReadReferenceForms(folder + objectProductFormFileName)))
+        {
+            product.EnsureDirectionData();
+            product.SyncLegacyAnimClip(product.GetDefaultAnimDirection());
+            product.SyncLegacyModelTransform(product.GetDefaultAnimDirection());
+            ObjectProductForm.AddData(product);
+        }
+    }
+
+    // Create placement-owned Products for every Cache scene before the first Save.
+    // This prepares current authored data; loading never repairs older schemas.
+    public void PrepareObjectProducts(string cacheFolder)
+    {
+        foreach (var scene in SceneForm.DataByUid.Values)
+        {
+            string path = cacheFolder + "/" + Main2StoryManager.GetSceneFileNameById(scene.uid);
+            if (!SaveAndLoad.Exist(path)) continue;
+            var map = JObject.Parse(SaveAndLoad.Load<string>(path));
+            var token = map["objectJa"];
+            if (token == null || token.Type == JTokenType.Null) continue;
+            var objects = token.Type == JTokenType.String ? JArray.Parse((string)token) : (JArray)token;
+            bool changed = false;
+            foreach (var row in objects.OfType<JObject>())
+            {
+                var extra = string.IsNullOrEmpty((string)row["extra"]) ? new JObject() : JObject.Parse((string)row["extra"]);
+                if (!(extra[MapUnit.productKey] is JArray tuple) || tuple.Count < 2
+                    || !ObjectProductForm.DataByUid.TryGetValue((int)tuple[0], out var source) || source.protoUid != 0) continue;
+                var product = ObjectUnit.CreateProductForPlacement(source, extra);
+                extra[MapUnit.productKey] = new JArray(product.uid, -1);
+                row["extra"] = extra.ToString();
+                row["prefabName"] = GlobalDefaultHelper.GetRuntimeMapObjectPrefabName(ObjectProductForm.GetTemplateUid(product));
+                changed = true;
+            }
+            if (!changed) continue;
+            map["objectJa"] = token.Type == JTokenType.String ? (JToken)objects.ToString() : objects;
+            SaveAndLoad.Save(path, map.ToString());
+        }
     }
 
     public void LoadCharacter(string folder)
@@ -1182,7 +1192,8 @@ public class GameSaveController : Z_Controller<GameManager>
             foreach (var form in StoryAudioAssetForm.GetDatasByJa(forms))
             {
                 StoryAudioAssetForm.AddData(form);
-                form.path = GetStoryAssetPath(folder, AssetManager.instance.audioCtrl, form);
+                form.path = GlobalDefaultHelper.IsEmptyAsset(form) ? string.Empty
+                    : GetStoryAssetPath(folder, AssetManager.instance.audioCtrl, form);
             }
         }
         path = folder + videoAssetFormFileName;
@@ -1193,7 +1204,8 @@ public class GameSaveController : Z_Controller<GameManager>
             foreach (var form in StoryVideoAssetForm.GetDatasByJa(forms))
             {
                 StoryVideoAssetForm.AddData(form);
-                form.path = GetStoryAssetPath(folder, AssetManager.instance.videoCtrl, form);
+                form.path = GlobalDefaultHelper.IsEmptyAsset(form) ? string.Empty
+                    : GetStoryAssetPath(folder, AssetManager.instance.videoCtrl, form);
             }
         }
 
@@ -1250,8 +1262,7 @@ public class GameSaveController : Z_Controller<GameManager>
     {
         var mapData = new GameMapData();
         var json = SaveAndLoad.Load<string>(scenePath);
-        // Keep migration in memory when Mod reads authored Core directly.
-        mapData.Init(ObjectProductForm.MigrateSceneJson(json, false));
+        mapData.Init(json);
         return mapData;
     }
     public void LoadProgress(string folder)
@@ -1329,7 +1340,20 @@ public class GameSaveController : Z_Controller<GameManager>
         ImageUiItemForm.Clear();
         if (SaveAndLoad.Exist(pathForm))
         {
-            foreach (var form in ImageUiItemForm.GetDatasByJa(ReadReferenceForms(pathForm)))
+            var rows = ReadReferenceForms(pathForm);
+            foreach (var row in rows.OfType<JObject>())
+            {
+                // Old Add initialized unused opacity fields to zero, while its
+                // renderer ignored them. Explicit SetOpacity wrote oldOpacity=1.
+                // Preserve only that legacy initial appearance, not an authored fade.
+                if (row["isText"] == null && ((float?)row["oldOpacity"] ?? 0) == 0
+                    && ((float?)row["tarOpacity"] ?? 0) == 0 && ((float?)row["opacityTime"] ?? 0) == 0)
+                {
+                    row["oldOpacity"] = 1f;
+                    row["tarOpacity"] = 1f;
+                }
+            }
+            foreach (var form in ImageUiItemForm.GetDatasByJa(rows))
             {
                 ImageUiItemForm.AddData(form);
             }
@@ -1396,13 +1420,12 @@ public class GameSaveController : Z_Controller<GameManager>
 
     private static void SaveReferenceForms(string path, JArray forms)
     {
-        SaveAndLoad.Save(path, GlobalEventHelper.SaveSceneObjectReferences(forms).ToString());
+        SaveAndLoad.Save(path, forms.ToString());
     }
 
     private static JArray ReadReferenceForms(string path)
     {
         var forms = JArray.Parse(SaveAndLoad.Load<string>(path));
-        GlobalEventHelper.MigrateSceneObjectReferences(forms);
         return forms;
     }
 
@@ -1471,6 +1494,34 @@ public class GameSaveController : Z_Controller<GameManager>
 
             missingReference.partTex[missingReference.part] = replacementId;
         }
+    }
+
+    public void EnsureEmptyAssets()
+    {
+        // Above the automatic-ID range, so Story resets preserve all three rows.
+        int imageId = AssetForm.autoIdCnt + 200000;
+        int audioId = imageId + 1;
+        int videoId = imageId + 2;
+        GlobalDefaultHelper.DefaultTexId = GlobalDefaultHelper.DefaultStoryTexId = imageId;
+        GlobalDefaultHelper.DefaultEventTexId = GlobalDefaultHelper.DefaultCharacterTexId = imageId;
+        GlobalDefaultHelper.DefaultItemTexId = GlobalDefaultHelper.DefaultModelTexId = imageId;
+        GlobalDefaultHelper.ExternDefaultTexId = imageId;
+        GlobalDefaultHelper.DefaultAudioId = audioId;
+        GlobalDefaultHelper.DefaultVideoId = videoId;
+        var assets = AssetManager.instance;
+        assets.texCtrl.emptyAssetId = imageId;
+        assets.audioCtrl.emptyAssetId = audioId;
+        assets.videoCtrl.emptyAssetId = videoId;
+        if (!StoryTexAssetForm.DataById.ContainsKey(imageId))
+        {
+            var image = assets.texCtrl.CreateDataByBytes(TextureHelper.GetTextureByte(TextureHelper.transparentTexture), string.Empty);
+            image.id = imageId;
+            AddStoryTex(ref image);
+        }
+        if (!StoryAudioAssetForm.DataById.ContainsKey(audioId))
+            AddStoryAudio(new AudioAssetForm.Data(audioId, string.Empty, string.Empty, null, string.Empty, null, LabForm.NoneId));
+        if (!StoryVideoAssetForm.DataById.ContainsKey(videoId))
+            AddStoryVideo(new VideoAssetForm.Data(videoId, string.Empty, string.Empty, null, string.Empty, null, LabForm.NoneId));
     }
 
     private StoryTexAssetForm.Data AddStoryTexInternal(TexAssetForm.Data rawData)

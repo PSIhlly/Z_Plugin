@@ -28,8 +28,7 @@ namespace Z_Code
         protected override bool ExecuteInternal(BoxDataForm.Data[] prm, InterpretAsyncTask asyncTask)
         {
             var unit = SceneUnitCommand.Resolve(prm[0].str);
-            var position = unit == null ? Vector3.zero : GameManager.MapPosToPlayerPos(
-                MapManager.instance.utilCtrl.RealPos2MapPos(unit.data.pos));
+            var position = unit == null ? Vector3.zero : GameManager.MapPosToPlayerPos(unit.data.pos);
             asyncTask.res = new[] { SceneUnitCommand.BoxVector(position) };
             return true;
         }
@@ -44,7 +43,7 @@ namespace Z_Code
             var target = SceneUnitCommand.Resolve(prm[0].str);
             var origin = SceneUnitCommand.Resolve(prm[1].str);
             var offset = target == null || origin == null ? Vector3.zero :
-                MapManager.instance.utilCtrl.RealPos2MapPos(target.data.pos - origin.data.pos);
+                target.data.pos - origin.data.pos;
             asyncTask.res = new[] { SceneUnitCommand.BoxVector(offset) };
             return true;
         }
@@ -60,7 +59,7 @@ namespace Z_Code
             var units = SceneUnitCommand.ResolveAll(prm[0].str);
             if (!units.Exists(SceneUnitCommand.CanMove)) return true;
             var vector = SceneUnitCommand.ReadVector(prm[1]);
-            var offsetOrPosition = Relative ? MapManager.instance.utilCtrl.MapPos2RealPos(vector)
+            var offsetOrPosition = Relative ? vector
                 : SceneUnitCommand.WorldPosition(vector);
             var data = new Z_UnitSystem.Form.UnitForm.Data[units.Count];
             var positions = new Vector3[units.Count];

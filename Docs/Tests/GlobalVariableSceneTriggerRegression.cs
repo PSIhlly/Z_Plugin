@@ -44,7 +44,7 @@ public static class GlobalVariableSceneTriggerRegression
         public int tag;
         public string name;
         public string owner;
-        public BoxDataForm.Data oldValue, newValue;
+        public BoxDataForm.Data delta, newValue;
     }
 
     private sealed class ChangedProbe : IZ_Listener<GlobalVariableChangedEvent>
@@ -67,8 +67,8 @@ public static class GlobalVariableSceneTriggerRegression
         public override CmdBase GetNew() => new CaptureCmd();
         protected override bool ExecuteInternal(BoxDataForm.Data[] prm, InterpretAsyncTask task)
         {
-            captures.Add(new Observation { tag = (int)prm[0].num, name = prm[1].str,
-                oldValue = prm[2].DeepCopy(), newValue = prm[3].DeepCopy() });
+            captures.Add(new Observation { tag = (int)prm[0].num, owner = prm[1].str, name = prm[2].str,
+                delta = prm[3].DeepCopy(), newValue = prm[4].DeepCopy() });
             return true;
         }
     }
@@ -80,7 +80,7 @@ public static class GlobalVariableSceneTriggerRegression
         protected override bool ExecuteInternal(BoxDataForm.Data[] prm, InterpretAsyncTask task)
         {
             captures.Add(new Observation { tag = (int)prm[0].num, owner = prm[1].str, name = prm[2].str,
-                oldValue = prm[3].DeepCopy(), newValue = prm[4].DeepCopy() });
+                delta = prm[3].DeepCopy(), newValue = prm[4].DeepCopy() });
             return true;
         }
     }
@@ -158,13 +158,13 @@ public static class GlobalVariableSceneTriggerRegression
         var capture = new CaptureCmd();
         BaseData.cmdDic[capture.GetName()] = capture;
         CmdDataForm.AddData(new CmdDataForm.Data(98101, capture.GetName(),
-            new List<string> { "tag", "name", "old", "new" },
-            new List<string> { "num", "var", "var", "var" }, null, new List<string> { "void" },
-            "", "GlobalSceneTriggerProbe(0,param1,param2,param3);"));
+            new List<string> { "tag", "owner", "name", "delta", "new" },
+            new List<string> { "num", "var", "var", "var", "var" }, null, new List<string> { "void" },
+            "", "GlobalSceneTriggerProbe(0,param1,param2,param3,param4);"));
         var unitCapture = new UnitCaptureCmd();
         BaseData.cmdDic[unitCapture.GetName()] = unitCapture;
         CmdDataForm.AddData(new CmdDataForm.Data(98102, unitCapture.GetName(),
-            new List<string> { "tag", "owner", "name", "old", "new" },
+            new List<string> { "tag", "owner", "name", "delta", "new" },
             new List<string> { "num", "var", "var", "var", "var" }, null, new List<string> { "void" },
             "", "GlobalUnitTriggerProbe(0,param1,param2,param3,param4);"));
         game = Manager<GameManager>();
@@ -284,7 +284,7 @@ public static class GlobalVariableSceneTriggerRegression
         return data;
     }
 
-    private static string Capture(int tag) => "GlobalSceneTriggerProbe(" + tag + ",param1,param2,param3);";
+    private static string Capture(int tag) => "GlobalSceneTriggerProbe(" + tag + ",param1,param2,param3,param4);";
 
     private static void UnitBindingsAndRetirement()
     {
@@ -300,7 +300,8 @@ public static class GlobalVariableSceneTriggerRegression
         }
         foreach (var form in new[] { typeof(ObjectUnitForm), typeof(CharacterUnitForm), typeof(ItemUnitForm),
             typeof(TileUnitForm), typeof(ObjectProductForm), typeof(CharacterProductForm), typeof(ItemProductForm), typeof(MapTextureForm) }) Register(form);
-        var global = Global("格挡1", Num(0)); string key = Prefix + global.uid;
+        var global = Global("格挡1", Num(5)); string key = Prefix + global.uid;
+        Bind(scene, Prefix, 29); Bind(scene, key, 30);
         string UnitCapture(int tag) => "GlobalUnitTriggerProbe(" + tag + ",param1,param2,param3,param4);";
         EventTriggerForm.Data Trigger(int tag) => new EventTriggerForm.Data(-1, key,
             new List<int> { Program(UnitCapture(tag)).uid }, TriggerType.NoLimit);
@@ -308,8 +309,7 @@ public static class GlobalVariableSceneTriggerRegression
         product.events = new Dictionary<string, EventTriggerForm.Data> { [key] = Trigger(31) };
         ObjectProductForm.AddData(product);
         var data = ObjectUnitForm.GetDataByJo(new JObject()); data.uid = 93002;
-        data.extra = new JObject { [ObjectProductForm.ProductVersionKey] = ObjectProductForm.ProductVersion,
-            [MapUnit.productKey] = new JArray(product.uid, -1) }.ToString(); ObjectUnitForm.AddData(data);
+        data.extra = new JObject {             [MapUnit.productKey] = new JArray(product.uid, -1) }.ToString(); ObjectUnitForm.AddData(data);
         var local = new Dictionary<string, EventTriggerForm.Data> { [key] = Trigger(32),
             [Prefix] = new EventTriggerForm.Data(-1, Prefix, new List<int> { Program(UnitCapture(33)).uid }, default) };
         data.unit.evtDic = local;
@@ -326,16 +326,19 @@ public static class GlobalVariableSceneTriggerRegression
         var tile = TileUnitForm.GetDataByJo(new JObject()); tile.uid = 93008;
         tile.texDic = new Dictionary<int, int> { [0] = texture.id }; TileUnitForm.AddData(tile);
         Set(global.name, Num(2));
-        Check(EventInterpretDataForm.DataByUid.Values.All(evt => evt.sceneOwner != null),
+        Check(EventInterpretDataForm.DataByUid.Values.Count(evt => evt.sceneOwner != null) == 6,
             "global Unit handlers capture their real scene-owner Data for cancellation and UID-reuse guards");
+        Check(EventInterpretDataForm.DataByUid.Values.Where(evt => evt.sceneOwner == null)
+            .All(evt => evt.heap["param1"].str == null && evt.heap["param1"].num == 0),
+            "Scene-panel handlers have no Unit owner and reserve param1 as numeric zero");
         Tick();
-        Check(captures.Select(value => value.tag).OrderBy(value => value).SequenceEqual(new[] { 31, 32, 33, 34, 35, 36 }),
-            "Object, Character, Item and Tile instances execute their inherited and appended global bindings");
+        Check(captures.Select(value => value.tag).OrderBy(value => value).SequenceEqual(new[] { 29, 30, 31, 32, 33, 34, 35, 36 }),
+            "Scene-panel Any/exact and Object, Character, Item and Tile bindings execute the same change");
         Check(captures.FindIndex(value => value.tag == 31) < captures.FindIndex(value => value.tag == 32)
-            && captures.All(value => value.name == global.name && value.oldValue.num == 0 && value.newValue.num == 2),
-            "prototype handlers run before instance appends with independent global-change arguments: "
-            + string.Join(";", captures.Select(value => value.tag + ":" + value.name + ":" + value.oldValue.num + "/" + value.newValue.num)));
-        foreach (var capture in captures)
+            && captures.All(value => value.name == global.name && value.delta.str == null
+                && value.delta.num == -3 && value.newValue.num == 2),
+            "All bindings receive the variable name in param2 and new-minus-old in param3; prototypes run first");
+        foreach (var capture in captures.Where(value => value.tag >= 31))
         {
             int ownerUid = capture.tag <= 33 ? data.uid : capture.tag == 34 ? ch.uid : capture.tag == 35 ? it.uid : tile.uid;
             Check(capture.owner == GlobalEventHelper.GetSceneUnitReference(ownerUid)
@@ -389,14 +392,14 @@ public static class GlobalVariableSceneTriggerRegression
         Tick();
         Check(captures.Select(item => item.tag).OrderBy(tag => tag).SequenceEqual(new[] { 1, 2 }),
             "The real scheduler executes Any and exact UID handlers, not an unrelated global binding");
-        Check(captures.All(item => item.name == "watched$variable" && item.oldValue.num == 0
-            && item.newValue.num == 5), "Handlers receive name, old value and new value in param1..3");
+        Check(captures.All(item => item.name == "watched$variable" && item.delta.num == 5
+            && item.newValue.num == 5), "Handlers receive the variable name in param2 and numeric delta in param3");
         Check(new ModAssetCtrl(null).RenameGlobalVar(global.uid, "renamed$global"),
             "The actual authoring rename succeeds without replacing the global UID");
         captures.Clear();
         Set(global.name, Num(7)); Tick();
         Check(captures.Count == 2 && captures.All(item => item.name == "renamed$global"
-            && item.oldValue.num == 5 && item.newValue.num == 7),
+            && item.delta.num == 2 && item.newValue.num == 7),
             "Renaming a variable, including a dollar sign in its name, preserves the UID trigger binding");
         events.ClearScene();
         var next = NewScene(2);
@@ -414,6 +417,7 @@ public static class GlobalVariableSceneTriggerRegression
             new Dictionary<string, BoxDataForm.Data>()), Num(0), false,
             "Stored scalar metadata and empty/lazy dictionary do not change a value");
         CheckChange(Num(1), Num(2), true, "Numeric changes trigger");
+        CheckChange(Num(2), Num(-1.25f), true, "Decreases preserve signed fractional deltas");
         CheckChange(Num(1), Text("1"), true, "Numeric and text types are distinct");
         CheckChange(Text(""), Text(""), false, "Explicit empty strings compare equal");
         CheckChange(new BoxDataForm.Data(2, "same", "old", 99, null),
@@ -452,8 +456,14 @@ public static class GlobalVariableSceneTriggerRegression
             "The setter still commits an independent effective value in equality cases");
         if (!changed) return;
         Tick();
-        Check(captures.Count == 1 && Equal(captures[0].oldValue, before) && Equal(captures[0].newValue, after),
-            "Typed snapshots preserve both effective values through the actual interpreter");
+        bool numeric = before?.str == null && after?.str == null
+            && (before?.dic?.Count ?? 0) == 0 && (after?.dic?.Count ?? 0) == 0;
+        float delta = numeric ? (after?.num ?? 0) - (before?.num ?? 0) : 0;
+        Check(captures.Count == 1 && captures[0].name == "compare"
+            && captures[0].delta.str == null && captures[0].delta.num == delta
+            && Equal(captures[0].newValue, after)
+            && Equal(changes.payloads[0].oldValue, before) && Equal(changes.payloads[0].newValue, after),
+            "param3 carries the numeric delta (zero for nonnumeric changes), without losing typed value snapshots");
     }
 
     private static void HeapAndPayloadIsolation()
@@ -462,26 +472,27 @@ public static class GlobalVariableSceneTriggerRegression
         var old = Nested(1, 0.5f);
         var global = Global("dictionary", old);
         Bind(scene, Prefix, TriggerType.NoLimit,
-            Program("param2.x = -100; param3.x = -200; " + Capture(11)), Program(Capture(12)));
+            Program("param2 = \"local-only\"; param3 = -100; param4.x = -200; " + Capture(11)), Program(Capture(12)));
         Bind(scene, Prefix + global.uid, 13);
         var input = Nested(2, 0.8f);
         Set(global.name, input);
         var pending = EventInterpretDataForm.DataByUid.Values.ToArray();
         Check(pending.Length == 3 && !ReferenceEquals(pending[0].heap, pending[1].heap)
             && !ReferenceEquals(pending[0].heap["param3"], pending[1].heap["param3"])
-            && !ReferenceEquals(pending[0].heap["param3"].dic["nested"], pending[2].heap["param3"].dic["nested"]),
+            && !ReferenceEquals(pending[0].heap["param4"].dic["nested"], pending[2].heap["param4"].dic["nested"]),
             "Every program, including siblings in one trigger, receives an independent deep argument heap");
         input.dic["x"].num = 200;
         old.dic["x"].num = 100;
         changes.payloads[0].newValue.dic["x"].num = 300;
-        Check(pending.All(item => item.heap["param2"].dic["x"].num == 1
-            && item.heap["param3"].dic["x"].num == 2),
+        Check(pending.All(item => item.heap["param2"].str == global.name && item.heap["param3"].num == 0
+            && item.heap["param4"].dic["x"].num == 2),
             "Queued arguments are isolated from source, previous storage and published-event mutations");
         Tick();
-        Check(captures.Single(item => item.tag == 11).oldValue.dic["x"].num == -100
+        Check(captures.Single(item => item.tag == 11).name == "local-only"
+            && captures.Single(item => item.tag == 11).delta.num == -100
             && captures.Single(item => item.tag == 11).newValue.dic["x"].num == -200,
             "The mutation program really writes its own trigger parameters");
-        Check(captures.Where(item => item.tag != 11).All(item => item.oldValue.dic["x"].num == 1
+        Check(captures.Where(item => item.tag != 11).All(item => item.name == global.name && item.delta.num == 0
             && item.newValue.dic["x"].num == 2) && global.data.dic["x"].num == 2,
             "A handler cannot corrupt sibling/exact handlers or the committed global value");
     }
@@ -491,7 +502,7 @@ public static class GlobalVariableSceneTriggerRegression
         FreshCase();
         var global = Global("scheduler", Num(0));
         Bind(scene, Prefix + global.uid, TriggerType.NoLimit,
-            Program("SetGlobalVar(param1,param3); " + Capture(21)));
+            Program("SetGlobalVar(param2,GetGlobalVar(param2)); " + Capture(21)));
         events.Execute(Program("SetGlobalVar(\"scheduler\",1);"), 0, null);
         Tick();
         Check(captures.Count == 0 && EventInterpretDataForm.DataByUid.Count == 1,
@@ -533,7 +544,7 @@ public static class GlobalVariableSceneTriggerRegression
         Set(global.name, Num(1)); Set(global.name, Num(2));
         Check(EventInterpretDataForm.DataByUid.Count == 1, "OnceDuring suppresses a concurrent second change");
         Tick(); Set(global.name, Num(3)); Tick();
-        Check(captures.Count == 2 && captures[1].oldValue.num == 2 && captures[1].newValue.num == 3,
+        Check(captures.Count == 2 && captures[1].delta.num == 1 && captures[1].newValue.num == 3,
             "OnceDuring releases after completion and runs a later value change");
     }
 

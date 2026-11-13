@@ -82,6 +82,7 @@ public static class CharacterReferenceRegression
             Check(CharacterProductForm.ResolveReferences(unrelated.uid).Count == 0
                 && CharacterProductForm.ResolveReference(unrelated.uid) == unrelated,
                 "missing Play copy cannot mutate a template but read-only fallback remains available");
+            CachedSceneLookup(scene, template, copyA, copyB, unrelated, unitA, unitB);
 
             foreach (string malformed in new[] { null, "", "$ch$$ch$", "$ch$x$ch$", "$ch$0$ch$",
                 "$ch$-1$ch$", "$ch$1$ch$extra", "$ch$999999999999999999$ch$", "$so$97102$so$" })
@@ -151,6 +152,50 @@ public static class CharacterReferenceRegression
         {
             DynamicGlobalSettings.playing = previousPlaying;
         }
+    }
+
+    private static void CachedSceneLookup(PlaySceneController scene, CharacterProductForm.Data template,
+        CharacterProductForm.Data copyA, CharacterProductForm.Data copyB, CharacterProductForm.Data unrelated,
+        CharacterUnitForm.Data unitA, CharacterUnitForm.Data unitB)
+    {
+        const BindingFlags hidden = BindingFlags.Instance | BindingFlags.NonPublic;
+        var cache = (Dictionary<CharacterProductForm.Data, CharacterUnitForm.Data>)typeof(PlaySceneController)
+            .GetField("_characterDic", hidden).GetValue(scene);
+        var groups = (Dictionary<CharacterProductForm.Data, List<CharacterUnitForm.Data>>)typeof(PlaySceneController)
+            .GetField("characterUnitGroups", hidden).GetValue(scene);
+        Check(cache[copyA] == unitA && cache[copyB] == unitB, "scene lookups populate the existing Product-to-Unit dictionary");
+        var group = groups[copyA];
+        bool correct = true;
+        for (int i = 0; i < 2000; i++)
+            correct &= scene.GetCharacterUnit(copyA.uid) == unitA && scene.GetCharacterUnit(template.uid) == unitB
+                && scene.GetCharacterUnit(unrelated.uid) == null;
+        Check(correct && ReferenceEquals(group, groups[copyA]),
+            "warm exact, prototype and absent-unit scalar queries reuse the index without rebuilding it");
+        Check(scene.GetOrNewCharacter(copyA) == unitA && ReferenceEquals(group, groups[copyA]),
+            "GetOrNewCharacter reuses the cached existing instance");
+        var duplicate = Unit(97200, copyA.uid);
+        var snapshot = scene.GetCharacterUnits(copyA.uid);
+        Check(snapshot.SequenceEqual(new[] { duplicate, unitA }) && scene.GetCharacterUnit(copyA.uid) == duplicate,
+            "adding another Unit of the same Product refreshes the cache and keeps the lowest UID representative");
+        CharacterUnitForm.RemoveData(duplicate.uid);
+        Check(snapshot.SequenceEqual(new[] { duplicate, unitA }) && scene.GetCharacterUnit(copyA.uid) == unitA,
+            "removal refreshes future queries while preserving an earlier plural snapshot");
+        unitA.unit.productInfo = (copyB.uid, -1);
+        Check(scene.GetCharacterUnit(copyA.uid) == null
+            && scene.GetCharacterUnits(copyB.uid).SequenceEqual(new[] { unitB, unitA }),
+            "rebinding productInfo invalidates both the old and new Product groups");
+        unitA.unit.productInfo = (copyA.uid, -1);
+        Check(scene.GetCharacterUnit(copyA.uid) == unitA && scene.GetCharacterUnit(copyB.uid) == unitB,
+            "restoring a binding publishes the original groups again");
+        var oldProduct = Product(97350, 0, true);
+        var temporary = Unit(97351, oldProduct.uid);
+        Check(scene.GetCharacterUnit(oldProduct.uid) == temporary, "a newly registered Product/Unit is indexed");
+        CharacterProductForm.RemoveData(oldProduct.uid);
+        var replacement = Product(97350, 0, true);
+        Check(scene.GetCharacterUnit(replacement.uid) == temporary && !cache.ContainsKey(oldProduct)
+            && cache[replacement] == temporary, "same-UID Product replacement cannot retain the old Data key");
+        CharacterUnitForm.RemoveData(temporary.uid);
+        CharacterProductForm.RemoveData(replacement.uid);
     }
 
     private static CharacterProductForm.Data Product(int uid, int protoUid, bool unique)

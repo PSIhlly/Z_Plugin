@@ -37,15 +37,15 @@ namespace Ui.ModStoryEventEditWindow
     }
     public partial class UiModStoryEventEditWindowCtrl
     {
-        UiContainer<UiItemCtrl> itemCon;
-        UiContainer<UiLineCtrl> lineCon;
+        UiTreeContainer<UiItemCtrl> itemCon;
+        UiTreeContainer<UiLineCtrl> lineCon;
         private int codeErrorRequestId;
 
         public override void OnCreate()
         {
 
-            itemCon = new UiContainer<UiItemCtrl>(this, view.go_item, false);
-            lineCon = new UiContainer<UiLineCtrl>(this, view.go_line, false);
+            itemCon = new UiTreeContainer<UiItemCtrl>(this, view.go_item);
+            lineCon = new UiTreeContainer<UiLineCtrl>(this, view.go_line);
 
             model.cpr = new Compiler();
             model.dcpr = new Decompiler();
@@ -60,7 +60,7 @@ namespace Ui.ModStoryEventEditWindow
             view.btn_lab.onClick.AddListener(ChooseLab);
             view.btn_switchMod.onClick.AddListener(() =>
             {
-                if (!ApplyCurrentMode())
+                if (!ApplyCurrentMode(false))
                     return;
                 model.codeEditMode = !model.codeEditMode;
                 model.selItem = null;
@@ -74,11 +74,6 @@ namespace Ui.ModStoryEventEditWindow
                     // Item rows must be created after their panel is visible, otherwise
                     // nested ContentSizeFitters measure the hidden hierarchy as zero.
                     Refresh();
-                    TimeManager.instance.AddNextUpdateAction(() =>
-                    {
-                        if (active && !model.codeEditMode)
-                            UiManager.Rebuild(view.scr_items.gameObject, true);
-                    }, gameObject);
                 }
             });
             view.btn_apply.onClick.AddListener(() =>
@@ -88,7 +83,7 @@ namespace Ui.ModStoryEventEditWindow
             });
             view.btn_close.onClick.AddListener(() =>
             {
-                if (ApplyCurrentMode())
+                if (ApplyCurrentMode(false))
                     Close();
             });
             view.btn_edit.onClick.AddListener(() =>
@@ -115,7 +110,7 @@ namespace Ui.ModStoryEventEditWindow
                         BaseData.cmdDic[data.name].GetUnitChooseCode((code) =>
                         {
                             if (tp == "void" && !string.IsNullOrEmpty(data.allowAsVoid))
-                                code = $"{data.allowAsVoid}{code};";
+                                code = BuildCommandStatementCode(data, code);
                             if (!TryCompileUnitSyntax(code, out var unit))
                                 return;
                             ReplaceNode(model.selUnit, unit);
@@ -139,6 +134,7 @@ namespace Ui.ModStoryEventEditWindow
                 {
                     parentList.Remove(model.selItem);
                     HideRenderedItems(deletedNode, true);
+                    UiTreeLayout.Request(view.scr_items.content);
                 }
 
                 model.selItem = null;
@@ -156,9 +152,7 @@ namespace Ui.ModStoryEventEditWindow
                         {
                             var data = GameCmdDataForm.DataByUid[item.id];
                             GameCmdDataForm.Data sel = GameCmdDataForm.DataByName[data.name];
-                            defaultCode = sel.defaultCode;
-                            if (!string.IsNullOrEmpty(sel.allowAsVoid))
-                                defaultCode = $"{sel.allowAsVoid}{defaultCode};";
+                            defaultCode = BuildCommandStatementCode(sel, sel.defaultCode);
                         }
                         else if (ProgramDataForm.DataByName.TryGetValue(item.content, out var program))
                         {
@@ -187,6 +181,17 @@ namespace Ui.ModStoryEventEditWindow
                 });
             });
         }
+        internal static string BuildCommandStatementCode(GameCmdDataForm.Data command, string code)
+        {
+            if (string.IsNullOrEmpty(command.allowAsVoid))
+                return code;
+            // Some authored defaults already include their result assignment.
+            // Keep complete statements intact; wrap only a call expression.
+            if (code.TrimStart().StartsWith(command.allowAsVoid, StringComparison.Ordinal))
+                return code;
+            return command.allowAsVoid + code.TrimEnd().TrimEnd(';').TrimEnd() + ";";
+        }
+
         internal static string BuildProgramCallCode(ProgramDataForm.Data program)
         {
             var code = new StringBuilder(program.name).Append('(');
@@ -199,12 +204,12 @@ namespace Ui.ModStoryEventEditWindow
             return code.Append(");").ToString();
         }
 
-        private bool ApplyCurrentMode()
+        private bool ApplyCurrentMode(bool refreshList = true)
         {
-            return model.codeEditMode ? ApplyCode() : ApplyEntry();
+            return model.codeEditMode ? ApplyCode() : ApplyEntry(refreshList);
         }
 
-        public bool ApplyEntry()
+        public bool ApplyEntry(bool refreshList = true)
         {
             var code = model.dcpr.Decompile(model.curEntry);
             if (model.data.TryApplyCode(code, out var syntaxNodes, out var errors, model.cpr))
@@ -213,7 +218,7 @@ namespace Ui.ModStoryEventEditWindow
                 model.selItem = null;
                 model.selUnit = null;
                 view.ipt_code.Set(model.data.code);
-                Refresh();
+                if (refreshList) Refresh();
                 return true;
             }
             else
@@ -365,44 +370,48 @@ namespace Ui.ModStoryEventEditWindow
         public override void OnDisable()
         {
             codeErrorRequestId++;
+            UiTreeLayout.Cancel(view.scr_items.content);
             model.onClose?.Invoke();
         }
         public void Refresh()
         {
             RefreshMode();
 
-            lineCon.Clear();
-            itemCon.Clear();
-            foreach (var node in model.curEntry)
+            if (!model.codeEditMode)
             {
+                lineCon.Clear();
+                itemCon.Clear();
+                foreach (var node in model.curEntry)
+                {
+                    itemCon.Add(new UiItemParam()
+                    {
+                        con = itemCon,
+                        node = node,
+                        deepth = 0,
+                        targetNewList = model.curEntry,
+                    });
+                }
                 itemCon.Add(new UiItemParam()
                 {
                     con = itemCon,
-                    node = node,
+                    node = null,
                     deepth = 0,
                     targetNewList = model.curEntry,
                 });
-            }
-            itemCon.Add(new UiItemParam()
-            {
-                con = itemCon,
-                node = null,
-                deepth = 0,
-                targetNewList = model.curEntry,
-            });
-            itemCon.Refresh();
-            for (int i = 0; i < itemCon.paramLst.Count; i++)
-            {
-                var item = (UiItemParam)itemCon.paramLst[i];
-                lineCon.Add(new UiLineParam()
+                itemCon.Refresh();
+                for (int i = 0; i < itemCon.paramLst.Count; i++)
                 {
-                    item = (UiItemCtrl)itemCon.Get(item).ctrl,
-                    node = item.node,
-                    index = i,
-                });
+                    var item = (UiItemParam)itemCon.paramLst[i];
+                    lineCon.Add(new UiLineParam()
+                    {
+                        item = (UiItemCtrl)itemCon.Get(item).ctrl,
+                        node = item.node,
+                        index = i,
+                    });
+                }
+                lineCon.Refresh();
+                UiTreeLayout.Request(view.scr_items.content);
             }
-            lineCon.Refresh();
-            UiManager.Rebuild(view.scr_items.gameObject, true);
 
             //
             view.txt_title.text = model.data.name;
@@ -414,6 +423,7 @@ namespace Ui.ModStoryEventEditWindow
 
         private void RefreshMode()
         {
+            if (model.codeEditMode) UiTreeLayout.Cancel(view.scr_items.content);
             view.sta_switchMod.ChangeState(model.codeEditMode ? 1 : 0);
             view.sta_switchModPanel.ChangeState(model.codeEditMode ? 1 : 0);
             RefreshUnitDetail();
@@ -526,7 +536,7 @@ namespace Ui.ModStoryEventEditWindow
                     item.node = nodeNew;
                 var itemCtrl = (UiItemCtrl)itemCon.Get(item).ctrl;
                 itemCtrl.RefreshUnits();
-                UiManager.Rebuild(itemCtrl.gameObject, true);
+                UiTreeLayout.Request(view.scr_items.content);
                 break;
             }
             if (nodeNow == itemNode)

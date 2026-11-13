@@ -43,10 +43,38 @@ namespace Ui.Stick
         public bool stickActive;
         public bool floatingPrepared;
         public UiStickParam prm;
+        public RectTransform stickRect;
     }
     public partial class UiStickCtrl : IZ_Listener<InputMouseDownEvent>, IZ_Listener<InputMouseUpEvent>, IZ_Listener<InputMouseEvent>,
         IZ_Listener<InputPointDownEvent>, IZ_Listener<InputPointUpEvent>, IZ_Listener<InputPointEvent>
     {
+        // The new icon sits inside the knob's mask. Resolve the original moving
+        // root from generated bindings without moving the entire input region.
+        private RectTransform StickRect
+        {
+            get
+            {
+                if (model.stickRect == null)
+                {
+                    var node = view.img_.rectTransform;
+                    while (node.parent != null && node.parent != view.go_stick.transform)
+                        node = (RectTransform)node.parent;
+                    model.stickRect = node;
+                }
+                return model.stickRect;
+            }
+        }
+
+        public void SetIcon(Sprite icon)
+        {
+            if (param != null) param.icon = icon;
+            if (model.prm != null) model.prm.icon = icon;
+            view.img_.UnbindTexData();
+            view.img_.overrideSprite = null;
+            view.img_.sprite = icon;
+            view.img_.enabled = icon != null;
+        }
+
         public override void OnCreate()
         {
 
@@ -64,8 +92,7 @@ namespace Ui.Stick
             model.prm = param;
             if (model.prm.floating)
                 PrepareFloatingState();
-            if(model.prm.icon!=null)
-                view.img_stick.sprite = model.prm.icon;
+            SetIcon(model.prm.icon);
         }
         public override void OnHide()
         {
@@ -94,13 +121,13 @@ namespace Ui.Stick
                 float dis = model.lastPos.magnitude;
                 var realDelta = model.lastPos.normalized * Math.Clamp(dis, -0.5f, 0.5f);
                 var center = model.prm.floating ? model.downPos : view.rtf_area.position;
-                var size = model.prm.floating ? view.rtf_stick : view.rtf_area;
-                view.rtf_stick.position = center + Graph.GetSize(size).x * realDelta;
+                var size = model.prm.floating ? StickRect : view.rtf_area;
+                StickRect.position = center + Graph.GetSize(size).x * realDelta;
                 model.prm.dragAct?.Invoke(model.lastPos);
             }
             else
             {
-                view.rtf_stick.position = view.rtf_area.position;
+                StickRect.position = view.rtf_area.position;
             }
 
 
@@ -117,7 +144,7 @@ namespace Ui.Stick
                 return;
             // The knob is a sibling of the area and wins the center raycast.
             // Q/E even disable the area's Graphic and rely on the knob alone.
-            if (ui == view.rtf_area.gameObject || ui == view.rtf_stick.gameObject)
+            if (ui == view.rtf_area.gameObject || ui == StickRect.gameObject)
             {
                 if(model.prm.canStartFunc!=null&&!model.prm.canStartFunc())
                 {
@@ -128,16 +155,16 @@ namespace Ui.Stick
                 {
                     model.curId = id;
                     model.curIsTouch = isTouch;
-                    model.downPos = new Vector3(pos.x, pos.y, view.rtf_stick.position.z);
+                    model.downPos = new Vector3(pos.x, pos.y, StickRect.position.z);
                     model.lastPos = Vector3.zero;
-                    view.rtf_stick.position = model.downPos;
-                    view.rtf_stick.gameObject.SetActive(true);
+                    StickRect.position = model.downPos;
+                    StickRect.gameObject.SetActive(true);
                     return;
                 }
                 var re = Vector3.one;
                 if (model.prm.startFromStick)
                 {
-                    re = Graph.GetNormalizedRelativePos(pos, view.rtf_stick) - new Vector2(0.5f, 0.5f);
+                    re = Graph.GetNormalizedRelativePos(pos, StickRect) - new Vector2(0.5f, 0.5f);
                 }
                 else
                 {
@@ -185,7 +212,7 @@ namespace Ui.Stick
                 {
                     // Use the visual knob size, not the much larger input region,
                     // so its existing deadzone remains a short, scale-aware drag.
-                    float size = Math.Max(0.0001f, Graph.GetSize(view.rtf_stick).x);
+                    float size = Math.Max(0.0001f, Graph.GetSize(StickRect).x);
                     model.lastPos = new Vector3(pos.x - model.downPos.x, pos.y - model.downPos.y) / size;
                 }
                 else
@@ -203,8 +230,8 @@ namespace Ui.Stick
             model.downPos = Vector3.zero;
             if (model.prm?.floating == true)
             {
-                view.rtf_stick.gameObject.SetActive(false);
-                view.rtf_stick.position = view.rtf_area.position;
+                StickRect.gameObject.SetActive(false);
+                StickRect.position = view.rtf_area.position;
             }
         }
 
@@ -222,9 +249,9 @@ namespace Ui.Stick
                 // raycastable while hiding only its visual, not its GameObject.
                 model.areaGraphic.enabled = true;
             }
-            model.stickActive = view.rtf_stick.gameObject.activeSelf;
+            model.stickActive = StickRect.gameObject.activeSelf;
             model.floatingPrepared = true;
-            view.rtf_stick.gameObject.SetActive(false);
+            StickRect.gameObject.SetActive(false);
         }
 
         private void RestoreFloatingState()
@@ -236,7 +263,7 @@ namespace Ui.Stick
                 model.areaGraphic.color = model.areaColor;
                 model.areaGraphic.enabled = model.areaEnabled;
             }
-            view.rtf_stick.gameObject.SetActive(model.stickActive);
+            StickRect.gameObject.SetActive(model.stickActive);
             model.floatingPrepared = false;
         }
 

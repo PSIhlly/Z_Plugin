@@ -168,10 +168,12 @@ public class GameMapData : MapInfo
     public override List<ObjectUnitForm.Data> GetObjectDatasByJa(string ja)
     {
         var objects = ObjectUnitForm.GetDatasByJa(JArray.Parse(mainData.objectJa));
-        // Mod scene entry reads authored Core maps directly. Upgrade their old
-        // template links and prefab keys before the map creates any instances.
+        // Bind the current placement Product before the map creates instances.
         foreach (var data in objects)
-            ObjectProductForm.BindUnit(data);
+        {
+            var product = data.unit.BindProduct();
+            if (product != null) data.isObstacle = product.collision;
+        }
         return objects;
     }
 

@@ -360,7 +360,8 @@ public static class MapRelatedUnitRefreshRegression
             data.pos = tile.data.pos;
             data.euler = new Vector3(0, 90, 0);
             data.scale = Vector3.one;
-            ObjectProductForm.AssignProduct(data, product);
+            data.unit.productInfo = (product.uid, -1);
+        data.prefabName = GlobalDefaultHelper.GetRuntimeMapObjectPrefabName(ObjectProductForm.GetTemplateUid(product));
             ObjectUnitForm.AddData(data);
             units.Add(data.unit);
             map.updateCtrl.RefreshObjectOverlap(data.unit);

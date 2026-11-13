@@ -28,12 +28,11 @@ namespace Z_Code
         protected override bool ExecuteInternal(BoxDataForm.Data[] prm, InterpretAsyncTask asyncTask)
         {
             // The command returns a yaw, so height must not influence the facing.
-            // Convert only the delta: the player-space origin offset cancels out.
+            // World-space delta: the player-facing origin offset cancels out.
             var delta = new Vector3(
                 prm[1].dic["x"].num - prm[0].dic["x"].num,
                 0f,
                 prm[1].dic["y"].num - prm[0].dic["y"].num);
-            delta = MapManager.instance.utilCtrl.MapPos2RealPos(delta);
             float yaw = delta.x == 0f && delta.z == 0f
                 ? 0f
                 : Mathf.Repeat(Mathf.Atan2(delta.x, delta.z) * Mathf.Rad2Deg, 360f);

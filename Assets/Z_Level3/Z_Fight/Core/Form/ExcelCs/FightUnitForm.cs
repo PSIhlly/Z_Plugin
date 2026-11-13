@@ -358,8 +358,21 @@ namespace Z_Fight.Form
 
                 public Data Copy(bool sameId = true)
                 {
-        return new Data(sameId? uid:uidChain.GetId(),name,itemIdCountDic==null?new Dictionary<int,int>():new Dictionary<int,int>(itemIdCountDic),curUsingWeaponsSid==null?new List<int>():new List<int>(curUsingWeaponsSid),curReloadWeaponsSid==null?new List<int>():new List<int>(curReloadWeaponsSid),alertDistance,hp,hpMax,defence,targetFightUid,reloadTime,isMine,prefabName,pos,euler,scale,updateType,collidingUnitUid==null?new List<int>():new List<int>(collidingUnitUid),extra);
+                    using (DataCopyGuard.Enter(this))
+                    {
+        var copy = new Data(sameId? uid:uidChain.GetId(),name,itemIdCountDic==null?new Dictionary<int,int>():new Dictionary<int,int>(itemIdCountDic),curUsingWeaponsSid==null?new List<int>():new List<int>(curUsingWeaponsSid),curReloadWeaponsSid==null?new List<int>():new List<int>(curReloadWeaponsSid),alertDistance,hp,hpMax,defence,targetFightUid,reloadTime,isMine,prefabName,pos,euler,scale,updateType,collidingUnitUid==null?new List<int>():new List<int>(collidingUnitUid),extra);
+                        CopyRuntimeStateTo(copy);
+                        return copy;
+                    }
                 }
+
+            protected void CopyRuntimeStateTo(Data copy)
+            {
+                base.CopyRuntimeStateTo(copy);
+                OnCopy(copy);
+            }
+            partial void OnCopy(Data copy);
+
             
             public override  void BeforeGet()
             {

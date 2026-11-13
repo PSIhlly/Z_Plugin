@@ -279,7 +279,8 @@ public static class ObjectDirectionGeometryRegression
         data.pos = pos;
         data.euler = new Vector3(0, yaw, 0);
         data.scale = Vector3.one;
-        ObjectProductForm.AssignProduct(data, product);
+        data.unit.productInfo = (product.uid, -1);
+        data.prefabName = GlobalDefaultHelper.GetRuntimeMapObjectPrefabName(ObjectProductForm.GetTemplateUid(product));
         ObjectUnitForm.AddData(data);
         return data.unit;
     }

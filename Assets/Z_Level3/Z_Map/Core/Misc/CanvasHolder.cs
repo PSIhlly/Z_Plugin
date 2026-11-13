@@ -27,6 +27,8 @@ namespace Z_Map
         private Dictionary<int, TextMeshProUGUI> textDic = new Dictionary<int, TextMeshProUGUI>();
         private Dictionary<int, Slider> sliderDic = new Dictionary<int, Slider>();
         private Dictionary<Slider, TextMeshProUGUI> sliderTextDic = new Dictionary<Slider, TextMeshProUGUI>();
+        private readonly Dictionary<GameObject, Timer> toastTimers = new Dictionary<GameObject, Timer>();
+        internal int LifecycleVersion { get; private set; }
         public Transform trs
         {
             get
@@ -49,15 +51,37 @@ namespace Z_Map
                 dirTrs.gameObject.SetActive(true);
         }
 
+        private void OnDisable()
+        {
+            Reset();
+        }
+
+        private static void DestroyRuntimeObject(GameObject obj)
+        {
+            if (obj == null)
+                return;
+            // Destroy is deferred: hide now so same-frame pool reuse stays clean.
+            obj.SetActive(false);
+            Destroy(obj);
+        }
+
         public void Reset()
         {
+            LifecycleVersion++;
+            foreach (var pair in toastTimers)
+            {
+                if (pair.Value != null)
+                    pair.Value.cancel = true;
+                DestroyRuntimeObject(pair.Key);
+            }
+            toastTimers.Clear();
             if (dirTrs != null)
             {
                 dirTrs.gameObject.SetActive(false);
                 dirTrs.localRotation = Quaternion.identity;
             }
             if (chatTimer != null)
-                TimeManager.instance.CancelTimer(chatTimer);
+                chatTimer.cancel = true;
             chatTimer = null;
             if (chat != null)
                 chat.SetActive(false);
@@ -65,12 +89,12 @@ namespace Z_Map
             foreach (var obj in textDic.Values)
             {
                 if (obj != null)
-                    Destroy(obj.gameObject);
+                    DestroyRuntimeObject(obj.gameObject);
             }
             foreach (var obj in sliderDic.Values)
             {
                 if (obj != null)
-                    Destroy(obj.gameObject);
+                    DestroyRuntimeObject(obj.gameObject);
             }
             textDic.Clear();
             sliderDic.Clear();
@@ -148,8 +172,14 @@ namespace Z_Map
         // 飘字上升距离倍率：1 为原始距离(Vector3.up + Vector3.forward)
         // 当前 0.75 = 上一版 0.5 的 1.5 倍高度
         private const float toastRiseScale = 0.75f;
-        public void ToastText(string text, float lastTime)
+        public void ToastText(string text, float lastTime, System.Action onComplete = null)
         {
+            if (!isActiveAndEnabled || toastTextProto == null)
+            {
+                onComplete?.Invoke();
+                return;
+            }
+            int version = LifecycleVersion;
             GameObject tmp = Instantiate(toastTextProto.gameObject, toastTextProto.transform.parent);
             tmp.SetActive(true);
             var textTmp = tmp.GetComponent<TextMeshProUGUI>();
@@ -165,8 +195,15 @@ namespace Z_Map
             float moveTime = Mathf.Max(0.0001f, lastTime / Mathf.Max(0.0001f, toastSpeedScale));
             float totalTime = moveTime + Mathf.Max(0f, toastHoldTime);
             float timeCur = 0;
-            TimeManager.instance.StartTimer(0, 0.0001f, () =>
+            toastTimers[tmp] = TimeManager.instance.StartFrameTimer(() =>
             {
+                if (version != LifecycleVersion)
+                    return true;
+                if (tmp == null || textTmp == null)
+                {
+                    CompleteToast(tmp, onComplete);
+                    return true;
+                }
                 timeCur += TimeManager.GetDeltaTime();
 
                 // 出现：2 倍缩放到 1 倍（缩放时长长于渐显，显形后仍能看到缩小过程）
@@ -184,13 +221,20 @@ namespace Z_Map
                 float fade = Mathf.Clamp01((timeCur / totalTime - toastFadeBegin) / (1 - toastFadeBegin));
                 textTmp.color = new Color(oriColor.r, oriColor.g, oriColor.b, oriColor.a * fadeIn * (1 - fade));
 
-                if (timeCur > totalTime)
+                if (timeCur >= totalTime)
                 {
-                    Destroy(tmp.gameObject);
+                    CompleteToast(tmp, onComplete);
                     return true;
                 }
                 return false;
             }, this);
+        }
+
+        private void CompleteToast(GameObject toast, System.Action onComplete)
+        {
+            toastTimers.Remove(toast);
+            DestroyRuntimeObject(toast);
+            onComplete?.Invoke();
         }
 
     }

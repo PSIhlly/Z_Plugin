@@ -73,6 +73,7 @@ public static class StoryTargetSelectionRegression
             Probe("GetCharacterParameter", p =>
             {
                 if (p[1].str == "射程") return Number(6);
+                if (p[1].str == "攻击") return Number(12);
                 Check(p[1].str == "Team", "authored hostility program reads the Team parameter");
                 if (p[0].str != Self) currentCandidate = p[0].str;
                 return Number(p[0].str == Self || p[0].str == Friend ? 0 : 1);
@@ -200,8 +201,24 @@ public static class StoryTargetSelectionRegression
         }
     }
 
+    public static void RunLineOfSight()
+    {
+        try
+        {
+            CheckExactCoordinateRaycast();
+            Debug.Log("LINE_OF_SIGHT_WORLD_UNITS_REGRESSION_PASS checks=" + checks);
+            EditorApplication.Exit(0);
+        }
+        catch (Exception exception)
+        {
+            Debug.LogException(exception);
+            EditorApplication.Exit(1);
+        }
+    }
+
     private static void CheckExactCoordinateRaycast()
     {
+        CheckCherryTreeSweep();
         var map = CreateManager<MapManager>();
         map.data = new MapInfo
         {
@@ -212,6 +229,7 @@ public static class StoryTargetSelectionRegression
         };
         map.utilCtrl = new MapUtilController(map);
         map.updateCtrl = new MapUpdateController(map);
+        map.enable = true;
         var pool = CreateManager<InstancePoolManager>();
         pool.Init();
         pool.defaultRoot = pool.transform;
@@ -222,6 +240,8 @@ public static class StoryTargetSelectionRegression
         pool.AddPool(prefab);
         UnitForm.InitInternal();
         TileUnitForm.InitInternal();
+        ObjectUnitForm.InitInternal();
+        ObjectProductForm.InitInternal();
         map.data.RegisterMap(new TileUnitForm.Data(990001, "", new Dictionary<int, int>(),
             new Vector3Int(2, 0, 0), prefab.name, new Vector3(2, 0, 0), Vector3.zero, Vector3.one,
             UpdateType.ShowOnly, new List<int>(), "", true, false, new List<int>()));
@@ -237,6 +257,85 @@ public static class StoryTargetSelectionRegression
         }
         Check(Cast(.1f) == 0, "real IsUnobstructed uses exact low endpoints and hits the low wall");
         Check(Cast(.6f) == 1, "real IsUnobstructed passes the wall only when the caller raises endpoints");
+        foreach (var size in new[] { new Vector3(2, 3, 4), new Vector3(.5f, .25f, .5f) })
+        {
+            map.data.mainData.mapUnitSize = size;
+            Check(Cast(.3f) == 0, "world-height .3 hits the .4-high wall regardless of map cell size: " + size);
+            Check(Cast(.6f) == 1, "world-height .6 clears the wall regardless of map cell size: " + size);
+        }
+        map.data.mainData.mapUnitSize = Vector3.one;
+        map.enable = true;
+        var treePrefab = new GameObject("logged-cherry-sweep");
+        var treeCollider = treePrefab.AddComponent<BoxCollider>();
+        treeCollider.center = new Vector3(0, .75f, 0);
+        treeCollider.size = new Vector3(.8f, 1.5f, .8f);
+        pool.AddPool(treePrefab);
+        var owner = new TileUnitForm.Data(990002, "", new Dictionary<int, int>(),
+            new Vector3Int(509, 499, 413), prefab.name, new Vector3(509, 499, 413), Vector3.zero, Vector3.one,
+            UpdateType.ShowOnly, new List<int>(), "", true, false, new List<int>());
+        map.data.RegisterMap(owner);
+        var tree = new ObjectUnitForm.Data(990003, true, "logged-cherry-sweep", treePrefab.name,
+            owner.pos, Vector3.zero, Vector3.one, UpdateType.ShowOnly, new List<int>(), "", true, 0).unit;
+        map.updateCtrl.objectTileDic.Add(tree, owner.unit);
+        var loggedFrom = new Vector3(510.0142f, 499.4138f, 412.3144f);
+        var loggedTo = new Vector3(507.5f, 499.3199f, 414.0294f);
+        foreach (bool reverse in new[] { false, true })
+        {
+            var from = reverse ? loggedTo : loggedFrom;
+            var to = reverse ? loggedFrom : loggedTo;
+            Check(map.utilCtrl.CaptureCast(from, to, .3f).Contains(tree), "real CaptureCast hits the logged tree in both directions");
+            var task = new InterpretAsyncTask(null);
+            execute.Invoke(new IsUnobstructedCmd(), new object[] { new[] {
+                Vector(GameManager.MapPosToPlayerPos(from)), Vector(GameManager.MapPosToPlayerPos(to)), Number(.3f) }, task });
+            Check(task.res[0].num == 0, "real IsUnobstructed blocks the logged cherry-tree segment in both directions");
+        }
+    }
+
+    private static void CheckCherryTreeSweep()
+    {
+        var center = new Vector3(509, 499.75f, 413);
+        var from = new Vector3(510.0142f, 499.4138f, 412.3144f);
+        var to = new Vector3(507.5f, 499.3199f, 414.0294f);
+        foreach (var euler in new[] { Vector3.zero, new Vector3(0, 37, 0), new Vector3(25, 0, 0) })
+        {
+            var rotation = Quaternion.Euler(euler);
+            var box = Z_Mesh.Mesh.GetMesh(center, euler, new Vector3(.8f, 1.5f, .8f));
+            var rotatedFrom = center + rotation * (from - center);
+            var rotatedTo = center + rotation * (to - center);
+            foreach (float radius in new[] { .2f, .3f, .45f })
+            foreach (bool reverse in new[] { false, true })
+            {
+                var start = reverse ? rotatedTo : rotatedFrom;
+                var end = reverse ? rotatedFrom : rotatedTo;
+                var sphere = Z_Mesh.Mesh.GetMesh(start, radius, Vector3.zero, Vector3.one);
+                var result = Z_Mesh.Mesh.MeshIntersectMesh(sphere, box, end - start, out float distance, out var normal);
+                Check(result == Z_Math.Graph.IntersectType.Cross,
+                    "logged tree sweep crosses the box even when its endpoint is farther away: radius=" + radius + " reverse=" + reverse + " euler=" + euler);
+                Check(distance > 0 && distance < (end - start).magnitude && normal.sqrMagnitude > .9f,
+                    "tree sweep retains a first-contact distance and normal");
+            }
+        }
+        var cube = Z_Mesh.Mesh.GetMesh(Vector3.zero, Vector3.zero, Vector3.one);
+        float Distance(Vector3 start, Vector3 step, float radius)
+        {
+            var sphere = Z_Mesh.Mesh.GetMesh(start, radius, Vector3.zero, Vector3.one);
+            Z_Mesh.Mesh.MeshIntersectMesh(sphere, cube, step, out float distance, out _);
+            return distance;
+        }
+        Check(Mathf.Abs(Distance(new Vector3(1, 0, 0), Vector3.right * 2, .2f) - 2) < .0001f,
+            "a separated sphere moving away remains unobstructed");
+        Check(Mathf.Abs(Distance(new Vector3(1.5f, 0, 0), Vector3.left * .2f, .2f) - .2f) < .0001f,
+            "a short approach that stops before contact remains unobstructed");
+        Check(Mathf.Abs(Distance(new Vector3(.6f, 0, 0), Vector3.right, .2f) - 1) < .0001f,
+            "an initially overlapping sphere can move outward without getting trapped");
+        Check(Distance(new Vector3(.6f, 0, 0), Vector3.left * .05f, .2f) < .0001f,
+            "an initially overlapping sphere cannot move farther into the box");
+        Check(Mathf.Abs(Distance(Vector3.zero, Vector3.right * 2, .2f) - 2) < .0001f,
+            "a sphere with an embedded center can still escape");
+        Check(Mathf.Abs(Distance(new Vector3(0, .75f, 0), Vector3.right * .25f, .25f) - .25f) < .0001f,
+            "horizontal movement tangent to flat ground remains free");
+        Check(Mathf.Abs(Distance(new Vector3(-1, 0, 1), Vector3.right * 2, .2f) - 2) < .0001f,
+            "a sweep outside a box corner remains free");
     }
 
     private static void RunCase(ProgramDataForm.Data program, string[] query, string[] blocked, string expected, string context)
@@ -287,7 +386,7 @@ public static class StoryTargetSelectionRegression
         ProjectilePositions[projectile] = Positions[Self] + Vector3.up * .2f;
         ProjectileParameters[projectile] = new Dictionary<string, BoxDataForm.Data>
         {
-            ["移动方向"] = Vector(direction), ["所属人物"] = Text(Self)
+            ["移动方向"] = Vector(direction), ["所属Team"] = Number(0), ["伤害"] = Number(12)
         };
         Moves.Clear();
         RunProgram(programs.Single(data => data.uid == 9), projectile);

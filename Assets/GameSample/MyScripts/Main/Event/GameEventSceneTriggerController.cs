@@ -98,7 +98,7 @@ namespace Z_Map
         {
             if (this is CharacterUnit chU && CharacterProductForm.DataByUid.TryGetValue(chU.productInfo.Item1, out var ch))
                 return ch.events;
-            if (this is ObjectUnit oU && ObjectProductForm.GetProduct(oU.data) is ObjectProductForm.Data ob)
+            if (this is ObjectUnit oU && oU.product is ObjectProductForm.Data ob)
                 return ob.events;
             if (this is ItemUnit iU && ItemProductForm.DataByUid.TryGetValue(iU.productInfo.Item1, out var it))
                 return it.events;

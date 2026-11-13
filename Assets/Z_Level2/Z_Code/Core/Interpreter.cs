@@ -8,6 +8,7 @@ using Z_Code.Form;
 using Z_Debug;
 using Z_Time;
 using static Z_Code.Form.InterpretDataForm;
+using Stopwatch = System.Diagnostics.Stopwatch;
 
 namespace Z_Code
 {
@@ -47,6 +48,18 @@ namespace Z_Code
     {
         private const int MaxSubProgramDepth = 64;
         private int subProgramDepth;
+        private long executionStarted, priorExecutionTicks;
+
+        public bool IsTiming { get; private set; }
+        public long ElapsedTicks => priorExecutionTicks + Stopwatch.GetTimestamp() - executionStarted;
+        public bool HasTimedOut => ElapsedTicks > Stopwatch.Frequency * Interpreter.MaxExecutionSecondsPerFrame;
+
+        public void StartTiming(long elapsedTicks)
+        {
+            priorExecutionTicks = elapsedTicks;
+            executionStarted = Stopwatch.GetTimestamp();
+            IsTiming = true;
+        }
 
         public InterpretBudget(int instructionCount)
         {
@@ -274,6 +287,13 @@ namespace Z_Code
         /// 耗尽后保留 PC/栈状态并在下一帧续跑，不视为运行时错误。
         /// </summary>
         public const int MaxInstructionsPerExecution = 4096;
+        // Real execution time only: shared with synchronous subprograms, not
+        // time spent suspended across frames or while other events execute.
+        public const double MaxExecutionSecondsPerFrame = 1d;
+
+        private int executionFrame = -1, executionPc;
+        private long frameExecutionTicks;
+        private InterpretBudget activeBudget;
 
         public InterpretDataForm.Data data;
         private Op? opCode;
@@ -356,6 +376,34 @@ namespace Z_Code
 
         internal RetInfo Interpret(InterpretBudget budget)
         {
+            budget ??= new InterpretBudget(MaxInstructionsPerExecution);
+            bool isRoot = !budget.IsTiming;
+            if (isRoot)
+            {
+                if (executionFrame != Time.frameCount)
+                {
+                    executionFrame = Time.frameCount;
+                    frameExecutionTicks = 0;
+                }
+                budget.StartTiming(frameExecutionTicks);
+            }
+
+            var previousBudget = activeBudget;
+            activeBudget = budget;
+            executionPc = data?.p ?? 0;
+            try
+            {
+                return InterpretCore(budget);
+            }
+            finally
+            {
+                if (isRoot) frameExecutionTicks = budget.ElapsedTicks;
+                activeBudget = previousBudget;
+            }
+        }
+
+        private RetInfo InterpretCore(InterpretBudget budget)
+        {
             errors.Clear();
             opCode = null;
 
@@ -369,7 +417,6 @@ namespace Z_Code
                 return MakeRetInfo(true);
             }
 
-            budget ??= new InterpretBudget(MaxInstructionsPerExecution);
             int count = zCode.Count;
 
 #if INTERPRETER_DEBUG
@@ -378,7 +425,13 @@ namespace Z_Code
 
             while (data.p < count)
             {
+                executionPc = data.p;
                 if (data.IsCancelled)
+                {
+                    return MakeRetInfo(true);
+                }
+
+                if (budget.HasTimedOut)
                 {
                     return MakeRetInfo(true);
                 }
@@ -678,6 +731,7 @@ namespace Z_Code
                         default:
                             throw new InvalidOperationException($"不支持的操作码: {parsedOp}");
                     }
+                    if (budget.HasTimedOut) return MakeRetInfo(true);
                 }
                 catch (Exception ex)
                 {
@@ -1302,6 +1356,8 @@ namespace Z_Code
             numberCacheValid = null;
             integerCache = null;
             integerCacheValid = null;
+            executionFrame = -1;
+            frameExecutionTicks = 0;
         }
 
         public void Cancel()
@@ -1483,6 +1539,22 @@ namespace Z_Code
 
         private RetInfo MakeRetInfo(bool complete, BoxDataForm.Data ret = null)
         {
+            // Also check return/yield boundaries: the last instruction or a Cmd
+            // that starts asynchronous work can itself take longer than a second.
+            if (errors.Count == 0 && data != null && !data.IsCancelled && activeBudget != null
+                && activeBudget.HasTimedOut)
+            {
+                var previousOp = opCode;
+                var code = data.program?.zCode;
+                if (code != null && TryReadOpcode(code, executionPc, out var timedOutOp, out _))
+                    opCode = timedOutOp;
+                double seconds = (double)activeBudget.ElapsedTicks / Stopwatch.Frequency;
+                AddError(executionPc, $"单帧执行超时：累计耗时 {seconds.ToString("F3", CultureInfo.InvariantCulture)} 秒，"
+                    + $"超过 {MaxExecutionSecondsPerFrame.ToString(CultureInfo.InvariantCulture)} 秒限制，事件已终止");
+                opCode = previousOp;
+                complete = true;
+                ret = null;
+            }
             var info = new RetInfo(complete, ExportBox(ret));
             info.errors.AddRange(errors);
             return info;

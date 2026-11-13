@@ -22,6 +22,8 @@ namespace Z_Code
         public override CmdBase GetNew() => new ShowVideoCmd();
         protected override bool ExecuteInternal(BoxDataForm.Data[] prm, InterpretAsyncTask asyncTask)
         {
+            if (AssetManager.instance.videoCtrl.GetId(prm[0].str) == GlobalDefaultHelper.DefaultVideoId)
+                return true;
             asyncTask.interpreter.data.heapTemp.Clear();
             foreach (var p in prm)
                 asyncTask.interpreter.data.heapTemp.Add(p.DeepCopy());

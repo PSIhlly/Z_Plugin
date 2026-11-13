@@ -32,14 +32,14 @@ namespace Z_Code
             float argument = prm[2].num;
             if (float.IsNaN(argument) || float.IsInfinity(argument) || (!UsesDuration && argument <= 0))
                 return true;
-            var offsetOrPosition = Relative ? MapManager.instance.utilCtrl.MapPos2RealPos(vector)
+            var offsetOrPosition = Relative ? vector
                 : SceneUnitCommand.WorldPosition(vector);
             var moves = new List<PendingMove>();
             foreach (var unit in units)
             {
                 if (!SceneUnitCommand.CanMove(unit)) continue;
                 var target = Relative ? unit.data.pos + offsetOrPosition : offsetOrPosition;
-                float distance = MapManager.instance.utilCtrl.RealPos2MapPos(target - unit.data.pos).magnitude;
+                float distance = (target - unit.data.pos).magnitude;
                 if (distance <= .00001f) continue;
                 moves.Add(new PendingMove
                 {
@@ -92,12 +92,11 @@ namespace Z_Code
         internal static bool AdvanceMove(MapUnit unit, Vector3 target, float speed, ref float remainingTime, float deltaTime)
         {
             float delta = Mathf.Min(MapUtilController.ClampMovementDeltaTime(deltaTime), remainingTime);
-            var offset = MapManager.instance.utilCtrl.RealPos2MapPos(target - unit.data.pos);
+            var offset = target - unit.data.pos;
             var step = Vector3.ClampMagnitude(offset, speed * delta);
-            SceneUnitCommand.Move(unit, MapManager.instance.utilCtrl.MapPos2RealPos(step));
+            SceneUnitCommand.Move(unit, step);
             remainingTime -= delta;
-            return remainingTime <= .000001f || MapManager.instance.utilCtrl.RealPos2MapPos(
-                target - unit.data.pos).sqrMagnitude <= .0000000001f;
+            return remainingTime <= .000001f || (target - unit.data.pos).sqrMagnitude <= .0000000001f;
         }
     }
 

@@ -181,8 +181,35 @@ namespace Form
 
                 public Data Copy(bool sameId = true)
                 {
-        return new Data(sameId? uid:uidChain.GetId(),stack==null?new List<BoxDataForm.Data>():new List<BoxDataForm.Data>(stack),heap==null?new Dictionary<string,BoxDataForm.Data>():new Dictionary<string,BoxDataForm.Data>(heap),program,p,top,user,subInterpret,heapTemp==null?new List<BoxDataForm.Data>():new List<BoxDataForm.Data>(heapTemp),rootUid,releaseTrigger,blockProgramUid);
+                    using (DataCopyGuard.Enter(this))
+                    {
+        var copy = new Data(sameId? uid:uidChain.GetId(),stack==null?new List<BoxDataForm.Data>():CopyCollection0(stack),heap==null?new Dictionary<string,BoxDataForm.Data>():CopyCollection1(heap),program?.Copy(),p,top,user,subInterpret?.Copy(),heapTemp==null?new List<BoxDataForm.Data>():CopyCollection0(heapTemp),rootUid,releaseTrigger,blockProgramUid);
+                        CopyRuntimeStateTo(copy);
+                        return copy;
+                    }
                 }
+
+            protected void CopyRuntimeStateTo(Data copy)
+            {
+                base.CopyRuntimeStateTo(copy);
+                OnCopy(copy);
+            }
+            partial void OnCopy(Data copy);
+
+            private static List<BoxDataForm.Data> CopyCollection0(List<BoxDataForm.Data> source)
+            {
+                var result = new List<BoxDataForm.Data>(source.Count);
+                foreach (var item in source) result.Add(item?.Copy());
+                return result;
+            }
+
+            private static Dictionary<string,BoxDataForm.Data> CopyCollection1(Dictionary<string,BoxDataForm.Data> source)
+            {
+                var result = new Dictionary<string,BoxDataForm.Data>(source.Count, source.Comparer);
+                foreach (var pair in source) result.Add(pair.Key, pair.Value?.Copy());
+                return result;
+            }
+
             
             public override  void BeforeGet()
             {

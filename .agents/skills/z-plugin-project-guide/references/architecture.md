@@ -102,6 +102,10 @@ Rules:
 
 `GameManager.Init()` creates its plain C# controllers, initializes language/BGM, loads built-in `Resources/Z_Map` content, and loads story overview data. `GameManager.Start()` opens the entry UI.
 
+`PlaySceneController` uses `_characterDic` for the lowest-Unit-UID representative of each concrete Character Product, plus Product-to-Unit groups for plural snapshots (multiple scene Units may share a Product). Exact scalar queries and `GetOrNewCharacter` use this cache; prototype queries visit only the Product itself and its `DatasByProtouid` entries. Character Unit/Product add/remove notifications and Character `MapUnit.productInfo` setter changes advance a shared lookup version; each controller rebuilds lazily after a change. Registry identity/count checks cover table clearing/reloading, and every returned Unit/Product still passes current Data-reference and root-Unit registration checks. Begin/End clear scene-owned groups; subsystem registration detaches the static change handlers before later lazy registration. Warm scalar queries build no result list and do not enumerate all Character Units. `CharacterReferenceRegression` covers warm reuse, duplicate placements, binding changes and same-UID replacement; `CharacterRemovalRegression` covers removal/recreation and current-player handoff.
+
+Object Unit-to-Product reads use `ObjectUnit.product` and the original `MapUnit.productInfo` tuple plus `ObjectProductForm.DataByUid`. `ObjectProductForm.Runtime.cs` and the extra UnitBinding cache are removed. The separate `ObjectProductForm.SceneUnits` index serves Product-to-Unit queries. `UnitForm.changeExtraAction` invalidates parsed Product, parameter and event state when Extra content changes; current Play placement preparation lives in GameSaveController and instance binding in ObjectUnit. Stored Object data uses only the current schema; runtime legacy conversion is intentionally absent.
+
 The project uses one principal Unity scene. A story “scene” is a serialized logical map:
 
 ```text

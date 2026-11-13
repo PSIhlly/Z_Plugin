@@ -38,6 +38,17 @@ function Prefab-Block([string]$source, [string]$id) {
 $stickPrefab = Read-Source 'Assets/Z_Level3/Z_UI/Prefab/Standard/go_stick.prefab'
 $centerImage = Prefab-Block $stickPrefab '1903189635033183910'
 if (-not $centerImage.Contains('m_RaycastTarget: 1')) { throw 'The actual stick-center Graphic must retain raycast targeting.' }
+$areaImage = Prefab-Block $stickPrefab '7364165830919807275'
+$iconImage = Prefab-Block $stickPrefab '8147384666027036321'
+if (-not $iconImage.Contains('m_RaycastTarget: 0')) { throw 'The nested skill icon must not intercept stick-center pointer input.' }
+$savedBindings = Prefab-Block $stickPrefab '7366837555827469874'
+if (-not [regex]::IsMatch($savedBindings, 'elementTrsLst:\s+- \{fileID: 3477006036245981806\}\s+- \{fileID: 5634179870878149815\}\s+- \{fileID: 5634179870878149815\}\s+- \{fileID: 8910154659265096045\}\s+subUiHolderLst:')) {
+    throw 'The saved Stick holder must bind the new nested icon at the generated img_ slot.'
+}
+if (-not (Prefab-Block $stickPrefab '8910154659265096045').Contains('m_Father: {fileID: 5000579051089504443}') -or
+    -not (Prefab-Block $stickPrefab '5000579051089504443').Contains('m_Father: {fileID: 4245068258628321112}')) {
+    throw 'The generated skill icon must stay inside the moving center mask.'
+}
 foreach ($rectId in @('4245068258628321112', '5634179870878149815')) {
     if (-not (Prefab-Block $stickPrefab $rectId).Contains('m_Father: {fileID: 3477006036245981806}')) { throw 'Stick center and area must remain siblings under their authored root.' }
 }
@@ -47,13 +58,15 @@ foreach ($name in @('go_eStick', 'go_qStick')) {
     $instance = @($instances | Where-Object { $_.Value.Contains('value: ' + $name) })
     if ($instance.Count -ne 1) { throw "Expected one authored skill-stick instance: $name" }
     $text = $instance[0].Value
-    if (-not [regex]::IsMatch($text, '(?m)target: \{fileID: 7364165830919807275,[^\r\n]+\}\r?\n\s+propertyPath: m_Enabled\r?\n\s+value: 0')) { throw "$name should exercise the disabled area Graphic configuration." }
+    $areaOverride = [regex]::Match($text, '(?m)target: \{fileID: 7364165830919807275,[^\r\n]+\}\r?\n\s+propertyPath: m_Enabled\r?\n\s+value: ([01])')
+    $areaDisabled = if ($areaOverride.Success) { $areaOverride.Groups[1].Value -eq '0' } else { $areaImage.Contains('m_Enabled: 0') }
+    if (-not $areaDisabled) { throw "$name should exercise the disabled area Graphic configuration." }
     if ([regex]::IsMatch($text, '(?m)target: \{fileID: 1903189635033183910,[^\r\n]+\}\r?\n\s+propertyPath: m_RaycastTarget\r?\n\s+value: 0')) { throw "$name must not disable center raycast targeting." }
 }
 $fixture = Read-Source 'Docs/Tests/MobileInputRegression.cs'
 $fixture = $fixture.Replace('__MOD_POINTER_METHODS__', $modPointers).Replace('__MOD_COMMIT_METHOD__', $modCommit)
 $fixture = $fixture.Replace('__SKILL_SETUP__', $skillSetup).Replace('__SKILL_HELPERS__', $skillHelpers).Replace('__SKILL_REFRESH_CALLS__', $skillRefresh)
-$prefix = 'using System; using System.Collections.Generic; using System.Linq; using System.Reflection; using UnityEngine; using UnityEngine.UI; using UnityEngine.EventSystems; using Z_DesignStyle; using Z_Debug; using Z_Input; using Z_Math; using Z_Ui.Base; using Form; using Ui.Stick; using Z_Map;'
+$prefix = 'using System; using System.Collections.Generic; using System.Linq; using System.Reflection; using UnityEngine; using UnityEngine.UI; using UnityEngine.EventSystems; using Z_DesignStyle; using Z_Debug; using Z_Input; using Z_Math; using Z_Ui.Base; using Z_DataSystem.Form; using Form; using Ui.Stick; using Z_Map;'
 $code = $prefix + "`n" + (Without-Usings $eventSource) + "`n" + (Without-Usings $inputSource) + "`n" + (Without-Usings $stickSource) + "`n" + (Without-Usings $playerSource) + "`n" + $fixture
 $symbols = if ($Platform -eq 'Android') { 'UNITY_ANDROID' } else { 'UNITY_EDITOR,UNITY_EDITOR_WIN,UNITY_STANDALONE_WIN' }
 Add-Type -TypeDefinition $code -CompilerOptions "/define:$symbols" -IgnoreWarnings

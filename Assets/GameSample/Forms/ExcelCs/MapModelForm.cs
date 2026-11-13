@@ -243,8 +243,27 @@ public static readonly int autoIdCnt=100;
 
                 public Data Copy(bool sameId = true)
                 {
-        return new Data(sameId? id:idChain.GetId(),subPrefabUnitName==null?new List<int>():new List<int>(subPrefabUnitName),subPrefabUnitPos==null?new List<Vector3>():new List<Vector3>(subPrefabUnitPos),subPrefabUnitScale==null?new List<Vector3>():new List<Vector3>(subPrefabUnitScale),subUnitTexsName==null?new List<List<int>>():new List<List<int>>(subUnitTexsName),animTimeInterval,isObstacle,colliderScale);
+                    using (DataCopyGuard.Enter(this))
+                    {
+        var copy = new Data(sameId? id:idChain.GetId(),subPrefabUnitName==null?new List<int>():new List<int>(subPrefabUnitName),subPrefabUnitPos==null?new List<Vector3>():new List<Vector3>(subPrefabUnitPos),subPrefabUnitScale==null?new List<Vector3>():new List<Vector3>(subPrefabUnitScale),subUnitTexsName==null?new List<List<int>>():CopyCollection0(subUnitTexsName),animTimeInterval,isObstacle,colliderScale);
+                        CopyRuntimeStateTo(copy);
+                        return copy;
+                    }
                 }
+
+            protected void CopyRuntimeStateTo(Data copy)
+            {
+                OnCopy(copy);
+            }
+            partial void OnCopy(Data copy);
+
+            private static List<List<int>> CopyCollection0(List<List<int>> source)
+            {
+                var result = new List<List<int>>(source.Count);
+                foreach (var item in source) result.Add(item==null?null:new List<int>(item));
+                return result;
+            }
+
             
             public virtual  void BeforeGet()
             {

@@ -10,7 +10,7 @@ namespace Ui.ModStoryEventEditWindow
 {
     public partial class UiItemParam
     {
-        public UiContainer<UiItemCtrl> con;
+        public UiTreeContainer<UiItemCtrl> con;
         public SyntaxNode node;
         public int deepth;
         public Action<SyntaxNode> onClick;
@@ -20,9 +20,9 @@ namespace Ui.ModStoryEventEditWindow
     {
         public UiItemParam prm;
     }
-    public partial class UiItemCtrl
+    public partial class UiItemCtrl : IUiTreePoolItem
     {
-        private UiContainer<UiUnitCtrl> unitCon;
+        private UiTreeContainer<UiUnitCtrl> unitCon;
         private UiContainer<UiDeepthCtrl> deepthCon;
         private readonly List<UiUnitCtrl> renderedUnits = new List<UiUnitCtrl>();
 
@@ -35,26 +35,23 @@ namespace Ui.ModStoryEventEditWindow
             }
             view.txt_new.raycastTarget = false;
             deepthCon = new UiContainer<UiDeepthCtrl>(this, view.go_deepth);
-            unitCon = new UiContainer<UiUnitCtrl>(this, view.go_unit, false);
-            model.prm = param;
-            Refresh();
+            unitCon = new UiTreeContainer<UiUnitCtrl>(this, view.go_unit, p => ((UiUnitParam)p).parent);
         }
 
         public void OnLineClick()
         {
             if (model.prm.node == null)
             {
+                var requestedParam = model.prm;
                 ModManager.instance.assetCtrl.ChooseCmd(SceneEventType.All, "void", (item) =>
                 {
-                    if (item == null)
+                    if (item == null || !active || !ReferenceEquals(model.prm, requestedParam))
                         return;
                     if (GameCmdDataForm.DataByUid.ContainsKey(item.id))
                     {
                         var data = GameCmdDataForm.DataByUid[item.id];
                         GameCmdDataForm.Data sel = GameCmdDataForm.DataByName[data.name];
-                        string defaultCode = sel.defaultCode;
-                        if (!string.IsNullOrEmpty(sel.allowAsVoid))
-                            defaultCode = $"{sel.allowAsVoid}{defaultCode};";
+                        string defaultCode = UiModStoryEventEditWindowCtrl.BuildCommandStatementCode(sel, sel.defaultCode);
                         if (!parent.TryCompileSyntax(defaultCode, out var res))
                             return;
                         model.prm.targetNewList.AddRange(res);
@@ -80,7 +77,17 @@ namespace Ui.ModStoryEventEditWindow
         }
         public override void OnShow()
         {
+            if (param == null || ReferenceEquals(model.prm, param)) return;
+            model.prm = param;
+            Refresh();
+        }
 
+        public void OnTreePoolRelease()
+        {
+            unitCon?.Clear();
+            deepthCon?.Clear();
+            renderedUnits.Clear();
+            model.prm = null;
         }
 
 
@@ -165,9 +172,6 @@ namespace Ui.ModStoryEventEditWindow
 
         public void RefreshUnits()
         {
-            foreach (var unit in renderedUnits)
-                if (unit.gameObject)
-                    unit.gameObject.SetActive(false);
             unitCon.Clear();
             renderedUnits.Clear();
             if (model.prm.node != null)
@@ -216,7 +220,11 @@ namespace Ui.ModStoryEventEditWindow
                 return;
             }
             view.btn_.onClick.AddListener(() => param.item.OnLineClick());
-            RefreshSelection();
+        }
+
+        public override void OnShow()
+        {
+            if (param != null) RefreshSelection();
         }
 
         public void RefreshSelection()

@@ -35,6 +35,8 @@ namespace Z_Map.Analysis
         internal int groundPlaneVersion;
         internal float groundCenterY;
         internal bool groundIsNull;
+        internal bool hasLinkState;
+        internal NavigationController.LinkState linkState;
     }
     public interface NaviComponent
     {
@@ -93,6 +95,37 @@ namespace Z_Map.Analysis
     }
     public class NavigationController : Z_Controller<MapManager>
     {
+        internal readonly struct LinkState
+        {
+            private readonly Vector3Int position;
+            private readonly Vector4 heights;
+            private readonly List<NavUnit> links;
+            private readonly bool objectBlocked, groundBlocked, allowDrop;
+            private readonly int blockedDirections;
+            private readonly float step;
+
+            internal LinkState(NavUnit unit, bool groundBlocked, float step, bool allowDrop)
+            {
+                position = unit.pos;
+                heights = GetHeights(unit);
+                links = unit.links;
+                objectBlocked = unit.objectBlocked;
+                blockedDirections = unit.objectBlockedDirections;
+                this.groundBlocked = groundBlocked;
+                this.step = step;
+                this.allowDrop = allowDrop;
+            }
+
+            internal bool Matches(NavUnit unit, bool groundBlocked, float step, bool allowDrop) =>
+                position == unit.pos && ReferenceEquals(links, unit.links)
+                && objectBlocked == unit.objectBlocked && blockedDirections == unit.objectBlockedDirections
+                && this.groundBlocked == groundBlocked && this.step == step && this.allowDrop == allowDrop
+                && heights.Equals(GetHeights(unit));
+
+            private static Vector4 GetHeights(NavUnit unit) => unit.dirMaxY != null && unit.dirMaxY.Length >= 4
+                ? new Vector4(unit.dirMaxY[0], unit.dirMaxY[1], unit.dirMaxY[2], unit.dirMaxY[3]) : default;
+        }
+
         private const string MapGroundPrefabName = "MapPrefab$mapground";
         private const float PassableObstacleHeight = 0.2f;
         private const float ObjectBlockHeight = 0.3f;
@@ -457,12 +490,17 @@ namespace Z_Map.Analysis
                 if (ObjectUnitForm.DataByUid.ContainsKey(obj.data.uid))
                     ApplyObjectObstacle(obj.data, affected);
 
-            // A changed obstacle height affects links entering the changed cell too.
+            // Rebuild only when the inputs used by the published links changed.
+            // Coverage can stay the same while a within-cell move blocks an edge.
             var linkSources = objectRefreshLinkSources;
             linkSources.Clear();
             foreach (var navUnit in affected.Values)
+            {
+                var pos = navUnit.pos;
+                if (navUnit.hasLinkState && navUnit.linkState.Matches(navUnit,
+                        mapGroundBlocked.Contains((pos.x, pos.y, pos.z)), step, DynamicGlobalSettings.allowDrop))
+                    continue;
                 linkSources.Add(navUnit);
-            foreach (var navUnit in affected.Values)
                 for (int dy = -1; dy <= 1; dy++)
                     for (int dir = 0; dir < tryDir.Length; dir++)
                     {
@@ -470,6 +508,7 @@ namespace Z_Map.Analysis
                         if (navUnits.TryGetValue((origin.x, origin.y, origin.z), out var source))
                             linkSources.Add(source);
                     }
+            }
 
             foreach (var navUnit in linkSources)
                 RebuildLinks(navUnit, mapGroundBlocked);
@@ -841,9 +880,12 @@ namespace Z_Map.Analysis
 
         private void RebuildLinks(NavUnit navUnit, HashSet<(int, int, int)> blocked)
         {
-            navUnit.links.Clear();
             var pos = navUnit.pos;
-            if (navUnit.objectBlocked || blocked.Contains((pos.x, pos.y, pos.z)))
+            bool groundBlocked = blocked.Contains((pos.x, pos.y, pos.z));
+            navUnit.linkState = new LinkState(navUnit, groundBlocked, step, DynamicGlobalSettings.allowDrop);
+            navUnit.hasLinkState = true;
+            navUnit.links.Clear();
+            if (navUnit.objectBlocked || groundBlocked)
                 return;
 
             for (int m = -1; m <= 1; m++)

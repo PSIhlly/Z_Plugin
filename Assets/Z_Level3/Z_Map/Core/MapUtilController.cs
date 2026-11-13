@@ -676,9 +676,17 @@ namespace Z_Map
         }
         public List<MapUnit> CaptureCast(Vector3 from, Vector3 to, float radius)
         {
+            return CaptureCast(from, to, radius, out _, out _);
+        }
+
+        // Temporary diagnostic overload: expose the actual broad-phase traversal
+        // without changing which candidates are visited or which hits are returned.
+        public List<MapUnit> CaptureCast(Vector3 from, Vector3 to, float radius,
+            out HashSet<int> testedCandidates, out HashSet<(int, int)> checkedColumns)
+        {
             var res = new List<MapUnit>();
 
-            HashSet<int> exist = new HashSet<int>();
+            HashSet<int> exist = testedCandidates = new HashSet<int>();
 
             var fromMesh = Mesh.GetMesh(from, radius, Vector3.zero, Vector3.one);
             var toMesh = Mesh.GetMesh(to, radius, Vector3.zero, Vector3.one);
@@ -690,7 +698,7 @@ namespace Z_Map
             var lst = Graph.GetRoughOverlapIntPos(sweepPoints);
 
 
-            var checkedColumns = new HashSet<(int, int)>();
+            checkedColumns = new HashSet<(int, int)>();
             foreach (var pos in lst)
             {
                 var mapPos = RealPos2MapPosInt(pos);
@@ -787,6 +795,118 @@ namespace Z_Map
 
             return new List<TileUnit>(result);
         }
+        public List<TileUnit> GetObjectCollisionTiles(ObjectUnit unit, Vector3 displacement, CollideType type)
+        {
+            var result = new HashSet<TileUnit>();
+            Vector3 cellSize = _super.enable ? GetSafeMapUnitSize() : Vector3.one;
+            var owner = unit.belongTile;
+            int anchorY = owner != null ? owner.data.mapPos.y : RealPos2MapPosInt(unit.data.pos).y;
+            const float tolerance = 0.0001f;
+
+            foreach (var mesh in unit.GetMeshes(type))
+            {
+                if (!TryGetObjectProbeBounds(mesh, out var bounds)) continue;
+                Vector3 min = Vector3.Min(bounds.min, bounds.min + displacement);
+                Vector3 max = Vector3.Max(bounds.max, bounds.max + displacement);
+                int minX = Mathf.CeilToInt((min.x - tolerance) / cellSize.x - .5f);
+                int maxX = Mathf.FloorToInt((max.x + tolerance) / cellSize.x + .5f);
+                int minZ = Mathf.CeilToInt((min.z - tolerance) / cellSize.z - .5f);
+                int maxZ = Mathf.FloorToInt((max.z + tolerance) / cellSize.z + .5f);
+                // Keep the existing floor fallback and upper-layer candidates:
+                // a Tile's physical Collider can extend outside its logical Y cell.
+                int maxY = Mathf.Max(anchorY + 1, Mathf.CeilToInt((max.y + tolerance) / cellSize.y + .5f));
+
+                for (int x = minX; x <= maxX; x++)
+                for (int z = minZ; z <= maxZ; z++)
+                {
+                    float enter = 0f, exit = 1f;
+                    if (!ClipSweptTileAxis(bounds.min.x, bounds.max.x, displacement.x,
+                            (x - .5f) * cellSize.x - tolerance, (x + .5f) * cellSize.x + tolerance, ref enter, ref exit)
+                        || !ClipSweptTileAxis(bounds.min.z, bounds.max.z, displacement.z,
+                            (z - .5f) * cellSize.z - tolerance, (z + .5f) * cellSize.z + tolerance, ref enter, ref exit))
+                        continue;
+                    if (!DoesObjectSweepCrossColumn(mesh, displacement,
+                            new Vector2(x * cellSize.x, z * cellSize.z), new Vector2(cellSize.x, cellSize.z) * .5f))
+                        continue;
+                    for (int y = anchorY; y <= maxY; y++)
+                    {
+                        var tile = GetTile(x, y, z);
+                        if (tile != null) result.Add(tile);
+                    }
+                }
+            }
+            return new List<TileUnit>(result);
+        }
+
+        // Swept AABB versus a Tile column. Sharing the contact interval between
+        // X and Z excludes the empty corners of a diagonal sweep's bounding box.
+        private static bool ClipSweptTileAxis(float min, float max, float displacement,
+            float tileMin, float tileMax, ref float enter, ref float exit)
+        {
+            if (displacement == 0f) return min <= tileMax && max >= tileMin;
+            float first = (tileMin - max) / displacement;
+            float last = (tileMax - min) / displacement;
+            if (first > last) (first, last) = (last, first);
+            enter = Mathf.Max(enter, first);
+            exit = Mathf.Min(exit, last);
+            return enter <= exit;
+        }
+
+        private static bool DoesObjectSweepCrossColumn(MeshInfo mesh, Vector3 displacement, Vector2 center, Vector2 halfSize)
+        {
+            Vector2 step = new Vector2(displacement.x, displacement.z);
+            Vector2 start = new Vector2(mesh.center.x, mesh.center.z);
+            const float tolerance = 0.0001f;
+            if (mesh.type == MeshType.Sphere)
+            {
+                // The projected Sphere sweep is a capsule. Its Minkowski sum
+                // with the Tile rectangle is two strips plus four corner disks.
+                float radius = GetProbeSphereRadius(mesh) + tolerance;
+                if (DoesPointSweepCrossRect(start, step, center, halfSize + new Vector2(radius, 0))
+                    || DoesPointSweepCrossRect(start, step, center, halfSize + new Vector2(0, radius))) return true;
+                for (int x = -1; x <= 1; x += 2)
+                for (int z = -1; z <= 1; z += 2)
+                {
+                    Vector2 corner = center + new Vector2(x * halfSize.x, z * halfSize.y);
+                    float t = step.sqrMagnitude > 0f ? Mathf.Clamp01(Vector2.Dot(corner - start, step) / step.sqrMagnitude) : 0f;
+                    if ((start + step * t - corner).sqrMagnitude <= radius * radius) return true;
+                }
+                return false;
+            }
+
+            // Project the Box and its translation into X/Z. The resulting
+            // convex polygon has the three Box edges and the sweep as generators.
+            var points = mesh.positions;
+            Vector3 xEdge = (points[1] - points[0]) * .5f;
+            Vector3 yEdge = (points[2] - points[0]) * .5f;
+            Vector3 zEdge = (points[4] - points[0]) * .5f;
+            Vector2 a = new Vector2(xEdge.x, xEdge.z), b = new Vector2(yEdge.x, yEdge.z), c = new Vector2(zEdge.x, zEdge.z);
+            Vector2 halfStep = step * .5f;
+            Vector2 offset = start + halfStep - center;
+            return IsObjectSweepColumnAxis(offset, a, b, c, halfStep, halfSize, Vector2.right)
+                && IsObjectSweepColumnAxis(offset, a, b, c, halfStep, halfSize, Vector2.up)
+                && IsObjectSweepColumnAxis(offset, a, b, c, halfStep, halfSize, new Vector2(-a.y, a.x))
+                && IsObjectSweepColumnAxis(offset, a, b, c, halfStep, halfSize, new Vector2(-b.y, b.x))
+                && IsObjectSweepColumnAxis(offset, a, b, c, halfStep, halfSize, new Vector2(-c.y, c.x))
+                && IsObjectSweepColumnAxis(offset, a, b, c, halfStep, halfSize, new Vector2(-step.y, step.x));
+        }
+
+        private static bool DoesPointSweepCrossRect(Vector2 start, Vector2 step, Vector2 center, Vector2 halfSize)
+        {
+            float enter = 0f, exit = 1f;
+            return ClipSweptTileAxis(start.x, start.x, step.x, center.x - halfSize.x, center.x + halfSize.x, ref enter, ref exit)
+                && ClipSweptTileAxis(start.y, start.y, step.y, center.y - halfSize.y, center.y + halfSize.y, ref enter, ref exit);
+        }
+
+        private static bool IsObjectSweepColumnAxis(Vector2 offset, Vector2 a, Vector2 b, Vector2 c,
+            Vector2 halfStep, Vector2 halfSize, Vector2 axis)
+        {
+            float radius = Mathf.Abs(Vector2.Dot(a, axis)) + Mathf.Abs(Vector2.Dot(b, axis))
+                + Mathf.Abs(Vector2.Dot(c, axis)) + Mathf.Abs(Vector2.Dot(halfStep, axis))
+                + halfSize.x * Mathf.Abs(axis.x) + halfSize.y * Mathf.Abs(axis.y);
+            return Mathf.Abs(Vector2.Dot(offset, axis)) <= radius + 0.0001f * axis.magnitude;
+        }
+
         public List<TileUnit> GetColliderOverlap(ObjectUnitForm.Data oData)
         {
             var all = new List<List<Vector3Int>>();
@@ -864,7 +984,7 @@ namespace Z_Map
         {
             var result = new List<TileUnit>();
             var added = new HashSet<TileUnit>();
-            // Index physical bodies even before Play enables product.collision.
+            // The caller gates this physical coverage by the Unit's collision flag.
             foreach (var mesh in oData.unit.GetMeshes(CollideType.CollideOnly))
             {
                 if (!TryGetObjectNavigationRange(mesh, out var min, out var max))

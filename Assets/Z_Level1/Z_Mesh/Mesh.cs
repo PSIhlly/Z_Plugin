@@ -15,6 +15,20 @@ namespace Z_Mesh
         public MeshType type;
         public Vector3[] positions;
         public Vector3 center;
+        private Graph.CubeSatData cubeSatData;
+        private bool cubeSatReady;
+
+        public ref readonly Graph.CubeSatData GetCubeSatData()
+        {
+            // Positions are public and translation updates them in place.
+            // Validate every vertex so replacements and edits cannot reuse stale projections.
+            if (!cubeSatReady || !cubeSatData.Matches(positions))
+            {
+                cubeSatData = new Graph.CubeSatData(positions);
+                cubeSatReady = true;
+            }
+            return ref cubeSatData;
+        }
         public float GetMaxY()
         {
             float maxY = positions[0].y;
@@ -70,7 +84,7 @@ namespace Z_Mesh
             float curDis = 0;
             float length = step.magnitude;
             dis = length;
-            var assist = new Graph.IntersectAssisant(false);
+            var result = IntersectType.None;
             switch (o.type)
             {
                 case MeshType.Cube:
@@ -78,13 +92,14 @@ namespace Z_Mesh
                     {
                         case Z_Mesh.MeshType.Cube:
                             {
-                                assist.Add(Graph.CubeIntersectCube(o.positions, tar.positions, step, out curDis, out avoidDir));
+                                result = Graph.CubeIntersectCube(o.positions, tar.positions,
+                                    in o.GetCubeSatData(), in tar.GetCubeSatData(), step, out curDis, out avoidDir);
                                 dis = Math.Min(dis, curDis);
                                 break;
                             }
                         case Z_Mesh.MeshType.Sphere:
                             {
-                                assist.Add(Graph.SphereIntersectCube(tar.positions, o.positions, -step, out curDis, out avoidDir));
+                                result = Graph.SphereIntersectCube(tar.positions, o.positions, -step, out curDis, out avoidDir);
                                 dis = Math.Min(dis, curDis);
                                 break;
                             }
@@ -95,13 +110,13 @@ namespace Z_Mesh
                     {
                         case Z_Mesh.MeshType.Cube:
                             {
-                                assist.Add(Graph.SphereIntersectCube(o.positions, tar.positions, step, out curDis, out avoidDir));
+                                result = Graph.SphereIntersectCube(o.positions, tar.positions, step, out curDis, out avoidDir);
                                 dis = Math.Min(dis, curDis);
                                 break;
                             }
                         case Z_Mesh.MeshType.Sphere:
                             {
-                                assist.Add(Graph.SphereIntersectSphere(o.positions, tar.positions, step, out curDis, out avoidDir));
+                                result = Graph.SphereIntersectSphere(o.positions, tar.positions, step, out curDis, out avoidDir);
                                 dis = Math.Min(dis, curDis);
                                 break;
                             }
@@ -109,7 +124,8 @@ namespace Z_Mesh
                     break;
             }
 
-            return assist.GetRes();
+            // Match a single result in IntersectAssisant(oldIn: false).
+            return result == IntersectType.Inner ? IntersectType.In : result == IntersectType.Out ? IntersectType.None : result;
         }
 
     }

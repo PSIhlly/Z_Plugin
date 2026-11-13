@@ -166,7 +166,7 @@ public static class CameraCommandsRegression
             execution, 0, -1, 0, null, new List<BoxDataForm.Data>(), 0);
         var result = data.Interpret();
         Check(result.complete && result.errors.Count == 0 && result.ret.num == 42, "instant movement continues in the same interpreter pass");
-        Equal(camera.tarTrs.position, new Vector3(1006, 1521, 2004), "source NewVector maps x/y/height with absolute +500 only once");
+        Equal(camera.tarTrs.position, new Vector3(503, 507, 501), "source NewVector maps x/y/height with absolute +500 only once");
     }
 
     private static void CoordinatesAndInstantMoves()
@@ -174,14 +174,14 @@ public static class CameraCommandsRegression
         Reset(new Vector3(100, 200, 300));
         var task = Execute(new MoveCameraCmd(), Vector(new Vector3(2, 4, 3)), Number(0));
         Check(task.IsComplete() && task.error == null && !camera.followsPlayer, "zero duration takes manual control synchronously");
-        Equal(camera.tarTrs.position, new Vector3(104, 212, 312), "relative vector scales each axis without a +500 offset");
+        Equal(camera.tarTrs.position, new Vector3(102, 204, 303), "relative vector uses world units without a +500 offset");
         Execute(new MoveCameraCmd(), Vector(new Vector3(-1, -2, -3)), Number(-1));
-        Equal(camera.tarTrs.position, new Vector3(102, 206, 300), "negative duration positions immediately relative to the current camera");
+        Equal(camera.tarTrs.position, new Vector3(101, 202, 300), "negative duration positions immediately relative to the current camera");
         Execute(new MoveCameraToCmd(), Vector(new Vector3(2, 4, 3)), Number(0));
-        Equal(camera.tarTrs.position, new Vector3(1004, 1512, 2012), "absolute coordinates offset all logical axes before nonuniform scaling");
+        Equal(camera.tarTrs.position, new Vector3(502, 504, 503), "absolute coordinates retain +500 without applying nonuniform cell scaling");
         camera.tarTrs.position = new Vector3(7, 8, 9);
         Execute(new MoveCameraToCmd(), Vector(new Vector3(2, 4, 3)), Number(0));
-        Equal(camera.tarTrs.position, new Vector3(1004, 1512, 2012), "absolute positioning does not add the current camera origin");
+        Equal(camera.tarTrs.position, new Vector3(502, 504, 503), "absolute positioning does not add the current camera origin");
         Execute(new MoveCameraCmd(), Vector(Vector3.one * 10000), Number(0));
         Equal(camera.tarTrs.position, Vector3.one * 10000, "manual target respects registered camera limits");
 

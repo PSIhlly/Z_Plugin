@@ -210,7 +210,7 @@ namespace Z_Ui.Notify
             return builder.ToString();
         }
 
-        public void AddChoose(string title, bool canClose, Func<EntryItem, bool> func, EntryItem items)
+        public ChooseInfo AddChoose(string title, bool canClose, Func<EntryItem, bool> func, EntryItem items)
         {
             var info = new ChooseInfo()
             {
@@ -232,6 +232,7 @@ namespace Z_Ui.Notify
                     chooseInfo = info
                 });
             }
+            return info;
         }
         public void AddQuickChoose(Func<EntryItem, bool> func, EntryItem items)
         {

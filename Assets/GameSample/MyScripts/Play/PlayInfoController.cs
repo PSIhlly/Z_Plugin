@@ -127,6 +127,7 @@ public partial class PlayInfoController : Z_Controller<PlayManager>, InternalPla
     public void Begin()
     {
         enable = true;
+        EnsureCurrentCharacterAlive();
         bagName2UidDic.Clear();
         var bagTmp = new List<int>(GameManager.instance.curProgress.bag);
         foreach (var uid in bagTmp)
@@ -144,6 +145,9 @@ public partial class PlayInfoController : Z_Controller<PlayManager>, InternalPla
         if (!enable)
             return;
 
+        EnsureCurrentCharacterAlive();
+        if (GameManager.instance.curProgress == null)
+            return;
         Z_Map.DynamicGlobalSettings.pauseNav = GameManager.instance.curProgress.blockProgramUid == 0 ? false : true;
         if (GameManager.instance.curProgress.blockProgramUid != 0)
         {
@@ -166,9 +170,9 @@ public partial class PlayInfoController : Z_Controller<PlayManager>, InternalPla
         if (data != null)
         {
             var prm = data.paramDic.GetDv(name, null);
-            float oldValue = prm.GetValue().num;
             if (prm != null)
             {
+                float oldValue = prm.GetValue().num;
                 var maxPrm = string.IsNullOrEmpty(prm.max) ? null : data.paramDic.GetDv(prm.max, null);
                 float max = maxPrm == null ? GlobalSettings.MAX : maxPrm.GetValue().num;
                 var minPrm = string.IsNullOrEmpty(prm.min) ? null : data.paramDic.GetDv(prm.min, null);
@@ -195,6 +199,7 @@ public partial class PlayInfoController : Z_Controller<PlayManager>, InternalPla
                 data.paramDic[name].SetValue(value);
 
             }
+            EnsureCurrentCharacterAlive();
         }
 
 

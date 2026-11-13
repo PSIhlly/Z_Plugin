@@ -32,6 +32,7 @@ public class PlaySceneEffectController : Z_Controller<PlayManager>, IZ_Listener<
     private GameObject effectPrefab => InstancePoolManager.instance.GetPrefab(MapInfo.GetPrefabName("img"));
     private GameObject canvasPrefab => InstancePoolManager.instance.GetPrefab(MapInfo.GetPrefabName("canvas"));
     private Dictionary<int, CanvasHolder> canvasDic = new Dictionary<int, CanvasHolder>();
+    private readonly Dictionary<CanvasHolder, int> floatingCanvases = new Dictionary<CanvasHolder, int>();
     private int updateFrame;
     private int lifecycleVersion;
     private bool active;
@@ -78,6 +79,13 @@ public class PlaySceneEffectController : Z_Controller<PlayManager>, IZ_Listener<
         foreach (var canvas in canvasDic.Values)
             ReleaseCanvas(canvas);
         canvasDic.Clear();
+        foreach (var pair in floatingCanvases)
+        {
+            // An externally recycled Canvas may already belong to a new user.
+            if (pair.Key != null && pair.Key.LifecycleVersion == pair.Value)
+                ReleaseCanvas(pair.Key);
+        }
+        floatingCanvases.Clear();
     }
 
     private void ReleaseCanvas(CanvasHolder canvas)
@@ -119,7 +127,9 @@ public class PlaySceneEffectController : Z_Controller<PlayManager>, IZ_Listener<
             img.trs.localEulerAngles = img.trs.localEulerAngles.NewSetZ(-rot);
             img.trs.localScale = GetEffectScale(Vector3.one, isIsometricVerticalEffect);
             var propBlock = new MaterialPropertyBlock();
-            img.animTimer = TimeManager.instance.StartTimerImmediate(0, 0.0001f, () =>
+            Texture currentTexture = null;
+            bool animatedTexture = false;
+            Func<bool> updateEffect = () =>
             {
                 float progress = Time.time - startTime;
                 var clip = cur == -1 ? null : eft[cur];
@@ -134,14 +144,17 @@ public class PlaySceneEffectController : Z_Controller<PlayManager>, IZ_Listener<
                     }
 
                     clip = eft[cur];
+                    progress = 0;
                     img.render.GetPropertyBlock(propBlock);
                     propBlock.SetFloat("_Alpha", clip.opacity);
                     img.render.SetPropertyBlock(propBlock);
-                    DisFadeRenderRouting.SetTexture(img.render, TexAssetForm.DataById[clip.tex].GetTex(), GetEffectRoute(clip.opacity));
+                    animatedTexture = TexAssetForm.DataById[clip.tex].GetAnimationDuration() > 0;
+                    currentTexture = TextureAnimation.GetSample(clip.tex, 0, 0).texture;
+                    DisFadeRenderRouting.SetTexture(img.render, currentTexture, GetEffectRoute(clip.opacity));
 
 
                     beforeUpdate?.Invoke(img);
-                    img.trs.position = img.oriPos + MapManager.instance.utilCtrl.MapPos2RealPos(new Vector3(clip.pos.x, clip.pos.y, clip.pos.z));
+                    img.trs.position = img.oriPos + clip.pos;
 
                     if (GameManager.instance.curProgress.cameraMode == CameraMode.Overhead || data.ground)
                         img.trs.eulerAngles = img.trs.localEulerAngles.NewSetY(img.oriRot + clip.rot);
@@ -169,8 +182,21 @@ public class PlaySceneEffectController : Z_Controller<PlayManager>, IZ_Listener<
 
                 }
 
+                if (animatedTexture)
+                {
+                    var texture = TextureAnimation.GetSample(clip.tex, 0, progress).texture;
+                    if (texture != currentTexture)
+                    {
+                        currentTexture = texture;
+                        DisFadeRenderRouting.SetTexture(img.render, texture, GetEffectRoute(propBlock.GetFloat("_Alpha")));
+                    }
+                }
                 return false;
-            }, img);
+            };
+            // Show frame zero synchronously, then sample variable GIF/WebP delays
+            // once per rendered frame. Bind the timer to this pooled image.
+            if (!updateEffect())
+                img.animTimer = TimeManager.instance.StartFrameTimer(updateEffect, img);
         }
 
     }
@@ -271,7 +297,11 @@ public class PlaySceneEffectController : Z_Controller<PlayManager>, IZ_Listener<
     }
     public void FloatingText(string txt, Vector3 pos)
     {
+        if (!active || GameManager.instance.curProgress == null)
+            return;
         var o = InstancePoolManager.instance.CreateInstance(canvasPrefab);
+        var canvas = o.GetComponent<CanvasHolder>();
+        canvas.Reset();
         switch (GameManager.instance.curProgress.cameraMode)
         {
             case CameraMode.Overhead:
@@ -285,12 +315,16 @@ public class PlaySceneEffectController : Z_Controller<PlayManager>, IZ_Listener<
                 break;
         }
         o.SetActive(true);
-        o.GetComponent<CanvasHolder>().ToastText(txt, 2);
-        TimeManager.instance.StartTimer(3, 0, () =>
+        int version = canvas.LifecycleVersion;
+        floatingCanvases[canvas] = version;
+        canvas.ToastText(txt, 2, () =>
         {
-            InstancePoolManager.instance.DeleteInstance(o, canvasPrefab);
-            return true;
-        }, o.GetComponent<CanvasHolder>());
+            if (!floatingCanvases.TryGetValue(canvas, out var currentVersion) || currentVersion != version)
+                return;
+            floatingCanvases.Remove(canvas);
+            if (canvas != null && canvas.LifecycleVersion == version)
+                ReleaseCanvas(canvas);
+        });
     }
 
     public void ChatText(int characterUid, string txt, int img, float time)

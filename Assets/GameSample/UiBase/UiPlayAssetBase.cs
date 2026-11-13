@@ -24,11 +24,13 @@ namespace Ui.PlayAsset
 
             public GameObject go_image;
             public Img img_;
+            public Txt txt_;
         public UiImageView(UiHolder uiHolder):base(uiHolder)
         {
 
             go_image = uiHolder.elementTrsLst[0].gameObject;
             img_ = uiHolder.elementTrsLst[1].GetComponent<Img>();
+            txt_ = uiHolder.elementTrsLst[2].GetComponent<Txt>();
         }
 
     }

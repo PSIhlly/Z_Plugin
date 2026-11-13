@@ -26,12 +26,12 @@ namespace Z_Code
         public override CmdBase GetNew() => new GetCharactersInAreaCmd();
         protected override bool ExecuteInternal(BoxDataForm.Data[] prm, InterpretAsyncTask asyncTask)
         {
-            var pos = MapManager.instance.utilCtrl.MapPos2RealPos(GameManager.PlayerPosToMapPos(new Vector3(prm[0].dic["x"].num, prm[0].dic["height"].num, prm[0].dic["y"].num)));
+            var pos = GameManager.PlayerPosToMapPos(new Vector3(prm[0].dic["x"].num, prm[0].dic["height"].num, prm[0].dic["y"].num));
             var box = CodeHelper.CreateBox();
             int i = 0;
             foreach (var o in CharacterUnitForm.DataByUid.Values)
             {
-                var rela = MapManager.instance.utilCtrl.RealPos2MapPos(pos - o.pos);
+                var rela = pos - o.pos;
                 if (rela.sqrMagnitude < prm[1].num * prm[1].num)
                 {
                     box.dic[i.ToString()] = CodeHelper.CreateBoxByStr(GlobalEventHelper.GetName(GlobalEventHelper.CHARACTER, o.unit.productInfo.Item1.ToString()));

@@ -14,13 +14,79 @@ public partial class PlayInfoController
     public void UndeployCharacter(string reference) => ChangeParty(reference, PartyAction.Undeploy);
     public void SetCurrentCharacter(string reference) => ChangeParty(reference, PartyAction.SetCurrent);
 
-    private static List<CharacterProductForm.Data> GetPartyTargets(string reference, bool create)
+    public static bool CanBeCurrentCharacter(CharacterProductForm.Data character)
+    {
+        if (character == null)
+            return false;
+        // Stories without a configured HP parameter retain their existing behavior.
+        if (string.IsNullOrEmpty(character.hpParamName) || character.paramDic == null
+            || !character.paramDic.TryGetValue(character.hpParamName, out var parameter) || parameter == null)
+            return true;
+        var hp = parameter.GetValue();
+        return hp == null || hp.str != null || hp.num > 0;
+    }
+
+    private static bool IsAvailableActiveCharacter(ProgressForm.Data progress, int uid)
+    {
+        return uid > 0 && progress.teamActive != null && progress.teamActive.Contains(uid)
+            && progress.team != null && progress.team.Contains(uid)
+            && CharacterProductForm.DataByUid.TryGetValue(uid, out var character)
+            && CanBeCurrentCharacter(character);
+    }
+
+    private static int GetFirstAvailableActiveCharacter(ProgressForm.Data progress)
+    {
+        if (progress.teamActive != null)
+            foreach (int uid in progress.teamActive)
+                if (IsAvailableActiveCharacter(progress, uid))
+                    return uid;
+        return 0;
+    }
+
+    // Also used before scene player creation; never change team/deployment membership.
+    public static bool RepairCurrentCharacterHealth(ProgressForm.Data progress)
+    {
+        if (progress == null || progress.characterUid == 0
+            || IsAvailableActiveCharacter(progress, progress.characterUid))
+            return false;
+        int replacement = GetFirstAvailableActiveCharacter(progress);
+        if (replacement == progress.characterUid)
+            return false;
+        progress.characterUid = replacement;
+        return true;
+    }
+
+    public void EnsureCurrentCharacterAlive()
+    {
+        var progress = GameManager.instance.curProgress;
+        if (RepairCurrentCharacterHealth(progress))
+            PublishCurrentCharacterChange(progress);
+    }
+
+    private void PublishCurrentCharacterChange(ProgressForm.Data progress)
+    {
+        _super.sceneCtrl?.RefreshCurrentCharacter();
+        Z_EventHelper.Invoke(new StoryCharacterEvent
+        {
+            type = StoryCharacterEventType.ChangeCharacter,
+            data = CharacterProductForm.DataByUid.TryGetValue(progress.characterUid, out var current) ? current : null
+        });
+    }
+
+    private static List<CharacterProductForm.Data> GetPartyTargets(string reference, bool create, bool requireAlive = false)
     {
         var targets = CharacterProductForm.ResolveReferences(reference);
         // Team members are live Products (or authored singletons), even when called before Play starts.
         targets.RemoveAll(data => data.protoUid == 0 && !data.unique);
+        if (requireAlive && targets.Count > 0)
+        {
+            // Do not manufacture a fresh copy when all existing copies are defeated.
+            targets.RemoveAll(data => !CanBeCurrentCharacter(data));
+            return targets;
+        }
         if (targets.Count == 0 && create && CharacterProductForm.TryGetReferenceUid(reference, out int uid)
-            && CharacterProductForm.DataByUid.TryGetValue(uid, out var proto) && proto.protoUid == 0)
+            && CharacterProductForm.DataByUid.TryGetValue(uid, out var proto) && proto.protoUid == 0
+            && (!requireAlive || CanBeCurrentCharacter(proto)))
         {
             var product = proto.Copy(false);
             product.ToProduct(proto.uid);
@@ -35,7 +101,8 @@ public partial class PlayInfoController
         if (progress == null)
             return;
         var targets = GetPartyTargets(reference,
-            action == PartyAction.Add || action == PartyAction.Deploy || action == PartyAction.SetCurrent);
+            action == PartyAction.Add || action == PartyAction.Deploy || action == PartyAction.SetCurrent,
+            action == PartyAction.SetCurrent);
         if (targets.Count == 0)
             return;
 
@@ -120,8 +187,8 @@ public partial class PlayInfoController
             AddPartyMember(progress.team, uid);
 
         change();
-        if (!progress.teamActive.Contains(progress.characterUid))
-            progress.characterUid = progress.teamActive.Count > 0 ? progress.teamActive[0] : 0;
+        if (!IsAvailableActiveCharacter(progress, progress.characterUid))
+            progress.characterUid = GetFirstAvailableActiveCharacter(progress);
 
         bool currentChanged = oldCurrent != progress.characterUid;
         bool teamChanged = !oldTeam.SequenceEqual(progress.team) || !oldActive.SequenceEqual(progress.teamActive);

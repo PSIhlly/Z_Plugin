@@ -41,6 +41,7 @@ public static class CharacterRemovalRegression
             foreach (bool unique in new[] { false, true })
                 Removal(sceneReference, unique);
             StaleDataCannotRemoveReplacement();
+            CurrentCharacterRotationHandoff();
             Debug.Log("CHARACTER_REMOVAL_REGRESSION_PASS checks=" + checks);
             EditorApplication.Exit(0);
         }
@@ -123,7 +124,7 @@ public static class CharacterRemovalRegression
             new List<int>(), "", false, false, new List<int>());
         map.data.RegisterMap(tile);
         owner = tile.unit;
-        var prefab = Go("removal-character");
+        var prefab = Go(GlobalDefaultHelper.GetRuntimePrefabName("character"));
         prefab.SetActive(false);
         prefab.AddComponent<CharacterInstance>();
         prefab.AddComponent<MeshRenderer>();
@@ -241,6 +242,78 @@ public static class CharacterRemovalRegression
             && ReferenceEquals(CharacterProductForm.DataByUid[product.uid], product),
             "an absent unique Character neither deletes its Product nor a replacement instance");
         Destroy("$ch$" + other.uid + "$ch$");
+    }
+
+    private static void CurrentCharacterRotationHandoff()
+    {
+        Manager<CameraInstance>();
+        typeof(PlaySceneController).GetField("enable", PrivateInstance).SetValue(scene, true);
+        var playerField = typeof(PlaySceneController).GetField("_playerM", PrivateInstance);
+        var productField = typeof(PlaySceneController).GetField("_playerG", PrivateInstance);
+        var moveField = typeof(PlaySceneController).GetField("setPlayerMove", PrivateInstance);
+        var rotationField = typeof(PlaySceneController).GetField("setPlayerRot", PrivateInstance);
+        var skillField = typeof(PlaySceneController).GetField("curOptSkill", PrivateInstance);
+        playerField.SetValue(scene, null); productField.SetValue(scene, null);
+
+        var first = Product(61101, true);
+        var firstUnit = Unit(first);
+        var initialEuler = new Vector3(5, 131, 7);
+        map.updateCtrl.ApplyMove(firstUnit.unit, owner.data.pos, initialEuler, true);
+        progress.characterUid = first.uid; progress.pos = owner.data.pos;
+        scene.RefreshCurrentCharacter();
+        Check(scene.playerM == firstUnit && firstUnit.euler == initialEuler,
+            "initial player selection without a predecessor retains its authored rotation");
+
+        var second = Product(61102, true);
+        var secondUnit = Unit(second);
+        map.updateCtrl.ApplyMove(secondUnit.unit, owner.data.pos, new Vector3(0, 40, 0), true);
+        secondUnit.unit.forceEuler = new Vector3(0, 90, 0);
+        var outgoingEuler = new Vector3(11, 247, 13);
+        var outgoingPosition = owner.data.pos + new Vector3(.1f, 0, .1f);
+        map.updateCtrl.ApplyMove(firstUnit.unit, outgoingPosition, outgoingEuler, true);
+        moveField.SetValue(scene, Vector3.one);
+        rotationField.SetValue(scene, Quaternion.Euler(0, 20, 0));
+        skillField.SetValue(scene, SkillType.E);
+        progress.pos = Vector3.zero; progress.characterUid = second.uid;
+        scene.RefreshCurrentCharacter();
+        Check(scene.playerM == secondUnit && secondUnit.euler == outgoingEuler,
+            "switching to an existing Character inherits the outgoing full Euler rotation");
+        Check(Quaternion.Angle(secondUnit.unit.ins.transform.rotation, Quaternion.Euler(outgoingEuler)) < .001f,
+            "the visible pooled Character transform receives the rotation synchronously");
+        Check(secondUnit.pos == outgoingPosition && progress.pos == outgoingPosition,
+            "rotation handoff still inherits the outgoing latest position");
+        Check(secondUnit.unit.forceEuler == null && rotationField.GetValue(scene) == null
+            && (Vector3)moveField.GetValue(scene) == Vector3.zero && skillField.GetValue(scene) == null,
+            "outgoing controls and the incoming NPC's stale queued rotation cannot overwrite the handoff");
+        Check(!CharacterUnitForm.DataByUid.ContainsKey(firstUnit.uid)
+            && ReferenceEquals(CharacterProductForm.DataByUid[first.uid], first),
+            "switching removes the old scene Character while retaining its unique Product");
+        int removals = probe.removed.Count;
+        secondUnit.unit.forceEuler = new Vector3(0, 15, 0);
+        scene.RefreshCurrentCharacter();
+        Check(scene.playerM == secondUnit && probe.removed.Count == removals
+            && secondUnit.unit.forceEuler.HasValue,
+            "refreshing the same current Character does not respawn it or erase its pending rotation");
+
+        var third = Product(61103, true);
+        progress.characterUid = third.uid;
+        scene.RefreshCurrentCharacter();
+        var thirdUnit = scene.playerM;
+        Check(thirdUnit != null && thirdUnit != secondUnit && thirdUnit.euler == outgoingEuler,
+            "a newly generated player inherits rotation just like a pre-existing Character");
+        thirdUnit.unit.Show();
+        Check(Quaternion.Angle(thirdUnit.unit.ins.transform.rotation, Quaternion.Euler(outgoingEuler)) < .001f,
+            "new Character appearance starts with the inherited rotation");
+
+        progress.characterUid = 0; scene.RefreshCurrentCharacter();
+        Check(scene.playerM == null && scene.playerG == null, "clearing current Character remains supported");
+        var fourth = Product(61104, true);
+        var fourthUnit = Unit(fourth);
+        var independentEuler = new Vector3(0, 88, 0);
+        map.updateCtrl.ApplyMove(fourthUnit.unit, owner.data.pos, independentEuler, true);
+        progress.characterUid = fourth.uid; scene.RefreshCurrentCharacter();
+        Check(scene.playerM == fourthUnit && fourthUnit.euler == independentEuler,
+            "selecting from an empty current state does not inherit stale rotation from an older Character");
     }
 
     private sealed class Probe : IZ_Listener<CharacterEvent>, IZ_Listener<SceneActionEvent>

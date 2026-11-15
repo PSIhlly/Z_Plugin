@@ -40,12 +40,15 @@ namespace Ui.ModStoryEventEditWindow
         UiTreeContainer<UiItemCtrl> itemCon;
         UiTreeContainer<UiLineCtrl> lineCon;
         private int codeErrorRequestId;
+        private string compiledSource;
+        private bool entriesDirty, listDirty = true;
+        public int CompileCount { get; private set; }
 
         public override void OnCreate()
         {
 
-            itemCon = new UiTreeContainer<UiItemCtrl>(this, view.go_item);
-            lineCon = new UiTreeContainer<UiLineCtrl>(this, view.go_line);
+            itemCon = new UiTreeContainer<UiItemCtrl>(this, view.go_item, viewport: view.scr_items);
+            lineCon = new UiTreeContainer<UiLineCtrl>(this, view.go_line, viewport: view.scr_items, sizeContent: false);
 
             model.cpr = new Compiler();
             model.dcpr = new Decompiler();
@@ -54,6 +57,7 @@ namespace Ui.ModStoryEventEditWindow
 
             view.ipt_name.onFinishInput += (v) =>
             {
+                if (model.data.name != v) compiledSource = null;
                 model.data.name = v;
                 view.txt_title.text = v;
             };
@@ -75,6 +79,7 @@ namespace Ui.ModStoryEventEditWindow
                     // nested ContentSizeFitters measure the hidden hierarchy as zero.
                     Refresh();
                 }
+                RefreshSelection();
             });
             view.btn_apply.onClick.AddListener(() =>
             {
@@ -128,17 +133,16 @@ namespace Ui.ModStoryEventEditWindow
             });
             view.btn_del.onClick.AddListener(() =>
             {
-                var deletedNode = model.selItem;
                 var parentList = FindParentList(model.curEntry, model.selItem);
                 if (parentList != null)
                 {
                     parentList.Remove(model.selItem);
-                    HideRenderedItems(deletedNode, true);
-                    UiTreeLayout.Request(view.scr_items.content);
+                    MarkEntriesDirty();
                 }
 
                 model.selItem = null;
                 model.selUnit = null;
+                Refresh();
                 RefreshUnitDetail();
             });
             view.btn_insert.onClick.AddListener(() =>
@@ -175,6 +179,7 @@ namespace Ui.ModStoryEventEditWindow
                         model.selItem = null;
                         model.selUnit = null;
                         // Structural edits need new Item/Line rows, but remain an unapplied draft.
+                        MarkEntriesDirty();
                         Refresh();
                     }
 
@@ -211,13 +216,23 @@ namespace Ui.ModStoryEventEditWindow
 
         public bool ApplyEntry(bool refreshList = true)
         {
+            if (!entriesDirty && compiledSource == model.data.code)
+            {
+                SetCodeText(model.data.code);
+                if (refreshList && listDirty) Refresh();
+                return true;
+            }
             var code = model.dcpr.Decompile(model.curEntry);
+            CompileCount++;
             if (model.data.TryApplyCode(code, out var syntaxNodes, out var errors, model.cpr))
             {
-                model.curEntry = syntaxNodes;
+                // The draft AST already describes this source. Keep its identity
+                // and bound rows instead of replacing it with an equivalent tree.
+                compiledSource = model.data.code;
+                entriesDirty = false;
                 model.selItem = null;
                 model.selUnit = null;
-                view.ipt_code.Set(model.data.code);
+                SetCodeText(model.data.code);
                 if (refreshList) Refresh();
                 return true;
             }
@@ -230,10 +245,16 @@ namespace Ui.ModStoryEventEditWindow
         public bool ApplyCode()
         {
             codeErrorRequestId++;
+            if (!entriesDirty && compiledSource == model.data.code && view.ipt_code.text == compiledSource)
+                return true;
+            CompileCount++;
             if (model.data.TryApplyCode(view.ipt_code.text, out var syntaxNodes,
                     out var errors, model.cpr))
             {
                 model.curEntry = syntaxNodes;
+                compiledSource = model.data.code;
+                entriesDirty = false;
+                listDirty = true;
                 model.selItem = null;
                 model.selUnit = null;
                 return true;
@@ -307,6 +328,7 @@ namespace Ui.ModStoryEventEditWindow
 
         internal bool TryCompileSyntax(string code, out List<SyntaxNode> syntaxNodes)
         {
+            CompileCount++;
             if (model.cpr.TryCompile(code, out _, out syntaxNodes, out _, out _, out _, out var errors))
                 return true;
 
@@ -354,14 +376,19 @@ namespace Ui.ModStoryEventEditWindow
         public override void OnShow()
         {
             codeErrorRequestId++;
+            lineCon.Clear(); itemCon.Clear();
             model.codeEditMode = false;
             model.data = param.data;
             model.onClose = param.onClose;
 
-            if (!TryCompileSyntax(model.data.code, out var initialEntries))
+            bool validSource = TryCompileSyntax(model.data.code, out var initialEntries);
+            if (!validSource)
                 initialEntries = new List<SyntaxNode>();
             model.curEntry = initialEntries;
-            view.ipt_code.Set(model.data.code);
+            compiledSource = validSource ? model.data.code : null;
+            entriesDirty = !validSource;
+            listDirty = true;
+            SetCodeText(model.data.code);
 
             model.selItem = null;
             model.selUnit = null;
@@ -371,46 +398,37 @@ namespace Ui.ModStoryEventEditWindow
         {
             codeErrorRequestId++;
             UiTreeLayout.Cancel(view.scr_items.content);
+            itemCon.SetViewportEnabled(false); lineCon.SetViewportEnabled(false);
             model.onClose?.Invoke();
         }
         public void Refresh()
         {
-            RefreshMode();
-
-            if (!model.codeEditMode)
+            if (!model.codeEditMode && listDirty)
             {
+                // Recycle stale hidden rows before making the Item panel visible.
                 lineCon.Clear();
                 itemCon.Clear();
                 foreach (var node in model.curEntry)
-                {
-                    itemCon.Add(new UiItemParam()
-                    {
-                        con = itemCon,
-                        node = node,
-                        deepth = 0,
-                        targetNewList = model.curEntry,
-                    });
-                }
-                itemCon.Add(new UiItemParam()
-                {
-                    con = itemCon,
-                    node = null,
-                    deepth = 0,
-                    targetNewList = model.curEntry,
-                });
-                itemCon.Refresh();
+                    PlanRow(node, 0, model.curEntry);
+                PlanRow(null, 0, model.curEntry);
                 for (int i = 0; i < itemCon.paramLst.Count; i++)
                 {
                     var item = (UiItemParam)itemCon.paramLst[i];
                     lineCon.Add(new UiLineParam()
                     {
-                        item = (UiItemCtrl)itemCon.Get(item).ctrl,
+                        row = item,
                         node = item.node,
                         index = i,
                     });
                 }
+                listDirty = false;
+            }
+            RefreshMode();
+            if (!model.codeEditMode)
+            {
+                itemCon.Refresh();
                 lineCon.Refresh();
-                UiTreeLayout.Request(view.scr_items.content);
+                if (!itemCon.IsVirtualized) UiTreeLayout.Request(view.scr_items.content);
             }
 
             //
@@ -423,10 +441,53 @@ namespace Ui.ModStoryEventEditWindow
 
         private void RefreshMode()
         {
+            itemCon.SetViewportEnabled(!model.codeEditMode);
+            lineCon.SetViewportEnabled(!model.codeEditMode);
             if (model.codeEditMode) UiTreeLayout.Cancel(view.scr_items.content);
             view.sta_switchMod.ChangeState(model.codeEditMode ? 1 : 0);
             view.sta_switchModPanel.ChangeState(model.codeEditMode ? 1 : 0);
             RefreshUnitDetail();
+        }
+
+        internal void MarkEntriesDirty(bool structure = true)
+        {
+            entriesDirty = true;
+            listDirty |= structure;
+        }
+
+        private void SetCodeText(string code)
+        {
+            if (view.ipt_code.text != code) view.ipt_code.Set(code);
+        }
+
+        // Expand structural rows independently of OnShow, so offscreen blocks
+        // and their New rows remain in the scroll extent and AST editing model.
+        private void PlanRow(SyntaxNode node, int depth, List<SyntaxNode> target)
+        {
+            itemCon.Add(new UiItemParam { con = itemCon, node = node, deepth = depth,
+                targetNewList = target, childrenPlanned = true });
+            if (node == null) return;
+            foreach (var sub in node.subNodes)
+                if (sub.desc.type == CodeType.Action && !SyntaxAnalysis.IsEmptyNode(sub))
+                {
+                    if (node.desc.type == CodeType.Reserved && node.desc.code == "for")
+                    {
+                        foreach (var statement in sub.subNodes) PlanRow(statement, depth + 1, sub.subNodes);
+                        PlanRow(null, depth + 1, sub.subNodes);
+                    }
+                    else PlanRow(sub, depth + 1, target);
+                }
+            if (node.desc.type == CodeType.Action)
+            {
+                foreach (var sub in node.subNodes) PlanRow(sub, depth + 1, node.subNodes);
+                PlanRow(null, depth + 1, node.subNodes);
+            }
+        }
+
+        internal bool TryGetItem(UiItemParam row, out UiItemCtrl item)
+        {
+            item = itemCon.TryGet(row, out var holder) ? (UiItemCtrl)holder.ctrl : null;
+            return item != null;
         }
 
         private static string GetLabLevelText(string level)
@@ -490,13 +551,18 @@ namespace Ui.ModStoryEventEditWindow
         {
             model.selItem = itemNode;
             model.selUnit = node;
+            RefreshSelection();
+        }
+
+        private void RefreshSelection()
+        {
             foreach (UiItemParam item in itemCon.paramLst)
             {
-                ((UiItemCtrl)itemCon.Get(item).ctrl).RefreshUnitSelection();
+                if (itemCon.TryGet(item, out var holder)) ((UiItemCtrl)holder.ctrl).RefreshUnitSelection();
             }
             foreach (UiLineParam line in lineCon.paramLst)
             {
-                ((UiLineCtrl)lineCon.Get(line).ctrl).RefreshSelection();
+                if (lineCon.TryGet(line, out var holder)) ((UiLineCtrl)holder.ctrl).RefreshSelection();
             }
             RefreshUnitDetail();
         }
@@ -526,55 +592,29 @@ namespace Ui.ModStoryEventEditWindow
             if (nodeNow == model.selUnit)
                 model.selUnit = nodeNew;
 
+            MarkEntriesDirty(nodeNow == itemNode);
             if (nodeNow == itemNode)
-                HideRenderedItems(nodeNow, false);
+            {
+                Refresh();
+                return;
+            }
             foreach (UiItemParam item in itemCon.paramLst)
             {
                 if (item.node != itemNode)
                     continue;
-                if (nodeNow == itemNode)
-                    item.node = nodeNew;
-                var itemCtrl = (UiItemCtrl)itemCon.Get(item).ctrl;
+                if (!TryGetItem(item, out var itemCtrl)) break;
                 itemCtrl.RefreshUnits();
-                UiTreeLayout.Request(view.scr_items.content);
+                if (itemCon.IsVirtualized)
+                {
+                    UiTreeLayout.Rebuild(itemCtrl.rect);
+                    itemCon.InvalidateViewport();
+                }
+                else UiTreeLayout.Request(view.scr_items.content);
                 break;
             }
-            if (nodeNow == itemNode)
-                foreach (UiLineParam line in lineCon.paramLst)
-                    if (line.node == itemNode)
-                    {
-                        line.node = nodeNew;
-                        ((UiLineCtrl)lineCon.Get(line).ctrl).RefreshSelection();
-                        break;
-                    }
             RefreshUnitDetail();
         }
 
-        private void HideRenderedItems(SyntaxNode subtree, bool includeRoot)
-        {
-            if (subtree == null)
-                return;
-
-            var start = -1;
-            for (var i = 0; i < itemCon.paramLst.Count; i++)
-                if (((UiItemParam)itemCon.paramLst[i]).node == subtree)
-                {
-                    start = i;
-                    break;
-                }
-            if (start < 0)
-                return;
-
-            var depth = ((UiItemParam)itemCon.paramLst[start]).deepth;
-            for (var i = includeRoot ? start : start + 1; i < itemCon.paramLst.Count; i++)
-            {
-                var item = (UiItemParam)itemCon.paramLst[i];
-                if (i > start && item.deepth <= depth)
-                    break;
-                itemCon.Get(item).gameObject.SetActive(false);
-                lineCon.Get(lineCon.paramLst[i]).gameObject.SetActive(false);
-            }
-        }
         private List<SyntaxNode> FindParentList(List<SyntaxNode> o, SyntaxNode target)
         {
             foreach (var sub in o)

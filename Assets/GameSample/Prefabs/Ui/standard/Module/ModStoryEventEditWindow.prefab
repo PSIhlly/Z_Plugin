@@ -310,7 +310,7 @@ MonoBehaviour:
   ySpacing: 0
   top: 0
   left: 0
-  cell: {fileID: 0}
+  cell: {fileID: 6858015287964661034}
   fiilType: 0
 --- !u!1 &174480058072145646
 GameObject:

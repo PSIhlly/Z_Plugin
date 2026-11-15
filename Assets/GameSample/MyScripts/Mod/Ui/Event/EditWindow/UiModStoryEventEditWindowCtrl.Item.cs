@@ -15,6 +15,7 @@ namespace Ui.ModStoryEventEditWindow
         public int deepth;
         public Action<SyntaxNode> onClick;
         public List<SyntaxNode> targetNewList;
+        public bool childrenPlanned;
     }
     public partial class UiItemModel
     {
@@ -67,6 +68,7 @@ namespace Ui.ModStoryEventEditWindow
                         return;
                     }
                     // The chooser has closed; render the new rows without applying/saving the event.
+                    parent.MarkEntriesDirty();
                     parent.Refresh();
                 });
             }
@@ -107,7 +109,7 @@ namespace Ui.ModStoryEventEditWindow
             else
             {
                 int curRender = model.prm.con.GetNowRenderId();
-                foreach (var sub in model.prm.node.subNodes)
+                if (!model.prm.childrenPlanned) foreach (var sub in model.prm.node.subNodes)
                 {
                     if (sub.desc.type == CodeType.Action && !SyntaxAnalysis.IsEmptyNode(sub))
                     {
@@ -145,7 +147,7 @@ namespace Ui.ModStoryEventEditWindow
 
                 }
 
-                if (model.prm.node.desc.type == CodeType.Action)
+                if (!model.prm.childrenPlanned && model.prm.node.desc.type == CodeType.Action)
                 {
                     foreach (var sub in model.prm.node.subNodes)
                     {
@@ -206,6 +208,7 @@ namespace Ui.ModStoryEventEditWindow
     public partial class UiLineParam
     {
         public UiItemCtrl item;
+        public UiItemParam row;
         public SyntaxNode node;
         public int index;
     }
@@ -219,7 +222,14 @@ namespace Ui.ModStoryEventEditWindow
                 gameObject.SetActive(false);
                 return;
             }
-            view.btn_.onClick.AddListener(() => param.item.OnLineClick());
+            view.btn_.onClick.AddListener(() =>
+            {
+                if (param?.row != null)
+                {
+                    if (parent.TryGetItem(param.row, out var item)) item.OnLineClick();
+                }
+                else param?.item?.OnLineClick();
+            });
         }
 
         public override void OnShow()

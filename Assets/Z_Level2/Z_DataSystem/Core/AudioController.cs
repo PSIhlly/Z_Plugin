@@ -45,7 +45,7 @@ namespace Z_DataSystem
         }
         public virtual string GetName(int id=-1)
         {
-            return $"{GetMark()}{(id > 0 ? id.ToString() : string.Empty)}{GetMark()}";
+            return $"{GetMark()}{(id > 0 && id != emptyAssetId ? id.ToString() : string.Empty)}{GetMark()}";
         }
         public int GetId(string name = "")
         {

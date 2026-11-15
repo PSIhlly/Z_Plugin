@@ -934,6 +934,8 @@ namespace Form
 
                 {1000395,new Data(1000395,"ShowText","Show text","显示文本")},
 
+                {1000396,new Data(1000396,"GenerateCharacter","Generate character","生成角色")},
+
                 };
                 _DatasHashSet=new HashSet<Data>();
                 
@@ -1706,6 +1708,8 @@ namespace Form
                         {"GenerateItem",_DataById[1000394]},
     
                         {"ShowText",_DataById[1000395]},
+    
+                        {"GenerateCharacter",_DataById[1000396]},
     
                     
                     };

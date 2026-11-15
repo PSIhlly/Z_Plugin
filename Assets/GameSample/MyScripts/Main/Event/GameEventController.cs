@@ -295,6 +295,8 @@ public class GameEventController : Z_Controller<GameManager>
     public GameEventSceneTriggerController sceneTriggerCtrl;
     public GameEventStoryTriggerController storyTriggerCtrl;
     List<EventTask> tasks;
+    readonly List<Func<bool>> sceneMoves = new List<Func<bool>>();
+    int sceneMoveVersion;
     readonly Dictionary<EventInterpretDataForm.Data, EventTask> tasksByEvent =
         new Dictionary<EventInterpretDataForm.Data, EventTask>(IdentityComparer<EventInterpretDataForm.Data>.Instance);
     readonly Dictionary<UnitForm.Data, EventTask> tasksBySceneOwner =
@@ -330,6 +332,8 @@ public class GameEventController : Z_Controller<GameManager>
     }
     public void ClearSceneEvent()
     {
+        sceneMoveVersion++;
+        sceneMoves.Clear();
         var clearLst = new List<EventInterpretDataForm.Data>();
         foreach (var data in EventInterpretDataForm.DataByUid.Values)
         {
@@ -375,6 +379,8 @@ public class GameEventController : Z_Controller<GameManager>
             TrackTask(task);
         }
     }
+    // Movement launched by an event outlives that event, but not the scene.
+    public void StartSceneMove(Func<bool> update) => sceneMoves.Add(update);
     private void TrackTask(EventTask task)
     {
         if (task.eventOwner != null)
@@ -432,6 +438,8 @@ public class GameEventController : Z_Controller<GameManager>
     private void CancelAllTasks()
     {
         taskVersion++;
+        sceneMoveVersion++;
+        sceneMoves.Clear();
         foreach (var task in tasks)
         {
             task.Cancel();
@@ -630,6 +638,7 @@ public class GameEventController : Z_Controller<GameManager>
             }
         }
         UpdateTasks();
+        UpdateSceneMoves();
         foreach (var data in EventInterpretDataForm.DataByUid.Values)
         {
             if (releaseTriggerTuple.Contains((data.user, data.releaseTrigger)))
@@ -677,6 +686,17 @@ public class GameEventController : Z_Controller<GameManager>
                 if (write < tasks.Count)
                     tasks.RemoveRange(write, tasks.Count - write);
             }
+        }
+    }
+
+    private void UpdateSceneMoves()
+    {
+        int version = sceneMoveVersion;
+        for (int i = sceneMoves.Count - 1; i >= 0; i--)
+        {
+            bool complete = sceneMoves[i]();
+            if (version != sceneMoveVersion) return;
+            if (complete) sceneMoves.RemoveAt(i);
         }
     }
 
@@ -776,12 +796,12 @@ public class GameEventController : Z_Controller<GameManager>
         EventInterpretDataForm.AddData(data);
         return data;
     }
-    public EntryItem GetEventEntry(SceneEventType objectType, string retType)
+    public EntryItem GetEventEntry(SceneEventType objectType, string retType, bool allowAnyReturnType = false)
     {
         var res = new EntryItem();
         foreach (var data in EventProgramDataForm.DataByUid.Values.OrderBy(data => data.labId).ThenBy(data => data.uid))
         {
-            if (!IsCorrect(retType, data.returnValue))
+            if (!allowAnyReturnType && !IsCorrect(retType, data.returnValue))
                 continue;
             LabForm.TryGetData(data.labId, out var lab);
             var cat = string.IsNullOrEmpty(lab?.lv1Lab) ? TextManager.instance.GetTxt(GlobalDefaultHelper.defaultLab) : lab.lv1Lab;

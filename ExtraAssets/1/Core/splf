@@ -1,15 +1,19 @@
 [
   {
-    "uid": 91,
-    "name": "梦想天生",
+    "uid": 96,
+    "name": "树妖q技能",
     "desc": "",
-    "labId": 13,
+    "labId": 10,
     "protoUid": 0,
-    "icon": 267,
+    "icon": 210000,
     "paramDic": [],
-    "skillTypes": [],
+    "skillTypes": [
+      {
+        "v": 3
+      }
+    ],
     "characterUid": 0,
-    "cd": 1.0,
+    "cd": 10.0,
     "lastUseTime": 0.0,
     "events": [
       {
@@ -19,7 +23,7 @@
           "name": "invoke",
           "evt": [
             {
-              "v": 67
+              "v": 74
             }
           ],
           "type": 0
@@ -29,12 +33,45 @@
     "triggerConditionUid": 0
   },
   {
-    "uid": 88,
-    "name": "咲夜的世界",
-    "desc": "大范围时间停止7秒",
-    "labId": 41,
+    "uid": 8287,
+    "name": "玉弹",
+    "desc": "发射魔法弹攻击敌人",
+    "labId": 10,
     "protoUid": 0,
-    "icon": 2890,
+    "icon": 47,
+    "paramDic": [],
+    "skillTypes": [
+      {
+        "v": 0
+      }
+    ],
+    "characterUid": 0,
+    "cd": 0.3,
+    "lastUseTime": 0.0,
+    "events": [
+      {
+        "k": "invoke",
+        "v": {
+          "uid": -1,
+          "name": "invoke",
+          "evt": [
+            {
+              "v": 70
+            }
+          ],
+          "type": 0
+        }
+      }
+    ],
+    "triggerConditionUid": 0
+  },
+  {
+    "uid": 8286,
+    "name": "神鬼·潜行者",
+    "desc": "",
+    "labId": 42,
+    "protoUid": 0,
+    "icon": 97,
     "paramDic": [],
     "skillTypes": [
       {
@@ -52,7 +89,403 @@
           "name": "invoke",
           "evt": [
             {
-              "v": 65
+              "v": 69
+            }
+          ],
+          "type": 0
+        }
+      }
+    ],
+    "triggerConditionUid": 0
+  },
+  {
+    "uid": 8285,
+    "name": "红符·绯红之主",
+    "desc": "",
+    "labId": 42,
+    "protoUid": 0,
+    "icon": 1874,
+    "paramDic": [],
+    "skillTypes": [
+      {
+        "v": 2
+      }
+    ],
+    "characterUid": 0,
+    "cd": 10.0,
+    "lastUseTime": 0.0,
+    "events": [
+      {
+        "k": "invoke",
+        "v": {
+          "uid": -1,
+          "name": "invoke",
+          "evt": [
+            {
+              "v": 68
+            }
+          ],
+          "type": 0
+        }
+      }
+    ],
+    "triggerConditionUid": 0
+  },
+  {
+    "uid": 1356,
+    "name": "毒刺",
+    "desc": "",
+    "labId": 10,
+    "protoUid": 0,
+    "icon": 365,
+    "paramDic": [],
+    "skillTypes": [
+      {
+        "v": 0
+      }
+    ],
+    "characterUid": 0,
+    "cd": 1.0,
+    "lastUseTime": 0.0,
+    "events": [
+      {
+        "k": "invoke",
+        "v": {
+          "uid": -1,
+          "name": "invoke",
+          "evt": [
+            {
+              "v": 37
+            }
+          ],
+          "type": 0
+        }
+      }
+    ],
+    "triggerConditionUid": 0
+  },
+  {
+    "uid": 26,
+    "name": "灵符·梦想封印",
+    "desc": "四面八方发出星弹的魔法",
+    "labId": 13,
+    "protoUid": 0,
+    "icon": 84,
+    "paramDic": [],
+    "skillTypes": [
+      {
+        "v": 2
+      }
+    ],
+    "characterUid": 0,
+    "cd": 10.0,
+    "lastUseTime": 0.0,
+    "events": [
+      {
+        "k": "invoke",
+        "v": {
+          "uid": -1,
+          "name": "invoke",
+          "evt": [
+            {
+              "v": 66
+            }
+          ],
+          "type": 0
+        }
+      }
+    ],
+    "triggerConditionUid": 0
+  },
+  {
+    "uid": 9,
+    "name": "剑弹",
+    "desc": "发射飞剑弹攻击敌人",
+    "labId": 10,
+    "protoUid": 0,
+    "icon": 53,
+    "paramDic": [],
+    "skillTypes": [
+      {
+        "v": 0
+      }
+    ],
+    "characterUid": 0,
+    "cd": 0.3,
+    "lastUseTime": 0.0,
+    "events": [
+      {
+        "k": "invoke",
+        "v": {
+          "uid": -1,
+          "name": "invoke",
+          "evt": [
+            {
+              "v": 19
+            }
+          ],
+          "type": 0
+        }
+      }
+    ],
+    "triggerConditionUid": 0
+  },
+  {
+    "uid": 17,
+    "name": "魔炮·最终火花",
+    "desc": "集中一个方向发射大量星弹的魔法",
+    "labId": 9,
+    "protoUid": 0,
+    "icon": 972,
+    "paramDic": [],
+    "skillTypes": [
+      {
+        "v": 3
+      }
+    ],
+    "characterUid": 0,
+    "cd": 30.0,
+    "lastUseTime": 0.0,
+    "events": [
+      {
+        "k": "invoke",
+        "v": {
+          "uid": -1,
+          "name": "invoke",
+          "evt": [
+            {
+              "v": 23
+            }
+          ],
+          "type": 0
+        }
+      }
+    ],
+    "triggerConditionUid": 0
+  },
+  {
+    "uid": 3,
+    "name": "札弹",
+    "desc": "发射追踪符弹攻击敌人",
+    "labId": 10,
+    "protoUid": 0,
+    "icon": 46,
+    "paramDic": [],
+    "skillTypes": [
+      {
+        "v": 0
+      }
+    ],
+    "characterUid": 0,
+    "cd": 0.4,
+    "lastUseTime": 0.0,
+    "events": [
+      {
+        "k": "invoke",
+        "v": {
+          "uid": -1,
+          "name": "invoke",
+          "evt": [
+            {
+              "v": 5
+            }
+          ],
+          "type": 0
+        }
+      }
+    ],
+    "triggerConditionUid": 0
+  },
+  {
+    "uid": 4,
+    "name": "星弹",
+    "desc": "发射魔法弹攻击敌人",
+    "labId": 10,
+    "protoUid": 0,
+    "icon": 33,
+    "paramDic": [],
+    "skillTypes": [
+      {
+        "v": 0
+      }
+    ],
+    "characterUid": 0,
+    "cd": 0.3,
+    "lastUseTime": 0.0,
+    "events": [
+      {
+        "k": "invoke",
+        "v": {
+          "uid": -1,
+          "name": "invoke",
+          "evt": [
+            {
+              "v": 6
+            }
+          ],
+          "type": 0
+        }
+      }
+    ],
+    "triggerConditionUid": 0
+  },
+  {
+    "uid": 5,
+    "name": "魔符·星屑幻想",
+    "desc": "四面八方发出星弹的魔法",
+    "labId": 9,
+    "protoUid": 0,
+    "icon": 2,
+    "paramDic": [],
+    "skillTypes": [
+      {
+        "v": 2
+      }
+    ],
+    "characterUid": 0,
+    "cd": 10.0,
+    "lastUseTime": 0.0,
+    "events": [
+      {
+        "k": "invoke",
+        "v": {
+          "uid": -1,
+          "name": "invoke",
+          "evt": [
+            {
+              "v": 13
+            }
+          ],
+          "type": 0
+        }
+      }
+    ],
+    "triggerConditionUid": 0
+  },
+  {
+    "uid": 11,
+    "name": "触击",
+    "desc": "",
+    "labId": 0,
+    "protoUid": 0,
+    "icon": 210000,
+    "paramDic": [],
+    "skillTypes": [
+      {
+        "v": 0
+      }
+    ],
+    "characterUid": 0,
+    "cd": 1.0,
+    "lastUseTime": 0.0,
+    "events": [
+      {
+        "k": "invoke",
+        "v": {
+          "uid": -1,
+          "name": "invoke",
+          "evt": [
+            {
+              "v": 18
+            }
+          ],
+          "type": 0
+        }
+      }
+    ],
+    "triggerConditionUid": 0
+  },
+  {
+    "uid": 76,
+    "name": "麟弹",
+    "desc": "发射麟弹攻击敌人",
+    "labId": 10,
+    "protoUid": 0,
+    "icon": 160,
+    "paramDic": [],
+    "skillTypes": [
+      {
+        "v": 0
+      }
+    ],
+    "characterUid": 0,
+    "cd": 0.25,
+    "lastUseTime": 0.0,
+    "events": [
+      {
+        "k": "invoke",
+        "v": {
+          "uid": -1,
+          "name": "invoke",
+          "evt": [
+            {
+              "v": 34
+            }
+          ],
+          "type": 0
+        }
+      }
+    ],
+    "triggerConditionUid": 0
+  },
+  {
+    "uid": 15796,
+    "name": "大星弹",
+    "desc": "发射魔法弹攻击敌人",
+    "labId": 10,
+    "protoUid": 0,
+    "icon": 33,
+    "paramDic": [],
+    "skillTypes": [
+      {
+        "v": 0
+      }
+    ],
+    "characterUid": 0,
+    "cd": 0.3,
+    "lastUseTime": 0.0,
+    "events": [
+      {
+        "k": "invoke",
+        "v": {
+          "uid": -1,
+          "name": "invoke",
+          "evt": [
+            {
+              "v": 20
+            }
+          ],
+          "type": 0
+        }
+      }
+    ],
+    "triggerConditionUid": 0
+  },
+  {
+    "uid": 1551,
+    "name": "幽灵e技能",
+    "desc": "",
+    "labId": 10,
+    "protoUid": 0,
+    "icon": 210000,
+    "paramDic": [],
+    "skillTypes": [
+      {
+        "v": 2
+      }
+    ],
+    "characterUid": 0,
+    "cd": 10.0,
+    "lastUseTime": 0.0,
+    "events": [
+      {
+        "k": "invoke",
+        "v": {
+          "uid": -1,
+          "name": "invoke",
+          "evt": [
+            {
+              "v": 41
             }
           ],
           "type": 0
@@ -98,243 +531,12 @@
     "triggerConditionUid": 0
   },
   {
-    "uid": 1551,
-    "name": "幽灵e技能",
-    "desc": "",
-    "labId": 10,
+    "uid": 88,
+    "name": "咲夜的世界",
+    "desc": "大范围时间停止7秒",
+    "labId": 41,
     "protoUid": 0,
-    "icon": 210000,
-    "paramDic": [],
-    "skillTypes": [
-      {
-        "v": 2
-      }
-    ],
-    "characterUid": 0,
-    "cd": 10.0,
-    "lastUseTime": 0.0,
-    "events": [
-      {
-        "k": "invoke",
-        "v": {
-          "uid": -1,
-          "name": "invoke",
-          "evt": [
-            {
-              "v": 41
-            }
-          ],
-          "type": 0
-        }
-      }
-    ],
-    "triggerConditionUid": 0
-  },
-  {
-    "uid": 15796,
-    "name": "大星弹",
-    "desc": "发射魔法弹攻击敌人",
-    "labId": 10,
-    "protoUid": 0,
-    "icon": 33,
-    "paramDic": [],
-    "skillTypes": [
-      {
-        "v": 0
-      }
-    ],
-    "characterUid": 0,
-    "cd": 0.3,
-    "lastUseTime": 0.0,
-    "events": [
-      {
-        "k": "invoke",
-        "v": {
-          "uid": -1,
-          "name": "invoke",
-          "evt": [
-            {
-              "v": 20
-            }
-          ],
-          "type": 0
-        }
-      }
-    ],
-    "triggerConditionUid": 0
-  },
-  {
-    "uid": 76,
-    "name": "麟弹",
-    "desc": "发射麟弹攻击敌人",
-    "labId": 10,
-    "protoUid": 0,
-    "icon": 160,
-    "paramDic": [],
-    "skillTypes": [
-      {
-        "v": 0
-      }
-    ],
-    "characterUid": 0,
-    "cd": 0.25,
-    "lastUseTime": 0.0,
-    "events": [
-      {
-        "k": "invoke",
-        "v": {
-          "uid": -1,
-          "name": "invoke",
-          "evt": [
-            {
-              "v": 34
-            }
-          ],
-          "type": 0
-        }
-      }
-    ],
-    "triggerConditionUid": 0
-  },
-  {
-    "uid": 11,
-    "name": "触击",
-    "desc": "",
-    "labId": 0,
-    "protoUid": 0,
-    "icon": 210000,
-    "paramDic": [],
-    "skillTypes": [
-      {
-        "v": 0
-      }
-    ],
-    "characterUid": 0,
-    "cd": 1.0,
-    "lastUseTime": 0.0,
-    "events": [
-      {
-        "k": "invoke",
-        "v": {
-          "uid": -1,
-          "name": "invoke",
-          "evt": [
-            {
-              "v": 18
-            }
-          ],
-          "type": 0
-        }
-      }
-    ],
-    "triggerConditionUid": 0
-  },
-  {
-    "uid": 5,
-    "name": "魔符·星屑幻想",
-    "desc": "四面八方发出星弹的魔法",
-    "labId": 9,
-    "protoUid": 0,
-    "icon": 2,
-    "paramDic": [],
-    "skillTypes": [
-      {
-        "v": 2
-      }
-    ],
-    "characterUid": 0,
-    "cd": 10.0,
-    "lastUseTime": 0.0,
-    "events": [
-      {
-        "k": "invoke",
-        "v": {
-          "uid": -1,
-          "name": "invoke",
-          "evt": [
-            {
-              "v": 13
-            }
-          ],
-          "type": 0
-        }
-      }
-    ],
-    "triggerConditionUid": 0
-  },
-  {
-    "uid": 4,
-    "name": "星弹",
-    "desc": "发射魔法弹攻击敌人",
-    "labId": 10,
-    "protoUid": 0,
-    "icon": 33,
-    "paramDic": [],
-    "skillTypes": [
-      {
-        "v": 0
-      }
-    ],
-    "characterUid": 0,
-    "cd": 0.3,
-    "lastUseTime": 0.0,
-    "events": [
-      {
-        "k": "invoke",
-        "v": {
-          "uid": -1,
-          "name": "invoke",
-          "evt": [
-            {
-              "v": 6
-            }
-          ],
-          "type": 0
-        }
-      }
-    ],
-    "triggerConditionUid": 0
-  },
-  {
-    "uid": 3,
-    "name": "札弹",
-    "desc": "发射追踪符弹攻击敌人",
-    "labId": 10,
-    "protoUid": 0,
-    "icon": 46,
-    "paramDic": [],
-    "skillTypes": [
-      {
-        "v": 0
-      }
-    ],
-    "characterUid": 0,
-    "cd": 0.4,
-    "lastUseTime": 0.0,
-    "events": [
-      {
-        "k": "invoke",
-        "v": {
-          "uid": -1,
-          "name": "invoke",
-          "evt": [
-            {
-              "v": 5
-            }
-          ],
-          "type": 0
-        }
-      }
-    ],
-    "triggerConditionUid": 0
-  },
-  {
-    "uid": 17,
-    "name": "魔炮·最终火花",
-    "desc": "集中一个方向发射大量星弹的魔法",
-    "labId": 9,
-    "protoUid": 0,
-    "icon": 972,
+    "icon": 2890,
     "paramDic": [],
     "skillTypes": [
       {
@@ -352,7 +554,7 @@
           "name": "invoke",
           "evt": [
             {
-              "v": 23
+              "v": 65
             }
           ],
           "type": 0
@@ -362,84 +564,14 @@
     "triggerConditionUid": 0
   },
   {
-    "uid": 9,
-    "name": "剑弹",
-    "desc": "发射飞剑弹攻击敌人",
-    "labId": 10,
-    "protoUid": 0,
-    "icon": 53,
-    "paramDic": [],
-    "skillTypes": [
-      {
-        "v": 0
-      }
-    ],
-    "characterUid": 0,
-    "cd": 0.3,
-    "lastUseTime": 0.0,
-    "events": [
-      {
-        "k": "invoke",
-        "v": {
-          "uid": -1,
-          "name": "invoke",
-          "evt": [
-            {
-              "v": 19
-            }
-          ],
-          "type": 0
-        }
-      }
-    ],
-    "triggerConditionUid": 0
-  },
-  {
-    "uid": 26,
-    "name": "灵符·梦想封印",
-    "desc": "四面八方发出星弹的魔法",
+    "uid": 91,
+    "name": "梦想天生",
+    "desc": "",
     "labId": 13,
     "protoUid": 0,
-    "icon": 84,
+    "icon": 267,
     "paramDic": [],
-    "skillTypes": [
-      {
-        "v": 2
-      }
-    ],
-    "characterUid": 0,
-    "cd": 10.0,
-    "lastUseTime": 0.0,
-    "events": [
-      {
-        "k": "invoke",
-        "v": {
-          "uid": -1,
-          "name": "invoke",
-          "evt": [
-            {
-              "v": 66
-            }
-          ],
-          "type": 0
-        }
-      }
-    ],
-    "triggerConditionUid": 0
-  },
-  {
-    "uid": 1356,
-    "name": "毒刺",
-    "desc": "",
-    "labId": 10,
-    "protoUid": 0,
-    "icon": 365,
-    "paramDic": [],
-    "skillTypes": [
-      {
-        "v": 0
-      }
-    ],
+    "skillTypes": [],
     "characterUid": 0,
     "cd": 1.0,
     "lastUseTime": 0.0,
@@ -451,106 +583,7 @@
           "name": "invoke",
           "evt": [
             {
-              "v": 37
-            }
-          ],
-          "type": 0
-        }
-      }
-    ],
-    "triggerConditionUid": 0
-  },
-  {
-    "uid": 8285,
-    "name": "红符·绯红之主",
-    "desc": "",
-    "labId": 42,
-    "protoUid": 0,
-    "icon": 1874,
-    "paramDic": [],
-    "skillTypes": [
-      {
-        "v": 2
-      }
-    ],
-    "characterUid": 0,
-    "cd": 10.0,
-    "lastUseTime": 0.0,
-    "events": [
-      {
-        "k": "invoke",
-        "v": {
-          "uid": -1,
-          "name": "invoke",
-          "evt": [
-            {
-              "v": 68
-            }
-          ],
-          "type": 0
-        }
-      }
-    ],
-    "triggerConditionUid": 0
-  },
-  {
-    "uid": 8286,
-    "name": "神鬼·潜行者",
-    "desc": "",
-    "labId": 42,
-    "protoUid": 0,
-    "icon": 97,
-    "paramDic": [],
-    "skillTypes": [
-      {
-        "v": 3
-      }
-    ],
-    "characterUid": 0,
-    "cd": 30.0,
-    "lastUseTime": 0.0,
-    "events": [
-      {
-        "k": "invoke",
-        "v": {
-          "uid": -1,
-          "name": "invoke",
-          "evt": [
-            {
-              "v": 69
-            }
-          ],
-          "type": 0
-        }
-      }
-    ],
-    "triggerConditionUid": 0
-  },
-  {
-    "uid": 8287,
-    "name": "玉弹",
-    "desc": "发射魔法弹攻击敌人",
-    "labId": 10,
-    "protoUid": 0,
-    "icon": 47,
-    "paramDic": [],
-    "skillTypes": [
-      {
-        "v": 0
-      }
-    ],
-    "characterUid": 0,
-    "cd": 0.3,
-    "lastUseTime": 0.0,
-    "events": [
-      {
-        "k": "invoke",
-        "v": {
-          "uid": -1,
-          "name": "invoke",
-          "evt": [
-            {
-              "v": 70
+              "v": 67
             }
           ],
           "type": 0

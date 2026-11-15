@@ -79,8 +79,10 @@ public static class EmptyMediaAssetsRegression
             "all controllers produce the same empty-marker format");
         Check(assets.texCtrl.GetId("$i$$i$") == ids[0] && assets.audioCtrl.GetId("$a$$a$") == ids[1]
             && assets.videoCtrl.GetId("$v$$v$") == ids[2], "empty references resolve to their real reserved rows");
-        Check(assets.audioCtrl.GetId(assets.audioCtrl.GetName(ids[1])) == ids[1]
-            && assets.videoCtrl.GetId(assets.videoCtrl.GetName(ids[2])) == ids[2], "numeric references to the empty rows remain valid");
+        Check(assets.audioCtrl.GetName(ids[1]) == "$a$$a$", "selecting the empty audio emits the empty marker");
+        Check(assets.videoCtrl.GetName(ids[2]) == "$v$$v$", "selecting the empty video emits the empty marker");
+        Check(assets.audioCtrl.GetId($"$a${ids[1]}$a$") == ids[1]
+            && assets.videoCtrl.GetId($"$v${ids[2]}$v$") == ids[2], "numeric references to the empty rows remain valid");
         Check(assets.audioCtrl.GetId(null) == -1 && assets.videoCtrl.GetId("junk$v$$v$") == -1
             && assets.texCtrl.GetId("$i$$i$junk") == -1, "malformed or absent references do not become empty assets");
     }

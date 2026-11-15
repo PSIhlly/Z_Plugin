@@ -4,6 +4,7 @@ namespace Z_Code
     public class MoveObjectRelativeCmd : MoveRelativeCmd
     {
         protected override bool UsesDuration => true;
+        protected override bool RunInBackground => false;
         public override CmdBase GetNew() => new MoveObjectRelativeCmd();
     }
 }

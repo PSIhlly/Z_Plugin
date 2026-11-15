@@ -2039,20 +2039,20 @@ public static class MapRuntimeRegression
                 var movingCopies = Invoke(new Z_Code.MoveRelativeCmd(), templateReference, VectorBox(Vector3.forward),
                     Z_Code.CodeHelper.CreateBoxByNum(1));
                 float frameDelta = MapUtilController.MovementDeltaTime;
-                Require(!movingCopies.IsComplete() && character.data.pos == origins[0] + Vector3.forward * frameDelta
+                var sceneMoves = (System.Collections.IList)typeof(GameEventController).GetField("sceneMoves", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(events);
+                var pendingMove = (Func<bool>)sceneMoves[0];
+                pendingMove();
+                Require(movingCopies.IsComplete() && character.data.pos == origins[0] + Vector3.forward * frameDelta
                     && copiedCharacters[0].data.pos == origins[1] + Vector3.forward * frameDelta
                     && copiedCharacters[1].data.pos == origins[2] + Vector3.forward * frameDelta,
                     "template Move schedules all copies with independent starts and one bounded step");
-                var pending = ((System.Collections.IEnumerable)taskField.GetValue(events)).Cast<object>().Last();
                 UnitForm.DataByUid.Remove(copiedCharacters[0].data.uid);
                 var removedPosition = copiedCharacters[0].data.pos;
-                pending.GetType().GetMethod("Update").Invoke(pending, null);
-                Require(!movingCopies.IsComplete() && copiedCharacters[0].data.pos == removedPosition,
+                Require(!pendingMove() && copiedCharacters[0].data.pos == removedPosition,
                     "removing one captured copy stops only that copy and does not finish surviving targets");
                 UnitForm.DataByUid.Remove(character.data.uid);
                 UnitForm.DataByUid.Remove(copiedCharacters[1].data.uid);
-                pending.GetType().GetMethod("Update").Invoke(pending, null);
-                Require(movingCopies.IsComplete(), "group movement completes once every captured target ends");
+                Require(pendingMove(), "group movement completes once every captured target ends");
                 UnitForm.DataByUid[character.data.uid] = character.data;
                 foreach (var actor in copiedCharacters) UnitForm.DataByUid[actor.data.uid] = actor.data;
 
@@ -2123,15 +2123,18 @@ public static class MapRuntimeRegression
                     new List<Z_Code.Form.BoxDataForm.Data>(), 0);
                 var task = new Z_Code.InterpretAsyncTask(new Z_Code.Interpreter(data));
                 task.Run();
-                sample.cmd.GetType().GetMethod("ExecuteInternal", BindingFlags.Instance | BindingFlags.NonPublic)
+                bool immediate = (bool)sample.cmd.GetType().GetMethod("ExecuteInternal", BindingFlags.Instance | BindingFlags.NonPublic)
                     .Invoke(sample.cmd, new object[] { prm, task });
+                if (immediate)
+                    typeof(GameEventController).GetMethod("UpdateSceneMoves", BindingFlags.Instance | BindingFlags.NonPublic).Invoke(events, null);
                 float delta = MapUtilController.MovementDeltaTime;
                 Vector3 expected = new Vector3(1, 0, 1) * delta;
                 Require(Vector3.Distance(sample.unit.data.pos, start + expected) < .0001f,
                     sample.cmd.GetName() + " passes only the bounded displacement, not the nonzero old position");
                 Require(data.heapTemp.Count == 0 && !task.IsComplete() && Read(pos) == input,
                     sample.cmd.GetName() + " captures its own state without modifying input vectors or shared heapTemp");
-                Require(((System.Collections.IList)taskField.GetValue(events)).Count == 1,
+                Require(immediate == (sample.relative && !sample.legacy), "only canonical relative movement returns immediately");
+                Require(immediate || ((System.Collections.IList)taskField.GetValue(events)).Count == 1,
                     sample.cmd.GetName() + " remains scheduled rather than completing after a lagged frame");
             }
             clearTasks.Invoke(events, null);

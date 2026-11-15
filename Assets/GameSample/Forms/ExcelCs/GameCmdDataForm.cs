@@ -340,7 +340,7 @@ namespace Form
 
                 {100037,new Data(100037,"GenerateObject",new List<string>(){"sceneObject","pos",},new List<string>(){"sceneObject","vector",},new List<string>(){"new Object",},new List<string>(){"sceneObject",},"object {0}: Generate at coordinates({1}):","GenerateObject(\"empty\",NewVector(0,0,0))",10016,EditorStyle.Rpg,"newObject = ")},
 
-                {100038,new Data(100038,"MoveRelative",new List<string>(){"unit","pos","speed",},new List<string>(){"var","vector","num",},null,new List<string>(){"void",},"scene unit {0}: Move to relative coordinates ({1}) at {2} tiles/second","MoveRelative(param1,NewVector(1,1,0),1);",10026,EditorStyle.Rpg,"")},
+                {100038,new Data(100038,"MoveRelative",new List<string>(){"unit","pos","speed",},new List<string>(){"var","vector","num",},null,new List<string>(){"void",},"scene unit {0}: Move by offset ({1}) at {2} units/second without waiting","MoveRelative(param1,NewVector(1,1,0),1);",10026,EditorStyle.Rpg,"")},
 
                 {100039,new Data(100039,"Move",new List<string>(){"unit","pos","speed",},new List<string>(){"var","vector","num",},null,new List<string>(){"void",},"scene unit {0}: Move to absolute coordinates ({1}) at {2} tiles/second","Move(param1,NewVector(1,1,0),1);",10026,EditorStyle.Rpg,"")},
 
@@ -523,6 +523,8 @@ namespace Form
                 {100134,new Data(100134,"ShowText",new List<string>(){"text","scale","showTime",},new List<string>(){"string","num","num",},new List<string>(){"image",},new List<string>(){"uiImg",},"Show Text:{0} ,scale {1}, last {2} seconds","text = ShowText(\"empty\", 1, 1);",10022,EditorStyle.Avg,"text = ")},
 
                 {100135,new Data(100135,"SelectOneTeamer",null,null,new List<string>(){"teamer",},new List<string>(){"character",},"Select one Teamer","teamer = SelectOneTeamer();",10022,EditorStyle.AvgAdvanced,"teamer = ")},
+
+                {100136,new Data(100136,"GenerateCharacter",new List<string>(){"character","pos",},new List<string>(){"character","vector",},new List<string>(){"new Character",},new List<string>(){"character",},"character {0}: Generate at coordinates ({1}):","GenerateCharacter(\"empty\",NewVector(0,0,0))",10011,EditorStyle.Rpg,"newCharacter = ")},
 
                 };
                 _DatasHashSet=new HashSet<Data>();
@@ -787,6 +789,8 @@ namespace Form
     
                         {"SelectOneTeamer",_DataByUid[100135]},
     
+                        {"GenerateCharacter",_DataByUid[100136]},
+    
                     
                     };
                     foreach(var v in _DataByUid.Values)
@@ -813,6 +817,8 @@ namespace Form
                             {10020,new List<Data>()},
         
                             {10015,new List<Data>()},
+        
+                            {10011,new List<Data>()},
         
                 };
 
@@ -1073,6 +1079,8 @@ namespace Form
                     _DatasByLabid[10022].Add(_DataByUid[100134]);
 
                     _DatasByLabid[10022].Add(_DataByUid[100135]);
+
+                    _DatasByLabid[10011].Add(_DataByUid[100136]);
 
 
             childInitAction?.Invoke();

@@ -38,6 +38,14 @@ public static class SceneProductCommandRegression
             CharacterProductForm.AddData(characterProto);
             var characterA = Character(97501, 97511, characterProto.uid, new Vector3(5, 0, 5));
             var characterB = Character(97502, 97512, characterProto.uid, new Vector3(7, 0, 5));
+            Check(GameCmdDataForm.DataByName.TryGetValue("GenerateCharacter", out var generateMetadata)
+                && generateMetadata.prmTypes[0] == "character" && generateMetadata.retTypes[0] == "character",
+                "GenerateCharacter exposes its character input and return type");
+            var generateType = typeof(GameManager).Assembly.GetType("Z_Code.GenerateCharacterCmd");
+            Check(generateType != null, "GenerateCharacter runtime command exists");
+            var invalidGeneration = Invoke((CmdBase)Activator.CreateInstance(generateType), Text("invalid"), Vector(Vector3.zero));
+            Check(invalidGeneration.IsComplete() && invalidGeneration.res[0].num == 0,
+                "invalid character generation returns zero without placing a character");
             CheckGroup("Character", "$ch$97500$ch$", "$ch$97501$ch$", new MapUnit[] { characterA, characterB });
 
             var objectTemplate = MapObjectForm.defaultData;
@@ -51,6 +59,14 @@ public static class SceneProductCommandRegression
             ObjectProductForm.AddData(objectPrototype);
             var objectA = Object(97602, 97611, 97601, objectTemplate.id, new Vector3(5, 0, 7));
             var objectB = Object(97603, 97612, 97601, objectTemplate.id, new Vector3(7, 0, 7));
+            int objectCount = ObjectUnitForm.DataByUid.Count;
+            int characterCount = CharacterUnitForm.DataByUid.Count;
+            var unsupported = Vector(GameManager.MapPosToPlayerPos(new Vector3(100, 0, 100)));
+            var objectResult = Invoke(new GenerateObjectCmd(), Text("$so$97601$so$"), unsupported);
+            var characterResult = Invoke((CmdBase)Activator.CreateInstance(generateType), Text("$ch$97500$ch$"), unsupported);
+            Check(objectResult.res[0].num == 0 && characterResult.res[0].num == 0
+                && ObjectUnitForm.DataByUid.Count == objectCount && CharacterUnitForm.DataByUid.Count == characterCount,
+                "generation outside the map returns zero without creating Object or Character units");
             CheckGroup("Object", "$so$97601$so$", "$so$97602$so$", new MapUnit[] { objectA, objectB });
             foreach (string alias in new[] { "$so$97601$so$" })
             {
@@ -181,10 +197,16 @@ public static class SceneProductCommandRegression
         Restore(units, initial);
         var moving = Invoke(new MoveRelativeCmd(), Text(template), Vector(Vector3.forward * 2), Number(2));
         float delta = MapUtilController.MovementDeltaTime;
-        Check(!moving.IsComplete() && delta <= .020001f, family + " grouped movement waits on bounded game time");
+        Check(moving.IsComplete() && delta <= .020001f, family + " relative movement returns immediately");
+        typeof(GameEventController).GetMethod("UpdateSceneMoves", BindingFlags.Instance | BindingFlags.NonPublic).Invoke(events, null);
         for (int i = 0; i < units.Length; i++)
-            Equal(units[i].data.pos, initial[i] + Vector3.forward * 2 * delta, family + " Move captures independent target/start");
-        CheckCapturedRemoval(family + " Move", moving, units);
+            Equal(units[i].data.pos, initial[i] + Vector3.forward * 2 * delta, family + " MoveRelative uses speed and captures independent target/start");
+        Check(((System.Collections.IList)typeof(GameEventController).GetField("sceneMoves", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(events)).Count == 1,
+            family + " movement stays scheduled after the command finishes");
+        events.ClearSceneEvent();
+        Check(((System.Collections.IList)typeof(GameEventController).GetField("sceneMoves", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(events)).Count == 0,
+            family + " scene exit clears background movement");
+        Clear.Invoke(events, null);
 
         Restore(units, initial);
         CmdBase durationAlias = units[0] is CharacterUnit ? (CmdBase)new MoveCharacterRelativeCmd() : new MoveObjectRelativeCmd();

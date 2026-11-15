@@ -1,7 +1,7 @@
 [
   {
-    "uid": 11,
-    "name": "红符·绯红之主",
+    "uid": 12,
+    "name": "神鬼·潜行者",
     "labId": 12,
     "clips": [
       {
@@ -22,7 +22,7 @@
             "v": {
               "uid": -1,
               "tex": 2374,
-              "time": 1.0,
+              "time": 2.5,
               "pos": "0|0.1|0",
               "rot": 179.0,
               "scale": "3|3|3",
@@ -48,8 +48,8 @@
     "ground": true
   },
   {
-    "uid": 10,
-    "name": "梦想天生",
+    "uid": 2,
+    "name": "魔符·星屑幻想",
     "labId": 12,
     "clips": [
       {
@@ -57,11 +57,11 @@
           {
             "v": {
               "uid": -1,
-              "tex": 96,
+              "tex": 48,
               "time": 1.0,
               "pos": "0|0.1|0",
               "rot": 0.0,
-              "scale": "0|0|0",
+              "scale": "3|3|3",
               "opacity": 0.0,
               "transition": true
             }
@@ -69,8 +69,8 @@
           {
             "v": {
               "uid": -1,
-              "tex": 96,
-              "time": 3.0,
+              "tex": 48,
+              "time": 1.0,
               "pos": "0|0.1|0",
               "rot": 179.0,
               "scale": "3|3|3",
@@ -81,288 +81,12 @@
           {
             "v": {
               "uid": -1,
-              "tex": 96,
-              "time": 1.0,
-              "pos": "0|0.1|0",
-              "rot": 356.0,
-              "scale": "0|0|0",
-              "opacity": 0.0,
-              "transition": false
-            }
-          }
-        ]
-      }
-    ],
-    "ground": true
-  },
-  {
-    "uid": 9,
-    "name": "灵符·梦想封印",
-    "labId": 12,
-    "clips": [
-      {
-        "v": [
-          {
-            "v": {
-              "uid": -1,
-              "tex": 95,
-              "time": 1.0,
-              "pos": "0|0.1|0",
-              "rot": 0.0,
-              "scale": "1|1|1",
-              "opacity": 0.0,
-              "transition": true
-            }
-          },
-          {
-            "v": {
-              "uid": -1,
-              "tex": 95,
-              "time": 1.0,
-              "pos": "0|0.1|0",
-              "rot": 0.0,
-              "scale": "3|3|3",
-              "opacity": 1.0,
-              "transition": true
-            }
-          },
-          {
-            "v": {
-              "uid": -1,
-              "tex": 95,
-              "time": 1.0,
-              "pos": "0|0|0",
-              "rot": 0.0,
-              "scale": "0|0|0",
-              "opacity": 0.0,
-              "transition": false
-            }
-          }
-        ]
-      }
-    ],
-    "ground": true
-  },
-  {
-    "uid": 8,
-    "name": "睡眠",
-    "labId": 0,
-    "clips": [
-      {
-        "v": [
-          {
-            "v": {
-              "uid": -1,
-              "tex": 8531,
-              "time": 7.0,
-              "pos": "0|0.6|0.2",
-              "rot": 0.0,
-              "scale": "1|1|1",
-              "opacity": 1.0,
-              "transition": false
-            }
-          }
-        ]
-      }
-    ],
-    "ground": false
-  },
-  {
-    "uid": 7,
-    "name": "咲夜的世界",
-    "labId": 12,
-    "clips": [
-      {
-        "v": [
-          {
-            "v": {
-              "uid": -1,
-              "tex": 94,
-              "time": 0.2,
-              "pos": "0|0.1|0",
-              "rot": 0.0,
-              "scale": "0|0|0",
-              "opacity": 0.0,
-              "transition": true
-            }
-          },
-          {
-            "v": {
-              "uid": -1,
-              "tex": 94,
-              "time": 0.2,
-              "pos": "0|0.1|0",
-              "rot": 0.0,
-              "scale": "6|6|6",
-              "opacity": 1.0,
-              "transition": true
-            }
-          },
-          {
-            "v": {
-              "uid": -1,
-              "tex": 94,
-              "time": 0.2,
-              "pos": "0|0.1|0",
-              "rot": 0.0,
-              "scale": "10|10|10",
-              "opacity": 0.0,
-              "transition": false
-            }
-          }
-        ]
-      }
-    ],
-    "ground": true
-  },
-  {
-    "uid": 6,
-    "name": "幻符·杀人玩偶",
-    "labId": 12,
-    "clips": [
-      {
-        "v": [
-          {
-            "v": {
-              "uid": -1,
-              "tex": 94,
-              "time": 1.0,
-              "pos": "0|0.1|0",
-              "rot": 0.0,
-              "scale": "0|0|0",
-              "opacity": 0.0,
-              "transition": true
-            }
-          },
-          {
-            "v": {
-              "uid": -1,
-              "tex": 94,
-              "time": 2.0,
-              "pos": "0|0.1|0",
-              "rot": 179.0,
-              "scale": "3|3|3",
-              "opacity": 1.0,
-              "transition": true
-            }
-          },
-          {
-            "v": {
-              "uid": -1,
-              "tex": 94,
+              "tex": 48,
               "time": 1.0,
               "pos": "0|0.1|0",
               "rot": 359.0,
               "scale": "3|3|3",
               "opacity": 0.0,
-              "transition": false
-            }
-          }
-        ]
-      }
-    ],
-    "ground": true
-  },
-  {
-    "uid": 5,
-    "name": "出现",
-    "labId": 0,
-    "clips": [
-      {
-        "v": [
-          {
-            "v": {
-              "uid": -1,
-              "tex": 92,
-              "time": 1.0,
-              "pos": "0.2|0.4|0",
-              "rot": 0.0,
-              "scale": "1|1|1",
-              "opacity": 1.0,
-              "transition": true
-            }
-          }
-        ]
-      }
-    ],
-    "ground": false
-  },
-  {
-    "uid": 4,
-    "name": "治疗",
-    "labId": 11,
-    "clips": [
-      {
-        "v": [
-          {
-            "v": {
-              "uid": -1,
-              "tex": 93,
-              "time": 1.0,
-              "pos": "0|0|0",
-              "rot": 0.0,
-              "scale": "1|1|1",
-              "opacity": 1.0,
-              "transition": false
-            }
-          }
-        ]
-      }
-    ],
-    "ground": false
-  },
-  {
-    "uid": 3,
-    "name": "魔炮·最终火花",
-    "labId": 12,
-    "clips": [
-      {
-        "v": [
-          {
-            "v": {
-              "uid": -1,
-              "tex": 1155,
-              "time": 0.3,
-              "pos": "0|0.1|0",
-              "rot": 0.0,
-              "scale": "0|0|0",
-              "opacity": 0.0,
-              "transition": true
-            }
-          },
-          {
-            "v": {
-              "uid": -1,
-              "tex": 1155,
-              "time": 1.7,
-              "pos": "0|0.1|0",
-              "rot": 179.0,
-              "scale": "3|3|3",
-              "opacity": 1.0,
-              "transition": true
-            }
-          },
-          {
-            "v": {
-              "uid": -1,
-              "tex": 1155,
-              "time": 0.3,
-              "pos": "0|0.1|0",
-              "rot": 359.0,
-              "scale": "3|3|3",
-              "opacity": 1.0,
-              "transition": true
-            }
-          },
-          {
-            "v": {
-              "uid": -1,
-              "tex": 1155,
-              "time": 0.1,
-              "pos": "0|0|0",
-              "rot": 0.0,
-              "scale": "0|0|0",
-              "opacity": 1.0,
               "transition": false
             }
           }
@@ -520,8 +244,8 @@
     "ground": false
   },
   {
-    "uid": 2,
-    "name": "魔符·星屑幻想",
+    "uid": 3,
+    "name": "魔炮·最终火花",
     "labId": 12,
     "clips": [
       {
@@ -529,11 +253,11 @@
           {
             "v": {
               "uid": -1,
-              "tex": 48,
-              "time": 1.0,
+              "tex": 1155,
+              "time": 0.3,
               "pos": "0|0.1|0",
               "rot": 0.0,
-              "scale": "3|3|3",
+              "scale": "0|0|0",
               "opacity": 0.0,
               "transition": true
             }
@@ -541,8 +265,8 @@
           {
             "v": {
               "uid": -1,
-              "tex": 48,
-              "time": 1.0,
+              "tex": 1155,
+              "time": 1.7,
               "pos": "0|0.1|0",
               "rot": 179.0,
               "scale": "3|3|3",
@@ -553,7 +277,115 @@
           {
             "v": {
               "uid": -1,
-              "tex": 48,
+              "tex": 1155,
+              "time": 0.3,
+              "pos": "0|0.1|0",
+              "rot": 359.0,
+              "scale": "3|3|3",
+              "opacity": 1.0,
+              "transition": true
+            }
+          },
+          {
+            "v": {
+              "uid": -1,
+              "tex": 1155,
+              "time": 0.1,
+              "pos": "0|0|0",
+              "rot": 0.0,
+              "scale": "0|0|0",
+              "opacity": 1.0,
+              "transition": false
+            }
+          }
+        ]
+      }
+    ],
+    "ground": true
+  },
+  {
+    "uid": 4,
+    "name": "治疗",
+    "labId": 11,
+    "clips": [
+      {
+        "v": [
+          {
+            "v": {
+              "uid": -1,
+              "tex": 93,
+              "time": 1.0,
+              "pos": "0|0|0",
+              "rot": 0.0,
+              "scale": "1|1|1",
+              "opacity": 1.0,
+              "transition": false
+            }
+          }
+        ]
+      }
+    ],
+    "ground": false
+  },
+  {
+    "uid": 5,
+    "name": "出现",
+    "labId": 0,
+    "clips": [
+      {
+        "v": [
+          {
+            "v": {
+              "uid": -1,
+              "tex": 92,
+              "time": 1.0,
+              "pos": "0.2|0.4|0",
+              "rot": 0.0,
+              "scale": "1|1|1",
+              "opacity": 1.0,
+              "transition": true
+            }
+          }
+        ]
+      }
+    ],
+    "ground": false
+  },
+  {
+    "uid": 6,
+    "name": "幻符·杀人玩偶",
+    "labId": 12,
+    "clips": [
+      {
+        "v": [
+          {
+            "v": {
+              "uid": -1,
+              "tex": 94,
+              "time": 1.0,
+              "pos": "0|0.1|0",
+              "rot": 0.0,
+              "scale": "0|0|0",
+              "opacity": 0.0,
+              "transition": true
+            }
+          },
+          {
+            "v": {
+              "uid": -1,
+              "tex": 94,
+              "time": 2.0,
+              "pos": "0|0.1|0",
+              "rot": 179.0,
+              "scale": "3|3|3",
+              "opacity": 1.0,
+              "transition": true
+            }
+          },
+          {
+            "v": {
+              "uid": -1,
+              "tex": 94,
               "time": 1.0,
               "pos": "0|0.1|0",
               "rot": 359.0,
@@ -568,8 +400,176 @@
     "ground": true
   },
   {
-    "uid": 12,
-    "name": "神鬼·潜行者",
+    "uid": 7,
+    "name": "咲夜的世界",
+    "labId": 12,
+    "clips": [
+      {
+        "v": [
+          {
+            "v": {
+              "uid": -1,
+              "tex": 94,
+              "time": 0.2,
+              "pos": "0|0.1|0",
+              "rot": 0.0,
+              "scale": "0|0|0",
+              "opacity": 0.0,
+              "transition": true
+            }
+          },
+          {
+            "v": {
+              "uid": -1,
+              "tex": 94,
+              "time": 0.2,
+              "pos": "0|0.1|0",
+              "rot": 0.0,
+              "scale": "6|6|6",
+              "opacity": 1.0,
+              "transition": true
+            }
+          },
+          {
+            "v": {
+              "uid": -1,
+              "tex": 94,
+              "time": 0.2,
+              "pos": "0|0.1|0",
+              "rot": 0.0,
+              "scale": "10|10|10",
+              "opacity": 0.0,
+              "transition": false
+            }
+          }
+        ]
+      }
+    ],
+    "ground": true
+  },
+  {
+    "uid": 8,
+    "name": "睡眠",
+    "labId": 0,
+    "clips": [
+      {
+        "v": [
+          {
+            "v": {
+              "uid": -1,
+              "tex": 8531,
+              "time": 7.0,
+              "pos": "0|0.6|0.2",
+              "rot": 0.0,
+              "scale": "1|1|1",
+              "opacity": 1.0,
+              "transition": false
+            }
+          }
+        ]
+      }
+    ],
+    "ground": false
+  },
+  {
+    "uid": 9,
+    "name": "灵符·梦想封印",
+    "labId": 12,
+    "clips": [
+      {
+        "v": [
+          {
+            "v": {
+              "uid": -1,
+              "tex": 95,
+              "time": 1.0,
+              "pos": "0|0.1|0",
+              "rot": 0.0,
+              "scale": "1|1|1",
+              "opacity": 0.0,
+              "transition": true
+            }
+          },
+          {
+            "v": {
+              "uid": -1,
+              "tex": 95,
+              "time": 1.0,
+              "pos": "0|0.1|0",
+              "rot": 0.0,
+              "scale": "3|3|3",
+              "opacity": 1.0,
+              "transition": true
+            }
+          },
+          {
+            "v": {
+              "uid": -1,
+              "tex": 95,
+              "time": 1.0,
+              "pos": "0|0|0",
+              "rot": 0.0,
+              "scale": "0|0|0",
+              "opacity": 0.0,
+              "transition": false
+            }
+          }
+        ]
+      }
+    ],
+    "ground": true
+  },
+  {
+    "uid": 10,
+    "name": "梦想天生",
+    "labId": 12,
+    "clips": [
+      {
+        "v": [
+          {
+            "v": {
+              "uid": -1,
+              "tex": 96,
+              "time": 1.0,
+              "pos": "0|0.1|0",
+              "rot": 0.0,
+              "scale": "0|0|0",
+              "opacity": 0.0,
+              "transition": true
+            }
+          },
+          {
+            "v": {
+              "uid": -1,
+              "tex": 96,
+              "time": 3.0,
+              "pos": "0|0.1|0",
+              "rot": 179.0,
+              "scale": "3|3|3",
+              "opacity": 1.0,
+              "transition": true
+            }
+          },
+          {
+            "v": {
+              "uid": -1,
+              "tex": 96,
+              "time": 1.0,
+              "pos": "0|0.1|0",
+              "rot": 356.0,
+              "scale": "0|0|0",
+              "opacity": 0.0,
+              "transition": false
+            }
+          }
+        ]
+      }
+    ],
+    "ground": true
+  },
+  {
+    "uid": 11,
+    "name": "红符·绯红之主",
     "labId": 12,
     "clips": [
       {
@@ -590,7 +590,7 @@
             "v": {
               "uid": -1,
               "tex": 2374,
-              "time": 2.5,
+              "time": 1.0,
               "pos": "0|0.1|0",
               "rot": 179.0,
               "scale": "3|3|3",

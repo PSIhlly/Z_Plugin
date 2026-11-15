@@ -80,54 +80,54 @@ namespace Ui.ModStory.ModStoryCharacter.ModStoryCharacterUnit.ModStoryCharacterU
             {
                 ModManager.instance.assetCtrl.ChooseSkill(TextManager.instance.GetTxt("Choose Skill"), (item) =>
                 {
-                    model.data.skill[SkillType.LightAttack] = item.uid;
+                    if (item == null) model.data.skill.Remove(SkillType.LightAttack); else model.data.skill[SkillType.LightAttack] = item.uid;
                     Refresh();
-                });
+                }, true);
             });
 
             view.btn_heavyAttack.onClick.AddListener(() =>
             {
                 ModManager.instance.assetCtrl.ChooseSkill(TextManager.instance.GetTxt("Choose Skill"), (item) =>
                 {
-                    model.data.skill[SkillType.HeavyAttack] = item.uid;
+                    if (item == null) model.data.skill.Remove(SkillType.HeavyAttack); else model.data.skill[SkillType.HeavyAttack] = item.uid;
                     Refresh();
-                });
+                }, true);
             });
 
             view.btn_e.onClick.AddListener(() =>
             {
                 ModManager.instance.assetCtrl.ChooseSkill(TextManager.instance.GetTxt("Choose Skill"), (item) =>
                 {
-                    model.data.skill[SkillType.E] = item.uid;
+                    if (item == null) model.data.skill.Remove(SkillType.E); else model.data.skill[SkillType.E] = item.uid;
                     Refresh();
-                });
+                }, true);
             });
 
             view.btn_q.onClick.AddListener(() =>
             {
                 ModManager.instance.assetCtrl.ChooseSkill(TextManager.instance.GetTxt("Choose Skill"), (item) =>
                 {
-                    model.data.skill[SkillType.Q] = item.uid;
+                    if (item == null) model.data.skill.Remove(SkillType.Q); else model.data.skill[SkillType.Q] = item.uid;
                     Refresh();
-                });
+                }, true);
             });
 
             view.btn_passive1.onClick.AddListener(() =>
             {
                 ModManager.instance.assetCtrl.ChooseSkill(TextManager.instance.GetTxt("Choose Skill"), (item) =>
                 {
-                    model.data.skill[SkillType.Passive] = item.uid;
+                    if (item == null) model.data.skill.Remove(SkillType.Passive); else model.data.skill[SkillType.Passive] = item.uid;
                     Refresh();
-                });
+                }, true);
             });
 
             view.btn_passive2.onClick.AddListener(() =>
             {
                 ModManager.instance.assetCtrl.ChooseSkill(TextManager.instance.GetTxt("Choose Skill"), (item) =>
                 {
-                    model.data.skill[SkillType.Passive] = item.uid;
+                    if (item == null) model.data.skill.Remove(SkillType.Passive); else model.data.skill[SkillType.Passive] = item.uid;
                     Refresh();
-                });
+                }, true);
             });
 
             view.btn_minimapIcon.onClick.AddListener(() =>

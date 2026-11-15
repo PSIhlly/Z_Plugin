@@ -27,12 +27,16 @@ namespace Z_Code
         public override CmdBase GetNew() => new GenerateObjectCmd();
         protected override bool ExecuteInternal(BoxDataForm.Data[] prm, InterpretAsyncTask asyncTask)
         {
+            asyncTask.res = new[] { CodeHelper.CreateBoxByNum(0) };
             var data = GlobalEventHelper.ResolveSceneObjectTemplate(prm[0].str);
-            if (data != null)
+            var map = MapManager.instance;
+            if (data != null && TryPosition(prm[1], out var position)
+                && map.data != null && map.utilCtrl != null && map.updateCtrl != null
+                && map.utilCtrl.GetPlacementTile(position) != null)
             {
                 var key = data.uid.ToString();
 
-                var newObjectData = MapManager.instance.AddObject(key, GameManager.PlayerPosToMapPos(new Vector3(prm[1].dic["x"].num, prm[1].dic["height"].num, prm[1].dic["y"].num)), GlobalDefaultHelper.GetRuntimeMapObjectPrefabName(ObjectProductForm.GetTemplateUid(data)), null);
+                var newObjectData = map.AddObject(key, position, GlobalDefaultHelper.GetRuntimeMapObjectPrefabName(ObjectProductForm.GetTemplateUid(data)), null);
 
                 if (newObjectData != null)
                 {
@@ -50,8 +54,20 @@ namespace Z_Code
                     return true;
                 }
             }
-            asyncTask.res = new BoxDataForm.Data[] { CodeHelper.CreateBoxByNum(0) };
             return true;
         }
+
+        private static bool TryPosition(BoxDataForm.Data value, out Vector3 position)
+        {
+            position = default;
+            if (value?.dic == null || !value.dic.TryGetValue("x", out var x)
+                || !value.dic.TryGetValue("y", out var y) || !value.dic.TryGetValue("height", out var height)
+                || !IsNumber(x) || !IsNumber(y) || !IsNumber(height)) return false;
+            position = GameManager.PlayerPosToMapPos(new Vector3(x.num, height.num, y.num));
+            return true;
+        }
+
+        private static bool IsNumber(BoxDataForm.Data value) => value != null && value.str == null
+            && !float.IsNaN(value.num) && !float.IsInfinity(value.num);
     }
 }

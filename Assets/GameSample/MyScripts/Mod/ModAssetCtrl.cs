@@ -943,9 +943,11 @@ public class ModAssetCtrl : Z_Controller<ModManager>
             }
         });
     }
-    public void ChooseSkill(string title, Action<SkillProductForm.Data> act)
+    public void ChooseSkill(string title, Action<SkillProductForm.Data> act, bool allowEmpty = false)
     {
         var items = new EntryItem();
+        if (allowEmpty)
+            items.Add("空技能", null, -1);
 
         foreach (var data in SkillProductForm.DataByUid.Values.OrderBy(data => data.uid))
         {
@@ -954,7 +956,7 @@ public class ModAssetCtrl : Z_Controller<ModManager>
         NotifyManager.instance.AddChoose(title,
             true, (item) =>
             {
-                act?.Invoke(SkillProductForm.DataByUid[item.id]);
+                act?.Invoke(item.id == -1 ? null : SkillProductForm.DataByUid[item.id]);
                 return true;
             }, items);
     }
@@ -1011,9 +1013,9 @@ public class ModAssetCtrl : Z_Controller<ModManager>
             },
         });
     }
-    public void ChooseEvent(SceneEventType type, string retType, string title, Action<EntryItem> act)
+    public void ChooseEvent(SceneEventType type, string retType, string title, Action<EntryItem> act, bool allowAnyReturnType = false)
     {
-        var items = GameManager.instance.evtCtrl.GetEventEntry(type, retType);
+        var items = GameManager.instance.evtCtrl.GetEventEntry(type, retType, allowAnyReturnType);
         NotifyManager.instance.AddMultipleChoose(title, true, (res) =>
         {
             act?.Invoke(res);

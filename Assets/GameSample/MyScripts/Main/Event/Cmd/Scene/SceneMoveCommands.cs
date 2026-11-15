@@ -9,13 +9,14 @@ namespace Z_Code
     {
         protected virtual bool Relative => false;
         protected virtual bool UsesDuration => false;
+        protected virtual bool RunInBackground => false;
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterAssembliesLoaded)]
         static void Init()
         {
             Register(new MoveCmd());
             Register(new MoveRelativeCmd());
-            // Stored events keep the former duration argument; the new names use speed.
+            // Legacy absolute movement uses duration; Move uses speed.
             RegisterAlias("MoveCharacter", new MoveCharacterCmd());
             RegisterAlias("MoveObject", new MoveObjectCmd());
             RegisterAlias("MoveCharacterRelative", new MoveCharacterRelativeCmd());
@@ -57,7 +58,7 @@ namespace Z_Code
                 return true;
             }
             // Capture all original identities/targets before the first movement callback runs.
-            GameManager.instance.evtCtrl.StartTask(asyncTask, () =>
+            System.Func<bool> update = () =>
             {
                 bool complete = true;
                 float delta = MapUtilController.MovementDeltaTime;
@@ -71,11 +72,17 @@ namespace Z_Code
                 if (complete)
                 {
                     // A blocked move ends after its allotted travel time, as before.
-                    asyncTask.Complete();
+                    if (!RunInBackground) asyncTask.Complete();
                     return true;
                 }
                 return false;
-            });
+            };
+            if (RunInBackground)
+            {
+                GameManager.instance.evtCtrl.StartSceneMove(update);
+                return true;
+            }
+            GameManager.instance.evtCtrl.StartTask(asyncTask, update);
             return false;
         }
 
@@ -103,6 +110,7 @@ namespace Z_Code
     public class MoveRelativeCmd : MoveCmd
     {
         protected override bool Relative => true;
+        protected override bool RunInBackground => true;
         public override string GetName() => "MoveRelative";
         public override CmdBase GetNew() => new MoveRelativeCmd();
     }

@@ -6,6 +6,12 @@ deep dynamic trees, subtree removal, flattening before reuse, stale parameter
 release, ordinary visibility changes, destroyed nodes, 58 ten-argument event rows
 (1218 Units), warm instance reuse, nested operator Units, pooled Line selection,
 actual editor mode switches/Return, and coalesced intrinsic layout requests.
+The virtual editor case plans 64 statements (58 ten-argument dialogs plus six
+other calls) and 65 logical rows, renders only the Scr cell range, and logs active
+rows/Units plus twenty warm-switch timings. Checks unchanged-source compilation
+and AST/Param reuse, changed-source rebinding, both Scr directions with nonuniform
+Canvas/cell scales, offscreen for-body planning/deletion, and scroll clamping after
+the source shrinks. Hidden/Code mode unregisters viewport callbacks.
 Success: `UI TREE CONTAINER REGRESSION PASS`. Pair with
 `SceneEventChooseListRegression` for the separate global Grid rebuild contract.
 This does not benchmark the user's live event or an IL2CPP Player.

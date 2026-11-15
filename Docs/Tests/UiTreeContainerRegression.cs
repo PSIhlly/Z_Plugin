@@ -64,6 +64,8 @@ public static class UiTreeContainerRegression
         PoolChecks();
         EditorNodeChecks();
         CodeSwitchChecks();
+        CodeSwitchChecks(true);
+        VirtualRangeChecks();
         LayoutChecks();
         yield return null;
         Canvas.ForceUpdateCanvases();
@@ -193,7 +195,7 @@ public static class UiTreeContainerRegression
         return new SyntaxNode(new Desc("TreeDialog", CodeType.FuncName), args);
     }
 
-    private static void CodeSwitchChecks()
+    private static void CodeSwitchChecks(bool virtualized = false)
     {
         var root = Child("actual-event-window"); root.SetActive(false);
         var holder = root.AddComponent<UiHolder>();
@@ -211,6 +213,22 @@ public static class UiTreeContainerRegression
         view.scr_items = panels[0].AddComponent<ScrView>();
         view.scr_items.content = (RectTransform)content.transform;
         view.scr_items.viewport = (RectTransform)panels[0].transform;
+        if (virtualized)
+        {
+            ((RectTransform)panels[0].transform).sizeDelta = new Vector2(480, 120);
+            var rect = (RectTransform)content.transform;
+            rect.anchorMin = rect.anchorMax = new Vector2(0, 1); rect.pivot = new Vector2(0, 1);
+            rect.anchoredPosition = Vector2.zero; rect.sizeDelta = new Vector2(480, 120);
+            view.scr_items.cell = (RectTransform)view.go_item.transform;
+            view.scr_items.cell.sizeDelta = new Vector2(180, 40);
+            view.scr_items.dir = ScrView.Direction.Vertical;
+            Intrinsic(view.go_item, false);
+            var metadata = CmdDataForm.DataByName["TreeDialog"];
+            metadata.prmNames = Enumerable.Range(0, 10).Select(i => "arg" + i).ToList();
+            metadata.prmTypes = Enumerable.Repeat("string", 10).ToList();
+            metadata.retTypes = new List<string> { "void" };
+            BaseData.cmdDic["TreeDialog"] = new TreeDialogFixtureCmd();
+        }
         view.ipt_code = Input(panels[1].transform); view.ipt_name = Input(root.transform);
         view.txt_title = Text(root.transform, "title"); view.txt_lab = Text(root.transform, "lab");
         view.sta_item = States(root.transform, 2); view.sta_unit = States(root.transform, 2);
@@ -222,13 +240,39 @@ public static class UiTreeContainerRegression
         view.btn_del = Child("delete", root.transform).AddComponent<Btn>();
         view.btn_insert = Child("insert", root.transform).AddComponent<Btn>();
         var data = EventProgramDataForm.defaultData; data.uid = 90200; data.name = "tree-switch-test"; data.code = "Print(\"start\");";
+        if (virtualized)
+            data.code = string.Join("\n", Enumerable.Range(0, 58).Select(i => "TreeDialog("
+                + string.Join(",", Enumerable.Range(0, 10).Select(j => "\"dialog-" + i + "-" + j + "\"")) + ");")
+                .Concat(Enumerable.Repeat("Print(\"tail\");", 6)));
         int closed = 0;
         var editor = new UiModStoryEventEditWindowCtrl { uiHolder = holder, view = view,
             model = new UiModStoryEventEditWindowModel(), param = new UiModStoryEventEditWindowParam { data = data, onClose = () => closed++ } };
         holder.ctrl = editor;
         root.SetActive(true);
+        if (virtualized) Canvas.ForceUpdateCanvases();
         var rows = (UiTreeContainer<UiItemCtrl>)typeof(UiModStoryEventEditWindowCtrl).GetField("itemCon", Hidden).GetValue(editor);
-        Check(rows.ActiveCount == 2, "real editor OnShow renders a statement and insertion row");
+        Check(virtualized ? rows.paramLst.Count == 65 && rows.ActiveCount <= 4 : rows.ActiveCount == 2,
+            "editor plans the complete source but materializes only the Scr cell range");
+        if (virtualized)
+        {
+            var unitField = typeof(UiItemCtrl).GetField("unitCon", Hidden);
+            int units = rows.paramLst.Where(p => rows.TryGet(p, out _)).Sum(p =>
+                ((UiTreeContainer<UiUnitCtrl>)unitField.GetValue(rows.Get(p).ctrl)).ActiveCount);
+            Check(units <= 84 && units > 0, "64 statements including 58 ten-argument dialogs activate at most four Unit trees, not 1218+ Units: visible=" + rows.ActiveCount + " units=" + units);
+            int compilations = editor.CompileCount;
+            var parameters = rows.paramLst.ToArray();
+            var watch = System.Diagnostics.Stopwatch.StartNew();
+            for (int i = 0; i < 10; i++) { view.btn_switchMod.onClick.Invoke(); view.btn_switchMod.onClick.Invoke(); }
+            watch.Stop();
+            Check(editor.CompileCount == compilations && rows.paramLst.SequenceEqual(parameters),
+                "twenty unchanged mode switches neither compile nor replace the planned AST/row parameters");
+            Debug.Log("TREE_VIRTUAL_PRESSURE logical=" + rows.paramLst.Count + " visible=" + rows.ActiveCount
+                + " units=" + units + " warm20SwitchMs=" + watch.Elapsed.TotalMilliseconds);
+            view.scr_items.content.anchoredPosition = new Vector2(0, 800);
+            rows.RefreshViewport();
+            Check(!rows.TryGet(rows.paramLst[0], out _) && rows.TryGet(rows.paramLst[20], out _)
+                && rows.CreatedCount <= 4, "scrolling recycles row and nested Unit trees instead of creating offscreen statements");
+        }
         var firstParam = rows.paramLst[0];
         int created = rows.CreatedCount;
         view.btn_switchMod.onClick.Invoke();
@@ -239,9 +283,76 @@ public static class UiTreeContainerRegression
         Check(!editor.model.codeEditMode && panels[0].activeSelf && rows.ActiveCount == 2 && rows.CreatedCount == created,
             "Code-to-Item binds the updated syntax using the existing rows");
         Check(data.code.Contains("changed") && !ReferenceEquals(rows.paramLst[0], firstParam), "switching back publishes the current source and fresh AST bindings");
+        if (virtualized) Check(rows.TryGet(rows.paramLst[0], out _) && Near(view.scr_items.content.anchoredPosition.y, 0),
+            "shortening the source while scrolled down immediately clamps back to real rows");
+        if (virtualized)
+        {
+            view.btn_switchMod.onClick.Invoke();
+            view.ipt_code.Set("for(i=0;i<2;i++){Print(\"inside\");}Print(\"outside\");");
+            view.btn_switchMod.onClick.Invoke();
+            Check(rows.paramLst.Cast<UiItemParam>().Select(p => p.deepth).SequenceEqual(new[] { 0, 1, 1, 0, 0 }),
+                "offscreen for bodies are planned once with the correct depth and New insertion rows");
+            var outside = ((UiItemParam)rows.paramLst[3]).node;
+            editor.SelUnit(outside, outside); view.btn_del.onClick.Invoke();
+            Check(rows.paramLst.Count == 4 && rows.paramLst.Cast<UiItemParam>().All(p => p.node != outside),
+                "deleting an unmaterialized row updates the AST and virtual extent without resurrecting it on scroll");
+            view.btn_switchMod.onClick.Invoke();
+            Check(!data.code.Contains("outside"), "structural draft edits invalidate the source cache and compile on mode switch");
+            view.btn_switchMod.onClick.Invoke();
+        }
         var rendered = rows.paramLst[0];
+        int beforeRename = editor.CompileCount;
+        view.ipt_name.onFinishInput.Invoke("renamed-window-event");
+        Check(editor.ApplyEntry(false) && editor.CompileCount == beforeRename + 1,
+            "renaming an event invalidates cached method-name validation even when its body is unchanged");
         view.btn_close.onClick.Invoke();
         Check(closed == 1 && !root.activeSelf && ReferenceEquals(rendered, rows.paramLst[0]), "Return applies and closes without rebuilding a hidden list");
+    }
+
+    private static void VirtualRangeChecks()
+    {
+        foreach (var direction in new[] { ScrView.Direction.Vertical, ScrView.Direction.Horizon })
+        {
+            var root = Child("virtual-axis"); root.SetActive(false);
+            ((RectTransform)root.transform).sizeDelta = new Vector2(200, 120);
+            root.transform.localScale = new Vector3(1.7f, .8f, 1);
+            var holder = root.AddComponent<UiHolder>(); var owner = new UiCtrl(); owner.BindHolderRecursively(holder);
+            var content = Child("content", root.transform); var rect = (RectTransform)content.transform;
+            rect.anchorMin = rect.anchorMax = new Vector2(0, 1); rect.pivot = new Vector2(0, 1);
+            rect.anchoredPosition = Vector2.zero; rect.sizeDelta = new Vector2(200, 120);
+            var scroll = root.AddComponent<ScrView>(); scroll.content = rect; scroll.viewport = (RectTransform)root.transform;
+            scroll.dir = direction;
+            var template = Child("cell", content.transform); template.AddComponent<UiHolder>();
+            scroll.cell = (RectTransform)template.transform; scroll.cell.sizeDelta = new Vector2(100, 40);
+            template.transform.localScale = new Vector3(.75f, 1.5f, 1);
+            var con = new UiTreeContainer<TreeProbeCtrl>(owner, template, viewport: scroll);
+            for (int i = 0; i < 100; i++) con.Add(new TreeProbeParam { con = con, destination = content.transform });
+            root.SetActive(true); con.Refresh();
+            int expected = direction == ScrView.Direction.Vertical ? 2 : 3;
+            Check(con.paramLst.Count == 100 && con.ActiveCount == expected, "range uses cell size in Content units along Scr.dir under nonuniform Canvas/cell scaling");
+            var first = con.Get(con.paramLst[0]); var firstRect = (RectTransform)first.transform;
+            Check(Near(direction == ScrView.Direction.Vertical ? firstRect.rect.height : firstRect.rect.width,
+                direction == ScrView.Direction.Vertical ? 40 : 100), "virtual placement does not apply cell scale twice");
+            rect.anchoredPosition = direction == ScrView.Direction.Vertical ? new Vector2(0, 1200) : new Vector2(-1500, 0);
+            scroll.onValueChanged.Invoke(Vector2.zero);
+            Check(con.TryGet(con.paramLst[20], out _) && !con.TryGet(con.paramLst[0], out _) && con.CreatedCount <= expected + 1,
+                "both axes recycle offscreen nodes and materialize their correct logical indices");
+            int renders = con.paramLst.Where(p => con.TryGet(p, out _)).Sum(p => ((TreeProbeCtrl)con.Get(p).ctrl).renders);
+            con.RefreshViewport(); con.RefreshViewport();
+            Check(renders == con.paramLst.Where(p => con.TryGet(p, out _)).Sum(p => ((TreeProbeCtrl)con.Get(p).ctrl).renders),
+                "unchanged viewport refresh never rebinds existing nodes");
+            rect.anchoredPosition = Vector2.zero; con.RefreshViewport();
+            scroll.dir = direction == ScrView.Direction.Vertical ? ScrView.Direction.Horizon : ScrView.Direction.Vertical;
+            con.RefreshViewport();
+            Check(con.ActiveCount == (scroll.dir == ScrView.Direction.Vertical ? 2 : 3),
+                "changing Scr.dir recomputes the existing virtual range along the new cell axis");
+            var offscreen = con.paramLst[50];
+            con.DelReal(con.Get(con.paramLst[0]).gameObject);
+            Check(con.paramLst.Count == 99 && con.paramLst.Contains(offscreen),
+                "explicit subtree deletion removes only its own Params, preserving unmaterialized logical rows");
+            con.RefreshViewport();
+            con.SetViewportEnabled(false); con.Clear(); UnityEngine.Object.Destroy(root);
+        }
     }
 
     private static Ipt Input(Transform parent)
@@ -371,6 +482,12 @@ public sealed class TreeFixtureEditor : UiModStoryEventEditWindowCtrl
     public override void OnCreate() { }
     public override void OnShow() { }
     public override void OnDisable() { }
+}
+public sealed class TreeDialogFixtureCmd : CmdBase
+{
+    public override string GetName() => "TreeDialog";
+    public override CmdBase GetNew() => new TreeDialogFixtureCmd();
+    protected override bool ExecuteInternal(BoxDataForm.Data[] prm, InterpretAsyncTask task) => true;
 }
 
 public sealed class TreeProbeParam : UiParam

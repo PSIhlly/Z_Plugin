@@ -216,7 +216,7 @@ namespace Ui.ModStoryEventTriggerWindow
                         return;
                     parent.ChangeEvents(binding, (trigger, index) => trigger.evt.Add(res.id));
                     Z_EventHelper.Invoke(new EventModifyEvent());
-                });
+                }, allowAnyReturnType: true);
             });
             view.btn_delete.onClick.AddListener(() =>
             {
@@ -236,7 +236,7 @@ namespace Ui.ModStoryEventTriggerWindow
                         return;
                     parent.ChangeEvents(binding, (trigger, index) => trigger.evt[index] = res.id);
                     Z_EventHelper.Invoke(new EventModifyEvent());
-                });
+                }, allowAnyReturnType: true);
             });
         }
         public override void OnShow()

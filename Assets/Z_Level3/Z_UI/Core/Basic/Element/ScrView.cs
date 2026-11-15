@@ -68,6 +68,30 @@ namespace Z_Ui.Base
             return GetRectInContentSpace(cell, cellCorners).size;
         }
 
+        // Trees occupy one cell along the scrolling axis. Their cross-axis size
+        // comes from the rendered syntax, rather than packing into a grid.
+        internal bool TryGetTreeViewport(out Rect visible, out Vector2 size)
+        {
+            visible = default; size = default;
+            if (!content || !viewport || !cell) return false;
+            visible = GetViewportRectInContentSpace();
+            size = GetCellSizeInContentSpace();
+            return visible.width > 0 && visible.height > 0 && (dir == Direction.Vertical ? size.y : size.x) > .001f
+                && (dir == Direction.Vertical ? size.y + ySpacing : size.x + xSpacing) > .001f;
+        }
+
+        internal Vector2 GetTreeSize(RectTransform rect) => GetRectInContentSpace(rect, cellCorners).size;
+
+        internal void GetTreeRange(int count, Rect visible, Vector2 size, out int first, out int end)
+        {
+            bool vertical = dir == Direction.Vertical;
+            float step = vertical ? size.y + ySpacing : size.x + xSpacing;
+            float start = vertical ? content.rect.yMax - visible.yMax - top : visible.xMin - content.rect.xMin - left;
+            float finish = vertical ? content.rect.yMax - visible.yMin - top : visible.xMax - content.rect.xMin - left;
+            first = Mathf.Clamp(Mathf.FloorToInt(start / step), 0, count);
+            end = Mathf.Clamp(Mathf.CeilToInt(finish / step), first, count);
+        }
+
         private int GetRowCount(float viewportHeight, float cellHeight)
         {
             return Mathf.Max(1, (int)((viewportHeight - top) / (cellHeight + ySpacing)));

@@ -241,6 +241,12 @@ AssetForm
 
 ## Offline texture split and join
 
+- For character action PNGs using the 托利亚 `newVersion` naming convention, use `前`, `后`, `左`, or `右` for facing direction. A standing frame has no suffix; suffix `1` denotes the left-hit reaction, `2` the left punch, and `3` and `4` the two walking frames (for example, `左2.png` faces left and punches). Identify direction and action from the image before renaming; preserve both walking frames.
+
+### 整理图片
+
+For each facing direction, use its standing PNG as the reference. Measure fully transparent rows above and below its nontransparent content. Scale each other frame's nontransparent content proportionally to match the standing frame's content height, and place it on the same-size transparent canvas so both empty-row counts match. Preserve the original horizontal center where possible, shifting only as needed to fit without clipping; if the scaled width cannot fit, stop and resolve the canvas constraint rather than distort or crop the image. For pixel art use nearest-neighbor resizing. Leave the standing reference unchanged and verify each resulting alpha bounding box against it.
+
 - `Z_OtherProjects/Z_Tool/ImageSplit/切图.bat` launches `split_png.py` to grid-split all direct sibling PNGs. Prompt for positive row/column counts; optional positional CLI counts and `--directory` support automation. Boundaries use `i*size//count`, preserving every pixel and transparency without resizing; non-divisible cells differ by at most one pixel. Reject zero-area grids per image and continue the batch. Output is `output/<stem>_<rows>x<columns>/r01_c01.png` with versioned directories on repeats; never overwrite sources or scan output recursively. APNG uses its first frame.
 
 - `ExtraAssets/使用中/贴图/test/texture_tool.py` owns the numbered PNG workflow invoked by `拆分.bat` and `拼合.bat`; the adjacent `PNG用途说明.txt` documents each input/output. Split overwrites 1–29 and 50–51; avoid a full split when refreshing only one preview would preserve authored edits.

@@ -1,10 +1,13 @@
 using Form;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using Ui.ModStoryEventTrigger;
 using Ui.EventChoose;
 using Ui.ModStoryEventTriggerWindow;
 using UnityEngine;
+using Z_Code;
+using Z_Code.Form;
 using Z_DataSystem;
 using Z_Map;
 using Z_Map.Form;
@@ -30,9 +33,21 @@ namespace Ui.ModSceneBehaviourUnit
         
     }
 
+    public partial class UiParamParam
+    {
+        public string key;
+        public GameParamForm.Data data;
+    }
+    public partial class UiParamModel
+    {
+        public string key;
+        public GameParamForm.Data data;
+    }
+
     public partial class UiModSceneBehaviourUnitCtrl
     {
         private UiContainer<UiEventTriggerCtrl> triggers;
+        private UiContainer<UiParamCtrl> parameters;
         private Ui.TriggerEventChoose.GlobalVariableTriggerList globalTriggers;
         private UiModStoryEventTriggerWindowCtrl eventWindow;
         private UiModStoryEventTriggerWindowParam openedWindow;
@@ -48,6 +63,7 @@ namespace Ui.ModSceneBehaviourUnit
                 Close();
             });
             view.btn_delete.onClick.AddListener(DeleteUnit);
+            parameters = new UiContainer<UiParamCtrl>(this, view.go_param);
             triggers = new UiContainer<UiEventTriggerCtrl>(this, view.go_trigger);
             globalTriggers = new Ui.TriggerEventChoose.GlobalVariableTriggerList(this, view.go_triggerEventChoose);
         }
@@ -66,6 +82,7 @@ namespace Ui.ModSceneBehaviourUnit
         public override void OnHide()
         {
             globalTriggers?.Clear();
+            ClearParams();
             foreach (var binding in triggers.paramLst)
                 ((UiEventTriggerCtrl)triggers.Get(binding).ctrl).Set(null);
             triggers.Clear();
@@ -162,6 +179,7 @@ namespace Ui.ModSceneBehaviourUnit
         public void Refresh()
         {
             view.txt_name.text =model.data.name;
+            RefreshParams();
             foreach (var binding in triggers.paramLst)
                 ((UiEventTriggerCtrl)triggers.Get(binding).ctrl).Set(null);
             triggers.Clear();
@@ -175,7 +193,73 @@ namespace Ui.ModSceneBehaviourUnit
                 && UnitForm.DataByUid.TryGetValue(data.uid, out var current) && ReferenceEquals(current, data), OpenTrigger);
             UiManager.Rebuild(gameObject, true);
         }
+        // 参数默认显示原型（product）的值，改过的参数才作为 override 存在场景单位上。
+        private void RefreshParams()
+        {
+            ClearParams();
+            var info = (model.data?.unit as MapUnit)?.paramInfo;
+            if (info != null)
+                foreach (var pair in info.OrderBy(pair => pair.Value?.uid ?? 0).ThenBy(pair => pair.Key))
+                    parameters.Add(new UiParamParam { key = pair.Key, data = pair.Value });
+            parameters.Refresh();
+        }
+        private void ClearParams()
+        {
+            foreach (var binding in parameters.paramLst)
+                ((UiParamCtrl)parameters.Get(binding).ctrl).Set(null);
+            parameters.Clear();
+        }
+        internal void SetParamValue(string key, GameParamForm.Data value)
+        {
+            if (!(model.data?.unit is MapUnit unit) || string.IsNullOrEmpty(key) || value == null)
+                return;
+            var data = model.data;
+            var map = MapManager.instance.data;
+            if (!ReferenceEquals(MapManager.instance.data, map)
+                || !UnitForm.DataByUid.TryGetValue(data.uid, out var current) || !ReferenceEquals(current, data))
+                return;
+            var scene = ModManager.instance.sceneCtrl;
+            using (scene?.BeginOperation())
+            {
+                scene?.Track(data);
+                unit.SetParamOverride(key, value);
+            }
+            Refresh();
+        }
        
+    }
+
+    public partial class UiParamCtrl
+    {
+        public override void OnCreate()
+        {
+            view.btn_value.onClick.AddListener(() =>
+            {
+                var data = model.data;
+                if (data == null)
+                    return;
+                ModManager.instance.assetCtrl.ChooseBasicCmd(data.GetValue(), () =>
+                {
+                    if (ReferenceEquals(model.data, data))
+                        parent.SetParamValue(model.key, data);
+                });
+            });
+        }
+        public override void OnShow() => Set(param);
+
+        public void Set(UiParamParam binding)
+        {
+            param = binding;
+            model.key = binding?.key;
+            model.data = binding?.data;
+            if (model.data != null)
+                Refresh();
+        }
+        private void Refresh()
+        {
+            view.txt_.text = model.data.name;
+            view.txt_value.text = model.data.GetValue().GetBoxContent();
+        }
     }
 
     public partial class UiEventTriggerParam

@@ -11,6 +11,22 @@ namespace Z_Code
 
     public abstract class CmdBase
     {
+#if ENABLE_PROFILER
+        private static readonly Dictionary<string, Unity.Profiling.ProfilerMarker> profilerMarkers =
+            new Dictionary<string, Unity.Profiling.ProfilerMarker>(StringComparer.Ordinal);
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+        private static void ResetProfilerMarkers() => profilerMarkers.Clear();
+        private Unity.Profiling.ProfilerMarker GetProfilerMarker()
+        {
+            string name = GetName();
+            if (!profilerMarkers.TryGetValue(name, out var marker))
+            {
+                marker = new Unity.Profiling.ProfilerMarker("ZCode.Cmd " + name);
+                profilerMarkers.Add(name, marker);
+            }
+            return marker;
+        }
+#endif
         public static bool TryGetForm(string name, out CmdDataForm.Data form)
         {
             form = null;
@@ -48,9 +64,17 @@ namespace Z_Code
         protected abstract bool ExecuteInternal(BoxDataForm.Data[] prm, InterpretAsyncTask asyncTask);
         public void Execute(BoxDataForm.Data[] prm, Dictionary<string, BoxDataForm.Data> heap, InterpretAsyncTask asyncTask)
         {
+#if ENABLE_PROFILER
+            Unity.Profiling.ProfilerMarker.AutoScope profile = default;
+            bool hasProfile = false;
+#endif
             try
             {
                 asyncTask.Run();
+#if ENABLE_PROFILER
+                profile = GetProfilerMarker().Auto();
+                hasProfile = true;
+#endif
                 if (prm == null)
                 {
                     throw new ArgumentNullException(nameof(prm));
@@ -74,9 +98,8 @@ namespace Z_Code
                         }
                         prm[i] = value;
                     }
-                    // Keep the command API's writable root dictionary available,
-                    // without allocating dictionaries during scalar interpretation.
-                    prm[i].GetOrCreateDictionary();
+                    // Scalar arguments keep dic == null. Dictionary writers must
+                    // request storage explicitly at the point they need it.
                 }
 
                 Array.Reverse(prm);
@@ -89,6 +112,12 @@ namespace Z_Code
             {
                 asyncTask.error = GetName() + " 执行失败: " + e.Message;
                 asyncTask.Complete();
+            }
+            finally
+            {
+#if ENABLE_PROFILER
+                if (hasProfile) profile.Dispose();
+#endif
             }
         }
     }

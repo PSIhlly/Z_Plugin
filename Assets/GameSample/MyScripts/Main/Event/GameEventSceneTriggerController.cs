@@ -304,11 +304,13 @@ public class GameEventSceneTriggerController : Z_Controller<GameEventController>
 
     private static void ExecuteUnitEvent(MapUnit unit, string eventName, bool characterSelf)
     {
+        var trigger = unit.GetEvt(eventName);
+        if (trigger == null) return;
         var heap = new Dictionary<string, BoxDataForm.Data>();
         heap["param1"] = CodeHelper.CreateBoxByStr(characterSelf
             ? GlobalEventHelper.GetName(GlobalEventHelper.CHARACTER, unit.productInfo.Item1.ToString())
             : GlobalEventHelper.GetSceneObjectReference(unit));
-        unit.ExecuteEvt(eventName, heap);
+        GameManager.instance.evtCtrl.TriggerEventExecute(trigger, unit.data.uid, heap);
     }
 
     public void OnEvent(TileEvent evt)
@@ -366,12 +368,7 @@ public class GameEventSceneTriggerController : Z_Controller<GameEventController>
 
         evts += () =>
         {
-            foreach (var data in ItemUnitForm.DataByUid.Values)
-                ExecuteUnitEvent(data.unit, "onPerSecondEvent", false);
-            foreach (var data in CharacterUnitForm.DataByUid.Values)
-                ExecuteUnitEvent(data.unit, "onPerSecondEvent", true);
-            foreach (var data in ObjectUnitForm.DataByUid.Values)
-                ExecuteUnitEvent(data.unit, "onPerSecondEvent", false);
+            _super.unitSubscriptions.EverySecond();
         };
     }
 }

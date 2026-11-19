@@ -29,10 +29,11 @@ namespace Z_Code
         public override CmdBase GetNew() => new MoveToSceneCmd();
         protected override bool ExecuteInternal(BoxDataForm.Data[] prm, InterpretAsyncTask asyncTask)
         {
+            var components1 = prm[1].GetOrCreateDictionary();
             var scene = SceneForm.DataByName.GetDv(prm[0].str, null);
             var ch = CharacterProductForm.DataByUid.GetDv(
                     GameManager.instance.curProgress.characterUid, null);
-            var pos= new Vector3(prm[1].dic["x"].num, prm[1].dic["height"].num, prm[1].dic["y"].num);
+            var pos= new Vector3(components1["x"].num, components1["height"].num, components1["y"].num);
             if (scene != null && ch != null)
             {
                 

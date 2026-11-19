@@ -107,25 +107,8 @@ public class GameEventStoryTriggerController : Z_Controller<GameEventController>
         _super.TriggerEventExecute(scene.events.GetDv("onGlobalVarChangeEvent$", null), 0, heap, copyDefaultHeap: true);
         if (ReferenceEquals(game.curScene, scene))
             _super.TriggerEventExecute(scene.events.GetDv($"onGlobalVarChangeEvent${evt.uid}", null), 0, heap, copyDefaultHeap: true);
-        // Capture current-scene owners before dispatch. Each handler receives
-        // its own value snapshots and resolves prototype events before appends.
-        var owners = UnitForm.DataByUid.Values.Where(data => data.unit is MapUnit).ToArray();
-        foreach (var data in owners)
-        {
-            if (!ReferenceEquals(game.curScene, scene)) break;
-            if (!UnitForm.DataByUid.TryGetValue(data.uid, out var current) || !ReferenceEquals(current, data)) continue;
-            var unit = (MapUnit)data.unit;
-            // Scene and Unit bindings share name/delta arguments, like parameter
-            // changes. Only param1 changes to the exact Unit that owns the binding.
-            var unitHeap = new Dictionary<string, BoxDataForm.Data>(heap)
-            {
-                ["param1"] = CodeHelper.CreateBoxByStr(GlobalEventHelper.GetSceneUnitReference(data.uid))
-            };
-            _super.TriggerEventExecute(unit.GetEvt("onGlobalVarChangeEvent$"), data.uid, unitHeap, copyDefaultHeap: true);
-            if (ReferenceEquals(game.curScene, scene) && UnitForm.DataByUid.TryGetValue(data.uid, out current)
-                && ReferenceEquals(current, data))
-                _super.TriggerEventExecute(unit.GetEvt($"onGlobalVarChangeEvent${evt.uid}"), data.uid, unitHeap, copyDefaultHeap: true);
-        }
+        if (ReferenceEquals(game.curScene, scene))
+            _super.unitSubscriptions.GlobalChanged(evt, heap);
     }
 
     private static float GetGlobalVariableDelta(GlobalVariableChangedEvent evt)

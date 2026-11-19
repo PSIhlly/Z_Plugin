@@ -27,7 +27,8 @@ namespace Z_Code
         public override CmdBase GetNew() => new GetVectorLengthCmd();
         protected override bool ExecuteInternal(BoxDataForm.Data[] prm, InterpretAsyncTask asyncTask)
         {
-            var a = new Vector3(prm[0].dic["x"].num, prm[0].dic["height"].num, prm[0].dic["y"].num);
+            var components0 = prm[0].GetOrCreateDictionary();
+            var a = new Vector3(components0["x"].num, components0["height"].num, components0["y"].num);
             asyncTask.res = new BoxDataForm.Data[] { CodeHelper.CreateBoxByNum(a.magnitude) }; 
             return true;
         }

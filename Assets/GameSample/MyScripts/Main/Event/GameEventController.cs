@@ -309,8 +309,10 @@ public class GameEventController : Z_Controller<GameManager>
     readonly HashSet<UnitForm.Data> destroyingUnits = new HashSet<UnitForm.Data>(IdentityComparer<UnitForm.Data>.Instance);
     internal bool BeginUnitDestroy(UnitForm.Data data) => destroyingUnits.Add(data);
     internal void EndUnitDestroy(UnitForm.Data data) => destroyingUnits.Remove(data);
+    internal readonly GameEventUnitSubscriptions unitSubscriptions;
     public GameEventController(GameManager super) : base(super)
     {
+        unitSubscriptions = new GameEventUnitSubscriptions(this);
         sceneTriggerCtrl = new GameEventSceneTriggerController(this);
         storyTriggerCtrl = new GameEventStoryTriggerController(this);
         tasks = new List<EventTask>();
@@ -319,6 +321,7 @@ public class GameEventController : Z_Controller<GameManager>
     }
     public void Reset()
     {
+        unitSubscriptions.Reset();
         sceneTriggerCtrl.evts -= sceneTriggerCtrl.evts;
         foreach (var data in EventInterpretDataForm.DataByUid.Values)
         {
@@ -529,6 +532,7 @@ public class GameEventController : Z_Controller<GameManager>
     }
     public void ClearScene()
     {
+        unitSubscriptions.Reset();
         foreach (var data in EventInterpretDataForm.DataByUid.Values)
         {
             data.Cancel();
@@ -541,6 +545,11 @@ public class GameEventController : Z_Controller<GameManager>
         currentEventData = null;
     }
 
+    private static readonly Unity.Profiling.ProfilerMarker SnapshotMarker = new Unity.Profiling.ProfilerMarker("Events.Snapshot");
+    private static readonly Unity.Profiling.ProfilerMarker InterpretMarker = new Unity.Profiling.ProfilerMarker("Events.Interpret");
+    private static readonly Unity.Profiling.ProfilerMarker TasksMarker = new Unity.Profiling.ProfilerMarker("Events.Tasks");
+    private static readonly Unity.Profiling.ProfilerMarker SceneMovesMarker = new Unity.Profiling.ProfilerMarker("Events.SceneMoves");
+
     public void LateUpdate()
     {
         // Keep additions deferred until the next scheduler pass, without allocating
@@ -550,10 +559,13 @@ public class GameEventController : Z_Controller<GameManager>
         isManagingEvents = true;
         try
         {
-            eventSnapshot.AddRange(EventInterpretDataForm.DataByUid.Values);
-            // Recycled UIDs reuse Dictionary slots, which do not retain enqueue
-            // order. Preserve trigger list order independently of those slots.
-            eventSnapshot.Sort((left, right) => left.enqueueOrder.CompareTo(right.enqueueOrder));
+            using (SnapshotMarker.Auto())
+            {
+                eventSnapshot.AddRange(EventInterpretDataForm.DataByUid.Values);
+                // Recycled UIDs reuse Dictionary slots, which do not retain enqueue
+                // order. Preserve trigger list order independently of those slots.
+                eventSnapshot.Sort((left, right) => left.enqueueOrder.CompareTo(right.enqueueOrder));
+            }
             ManageEventDatas(eventSnapshot);
         }
         finally
@@ -565,6 +577,7 @@ public class GameEventController : Z_Controller<GameManager>
     private void ManageEventDatas(List<EventInterpretDataForm.Data> lst)
     {
         releaseTriggerTuple.Clear();
+        using (InterpretMarker.Auto())
         foreach (var data in lst)
         {
             if (!IsRegisteredEvent(data))
@@ -637,8 +650,8 @@ public class GameEventController : Z_Controller<GameManager>
                 }
             }
         }
-        UpdateTasks();
-        UpdateSceneMoves();
+        using (TasksMarker.Auto()) UpdateTasks();
+        using (SceneMovesMarker.Auto()) UpdateSceneMoves();
         foreach (var data in EventInterpretDataForm.DataByUid.Values)
         {
             if (releaseTriggerTuple.Contains((data.user, data.releaseTrigger)))

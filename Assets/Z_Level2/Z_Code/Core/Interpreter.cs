@@ -302,6 +302,80 @@ namespace Z_Code
         private int pendingCommandPc, pendingParameterCount, pendingReturnCount;
         private string pendingCommandName;
         private bool pendingDiscardReturn;
+        private int executionDepth;
+        internal bool IsExecuting => executionDepth != 0;
+
+        // Only successful, completed private call frames enter this shared pool.
+        // Suspended frames stay with their caller; canceled/error frames retain
+        // their cancellation identity for any outstanding command callbacks.
+        private sealed class SubProgramContext : InterpretDataForm.Data
+        {
+            internal SubProgramContext next;
+            internal bool CanRecycle => _interpreter == null || !_interpreter.IsExecuting;
+            internal SubProgramContext() : base(-1, new List<BoxDataForm.Data>(),
+                new Dictionary<string, BoxDataForm.Data>(), null, 0, -1, 0, null,
+                new List<BoxDataForm.Data>(), 0) { }
+        }
+        private const int MaxPooledSubPrograms = 128;
+        private static SubProgramContext freeSubPrograms;
+        private static int pooledSubProgramCount;
+        private static readonly List<string> parameterNames = new List<string>();
+
+        private static string ParameterName(int index)
+        {
+            while (parameterNames.Count <= index)
+                parameterNames.Add("param" + (parameterNames.Count + 1).ToString(CultureInfo.InvariantCulture));
+            return parameterNames[index];
+        }
+
+        private static SubProgramContext RentSubProgram(ProgramDataForm.Data program, int rootUid)
+        {
+            var context = freeSubPrograms;
+            if (context == null) context = new SubProgramContext();
+            else
+            {
+                freeSubPrograms = context.next;
+                context.next = null;
+                pooledSubProgramCount--;
+            }
+            context.program = program;
+            context.rootUid = rootUid;
+            return context;
+        }
+
+        private void ReleaseSubProgram(bool recycle)
+        {
+            var child = data?.subInterpret;
+            if (child == null) return;
+            data.subInterpret = null;
+            if (!recycle || child.IsCancelled || !(child is SubProgramContext context) || !context.CanRecycle)
+            {
+                child.Cancel();
+                return;
+            }
+            // Clear containers, never the Boxes they reference: return values and
+            // copy-out parameters may now belong to the caller or a command.
+            bool retain = pooledSubProgramCount < MaxPooledSubPrograms
+                && context.stack.Capacity <= 4096 && context.heap.Count <= 1024 && context.heapTemp.Capacity <= 1024;
+            context.Reset();
+            context.program = null;
+            context.rootUid = 0;
+            context.debugId = 0;
+            if (retain)
+            {
+                context.next = freeSubPrograms;
+                freeSubPrograms = context;
+                pooledSubProgramCount++;
+            }
+        }
+
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+        private static void ResetSubProgramPool()
+        {
+            freeSubPrograms = null;
+            pooledSubProgramCount = 0;
+            parameterNames.Clear();
+        }
 
         // Only interpreter-created scalar/reference stack values are pooled.
         // Heap/dictionary values and values exported to commands/RetInfo are owned
@@ -390,15 +464,24 @@ namespace Z_Code
 
             var previousBudget = activeBudget;
             activeBudget = budget;
+            executionDepth++;
             executionPc = data?.p ?? 0;
+#if ENABLE_PROFILER
+            bool hasProfile = data?.program != null;
+            var profile = hasProfile ? data.program.GetProfilerMarker().Auto() : default;
+#endif
             try
             {
                 return InterpretCore(budget);
             }
             finally
             {
+#if ENABLE_PROFILER
+                if (hasProfile) profile.Dispose();
+#endif
                 if (isRoot) frameExecutionTicks = budget.ElapsedTicks;
                 activeBudget = previousBudget;
+                executionDepth--;
             }
         }
 
@@ -816,23 +899,14 @@ namespace Z_Code
             int argumentStart = data.top - parameterCount;
             if (data.subInterpret == null)
             {
-                var subHeap = new Dictionary<string, BoxDataForm.Data>();
-                for (int i = 0; i < parameterCount; i++)
+                data.subInterpret = RentSubProgram(func.CreateRuntimeSnapshot(), data.rootUid == 0 ? data.uid : data.rootUid);
+                try
                 {
-                    subHeap[$"param{i + 1}"] = GetBox(data.stack[argumentStart + i]).DeepCopy();
+                    var subHeap = data.subInterpret.heap;
+                    for (int i = 0; i < parameterCount; i++)
+                        subHeap[ParameterName(i)] = GetBox(data.stack[argumentStart + i]).DeepCopy();
                 }
-
-                data.subInterpret = new InterpretDataForm.Data(
-                    -1,
-                    new List<BoxDataForm.Data>(),
-                    subHeap,
-                    func.CreateRuntimeSnapshot(),
-                    0,
-                    -1,
-                    0,
-                    null,
-                    new List<BoxDataForm.Data>(),
-                    data.rootUid == 0 ? data.uid : data.rootUid);
+                catch { ReleaseSubProgram(false); throw; }
             }
 
             if (!budget.TryEnterSubProgram())
@@ -859,7 +933,7 @@ namespace Z_Code
             if (subResult.errors != null && subResult.errors.Count > 0)
             {
                 errors.AddRange(subResult.errors);
-                data.subInterpret = null;
+                ReleaseSubProgram(false);
                 return MakeRetInfo(true);
             }
 
@@ -868,25 +942,23 @@ namespace Z_Code
                 return MakeRetInfo(false);
             }
 
-            data.heapTemp?.Clear();
-            var completedSubHeap = data.subInterpret.heap;
-            for (int i = 0; i < parameterCount; i++)
+            bool completed = false;
+            try
             {
-                string parameterName = $"param{i + 1}";
-                if (!completedSubHeap.TryGetValue(parameterName, out var parameterValue) || parameterValue == null)
+                data.heapTemp?.Clear();
+                var completedSubHeap = data.subInterpret.heap;
+                for (int i = 0; i < parameterCount; i++)
                 {
-                    throw new InvalidOperationException($"程序 {funcName} 完成后缺少参数 {parameterName}");
+                    string parameterName = ParameterName(i);
+                    if (!completedSubHeap.TryGetValue(parameterName, out var parameterValue) || parameterValue == null)
+                        throw new InvalidOperationException($"程序 {funcName} 完成后缺少参数 {parameterName}");
+                    GetBox(data.stack[argumentStart + i]).Reset(parameterValue);
                 }
-
-                GetBox(data.stack[argumentStart + i]).Reset(parameterValue);
+                PopMany(parameterCount + 1);
+                if (!discardReturn) Push(subResult.ret ?? CodeHelper.CreateBox());
+                completed = true;
             }
-
-            PopMany(parameterCount + 1);
-            if (!discardReturn)
-            {
-                Push(subResult.ret ?? CodeHelper.CreateBox());
-            }
-            data.subInterpret = null;
+            finally { ReleaseSubProgram(completed); }
             data.p += 2;
             return null;
         }
@@ -1345,6 +1417,7 @@ namespace Z_Code
 
         public void Reset()
         {
+            ReleaseSubProgram(false);
             DetachStackTemporaries();
             ResetCommand();
             errors.Clear();
@@ -1364,6 +1437,7 @@ namespace Z_Code
         {
             DetachStackTemporaries();
             asyncTask.Cancel();
+            if (!IsExecuting) ReleaseSubProgram(false);
         }
 
         private BoxDataForm.Data ArithmeticValues(BoxDataForm.Data left, BoxDataForm.Data right, Op operation,
@@ -1555,6 +1629,7 @@ namespace Z_Code
                 complete = true;
                 ret = null;
             }
+            if (complete && (data?.IsCancelled == true || errors.Count > 0)) ReleaseSubProgram(false);
             var info = new RetInfo(complete, ExportBox(ret));
             info.errors.AddRange(errors);
             return info;

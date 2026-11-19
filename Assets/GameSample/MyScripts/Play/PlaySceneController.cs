@@ -51,6 +51,10 @@ public interface ExternalPlaySceneController
 }
 public class PlaySceneController : Z_Controller<PlayManager>, InternalPlaySceneController, ExternalPlaySceneController, IZ_Listener<InputKeyEvent>, IZ_Listener<InputKeyUpEvent>, IZ_Listener<InputMouseEvent>, IZ_Listener<InputMouseDownEvent>, IZ_Listener<InputMouseUpEvent>, IZ_Listener<InputMouseMoveEvent>
 {
+    private static readonly Unity.Profiling.ProfilerMarker PlayerMoveMarker = new Unity.Profiling.ProfilerMarker("Play.PlayerMovement");
+    private static readonly Unity.Profiling.ProfilerMarker CameraMarker = new Unity.Profiling.ProfilerMarker("Play.CameraFollow");
+    private static readonly Unity.Profiling.ProfilerMarker TriggersMarker = new Unity.Profiling.ProfilerMarker("Play.DeferredSceneTriggers");
+    private static readonly Unity.Profiling.ProfilerMarker NavigationMarker = new Unity.Profiling.ProfilerMarker("Map.NavigationUpdate");
     public PlaySceneController(PlayManager super) : base(super)
     {
 
@@ -330,12 +334,6 @@ public class PlaySceneController : Z_Controller<PlayManager>, InternalPlaySceneC
         // set z
         //if(release)
         {
-            pos.z = CameraInstance.instance.cam.nearClipPlane;
-            // to world
-            Vector3 worldPosition = CameraInstance.instance.cam.ScreenToWorldPoint(pos);
-            worldPosition.y = CameraInstance.instance.tarTrs.position.y;
-            var hits = Physics.RaycastAll(worldPosition + Vector3.up * 100, Vector3.down);
-            var hitPos = MapManager.instance.utilCtrl.RealPos2MapPos(worldPosition);
             if (_playerG != null && _playerG.skill.ContainsKey(SkillType.LightAttack) && SkillProductForm.DataByUid.ContainsKey(_playerG.skill[SkillType.LightAttack]))
             {
                 var data = SkillProductForm.DataByUid[_playerG.skill[SkillType.LightAttack]];
@@ -383,7 +381,7 @@ public class PlaySceneController : Z_Controller<PlayManager>, InternalPlaySceneC
         {
             if (_playerM != null)
             {
-                _playerM.unit.Move(setPlayerMove);
+                using (PlayerMoveMarker.Auto()) _playerM.unit.Move(setPlayerMove);
             }
             setPlayerMove = Vector3.zero;
         }
@@ -405,16 +403,19 @@ public class PlaySceneController : Z_Controller<PlayManager>, InternalPlaySceneC
         {
 
             lastPlayerPos = _playerM.pos;
-            SetCamera(lastPlayerPos.x, lastPlayerPos.y, lastPlayerPos.z);
+            using (CameraMarker.Auto()) SetCamera(lastPlayerPos.x, lastPlayerPos.y, lastPlayerPos.z);
             GameManager.instance.curProgress.pos = _playerM.pos;
         }
 
-        GameManager.instance.evtCtrl.sceneTriggerCtrl.evts?.Invoke();
-        GameManager.instance.evtCtrl.sceneTriggerCtrl.evts -= GameManager.instance.evtCtrl.sceneTriggerCtrl.evts;
+        using (TriggersMarker.Auto())
+        {
+            GameManager.instance.evtCtrl.sceneTriggerCtrl.evts?.Invoke();
+            GameManager.instance.evtCtrl.sceneTriggerCtrl.evts -= GameManager.instance.evtCtrl.sceneTriggerCtrl.evts;
+        }
 
         if (updateNavFrame < Time.frameCount)
         {
-            MapManager.instance.navigationCtrl.UpdateMap(Mathf.Max((TileUnitForm.DataByUid.Count * 3 + ObjectUnitForm.DataByUid.Count) / 100, 5));
+            using (NavigationMarker.Auto()) MapManager.instance.navigationCtrl.UpdateMap(Mathf.Max((TileUnitForm.DataByUid.Count * 3 + ObjectUnitForm.DataByUid.Count) / 100, 5));
             updateNavFrame = Time.frameCount + 60;
         }
     }

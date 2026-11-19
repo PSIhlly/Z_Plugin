@@ -9,6 +9,7 @@ using System.Runtime.ConstrainedExecution;
 using UnityEngine;
 using UnityEngine.Rendering;
 using Z_ByteSerialize;
+using Z_Code.Form;
 using Z_DataSystem;
 using Z_DataSystem.Form;
 using Z_DesignStyle;
@@ -208,6 +209,97 @@ namespace Z_Map
             }
             return ori.ToString();
         }
+        // Parameters default to the Product (prototype) values and are only stored on the
+        // scene unit once they are edited, so changing the Product still reaches every
+        // placement that never overrode that parameter.
+        public Dictionary<string, GameParamForm.Data> GetParamOverrides()
+        {
+            var all = paramInfo;
+            if (all == null || all.Count == 0)
+                return all;
+            var result = new Dictionary<string, GameParamForm.Data>(all.Count);
+            foreach (var pair in all)
+            {
+                if (pair.Value == null)
+                    continue;
+                var prototype = GetPrototypeParam(pair.Key);
+                if (prototype != null && IsSameParam(prototype, pair.Value))
+                    continue;
+                result[pair.Key] = pair.Value;
+            }
+            return result;
+        }
+        public void SetParamOverride(string key, GameParamForm.Data value)
+        {
+            if (string.IsNullOrEmpty(key) || value == null)
+                return;
+            var info = paramInfo != null
+                ? new Dictionary<string, GameParamForm.Data>(paramInfo)
+                : new Dictionary<string, GameParamForm.Data>();
+            info[key] = value;
+            paramInfo = info;
+            data.extra = GetOverrideParamInfoString(
+                string.IsNullOrEmpty(data.extra) ? new JObject() : JObject.Parse(data.extra), this);
+        }
+        public static string GetOverrideParamInfoString(JObject ori, MapUnit unit)
+        {
+            var overrides = unit?.GetParamOverrides();
+            if (overrides == null || overrides.Count == 0)
+            {
+                ori.Remove(paramKey);
+                return ori.ToString();
+            }
+            return GetParamInfoString(ori, overrides);
+        }
+        private GameParamForm.Data GetPrototypeParam(string key)
+        {
+            if (this is CharacterUnit)
+            {
+                var product = CharacterProductForm.DataByUid.GetDv(productInfo.Item1, null);
+                return product?.paramDic != null && product.paramDic.TryGetValue(key, out var value) ? value : null;
+            }
+            if (this is ItemUnit)
+            {
+                var product = ItemProductForm.DataByUid.GetDv(productInfo.Item1, null);
+                return product?.paramDic != null && product.paramDic.TryGetValue(key, out var value) ? value : null;
+            }
+            if (this is ObjectUnit obj)
+            {
+                var product = obj.product;
+                // A Play Object binds a template copy, so compare against the template Product.
+                // Without a resolvable template every value stays an override rather than
+                // being pruned against itself.
+                if (DynamicGlobalSettings.playing)
+                {
+                    if (product == null
+                        || !ObjectProductForm.DataByUid.TryGetValue(ObjectProductForm.GetTemplateUid(product), out var template)
+                        || template == null)
+                        return null;
+                    product = template;
+                }
+                return product?.paramDic != null && product.paramDic.TryGetValue(key, out var value) ? value : null;
+            }
+            return null;
+        }
+        private static bool IsSameParam(GameParamForm.Data left, GameParamForm.Data right)
+        {
+            if (left == null || right == null)
+                return false;
+            return left.name == right.name && left.valueType == right.valueType
+                && left.min == right.min && left.max == right.max
+                && JToken.DeepEquals(GetParamValueJo(left), GetParamValueJo(right));
+        }
+        private static JObject GetParamValueJo(GameParamForm.Data data)
+        {
+            try
+            {
+                return BoxDataForm.GetJoByData(data.GetValue());
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+        }
     }
 }
 
@@ -261,7 +353,7 @@ public class GameMapController : Z_Controller<GameManager>, IZ_Listener<TileEven
 
                 MapUnit.GetProductInfoString(jo, mapU.productInfo);
 
-                MapUnit.GetParamInfoString(jo, mapU.paramInfo);
+                MapUnit.GetOverrideParamInfoString(jo, mapU);
                 data.extra = jo.ToString();
             }
 
@@ -347,6 +439,7 @@ public class GameMapController : Z_Controller<GameManager>, IZ_Listener<TileEven
         = new Dictionary<(int, AnimDirecton, int), Rect>();
     private static readonly Dictionary<Texture2D, Rect> objectWangTileTextureBounds = new Dictionary<Texture2D, Rect>();
     private readonly HashSet<ObjectUnit> objectCollisionBoundsUnits = new HashSet<ObjectUnit>();
+    private readonly HashSet<ObjectUnit> initializingObjects = new HashSet<ObjectUnit>();
     private readonly Dictionary<ObjectUnit, (Bounds bounds, int templateUid, bool notified)> objectWangTileBounds
         = new Dictionary<ObjectUnit, (Bounds, int, bool)>();
     private readonly Dictionary<ObjectUnit, (Bounds bounds, int templateUid, int mask)> objectWangTileMasks
@@ -609,6 +702,34 @@ public class GameMapController : Z_Controller<GameManager>, IZ_Listener<TileEven
     {
         DisFadeRenderRouting.SetTexture(ins.renderers[rendererId], texture, ins.GetRendererRoute(rendererId));
     }
+    // Bind final Product/geometry before AddObject creates spatial associations.
+    // Show/Refresh may restore instance Collider state, but this new owner's
+    // associations already use that same final geometry and need no second pass.
+    public ObjectUnitForm.Data GenerateObject(ObjectProductForm.Data source, Vector3 position)
+    {
+        var map = MapManager.instance;
+        ObjectUnit configured = null;
+        try
+        {
+            var row = map.AddObject(source.uid.ToString(), position,
+                GlobalDefaultHelper.GetRuntimeMapObjectPrefabName(ObjectProductForm.GetTemplateUid(source)), null, created =>
+                {
+                    configured = created.unit;
+                    initializingObjects.Add(configured);
+                    var product = source;
+                    if (source.protoUid != 0)
+                    {
+                        product = source.Copy(false);
+                        product.ToProduct(ObjectProductForm.GetTemplateUid(source));
+                    }
+                    RegisterObject(created, product);
+                });
+            if (row != null) map.updateCtrl.RefreshObjectVisibility(row.unit);
+            return row;
+        }
+        finally { if (configured != null) initializingObjects.Remove(configured); }
+    }
+
     public void RegisterObject(ObjectUnitForm.Data newObjectData, ObjectProductForm.Data objectData)
     {
         // Select/create the runtime Product before serializing its Unit link.
@@ -616,7 +737,8 @@ public class GameMapController : Z_Controller<GameManager>, IZ_Listener<TileEven
         objectData = newObjectData.unit.BindProduct(objectData) ?? objectData;
 
         newObjectData.isObstacle = objectData.collision;
-        UpdateObjectWangTileNeighbours(newObjectData.unit, objectData);
+        if (!initializingObjects.Contains(newObjectData.unit))
+            UpdateObjectWangTileNeighbours(newObjectData.unit, objectData);
         RefreshObjectAppearance(newObjectData.unit, objectData);
     }
 
@@ -998,8 +1120,11 @@ public class GameMapController : Z_Controller<GameManager>, IZ_Listener<TileEven
         bool changed = unit.SetFirstPartCollisionBounds(collisionBounds, colliderScale, data.centerCollider);
         if (changed || geometryChanged || forceCollisionRefresh || collisionChanged)
         {
-            unit.InvalidateCollisionGeometry();
-            MapManager.instance.updateCtrl.RefreshObjectOverlap(unit);
+            if (!initializingObjects.Contains(unit))
+            {
+                unit.InvalidateCollisionGeometry();
+                MapManager.instance.updateCtrl.RefreshObjectOverlap(unit);
+            }
         }
 
         if (unit.ins == null)

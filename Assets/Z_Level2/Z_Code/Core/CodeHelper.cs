@@ -75,6 +75,28 @@ namespace Z_Code.Form
             // Runtime-only: generated persistence continues to serialize the
             // authored program, never this shared execution snapshot.
             private RuntimeCodeSnapshot runtimeCodeSnapshot;
+#if ENABLE_PROFILER
+            // Snapshots share immutable profiling metadata; do not allocate a
+            // label each time a pooled child context receives a new wrapper.
+            private ProgramProfile runtimeProfile;
+            private sealed class ProgramProfile
+            {
+                internal readonly int uid;
+                internal readonly string name;
+                internal readonly Unity.Profiling.ProfilerMarker marker;
+                internal ProgramProfile(int uid, string name)
+                {
+                    this.uid = uid; this.name = name;
+                    marker = new Unity.Profiling.ProfilerMarker("ZCode.Program [" + uid + "] " + name);
+                }
+            }
+            internal Unity.Profiling.ProfilerMarker GetProfilerMarker()
+            {
+                if (runtimeProfile == null || runtimeProfile.uid != uid || runtimeProfile.name != name)
+                    runtimeProfile = new ProgramProfile(uid, name);
+                return runtimeProfile.marker;
+            }
+#endif
 
             private sealed class RuntimeCodeSnapshot
             {
@@ -102,6 +124,9 @@ namespace Z_Code.Form
             /// </summary>
             public Data CreateRuntimeSnapshot()
             {
+#if ENABLE_PROFILER
+                GetProfilerMarker();
+#endif
                 if (runtimeCodeSnapshot == null || !runtimeCodeSnapshot.Matches(zCode, zCodeMap))
                     runtimeCodeSnapshot = new RuntimeCodeSnapshot(zCode, zCodeMap);
                 var snapshot = (Data)MemberwiseClone();

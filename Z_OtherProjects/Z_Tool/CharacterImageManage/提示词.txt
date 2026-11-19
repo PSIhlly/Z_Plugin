@@ -1,0 +1,3 @@
+ /home/ubuntu/Z_Plugin/ExtraAssets/人物模型/四向/ 复制一份到/home/ubuntu/Z_Plugin/ExtraAssets/使用中/帕秋莉/newVersion/ ，提取图片中人物的外观特征（穿着、瞳色、眼型、发型、肤色、胸部大小、瞳色等），注意不要身体比例信息。 对 复制后图片 中的人物进行改造，保持原图的人物各部比例、人物整体尺寸。像素风
+
+/home/ubuntu/Z_Plugin/ExtraAssets/人物模型/动作/ 里面的子文件夹 复制一份到/home/ubuntu/Z_Plugin/ExtraAssets/使用中/帕秋莉/newVersion/ ， 且人物替换为对应朝向的/home/ubuntu/Z_Plugin/ExtraAssets/使用中/帕秋莉/newVersion/四向 中的人，像素风

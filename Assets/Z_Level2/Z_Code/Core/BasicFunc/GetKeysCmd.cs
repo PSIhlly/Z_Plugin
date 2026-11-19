@@ -19,10 +19,13 @@ namespace Z_Code
         {
             int i = 0;
             var box = CodeHelper.CreateBox();
-            foreach (var pair in prm[0].dic)
+            if (prm[0].dic != null)
             {
-                box.dic[i.ToString()] = CodeHelper.CreateBoxByStr(pair.Key);
-                i++;
+                foreach (var pair in prm[0].dic)
+                {
+                    box.dic[i.ToString()] = CodeHelper.CreateBoxByStr(pair.Key);
+                    i++;
+                }
             }
             asyncTask.res = new BoxDataForm.Data[] { box };
             return true;

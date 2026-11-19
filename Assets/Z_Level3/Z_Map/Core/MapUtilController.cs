@@ -33,17 +33,28 @@ namespace Z_Map
         }
         public List<TileUnit> GetNineTile((int, int, int) mapPos, float length)
         {
-            List<TileUnit> res = new List<TileUnit>();
+            var result = new List<TileUnit>();
+            int area = (int)Math.Max(1, length);
+            for (int x = mapPos.Item1 - area; x <= mapPos.Item1 + area; x++)
+            for (int y = mapPos.Item2; y <= mapPos.Item2 + 1; y++)
+            for (int z = mapPos.Item3 - area; z <= mapPos.Item3 + area; z++)
+            {
+                var tile = GetTile(x, y, z);
+                if (tile != null && !result.Contains(tile)) result.Add(tile);
+            }
+            return result;
+        }
+        public void CollectNineTiles((int, int, int) mapPos, float length, HashSet<TileUnit> res)
+        {
             int area = (int)Math.Max(1, length);
             for (int i = mapPos.Item1 - area; i <= mapPos.Item1 + area; i++)
                 for (int k = mapPos.Item2; k <= mapPos.Item2 + 1; k++)
                     for (int j = mapPos.Item3 - area; j <= mapPos.Item3 + area; j++)
                 {
                     var tile = GetTile(i, k, j);
-                    if (tile != null&& !res.Contains(tile))
+                    if (tile != null)
                         res.Add(tile);
                 }
-            return res;
         }
         public bool InArea((int, int, int) pos)
         {
@@ -674,71 +685,106 @@ namespace Z_Map
             float rearBoundaryDelta = modelBack * Mathf.Abs(scale.z) - colliderBack;
             return Vector3.forward * (zSign * rearBoundaryDelta);
         }
+        private sealed class CastWork
+        {
+            internal readonly HashSet<int> seen = new HashSet<int>();
+            internal readonly HashSet<(int, int)> columns = new HashSet<(int, int)>();
+            internal readonly MeshInfo sphere = Mesh.GetMesh(Vector3.zero, 1f, Vector3.zero, Vector3.one);
+            internal readonly Graph.IntersectAssisant state = new Graph.IntersectAssisant(false);
+            internal void Clear() { seen.Clear(); columns.Clear(); }
+        }
+        private readonly Stack<CastWork> castWorkPool = new Stack<CastWork>();
+
         public List<MapUnit> CaptureCast(Vector3 from, Vector3 to, float radius)
         {
-            return CaptureCast(from, to, radius, out _, out _);
+            var hits = new List<MapUnit>();
+            var work = castWorkPool.Count > 0 ? castWorkPool.Pop() : new CastWork();
+            try { Cast(from, to, radius, false, hits, work); return hits; }
+            finally { work.Clear(); castWorkPool.Push(work); }
         }
 
-        // Temporary diagnostic overload: expose the actual broad-phase traversal
-        // without changing which candidates are visited or which hits are returned.
+        // Diagnostic snapshots are owned by the caller, never pooled buffers.
         public List<MapUnit> CaptureCast(Vector3 from, Vector3 to, float radius,
             out HashSet<int> testedCandidates, out HashSet<(int, int)> checkedColumns)
         {
-            var res = new List<MapUnit>();
-
-            HashSet<int> exist = testedCandidates = new HashSet<int>();
-
-            var fromMesh = Mesh.GetMesh(from, radius, Vector3.zero, Vector3.one);
-            var toMesh = Mesh.GetMesh(to, radius, Vector3.zero, Vector3.one);
-            // The cast sweeps across the whole segment. Sampling only the two
-            // endpoint spheres misses intermediate Tile and Object colliders.
-            var sweepPoints = new Vector3[fromMesh.positions.Length + toMesh.positions.Length];
-            fromMesh.positions.CopyTo(sweepPoints, 0);
-            toMesh.positions.CopyTo(sweepPoints, fromMesh.positions.Length);
-            var lst = Graph.GetRoughOverlapIntPos(sweepPoints);
-
-
-            checkedColumns = new HashSet<(int, int)>();
-            foreach (var pos in lst)
+            var hits = new List<MapUnit>();
+            var work = castWorkPool.Count > 0 ? castWorkPool.Pop() : new CastWork();
+            try
             {
-                var mapPos = RealPos2MapPosInt(pos);
-                if (!checkedColumns.Add((mapPos.x, mapPos.z)) ||
-                    !_super.data.mapXZ2Y.TryGetValue((mapPos.x, mapPos.z), out var yLevels))
-                    continue;
+                Cast(from, to, radius, false, hits, work);
+                testedCandidates = new HashSet<int>(work.seen);
+                checkedColumns = new HashSet<(int, int)>(work.columns);
+                return hits;
+            }
+            finally { work.Clear(); castWorkPool.Push(work); }
+        }
 
-                // A Tile collider can extend into a different logical height layer.
-                // Check every real Tile in this column and let the mesh sweep decide.
-                foreach (var y in yLevels)
+        public bool HasBlockingCast(Vector3 from, Vector3 to, float radius)
+        {
+            var work = castWorkPool.Count > 0 ? castWorkPool.Pop() : new CastWork();
+            try { return Cast(from, to, radius, true, null, work); }
+            finally { work.Clear(); castWorkPool.Push(work); }
+        }
+
+        private bool Cast(Vector3 from, Vector3 to, float radius, bool blockersOnly, List<MapUnit> hits, CastWork work)
+        {
+            var sphere = work.sphere;
+            sphere.center = from;
+            var step = to - from;
+            int minX = int.MaxValue, minZ = int.MaxValue, maxX = int.MinValue, maxZ = int.MinValue;
+            for (int i = 0; i < sphere.positions.Length; i++)
+            {
+                var offset = (i == 0 ? Vector3.up : i == 1 ? Vector3.down : i == 2 ? Vector3.left
+                    : i == 3 ? Vector3.right : i == 4 ? Vector3.forward : Vector3.back) * radius;
+                var first = from + offset; var last = to + offset;
+                sphere.positions[i] = first;
+                // Match Graph.GetRoughOverlapIntPos's truncation and +1 padding.
+                minX = Math.Min(minX, Math.Min((int)first.x, (int)last.x));
+                minZ = Math.Min(minZ, Math.Min((int)first.z, (int)last.z));
+                maxX = Math.Max(maxX, Math.Max((int)first.x + 1, (int)last.x + 1));
+                maxZ = Math.Max(maxZ, Math.Max((int)first.z + 1, (int)last.z + 1));
+            }
+            // Y never changes the queried column; enumerate it once, but retain
+            // every registered Tile height whose Collider can reach the sweep.
+            var lowColumn = RealPos2MapPosInt(new Vector3(minX, 0, minZ));
+            var highColumn = RealPos2MapPosInt(new Vector3(maxX, 0, maxZ));
+            for (int x = Math.Min(lowColumn.x, highColumn.x); x <= Math.Max(lowColumn.x, highColumn.x); x++)
+            for (int z = Math.Min(lowColumn.z, highColumn.z); z <= Math.Max(lowColumn.z, highColumn.z); z++)
+            {
+                // Enumerate logical columns directly, including sub-world-unit cells.
+                if (!work.columns.Add((x, z)) || !_super.data.mapXZ2Y.TryGetValue((x, z), out var levels)) continue;
+                foreach (int y in levels)
                 {
-                    if (!_super.data.maps.TryGetValue((mapPos.x, y, mapPos.z), out var tileData))
-                        continue;
-                    var tile = tileData.unit;
-                    var unitLst = new List<MapUnit>() { tile };
+                    if (!_super.data.maps.TryGetValue((x, y, z), out var row)) continue;
+                    var tile = row.unit;
+                    if (CastCandidate(tile, step, blockersOnly, work))
+                    { if (blockersOnly) return true; hits.Add(tile); }
                     if (_super.updateCtrl.objectTileDic.TryGet(tile, out var objects))
-                        unitLst.AddRange(objects);
-                    if (_super.updateCtrl.characterOverlapTileDic.TryGet(tile, out var characters))
-                        unitLst.AddRange(characters);
-                    foreach (var u in unitLst)
-                    {
-                        if (exist.Contains(u.data.uid))
-                            continue;
-                        exist.Add(u.data.uid);
-
-                        _super.updateCtrl.CheckCollide(fromMesh, u, to - from, CollideType.CollideOnly, out _, out var assist);
-                        if (assist.GetRes() != Graph.IntersectType.None)
-                        {
-                            res.Add(u);
-                        }
-
-                    }
+                        foreach (var unit in objects)
+                            if (CastCandidate(unit, step, blockersOnly, work))
+                            { if (blockersOnly) return true; hits.Add(unit); }
+                    if (!blockersOnly && _super.updateCtrl.characterOverlapTileDic.TryGet(tile, out var characters))
+                        foreach (var unit in characters)
+                            if (CastCandidate(unit, step, false, work)) hits.Add(unit);
                 }
             }
-            Debug.DrawLine(from, to, Color.green);
-            return res;
+            return false;
+        }
+
+        private bool CastCandidate(MapUnit unit, Vector3 step, bool blockersOnly, CastWork work)
+        {
+            if (!work.seen.Add(unit.data.uid)) return false;
+            if (blockersOnly && !(unit is TileUnit) && !(unit is ObjectUnit obj && obj.data.isObstacle)) return false;
+            return _super.updateCtrl.CheckCollisionState(work.sphere, unit, step, CollideType.CollideOnly, work.state) != Graph.IntersectType.None;
         }
         public List<TileUnit> GetCharacterCollisionTiles(CharacterUnit unit, Vector3 displacement, CollideType type)
         {
             var result = new HashSet<TileUnit>();
+            CollectCharacterCollisionTiles(unit, displacement, type, result);
+            return new List<TileUnit>(result);
+        }
+        public void CollectCharacterCollisionTiles(CharacterUnit unit, Vector3 displacement, CollideType type, HashSet<TileUnit> result)
+        {
             bool hasPoint = false;
             Vector3 min = Vector3.zero;
             Vector3 max = Vector3.zero;
@@ -793,11 +839,15 @@ namespace Z_Map
                     result.Add(tile);
             }
 
-            return new List<TileUnit>(result);
         }
         public List<TileUnit> GetObjectCollisionTiles(ObjectUnit unit, Vector3 displacement, CollideType type)
         {
             var result = new HashSet<TileUnit>();
+            CollectObjectCollisionTiles(unit, displacement, type, result);
+            return new List<TileUnit>(result);
+        }
+        public void CollectObjectCollisionTiles(ObjectUnit unit, Vector3 displacement, CollideType type, HashSet<TileUnit> result)
+        {
             Vector3 cellSize = _super.enable ? GetSafeMapUnitSize() : Vector3.one;
             var owner = unit.belongTile;
             int anchorY = owner != null ? owner.data.mapPos.y : RealPos2MapPosInt(unit.data.pos).y;
@@ -835,7 +885,6 @@ namespace Z_Map
                     }
                 }
             }
-            return new List<TileUnit>(result);
         }
 
         // Swept AABB versus a Tile column. Sharing the contact interval between

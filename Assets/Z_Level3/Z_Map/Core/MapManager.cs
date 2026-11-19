@@ -123,6 +123,8 @@ public class MapManager : Z_MonoManager<MapManager>
     public MapUpdateController updateCtrl;
 
     public bool enable;
+    private bool ownsPhysicsSimulationMode;
+    private SimulationMode previousPhysicsSimulationMode;
 
 
     public override void Init()
@@ -138,7 +140,7 @@ public class MapManager : Z_MonoManager<MapManager>
 
     #region external
 
-    public void Begin(MapInfo data)
+    public void Begin(MapInfo data, bool useUnityPhysicsSimulation = true)
     {
         End();
         Init();
@@ -170,6 +172,15 @@ public class MapManager : Z_MonoManager<MapManager>
         {
             cData.unit.Create();
         }
+        // GameSample uses its own mesh collision/movement solver. Native Colliders
+        // remain available for picking without running fixed-step PhysX simulation.
+        // Acquire only after successful initialization; End/Destroy restore the owner.
+        if (!useUnityPhysicsSimulation)
+        {
+            previousPhysicsSimulationMode = Physics.simulationMode;
+            ownsPhysicsSimulationMode = true;
+            Physics.simulationMode = SimulationMode.Script;
+        }
     }
     #region unit
     public TileUnitForm.Data AddTile(Vector3Int mapPos, object[] prms = null)
@@ -179,7 +190,7 @@ public class MapManager : Z_MonoManager<MapManager>
         updateCtrl.UpdateSingleOne(tData.unit);
         return tData;
     }
-    public ObjectUnitForm.Data AddObject(string name, Vector3 realPos, string prefabName, object[] prms = null)
+    public ObjectUnitForm.Data AddObject(string name, Vector3 realPos, string prefabName, object[] prms = null, Action<ObjectUnitForm.Data> configure = null)
     {
         var mapPos = utilCtrl.RealPos2MapPosInt(realPos);
 
@@ -190,6 +201,7 @@ public class MapManager : Z_MonoManager<MapManager>
         }
         oData.name = name;
         oData.pos = realPos;
+        configure?.Invoke(oData);
         updateCtrl.RefreshObjectOverlap(oData.unit);
         oData.unit.Create();
         return oData;
@@ -297,6 +309,7 @@ public class MapManager : Z_MonoManager<MapManager>
     }
     public void End()
     {
+        RestorePhysicsSimulationMode();
         updateCtrl.End();
 
         if (edgeTransition != null)
@@ -314,6 +327,17 @@ public class MapManager : Z_MonoManager<MapManager>
 
 
     }
+
+    private void RestorePhysicsSimulationMode()
+    {
+        if (!ownsPhysicsSimulationMode) return;
+        ownsPhysicsSimulationMode = false;
+        // Respect a later explicit switch by another simulation owner.
+        if (Physics.simulationMode == SimulationMode.Script)
+            Physics.simulationMode = previousPhysicsSimulationMode;
+    }
+
+    private void OnDestroy() => RestorePhysicsSimulationMode();
 
 
     #endregion

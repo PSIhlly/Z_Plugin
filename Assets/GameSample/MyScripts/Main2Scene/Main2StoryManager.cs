@@ -564,7 +564,7 @@ public class Main2StoryManager : Z_MonoManager<Main2StoryManager>
 
             data.mainData.viewSize = new Vector3Int((int)(InputManager.instance.screenWorldSize.x / 2) + 4 + 1, 5, (int)(InputManager.instance.screenWorldSize.y / 2) + 4 + 1);
 
-            loading.RunStep("scene", phases[3], () => MapManager.instance.Begin(data));
+            loading.RunStep("scene", phases[3], () => MapManager.instance.Begin(data, useUnityPhysicsSimulation: false));
             await loading.WaitForRenderAsync();
             // All visual candidate columns must exist before resolving WangTile
             // collision masks, including off-screen Objects loaded from the save.

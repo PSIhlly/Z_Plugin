@@ -18,7 +18,8 @@ namespace Z_Code
         public override CmdBase GetNew() => new FloatingTextCmd();
         protected override bool ExecuteInternal(BoxDataForm.Data[] prm, InterpretAsyncTask asyncTask)
         {
-            var pos = GameManager.PlayerPosToMapPos(new Vector3(prm[1].dic["x"].num, prm[1].dic["height"].num, prm[1].dic["y"].num));
+            var components1 = prm[1].GetOrCreateDictionary();
+            var pos = GameManager.PlayerPosToMapPos(new Vector3(components1["x"].num, components1["height"].num, components1["y"].num));
             PlayManager.instance.effectCtrl.FloatingText(prm[0].ToString(), pos);
 
             return true;

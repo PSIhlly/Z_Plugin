@@ -27,12 +27,14 @@ namespace Z_Code
         public override CmdBase GetNew() => new GetLookAtRotationCmd();
         protected override bool ExecuteInternal(BoxDataForm.Data[] prm, InterpretAsyncTask asyncTask)
         {
+            var components0 = prm[0].GetOrCreateDictionary();
+            var components1 = prm[1].GetOrCreateDictionary();
             // The command returns a yaw, so height must not influence the facing.
             // World-space delta: the player-facing origin offset cancels out.
             var delta = new Vector3(
-                prm[1].dic["x"].num - prm[0].dic["x"].num,
+                components1["x"].num - components0["x"].num,
                 0f,
-                prm[1].dic["y"].num - prm[0].dic["y"].num);
+                components1["y"].num - components0["y"].num);
             float yaw = delta.x == 0f && delta.z == 0f
                 ? 0f
                 : Mathf.Repeat(Mathf.Atan2(delta.x, delta.z) * Mathf.Rad2Deg, 360f);

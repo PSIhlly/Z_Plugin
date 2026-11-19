@@ -7,6 +7,8 @@ param(
     [switch]$SceneCommands,
     [switch]$ItemPicking,
     [switch]$LineOfSight,
+    [switch]$InterpreterBenchmark,
+    [switch]$QueryOnlyPhysics,
     [switch]$SkipBuild,
     [string]$GifReferenceDirectory,
     [string]$ProjectileEventDirectory
@@ -31,6 +33,7 @@ $bindingRelative = 'Assets/Z_Level0/Z_Shader/Func/DisDark/DisFadeMaterialBinding
 $includedSources = @($runtimeProject.SelectNodes("//*[local-name()='Compile']") |
     ForEach-Object { $_.Include.Replace('\', '/') })
 $missingSources = @(@($bindingRelative,
+    'Assets/GameSample/MyScripts/Main/Event/GameEventUnitSubscriptions.cs',
     'Assets/Z_Level3/Z_UI/Core/Basic/Frame/UiTreeContainer.cs',
     'Assets/Z_Level3/Z_UI/Core/Basic/Frame/UiTreeLayout.cs',
     'Assets/GameSample/Forms/ExcelCs/ObjectProductForm.cs',
@@ -61,7 +64,7 @@ $missingSources = @(@($bindingRelative,
     Where-Object { $_ -notin $includedSources })
 $buildArguments = @('build', $runtimeProjectPath, '--no-restore', '--nologo', '-v:quiet', '-m:1',
     '-p:BuildInParallel=false', '-p:UseSharedCompilation=false')
-if ($missingSources.Count -gt 0 -or 'Assets/GameSample/MyScripts/Main/ObjectProductForm.Runtime.cs' -in $includedSources) {
+if (!$SkipBuild -or $Fixture -eq 'CodeInterpreterRuntimeRegression') {
     # Unity can briefly leave generated project files stale after new source is
     # added or removed. Correct only this validation build's source list, never edit the
     # generated .csproj or add Assembly-CSharp source to lower project refs.
@@ -74,7 +77,36 @@ if ($missingSources.Count -gt 0 -or 'Assets/GameSample/MyScripts/Main/ObjectProd
         $targetSource += '<Compile Include="' + $absolute + '" />'
     }
     $targetSource += '<Compile Remove="Assets/GameSample/MyScripts/Main/ObjectProductForm.Runtime.cs" />'
-    $targetSource += '</ItemGroup></Project>'
+    $targetSource += '</ItemGroup>'
+    # Other generated projects may still reference a previous Editor install.
+    # Remap only this build's missing Editor binaries, without rewriting csproj files.
+    $editorDirectory = Split-Path -Parent $UnityEditor
+    foreach ($projectFile in Get-ChildItem -LiteralPath $ProjectRoot -Filter '*.csproj' -File) {
+        [xml]$projectXml = Get-Content -LiteralPath $projectFile.FullName -Raw
+        $items = ''
+        foreach ($reference in $projectXml.SelectNodes("//*[local-name()='Reference']")) {
+            $hint = [string]$reference.HintPath
+            $marker = $hint.IndexOf('\Editor\Data\', [StringComparison]::OrdinalIgnoreCase)
+            if ($marker -lt 0 -or (Test-Path -LiteralPath $hint)) { continue }
+            $replacement = Join-Path $editorDirectory $hint.Substring($marker + 8)
+            if (!(Test-Path -LiteralPath $replacement)) { continue }
+            $include = [Security.SecurityElement]::Escape($reference.Include)
+            $path = [Security.SecurityElement]::Escape($replacement)
+            $items += '<Reference Remove="' + $include + '" /><Reference Include="' + $include + '"><HintPath>' + $path + '</HintPath><Private>False</Private></Reference>'
+        }
+        foreach ($analyzer in $projectXml.SelectNodes("//*[local-name()='Analyzer']")) {
+            $hint = [string]$analyzer.Include
+            $marker = $hint.IndexOf('\Editor\Data\', [StringComparison]::OrdinalIgnoreCase)
+            if ($marker -lt 0 -or (Test-Path -LiteralPath $hint)) { continue }
+            $replacement = Join-Path $editorDirectory $hint.Substring($marker + 8)
+            if (!(Test-Path -LiteralPath $replacement)) { continue }
+            $items += '<Analyzer Remove="' + [Security.SecurityElement]::Escape($hint) + '" /><Analyzer Include="' + [Security.SecurityElement]::Escape($replacement) + '" />'
+        }
+        if ($items) {
+            $targetSource += '<ItemGroup Condition="''$(MSBuildProjectName)'' == ''' + $projectFile.BaseName + '''">' + $items + '</ItemGroup>'
+        }
+    }
+    $targetSource += '</Project>'
     [IO.File]::WriteAllText($validationTargets, $targetSource)
     $buildArguments += '-p:CustomAfterMicrosoftCommonTargets=' + $validationTargets
 }
@@ -83,7 +115,9 @@ if (!$SkipBuild) {
     if ($LASTEXITCODE -ne 0) { throw "Production build failed." }
 }
 if ($Fixture -eq 'CodeInterpreterRuntimeRegression') {
-    & dotnet build (Join-Path $ProjectRoot 'Z_Code.Tests.Editor.csproj') --no-restore --nologo -v:quiet -m:1 -p:BuildInParallel=false -p:UseSharedCompilation=false
+    $interpreterTestArguments = @('build', (Join-Path $ProjectRoot 'Z_Code.Tests.Editor.csproj'), '--no-restore', '--nologo', '-v:quiet', '-m:1', '-p:BuildInParallel=false', '-p:UseSharedCompilation=false')
+    if ($validationTargets) { $interpreterTestArguments += '-p:CustomAfterMicrosoftCommonTargets=' + $validationTargets }
+    & dotnet @interpreterTestArguments
     if ($LASTEXITCODE -ne 0) { throw 'Interpreter test build failed.' }
 }
 $testProject = Join-Path $ProjectRoot ("Temp/MapRuntimeRegression-" + [guid]::NewGuid().ToString("N"))
@@ -113,8 +147,13 @@ if ($Fixture -eq 'CodeInterpreterRuntimeRegression') {
     $nunitPackage = Get-ChildItem -LiteralPath (Join-Path $ProjectRoot 'Library/PackageCache') -Directory -Filter 'com.unity.ext.nunit@*' | Select-Object -First 1
     if (!$nunitPackage) { throw 'The cached NUnit dependency is missing.' }
     Copy-Item -LiteralPath (Join-Path $nunitPackage.FullName 'net35/unity-custom/nunit.framework.dll') -Destination "$testProject/Assets/Plugins"
-    New-Item -ItemType Directory -Path "$testProject/ExtraAssets/2/Core" -Force | Out-Null
-    Copy-Item -LiteralPath (Join-Path $ProjectRoot 'ExtraAssets/2/Core/ef') -Destination "$testProject/ExtraAssets/2/Core/ef"
+    foreach ($story in Get-ChildItem -LiteralPath (Join-Path $ProjectRoot 'ExtraAssets') -Directory) {
+        $eventFile = Join-Path $story.FullName 'Core/ef'
+        if (!(Test-Path -LiteralPath $eventFile)) { continue }
+        $targetFolder = Join-Path $testProject ('ExtraAssets/' + $story.Name + '/Core')
+        New-Item -ItemType Directory -Path $targetFolder -Force | Out-Null
+        Copy-Item -LiteralPath $eventFile -Destination (Join-Path $targetFolder 'ef')
+    }
 }
 if ($Fixture -in @('PlayAssetTextRegression', 'CanvasToastRegression', 'UiTreeContainerRegression')) {
     if ($Fixture -eq 'PlayAssetTextRegression') {
@@ -241,7 +280,9 @@ if ($Fixture -eq 'GifDecoderRegression' -and $GifReferenceDirectory) {
 }
 $logPath = Join-Path $testProject "regression.log"
 $graphicsArguments = if ($Fixture -in @('MapFadeShaderRegression', 'MapShadowBiasRegression', 'MapShadowReceiverRegression', 'DisFadeBatchingRegression', 'SceneBehaviourTriggerRegression')) { '-force-d3d11' } else { '-nographics' }
-$entryPoint = if ($LineOfSight -and $Fixture -eq 'StoryTargetSelectionRegression') { 'RunLineOfSight' }
+$entryPoint = if ($InterpreterBenchmark -and $Fixture -eq 'CodeInterpreterRuntimeRegression') { 'RunBenchmark' }
+    elseif ($QueryOnlyPhysics -and $Fixture -eq 'ModSceneHistoryRuntimeRegression') { 'RunQueryOnlyPhysics' }
+    elseif ($LineOfSight -and $Fixture -eq 'StoryTargetSelectionRegression') { 'RunLineOfSight' }
     elseif ($ItemPicking -and $Fixture -eq 'ModSceneHistoryRuntimeRegression') { 'RunItemPicking' }
     elseif ($CharacterPlayLifecycle -and $Fixture -eq 'MapTextureRuntimeRegression') { 'RunCharacterPlayLifecycle' }
     elseif ($SceneCommands -and $Fixture -eq 'MapRuntimeRegression') { 'RunSceneCommands' } else { 'Run' }
@@ -309,6 +350,13 @@ $successMarker = switch ($Fixture) {
     'MapEdgeTransitionRegression' { 'MAP_EDGE_TRANSITION_REGRESSION_PASS' }
     'StoryPackageImportRegression' { 'STORY_PACKAGE_IMPORT_REGRESSION_PASS' }
     default { 'MAP_RUNTIME_REGRESSION_PASS' }
+}
+if ($InterpreterBenchmark -and $Fixture -eq 'CodeInterpreterRuntimeRegression') {
+    $successMarker = 'INTERPRETER_HOT_PATH_BENCHMARK_PASS'
+    Select-String -LiteralPath $logPath -Pattern 'INTERPRETER_BENCHMARK ' | ForEach-Object { $_.Line }
+}
+if ($QueryOnlyPhysics -and $Fixture -eq 'ModSceneHistoryRuntimeRegression') {
+    $successMarker = 'MAP_QUERY_ONLY_PHYSICS_REGRESSION_PASS'
 }
 $passed = Select-String -LiteralPath $logPath -Pattern $successMarker
 if ($ItemPicking -and $Fixture -eq 'ModSceneHistoryRuntimeRegression') {

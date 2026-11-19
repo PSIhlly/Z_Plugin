@@ -18,25 +18,23 @@ namespace Z_Code
         public override CmdBase GetNew() => new SetRotationCmd();
         protected override bool ExecuteInternal(BoxDataForm.Data[] prm, InterpretAsyncTask asyncTask)
         {
+            float angle = prm[1].num;
+            float duration = prm[2].num;
+            if (float.IsNaN(angle) || float.IsInfinity(angle) || float.IsNaN(duration) || float.IsInfinity(duration)) return true;
+            float targetYaw = Mathf.Repeat(angle, 360f);
             var units = SceneUnitCommand.ResolveAll(prm[0].str);
+            if (duration <= 0)
+            {
+                // ResolveAll already snapshots owners. Instant rotation needs no per-target transition objects.
+                foreach (var unit in units)
+                    if (SceneUnitCommand.CanMove(unit) && SceneUnitCommand.IsLive(unit, unit.data)) SetYaw(unit, targetYaw);
+                return true;
+            }
             var rotations = new List<PendingRotation>();
             foreach (var unit in units)
                 if (SceneUnitCommand.CanMove(unit))
                     rotations.Add(new PendingRotation { unit = unit, data = unit.data, startYaw = unit.data.euler.y });
             if (rotations.Count == 0) return true;
-            float angle = prm[1].num;
-            float duration = prm[2].num;
-            if (float.IsNaN(angle) || float.IsInfinity(angle)
-                || float.IsNaN(duration) || float.IsInfinity(duration))
-                return true;
-            float targetYaw = Mathf.Repeat(angle, 360f);
-            if (duration <= 0)
-            {
-                foreach (var rotation in rotations)
-                    if (SceneUnitCommand.IsLive(rotation.unit, rotation.data))
-                        SetYaw(rotation.unit, targetYaw);
-                return true;
-            }
 
             // Each target owns its original identity/start angle for the whole transition.
             GameManager.instance.evtCtrl.StartTask(asyncTask, () =>
@@ -87,6 +85,11 @@ namespace Z_Code
             if (unit is CharacterUnit character)
             {
                 character.forceEuler = euler;
+                if (unit.data.euler == euler)
+                {
+                    if (unit.ins != null) unit.ins.transform.eulerAngles = euler;
+                    return;
+                }
                 unit.data.euler = euler;
                 if (unit.ins != null)
                     unit.ins.transform.eulerAngles = euler;
@@ -94,6 +97,11 @@ namespace Z_Code
             }
             else if (unit is ObjectUnit obj)
             {
+                if (unit.data.euler == euler)
+                {
+                    if (unit.ins != null) unit.ins.transform.eulerAngles = euler;
+                    return;
+                }
                 MapManager.instance.updateCtrl.ApplyMove(obj, obj.data.pos, euler, teleport: true);
                 Z_EventHelper.Invoke(new ObjectEvent { type = MapEventType.Move, unit = obj });
             }

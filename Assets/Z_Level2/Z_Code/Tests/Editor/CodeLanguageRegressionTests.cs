@@ -173,49 +173,236 @@ namespace Z_Code.Tests
             }
         }
 
+        private sealed class ContextProbeCmd : CmdBase
+        {
+            internal readonly List<InterpretDataForm.Data> frames = new List<InterpretDataForm.Data>();
+            internal readonly List<int> roots = new List<int>();
+            internal Action<InterpretAsyncTask> onExecute;
+            public override string GetName() => "Len";
+            public override CmdBase GetNew() => this;
+            protected override bool ExecuteInternal(BoxDataForm.Data[] prm, InterpretAsyncTask task)
+            {
+                frames.Add(task.interpreter.data);
+                roots.Add(task.interpreter.data.rootUid);
+                onExecute?.Invoke(task);
+                task.res = new[] { prm[0] };
+                return true;
+            }
+        }
+
+        [Test]
+        public void SubProgramContext_ReusesContainersAndInterpreterWithoutChangingPublishedValues()
+        {
+            string probeName = "FrameProbe_" + Guid.NewGuid().ToString("N");
+            string functionName = "FrameChild_" + Guid.NewGuid().ToString("N");
+            var probe = new ContextProbeCmd();
+            using (new RegistryEntry<CmdBase>(BaseData.cmdDic, probeName, probe))
+            {
+                var function = CompileProgram(functionName, $"{probeName}(param1);param1.x+=1;Return param1;", "pooled dictionary child");
+                using (new RegistryEntry<ProgramDataForm.Data>(ProgramDataForm.DataByName, functionName, function))
+                {
+                    var program = CompileProgram("FrameParent", $"Return {functionName}(value);", "pooled parent");
+                    var first = CreateInterpret(program); first.uid = 18001;
+                    var argument = CodeHelper.CreateBox(); argument.dic["x"] = CodeHelper.CreateBoxByNum(2);
+                    first.heap["value"] = argument;
+                    var result = RunToCompletion(first, program.code);
+                    Assert.That(result.ret.dic["x"].num, Is.EqualTo(3));
+                    Assert.That(argument.dic["x"].num, Is.EqualTo(3), "copy-out parameters remain writable");
+                    var frame = probe.frames.Single();
+                    var interpreterField = typeof(InterpretDataForm.Data).GetField("_interpreter", BindingFlags.Instance | BindingFlags.NonPublic);
+                    var interpreter = interpreterField.GetValue(frame);
+                    Assert.That(frame.program, Is.Null);
+                    Assert.That(frame.heap, Is.Empty);
+                    Assert.That(frame.stack, Is.Empty);
+                    Assert.That(frame.heapTemp, Is.Empty);
+                    Assert.That(frame.rootUid, Is.Zero);
+
+                    var second = CreateInterpret(program); second.uid = 18002;
+                    var secondArgument = CodeHelper.CreateBox(); secondArgument.dic["x"] = CodeHelper.CreateBoxByNum(8);
+                    second.heap["value"] = secondArgument;
+                    var nextResult = RunToCompletion(second, program.code);
+                    Assert.That(probe.frames[1], Is.SameAs(frame));
+                    Assert.That(interpreterField.GetValue(frame), Is.SameAs(interpreter));
+                    Assert.That(probe.roots, Is.EqualTo(new[] { 18001, 18002 }));
+                    Assert.That(nextResult.ret.dic["x"].num, Is.EqualTo(9));
+                    Assert.That(result.ret.dic["x"].num, Is.EqualTo(3), "reuse must never clear or mutate an escaped result dictionary");
+                }
+            }
+        }
+
+        [Test]
+        public void SubProgramContext_WaitingCallsStayIndependentAndCancelledCallsNeverReenterThePool()
+        {
+            string alias = "FrameWait_" + Guid.NewGuid().ToString("N");
+            string functionName = "WaitingFrame_" + Guid.NewGuid().ToString("N");
+            var state = new DelayedProbeState();
+            using (new RegistryEntry<CmdBase>(BaseData.cmdDic, alias, new DelayedProbeCmd(state)))
+            {
+                var function = CompileProgram(functionName, $"Return {alias}(param1);", "waiting frame child");
+                using (new RegistryEntry<ProgramDataForm.Data>(ProgramDataForm.DataByName, functionName, function))
+                {
+                    var program = CompileProgram("WaitingFrameParent", $"Return {functionName}(7);", "waiting frame parent");
+                    var first = CreateInterpret(program); var second = CreateInterpret(program);
+                    Assert.That(first.Interpret().complete, Is.False);
+                    var firstFrame = first.subInterpret; var firstTask = state.Task;
+                    Assert.That(second.Interpret().complete, Is.False);
+                    var secondFrame = second.subInterpret; var secondTask = state.Task;
+                    Assert.That(firstFrame, Is.Not.SameAs(secondFrame));
+                    Assert.That(firstFrame.heap, Is.Not.SameAs(secondFrame.heap));
+                    Assert.That(firstFrame.heap.Keys.Single(), Is.SameAs(secondFrame.heap.Keys.Single()), "parameter names are shared immutable strings");
+                    firstTask.res = new[] { CodeHelper.CreateBoxByNum(11) }; firstTask.Complete();
+                    Assert.That(RunToCompletion(first, program.code).ret.num, Is.EqualTo(11));
+                    Assert.That(second.subInterpret, Is.SameAs(secondFrame));
+                    second.Cancel();
+                    Assert.That(secondTask.IsCancelled(), Is.True);
+                    var third = CreateInterpret(program);
+                    Assert.That(third.Interpret().complete, Is.False);
+                    Assert.That(third.subInterpret, Is.SameAs(firstFrame));
+                    Assert.That(third.subInterpret, Is.Not.SameAs(secondFrame));
+                    Assert.That(secondTask.IsCancelled(), Is.True, "a retained cancelled task cannot become active after another rent");
+                    third.Reset();
+                    Assert.That(third.subInterpret, Is.Null);
+                    Assert.That(state.Task.IsCancelled(), Is.True, "reset retires a waiting child's callbacks too");
+                }
+            }
+        }
+
+        [Test]
+        public void SubProgramContext_CancellationInsideAnActiveChildCannotRunTheParentsNextInstruction()
+        {
+            string alias = "FrameCancel_" + Guid.NewGuid().ToString("N");
+            string name = "CancelledFrame_" + Guid.NewGuid().ToString("N");
+            var probe = new ContextProbeCmd();
+            using (new RegistryEntry<CmdBase>(BaseData.cmdDic, alias, probe))
+            {
+                var function = CompileProgram(name, $"Return {alias}(param1);", "active child cancellation");
+                using (new RegistryEntry<ProgramDataForm.Data>(ProgramDataForm.DataByName, name, function))
+                {
+                    var program = CompileProgram("FrameCancellationParent", $"{name}(2);after=1;", "parent must stop");
+                    var parent = CreateInterpret(program);
+                    probe.onExecute = _ => parent.Cancel();
+                    var result = parent.Interpret();
+                    Assert.That(result.complete, Is.True);
+                    Assert.That(result.errors, Is.Empty);
+                    Assert.That(parent.heap.ContainsKey("after"), Is.False);
+                    var cancelledFrame = probe.frames.Single();
+                    Assert.That(cancelledFrame.IsCancelled, Is.True);
+                    probe.onExecute = null;
+                    RunToCompletion(CreateInterpret(program), program.code);
+                    Assert.That(probe.frames[1], Is.Not.SameAs(cancelledFrame));
+                    Assert.That(cancelledFrame.IsCancelled, Is.True);
+                }
+            }
+        }
+
+        [Test]
+        public void SubProgramContext_RecursiveCallsHaveSeparateLiveFrames()
+        {
+            string alias = "RecursiveFrameProbe_" + Guid.NewGuid().ToString("N");
+            string name = "FrameFactorial_" + Guid.NewGuid().ToString("N");
+            var probe = new ContextProbeCmd();
+            var function = new ProgramDataForm.Data(-1, name, "", new List<string>(), new List<int>(), 1, "var");
+            using (new RegistryEntry<CmdBase>(BaseData.cmdDic, alias, probe))
+            using (new RegistryEntry<ProgramDataForm.Data>(ProgramDataForm.DataByName, name, function))
+            {
+                Assert.That(function.TryApplyCode($"{alias}(param1);if(param1<=1){{Return 1;}}Return param1*{name}(param1-1);", out _, out var errors), Is.True,
+                    string.Join(Environment.NewLine, errors));
+                var program = CompileProgram("RecursiveFrameParent", $"Return {name}(5);", "recursive frames");
+                Assert.That(RunToCompletion(CreateInterpret(program), program.code).ret.num, Is.EqualTo(120));
+                Assert.That(probe.frames.Distinct().Count(), Is.EqualTo(5));
+                Assert.That(probe.frames.All(frame => frame.program == null && frame.heap.Count == 0), Is.True);
+            }
+        }
+
+        [Test]
+        public void CommandArguments_ScalarsKeepNullDictionariesAndDictionaryReadersAcceptEmptyInputs()
+        {
+            var command = new MutatingBoxProbeCmd(); var value = CodeHelper.CreateBoxByNum(3);
+            var task = new InterpretAsyncTask(null);
+            command.Execute(new[] { value }, new Dictionary<string, BoxDataForm.Data>(), task);
+            Assert.That(task.error, Is.Null);
+            Assert.That(value.num, Is.EqualTo(4));
+            Assert.That(value.dic, Is.Null, "ordinary scalar commands must not manufacture a writable dictionary");
+            foreach (var reader in new CmdBase[] { new GetKeysCmd(), new GetValuesCmd(), new LenCmd() })
+            {
+                var scalar = CodeHelper.CreateBoxByNum(5); var read = new InterpretAsyncTask(null);
+                reader.Execute(new[] { scalar }, new Dictionary<string, BoxDataForm.Data>(), read);
+                Assert.That(read.error, Is.Null, reader.GetName());
+                Assert.That(scalar.dic, Is.Null, reader.GetName());
+                Assert.That(read.res[0].dic?.Count ?? 0, Is.Zero, reader.GetName());
+            }
+        }
+
+        [Test]
+        public void SubProgramContext_WarmedCallsAllocateLessThanFreshFrames()
+        {
+            string name = "AllocationFrame_" + Guid.NewGuid().ToString("N");
+            var function = CompileProgram(name, "Return param1+1;", "allocation child");
+            using (new RegistryEntry<ProgramDataForm.Data>(ProgramDataForm.DataByName, name, function))
+            {
+                var program = CompileProgram("AllocationFrameParent", $"Return {name}(1);", "allocation parent");
+                var parent = CreateInterpret(program);
+                var reset = (Action)Delegate.CreateDelegate(typeof(Action), typeof(Interpreter).GetMethod("ResetSubProgramPool", BindingFlags.NonPublic | BindingFlags.Static));
+                Action invoke = () => { parent.Reset(); allocationSink = parent.Interpret(); };
+                Action cold = () => { reset(); invoke(); };
+                var sinkBefore = GC.GetAllocatedBytesForCurrentThread(); allocationSink = new byte[16384];
+                bool counterWorks = GC.GetAllocatedBytesForCurrentThread() > sinkBefore;
+                long coldBytes = MeasureAllocations(cold);
+                long warmBytes = MeasureAllocations(invoke);
+                Debug.Log($"SUBPROGRAM_POOL_ALLOCATION iterations=256 cold={coldBytes} warm={warmBytes} counter={counterWorks}");
+                if (counterWorks) Assert.That(warmBytes, Is.LessThan(coldBytes));
+                Assert.That(((InterpretDataForm.RetInfo)allocationSink).ret.num, Is.EqualTo(2));
+            }
+        }
+
         [Test]
         public void ExistingEfPrograms_CompileWithoutErrorsOrCarriageReturnOperands()
         {
-            var efPath = Path.GetFullPath(Path.Combine(Application.dataPath, "../ExtraAssets/2/Core/ef"));
-            Assert.That(File.Exists(efPath), Is.True, $"Missing legacy ef fixture: {efPath}");
-
-            var json = File.ReadAllText(efPath);
-            var envelope = JsonUtility.FromJson<EfEnvelope>($"{{\"records\":{json}}}");
-            Assert.That(envelope, Is.Not.Null);
-            Assert.That(envelope.records, Is.Not.Null.And.Length.GreaterThan(0));
-
-            var programs = new List<IDisposable>();
-            try
+            var storyRoot = Path.GetFullPath(Path.Combine(Application.dataPath, "../ExtraAssets"));
+            var paths = Directory.Exists(storyRoot)
+                ? Directory.GetDirectories(storyRoot).Select(folder => Path.Combine(folder, "Core/ef")).Where(File.Exists).OrderBy(path => path).ToArray()
+                : Array.Empty<string>();
+            Assert.That(paths, Is.Not.Empty, $"Missing authored ef fixtures under {storyRoot}");
+            foreach (var efPath in paths)
             {
-                // Match LoadEvent: register all names before compiling any forward/self calls.
-                foreach (var record in envelope.records)
-                    programs.Add(new RegistryEntry<ProgramDataForm.Data>(ProgramDataForm.DataByName,
-                        record.name, new ProgramDataForm.Data(-1, record.name, record.code,
-                            new List<string>(), new List<int>(), record.paramCount, record.returnValue)));
+                var json = File.ReadAllText(efPath);
+                var envelope = JsonUtility.FromJson<EfEnvelope>($"{{\"records\":{json}}}");
+                Assert.That(envelope, Is.Not.Null);
+                Assert.That(envelope.records, Is.Not.Null.And.Length.GreaterThan(0));
 
-                foreach (var record in envelope.records)
+                var programs = new List<IDisposable>();
+                try
                 {
-                    var zCode = Compile(
-                        record.code,
-                        out var zCodeMap,
-                        out var paramCount,
-                        out var returnValue,
-                        $"ef uid={record.uid}, name={record.name}");
+                    // Match LoadEvent: register all names before compiling any forward/self calls.
+                    foreach (var record in envelope.records)
+                        programs.Add(new RegistryEntry<ProgramDataForm.Data>(ProgramDataForm.DataByName,
+                            record.name, new ProgramDataForm.Data(-1, record.name, record.code,
+                                new List<string>(), new List<int>(), record.paramCount, record.returnValue)));
 
-                    Assert.That(zCode.All(operand => operand == null || !operand.Contains("\r")), Is.True,
-                        $"ef uid={record.uid}, name={record.name} compiled a CR into an operand");
-                    Assert.That(zCodeMap, Has.Count.EqualTo(zCode.Count));
-                    Assert.That(zCodeMap.All(index => index >= 0 && index < record.code.Length), Is.True,
-                        $"ef uid={record.uid}, name={record.name} has an invalid source map");
-                    Assert.That(paramCount, Is.EqualTo(record.paramCount),
-                        $"ef uid={record.uid}, name={record.name} changed its parameter contract");
-                    Assert.That(returnValue, Is.EqualTo(record.returnValue),
-                        $"ef uid={record.uid}, name={record.name} changed its return contract");
+                    foreach (var record in envelope.records)
+                    {
+                        var zCode = Compile(
+                            record.code,
+                            out var zCodeMap,
+                            out var paramCount,
+                            out var returnValue,
+                            $"ef uid={record.uid}, name={record.name}");
+
+                        Assert.That(zCode.All(operand => operand == null || !operand.Contains("\r")), Is.True,
+                            $"ef uid={record.uid}, name={record.name} compiled a CR into an operand");
+                        Assert.That(zCodeMap, Has.Count.EqualTo(zCode.Count));
+                        Assert.That(zCodeMap.All(index => index >= 0 && index < record.code.Length), Is.True,
+                            $"ef uid={record.uid}, name={record.name} has an invalid source map");
+                        Assert.That(paramCount, Is.EqualTo(record.paramCount),
+                            $"ef uid={record.uid}, name={record.name} changed its parameter contract");
+                        Assert.That(returnValue, Is.EqualTo(record.returnValue),
+                            $"ef uid={record.uid}, name={record.name} changed its return contract");
+                    }
                 }
-            }
-            finally
-            {
-                for (int i = programs.Count - 1; i >= 0; i--) programs[i].Dispose();
+                finally
+                {
+                    for (int i = programs.Count - 1; i >= 0; i--) programs[i].Dispose();
+                }
             }
         }
 
@@ -885,7 +1072,7 @@ Return owner.value+items[""key""];";
         }
 
         [Test]
-        public void ScalarBoxes_CreateDictionariesOnlyForMemberAccessOrCommandArguments()
+        public void ScalarBoxes_CreateDictionariesOnlyOnExplicitDemand()
         {
             var number = CodeHelper.CreateBoxByNum(7f);
             var text = CodeHelper.CreateBoxByStr("text");
@@ -1070,7 +1257,9 @@ Return owner.value+items[""key""];";
                 Assert.That(data.Interpret().complete, Is.False);
                 var retained = state.Parameters[0];
                 Assert.That(retained.num, Is.EqualTo(expected));
-                Assert.That(retained.dic, Is.Not.Null.And.Empty, "commands retain their writable dictionary API");
+                Assert.That(retained.dic, Is.Null, "retaining a scalar argument does not require dictionary storage");
+                Assert.That(retained.GetOrCreateDictionary(), Is.SameAs(retained.dic).And.Empty,
+                    "a command can still request its writable dictionary explicitly");
                 for (int i = 0; i < 4; i++)
                 {
                     Assert.That(data.Interpret().complete, Is.False);

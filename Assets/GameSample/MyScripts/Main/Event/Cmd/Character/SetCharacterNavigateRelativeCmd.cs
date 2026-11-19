@@ -27,6 +27,7 @@ namespace Z_Code
         public override CmdBase GetNew() => new SetCharacterNavigateRelativeCmd();
         protected override bool ExecuteInternal(BoxDataForm.Data[] prm, InterpretAsyncTask asyncTask)
         {
+            var components1 = prm[1].GetOrCreateDictionary();
             if (!CharacterProductForm.TryGetReferenceUid(prm[0].str, out var uid))
                 return true;
             foreach (var data in PlayManager.instance.sceneCtrl.GetCharacterUnits(uid))
@@ -35,7 +36,7 @@ namespace Z_Code
                 data.speed = SetCharacterNavigateCmd.GetNavigationSpeed(productData, data.speed);
                 data.pathDis = 999;
                 data.alertDis = 999;
-                data.destination = data.pos + new Vector3(prm[1].dic["x"].num, prm[1].dic["height"].num, prm[1].dic["y"].num);
+                data.destination = data.pos + new Vector3(components1["x"].num, components1["height"].num, components1["y"].num);
 
                 productData.enableNav = true;
             }

@@ -34,22 +34,9 @@ namespace Z_Code
                 && map.data != null && map.utilCtrl != null && map.updateCtrl != null
                 && map.utilCtrl.GetPlacementTile(position) != null)
             {
-                var key = data.uid.ToString();
-
-                var newObjectData = map.AddObject(key, position, GlobalDefaultHelper.GetRuntimeMapObjectPrefabName(ObjectProductForm.GetTemplateUid(data)), null);
-
+                var newObjectData = GameManager.instance.mapCtrl.GenerateObject(data, position);
                 if (newObjectData != null)
                 {
-                    // Selecting an existing instance copies its Product details;
-                    // the new placement must never share mutable state with it.
-                    if (data.protoUid != 0)
-                    {
-                        var copy = data.Copy(false);
-                        copy.ToProduct(ObjectProductForm.GetTemplateUid(data));
-                        data = copy;
-                    }
-                    GameManager.instance.mapCtrl.RegisterObject(newObjectData, data);
-                    MapManager.instance.updateCtrl.UpdateSingleOne(newObjectData.unit);
                     asyncTask.res = new BoxDataForm.Data[] { CodeHelper.CreateBoxByStr(GlobalEventHelper.GetSceneObjectReference(newObjectData.unit)) };
                     return true;
                 }

@@ -45,19 +45,76 @@ public static class ModSceneHistoryRuntimeRegression
     private static ModSceneHistory history;
     private static readonly HashSet<Type> registered = new HashSet<Type>();
 
+    private static void SetUpPickingCamera()
+    {
+        var camera = CreateManager<CameraInstance>();
+        var cameraGo = new GameObject("item-picking-camera");
+        cameraGo.transform.SetParent(camera.transform, false);
+        var component = cameraGo.AddComponent<Camera>();
+        component.orthographic = true;
+        component.orthographicSize = 5.2f;
+        typeof(CameraInstance).GetField("_cam", PrivateInstance).SetValue(camera, component);
+        CreateManager<InputManager>().screenSize = new Vector2(800, 600);
+    }
+
+    public static void RunQueryOnlyPhysics()
+    {
+        var originalMode = Physics.simulationMode;
+        bool autoSync = Physics.autoSyncTransforms;
+        bool edge = DynamicGlobalSettings.edgeTransition;
+        try
+        {
+            Physics.simulationMode = SimulationMode.Update;
+            Physics.autoSyncTransforms = false;
+            DynamicGlobalSettings.edgeTransition = false;
+            Initialize();
+            Check(Physics.simulationMode == SimulationMode.Script, "GameSample map disables automatic PhysX steps");
+            Check(map.mainGo.GetComponentsInChildren<Rigidbody>(true).Length == 0, "query-only fixture has no native Rigidbody");
+            SetUpPickingCamera();
+            ObjectSelectionCyclesRayCandidates();
+            var mainData = map.data.mainData;
+            MapInfo Empty() => new MapInfo { mainData = mainData,
+                maps = new Dictionary<(int, int, int), TileUnitForm.Data>(),
+                mapXZ2Y = new Dictionary<(int, int), SortedSet<int>>() };
+            map.End();
+            Check(Physics.simulationMode == SimulationMode.Update, "End restores the exact prior simulation mode");
+            foreach (var mode in new[] { SimulationMode.FixedUpdate, SimulationMode.Update, SimulationMode.Script })
+            {
+                Physics.simulationMode = mode;
+                map.Begin(Empty(), useUnityPhysicsSimulation: false);
+                Check(Physics.simulationMode == SimulationMode.Script, "query-only Begin works from " + mode);
+                map.Begin(Empty());
+                Check(Physics.simulationMode == mode, "replacing a query-only map with a normal map restores " + mode);
+                map.End();
+                Check(Physics.simulationMode == mode, "normal map End keeps its owner's mode");
+            }
+            Physics.simulationMode = SimulationMode.Update;
+            map.Begin(Empty(), useUnityPhysicsSimulation: false);
+            Physics.simulationMode = SimulationMode.FixedUpdate;
+            map.End();
+            Check(Physics.simulationMode == SimulationMode.FixedUpdate, "End respects a later explicit simulation owner");
+            Debug.Log("MAP_QUERY_ONLY_PHYSICS_REGRESSION_PASS checks=" + checks);
+            EditorApplication.Exit(0);
+        }
+        catch (Exception exception)
+        {
+            Debug.LogException(exception);
+            EditorApplication.Exit(1);
+        }
+        finally
+        {
+            Physics.simulationMode = originalMode;
+            Physics.autoSyncTransforms = autoSync;
+            DynamicGlobalSettings.edgeTransition = edge;
+        }
+    }
+
     public static void RunItemPicking()
     {
         try
         {
             Initialize();
-            var camera = CreateManager<CameraInstance>();
-            var cameraGo = new GameObject("item-picking-camera");
-            cameraGo.transform.SetParent(camera.transform, false);
-            var component = cameraGo.AddComponent<Camera>();
-            component.orthographic = true;
-            component.orthographicSize = 5.2f;
-            typeof(CameraInstance).GetField("_cam", PrivateInstance).SetValue(camera, component);
-            CreateManager<InputManager>().screenSize = new Vector2(800, 600);
+            SetUpPickingCamera();
             ObjectSelectionCyclesRayCandidates();
             Debug.Log("MOD_SCENE_ITEM_PICKING_REGRESSION_PASS checks=" + checks);
             EditorApplication.Exit(0);
@@ -274,7 +331,7 @@ public static class ModSceneHistoryRuntimeRegression
 
         DynamicGlobalSettings.playing = false;
         DynamicGlobalSettings.cameraMode = CameraMode.Overhead;
-        map.Begin(mapData);
+        map.Begin(mapData, useUnityPhysicsSimulation: false);
         map.SetPos(new Vector3(12, 0, 12));
         // Synchronize save-time caches before any history baseline is taken.
         mapData.GetJsonData();
@@ -340,7 +397,6 @@ public static class ModSceneHistoryRuntimeRegression
             controller.designType = mode; camera.tarTrs.position = new Vector3(10, height, 10);
             cam.transform.eulerAngles = Vector3.right * pitch;
             cam.transform.position = camera.tarTrs.position - cam.transform.forward * 12;
-            Physics.SyncTransforms();
             Vector3 screen = cam.WorldToScreenPoint(new Vector3(10, height, 10)); probes[mode].selected = null;
             controller.OnEvent(new InputMouseDownEvent { id = 0, pos = screen });
             controller.OnEvent(new InputMouseUpEvent { id = 0, pos = screen }); return probes[mode].selected;
@@ -371,6 +427,15 @@ public static class ModSceneHistoryRuntimeRegression
             }
             // Tile hits join the same cycle in Event mode; ordinary mode keeps
             // its original Object/Character/Item-only candidate types.
+            // Production click must synchronize moved Colliders itself.
+            Physics.SyncTransforms();
+            var originalHighestPosition = highest.unit.ins.transform.position;
+            highest.unit.ins.transform.position += Vector3.right * 4;
+            ResetSelection();
+            Check(Click(0, DesignType.MapObject) == upper, "click excludes a just-moved Collider without a simulation step");
+            highest.unit.ins.transform.position = originalHighestPosition;
+            ResetSelection();
+            Check(Click(0, DesignType.MapObject) == highest, "click sees a restored Collider in the same frame");
             ground.Show(); groundParent = ground.ins.transform.parent;
             ground.ins.transform.SetParent(map.mainGo.transform, true);
             tilePick = ground.ins.gameObject.AddComponent<BoxCollider>(); tilePick.isTrigger = true;

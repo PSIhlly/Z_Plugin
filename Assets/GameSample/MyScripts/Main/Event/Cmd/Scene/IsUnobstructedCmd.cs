@@ -28,21 +28,15 @@ namespace Z_Code
         public override CmdBase GetNew() => new IsUnobstructedCmd();
         protected override bool ExecuteInternal(BoxDataForm.Data[] prm, InterpretAsyncTask asyncTask)
         {
-            var inputFrom = new Vector3(prm[0].dic["x"].num, prm[0].dic["height"].num, prm[0].dic["y"].num);
-            var inputTo = new Vector3(prm[1].dic["x"].num, prm[1].dic["height"].num, prm[1].dic["y"].num);
+            var components0 = prm[0].GetOrCreateDictionary();
+            var components1 = prm[1].GetOrCreateDictionary();
+            var inputFrom = new Vector3(components0["x"].num, components0["height"].num, components0["y"].num);
+            var inputTo = new Vector3(components1["x"].num, components1["height"].num, components1["y"].num);
             var from = GameManager.PlayerPosToMapPos(inputFrom);
             var to = GameManager.PlayerPosToMapPos(inputTo);
             var radius = prm[2].num;
-            var res = MapManager.instance.utilCtrl.CaptureCast(from, to, radius);
-            asyncTask.res = new BoxDataForm.Data[] { CodeHelper.CreateBoxByNum(1) };
-            foreach (var u in res)
-            {
-                if (u is TileUnit || (u is ObjectUnit obj && obj.data.isObstacle))
-                {
-                    asyncTask.res[0].num = 0;
-                    break;
-                }
-            }
+            bool blocked = MapManager.instance.utilCtrl.HasBlockingCast(from, to, radius);
+            asyncTask.res = new[] { CodeHelper.CreateBoxByNum(blocked ? 0 : 1) };
 
             return true;
         }

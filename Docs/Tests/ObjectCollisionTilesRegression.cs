@@ -10,6 +10,8 @@ using Z_DataSystem.Form;
 using Z_DesignStyle;
 using Z_Map;
 using Z_Map.Form;
+using Z_Math;
+using Z_Mesh;
 using Z_Time;
 using Z_UnitSystem;
 using Z_UnitSystem.Form;
@@ -52,10 +54,14 @@ public static class ObjectCollisionTilesRegression
             SeparatePartsAndTriggers();
             SphereAndRotatedBox();
             EventDispatch();
+            StateOnlyQueriesAndRotationBuffers();
+            CastQueries();
+            NoopEventsAndWorkReuse();
             Grid(new Vector3(2, 3, .5f));
             var nonUnit = Unit(new Vector3(4, 1.5f, 1), out _, out _);
             Check(Columns(nonUnit, new Vector3(4, 0, 0)).SetEquals(new[] { (2, 2), (3, 2), (4, 2) }),
                 "nonuniform map cell sizes convert world displacement and geometry to the correct columns");
+            SubWorldUnitCast();
             Debug.Log("OBJECT_COLLISION_TILES_REGRESSION_PASS checks=" + checks);
             EditorApplication.Exit(0);
         }
@@ -184,6 +190,149 @@ public static class ObjectCollisionTilesRegression
 
     private static HashSet<(int, int)> Columns(ObjectUnit unit, Vector3 step, CollideType type = CollideType.All) =>
         new HashSet<(int, int)>(map.utilCtrl.GetObjectCollisionTiles(unit, step, type).Select(t => (t.data.mapPos.x, t.data.mapPos.z)));
+
+    private static void StateOnlyQueriesAndRotationBuffers()
+    {
+        var source = Unit(new Vector3(1, .8f, 2), out var body, out var trigger);
+        body.center = new Vector3(.3f, .1f, -.2f); body.size = new Vector3(.8f, .6f, 1.4f);
+        trigger.size = Vector3.one * 1.5f;
+        var sphere = body.gameObject.AddComponent<SphereCollider>(); sphere.radius = .3f;
+        var target = Unit(new Vector3(1.2f, .9f, 2.3f), out _, out var targetTrigger);
+        var targetSphere = targetTrigger.gameObject.AddComponent<SphereCollider>(); targetSphere.isTrigger = true; targetSphere.radius = .5f;
+        source.data.scale = new Vector3(1.7f, .6f, 1.2f);
+        target.data.scale = new Vector3(.8f, 1.2f, 1.4f);
+        var sourceMeshes = source.GetMeshes(CollideType.All);
+        var points = sourceMeshes.Select(mesh => mesh.positions).ToArray();
+        var method = typeof(MapUpdateController).GetMethod("CheckEventCollision", BindingFlags.Instance | BindingFlags.NonPublic);
+        var work = Activator.CreateInstance(method.GetParameters()[4].ParameterType, true);
+        var random = new System.Random(77103);
+        for (int i = 0; i < 128; i++)
+        {
+            source.data.euler = new Vector3((float)random.NextDouble() * 120, (float)random.NextDouble() * 360, (float)random.NextDouble() * 90);
+            target.data.euler = new Vector3(0, (float)random.NextDouble() * 360, 0);
+            var actual = source.GetMeshes(CollideType.All);
+            var expected = map.utilCtrl.GetCollidersMesh(source.prefab, source.data.pos, source.data.euler, source.data.scale, CollideType.CollideOnly);
+            expected.AddRange(map.utilCtrl.GetCollidersMesh(source.prefab, source.data.pos, source.data.euler, source.data.scale, CollideType.TriggerOnly));
+            Check(ReferenceEquals(actual, sourceMeshes) && actual.Select((mesh, j) => ReferenceEquals(mesh.positions, points[j])).All(value => value),
+                "pure rotation retains MeshInfo lists and vertex buffers");
+            for (int m = 0; m < actual.Count; m++)
+            {
+                Check((actual[m].center - expected[m].center).sqrMagnitude < .000001f, "rotated canonical centers match fresh Collider geometry");
+                for (int v = 0; v < actual[m].positions.Length; v++)
+                    Check((actual[m].positions[v] - expected[m].positions[v]).sqrMagnitude < .000001f, "rotated canonical vertices match fresh Collider geometry");
+            }
+            Vector3 step = new Vector3((float)random.NextDouble() * 4 - 2, (float)random.NextDouble() - .5f, (float)random.NextDouble() * 4 - 2);
+            foreach (bool oldIn in new[] { false, true })
+            foreach (var kind in new[] { CollideType.CollideOnly, CollideType.TriggerOnly, CollideType.All })
+            {
+                source.data.collidingUnitUid.Clear(); if (oldIn) source.data.collidingUnitUid.Add(target.data.uid);
+                var legacy = new Graph.IntersectAssisant(oldIn);
+                foreach (var mesh in source.GetMeshes(kind))
+                {
+                    map.updateCtrl.CheckCollide(mesh, target, step, kind, out _, out var inner);
+                    legacy.Merge(inner);
+                }
+                var state = (Graph.IntersectType)method.Invoke(map.updateCtrl, new object[] { source, target, step, kind, work });
+                Check(state == legacy.GetRes(), "state-only dispatch preserves Add/Merge and old-contact semantics");
+            }
+        }
+        source.InvalidateCollisionGeometry();
+        Check(!ReferenceEquals(source.GetMeshes(CollideType.All), sourceMeshes), "explicit configuration invalidation still rebuilds geometry");
+    }
+
+    private static List<MapUnit> LegacyCast(Vector3 from, Vector3 to, float radius)
+    {
+        var result = new List<MapUnit>(); var seen = new HashSet<int>(); var columns = new HashSet<(int, int)>();
+        var sphere = Z_Mesh.Mesh.GetMesh(from, radius, Vector3.zero, Vector3.one);
+        var end = Z_Mesh.Mesh.GetMesh(to, radius, Vector3.zero, Vector3.one);
+        foreach (var point in Graph.GetRoughOverlapIntPos(sphere.positions.Concat(end.positions).ToArray()))
+        {
+            var pos = map.utilCtrl.RealPos2MapPosInt(point);
+            if (!columns.Add((pos.x, pos.z)) || !map.data.mapXZ2Y.TryGetValue((pos.x, pos.z), out var levels)) continue;
+            foreach (int y in levels)
+            {
+                var tile = map.data.maps[(pos.x, y, pos.z)].unit;
+                var units = new List<MapUnit> { tile };
+                if (map.updateCtrl.objectTileDic.TryGet(tile, out var objects)) units.AddRange(objects);
+                if (map.updateCtrl.characterOverlapTileDic.TryGet(tile, out var characters)) units.AddRange(characters);
+                foreach (var unit in units)
+                {
+                    if (!seen.Add(unit.data.uid)) continue;
+                    map.updateCtrl.CheckCollide(sphere, unit, to - from, CollideType.CollideOnly, out _, out var assist);
+                    if (assist.GetRes() != Graph.IntersectType.None) result.Add(unit);
+                }
+            }
+        }
+        return result;
+    }
+
+    private static void CastQueries()
+    {
+        var near = Unit(new Vector3(1, .5f, 0), out _, out _); near.data.isObstacle = true;
+        var far = Unit(new Vector3(4, .5f, 0), out _, out _); far.data.isObstacle = true;
+        map.updateCtrl.objectTileDic.Add(near, map.utilCtrl.GetTile(1, 0, 0));
+        map.updateCtrl.objectTileDic.Add(far, map.utilCtrl.GetTile(4, 0, 0));
+        far.GetMeshes(CollideType.All); far._zMeshes = null;
+        Check(map.utilCtrl.HasBlockingCast(new Vector3(0, .5f, 0), new Vector3(5, .5f, 0), .05f) && far._zMeshes == null,
+            "boolean cast stops at the first actual obstacle before querying later geometry");
+        near.data.isObstacle = false;
+        Check(map.utilCtrl.HasBlockingCast(new Vector3(0, .5f, 0), new Vector3(5, .5f, 0), .05f) && far._zMeshes != null,
+            "boolean cast skips non-obstacle Objects and continues to a blocking Object");
+        var random = new System.Random(41107);
+        for (int i = 0; i < 80; i++)
+        {
+            var from = new Vector3((float)random.NextDouble() * 12 - 6, .5f, (float)random.NextDouble() * 12 - 6);
+            var to = new Vector3((float)random.NextDouble() * 12 - 6, .5f, (float)random.NextDouble() * 12 - 6);
+            float radius = (float)random.NextDouble() * .6f;
+            var legacy = LegacyCast(from, to, radius);
+            var current = map.utilCtrl.CaptureCast(from, to, radius);
+            Check(new HashSet<int>(legacy.Select(unit => unit.data.uid)).SetEquals(current.Select(unit => unit.data.uid)),
+                "buffered full cast preserves legacy sweep hits in both directions and negative coordinates");
+            Check(map.utilCtrl.HasBlockingCast(from, to, radius) == legacy.Any(unit => unit is TileUnit || unit is ObjectUnit obj && obj.data.isObstacle),
+                "boolean early-stop result equals filtering the full hit list");
+        }
+        map.utilCtrl.CaptureCast(Vector3.zero, Vector3.one, .1f, out var ids, out var columns);
+        int count = ids.Count, columnCount = columns.Count;
+        map.utilCtrl.CaptureCast(Vector3.one * 3, Vector3.zero, .2f);
+        Check(ids.Count == count && columns.Count == columnCount, "diagnostic snapshots remain caller-owned across pooled casts");
+    }
+
+    private static void SubWorldUnitCast()
+    {
+        Grid(Vector3.one * .25f);
+        var middle = Unit(new Vector3(.5f, .5f, .5f), out _, out _);
+        middle.data.isObstacle = true;
+        map.updateCtrl.objectTileDic.Add(middle, map.utilCtrl.GetTile(2, 2, 2));
+        Check(map.utilCtrl.HasBlockingCast(new Vector3(0, .5f, .5f), new Vector3(1, .5f, .5f), .05f),
+            "sub-world-unit cells retain intermediate columns skipped by integer world sampling");
+        Check(map.utilCtrl.CaptureCast(new Vector3(1, .5f, .5f), new Vector3(0, .5f, .5f), .05f).Contains(middle),
+            "full cast retains the same small-cell coverage in reverse");
+    }
+
+    private static void NoopEventsAndWorkReuse()
+    {
+        var a = Unit(new Vector3(5, .5f, 5), out _, out _); var b = Unit(new Vector3(6, .5f, 5), out _, out _);
+        var queue = (System.Collections.IList)typeof(TimeManager).GetField("CurLateUpdateWithoutCheckList", BindingFlags.Static | BindingFlags.NonPublic).GetValue(null);
+        int before = queue.Count;
+        var manage = typeof(MapUpdateController).GetMethod("ManageTriggerEvent", BindingFlags.Instance | BindingFlags.NonPublic);
+        manage.Invoke(map.updateCtrl, new object[] { a, b, Graph.IntersectType.Inner });
+        manage.Invoke(map.updateCtrl, new object[] { a, b, Graph.IntersectType.None });
+        Check(queue.Count == before, "None/Inner do not allocate/enqueue a no-op deferred transition");
+        manage.Invoke(map.updateCtrl, new object[] { a, b, Graph.IntersectType.Cross }); clock.LateUpdate();
+        Check(!a.data.collidingUnitUid.Contains(b.data.uid), "Cross still performs paired deferred Enter and Exit");
+        int objectKeys = map.updateCtrl.objectTileDic.GetDicT2().Count;
+        int itemKeys = map.updateCtrl.itemTileDic.GetDicT2().Count;
+        int characterKeys = map.updateCtrl.characterOverlapTileDic.GetDicT2().Count;
+        map.updateCtrl.CheckCollideEvent(a, Vector3.right * .1f); clock.LateUpdate();
+        var stack = typeof(MapUpdateController).GetField("collisionEventWork", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(map.updateCtrl);
+        var first = stack.GetType().GetMethod("Peek").Invoke(stack, null);
+        map.updateCtrl.CheckCollideEvent(b, Vector3.left * .1f); clock.LateUpdate();
+        Check(ReferenceEquals(first, stack.GetType().GetMethod("Peek").Invoke(stack, null)), "successive event queries reuse the same cleared work buffers");
+        Check(objectKeys == map.updateCtrl.objectTileDic.GetDicT2().Count
+            && itemKeys == map.updateCtrl.itemTileDic.GetDicT2().Count
+            && characterKeys == map.updateCtrl.characterOverlapTileDic.GetDicT2().Count,
+            "event candidate reads never insert empty reverse-index lists");
+    }
 
     private static ObjectUnit Unit(Vector3 position, out BoxCollider body, out BoxCollider trigger)
     {

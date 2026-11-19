@@ -6,6 +6,7 @@ using Z_DesignStyle;
 using Z_Ui;
 using Z_Ui.Loading;
 using Z_UnitSystem;
+using Unity.Profiling;
 
 public enum StoryLifeEventType
 {
@@ -30,6 +31,14 @@ public enum ParamShowType
 }
 public class PlayManager : Z_MonoManager<PlayManager>
 {
+    private static readonly ProfilerMarker EntryMarker = new ProfilerMarker("Play.SceneEntry");
+    private static readonly ProfilerMarker AliveMarker = new ProfilerMarker("Play.CheckCurrentCharacter");
+    private static readonly ProfilerMarker SceneMarker = new ProfilerMarker("Play.SceneUpdate");
+    private static readonly ProfilerMarker InfoMarker = new ProfilerMarker("Play.InfoUpdate");
+    private static readonly ProfilerMarker EffectsMarker = new ProfilerMarker("Play.EffectsUpdate");
+    private static readonly ProfilerMarker EventsMarker = new ProfilerMarker("Play.Events");
+    private static readonly ProfilerMarker MinimapMarker = new ProfilerMarker("Play.MinimapUploads");
+    private static readonly ProfilerMarker PresentationMarker = new ProfilerMarker("Play.ScenePresentation");
     private string _folderName;
 
     public bool boxPlay;
@@ -104,7 +113,7 @@ public class PlayManager : Z_MonoManager<PlayManager>
         {
             return;
         }
-        NotifySceneEntered();
+        using (EntryMarker.Auto()) NotifySceneEntered();
         UpdateScene();
     }
 
@@ -151,10 +160,10 @@ public class PlayManager : Z_MonoManager<PlayManager>
 
         // Direct Box edits may bypass the parameter command; reject a defeated
         // current player before this frame's map simulation or pending movement.
-        (_infoCtrl as PlayInfoController)?.EnsureCurrentCharacterAlive();
-        _sceneCtrl.Update();
-        _infoCtrl.Update();
-        effectCtrl.Update();
+        using (AliveMarker.Auto()) (_infoCtrl as PlayInfoController)?.EnsureCurrentCharacterAlive();
+        using (SceneMarker.Auto()) _sceneCtrl.Update();
+        using (InfoMarker.Auto()) _infoCtrl.Update();
+        using (EffectsMarker.Auto()) effectCtrl.Update();
     }
     public void LateUpdate()
     {
@@ -164,11 +173,11 @@ public class PlayManager : Z_MonoManager<PlayManager>
         }
         if (scenePresentationPending)
             LoadingManager.instance.SetPhase(ScenePresentationLoadItem, "First event update");
-        GameManager.instance.evtCtrl.LateUpdate();
-        mapCtrl.FlushUnlockTextures();
+        using (EventsMarker.Auto()) GameManager.instance.evtCtrl.LateUpdate();
+        using (MinimapMarker.Auto()) mapCtrl.FlushUnlockTextures();
         // Entry scripts have now had their normal first pass (including ShowDialog).
         // Keep loading above the HUD until this point even if BeginScene ran after Update.
-        CompleteScenePresentation(true);
+        using (PresentationMarker.Auto()) CompleteScenePresentation(true);
     }
     public async void BeginStory(int id, bool boxPlay)
     {

@@ -41,6 +41,11 @@ namespace Z_Math
             bool oldIn;
             public IntersectAssisant(bool oldIn)
             {
+                Reset(oldIn);
+            }
+            public void Reset(bool oldIn)
+            {
+                isOut = isIn = isCross = 0;
                 this.oldIn = oldIn;
             }
             public void Add(IntersectType type)

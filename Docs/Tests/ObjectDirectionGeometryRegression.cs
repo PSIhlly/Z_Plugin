@@ -49,6 +49,7 @@ public static class ObjectDirectionGeometryRegression
             CheckZeroToNonzeroDirection();
             CheckFittedRearAnchoredDirections();
             CheckDirectionOverlapRefresh();
+            CheckGeneratedInitialization();
             Debug.Log("OBJECT_DIRECTION_GEOMETRY_REGRESSION_PASS checks=" + checks);
             EditorApplication.Exit(0);
         }
@@ -417,6 +418,74 @@ public static class ObjectDirectionGeometryRegression
         var newPass = new HashSet<TileUnit>(map.utilCtrl.GetObjectPassTypeOverlap(unit.data));
         Check(newPass.SetEquals(passIndex.Get(unit)), "terrain pass-type probe index also follows current geometry");
         unit.Hide();
+    }
+
+    private sealed class GeneratedProbe : IZ_Listener<ObjectEvent>
+    {
+        public int templateUid;
+        public readonly Dictionary<ObjectUnit, List<MeshInfo>> created = new Dictionary<ObjectUnit, List<MeshInfo>>();
+        public void OnEvent(ObjectEvent evt)
+        {
+            if (evt.type != MapEventType.Create || ObjectProductForm.GetTemplateUid(evt.unit.product) != templateUid) return;
+            Check(evt.unit.product.protoUid == templateUid, "Create observes an independently bound runtime Product");
+            Check(new HashSet<TileUnit>(map.utilCtrl.GetVisionOverlap(evt.unit.data))
+                .SetEquals(map.updateCtrl.objectTileDic.Get(evt.unit)), "Create observes final visual associations");
+            created.Add(evt.unit, evt.unit.GetMeshes(CollideType.All));
+        }
+    }
+
+    private static void CheckGeneratedInitialization()
+    {
+        var product = NewProduct();
+        product.faceType = FaceType.Fixed;
+        product.collision = true;
+        product.isWangTile = true;
+        product.boundsCollision = true;
+        product.EnsureDirectionData();
+        product.SetModelSize(AnimDirecton.Fixed, new Vector3(.8f, .8f, .8f));
+        product.SetModelPosition(AnimDirecton.Fixed, Vector3.zero);
+        ObjectProductForm.AddData(product);
+        var prefab = util.CombineNewObjectByPrefabs(GlobalDefaultHelper.GetRuntimeMapObjectPrefabName(product.uid), product, true);
+        objects.Add(prefab);
+        pool.AddPool(prefab);
+        var support = map.utilCtrl.GetTile(5, 0, 5);
+        var oldInstance = support.ins;
+        var visible = Go("generated-visible-support");
+        visible.SetActive(false);
+        var instance = visible.AddComponent<TileInstance>();
+        instance.enabled = false;
+        support.ins = instance;
+        visible.SetActive(true);
+        var probe = new GeneratedProbe { templateUid = product.uid };
+        Z_EventHelper.Register(probe);
+        bool oldPlaying = DynamicGlobalSettings.playing;
+        DynamicGlobalSettings.playing = true;
+        try
+        {
+            var first = appearance.GenerateObject(product, new Vector3(5, 0, 5)).unit;
+            var second = appearance.GenerateObject(product, new Vector3(5.8f, 0, 5)).unit;
+            Check(first.isShowing && second.isShowing, "generated placements become visible on a showing Tile");
+            Check(probe.created.Count == 2 && !ReferenceEquals(first.product, second.product),
+                "each generated placement creates once and owns its Product");
+            foreach (var unit in new[] { first, second })
+            {
+                Check(ReferenceEquals(probe.created[unit], unit.GetMeshes(CollideType.All)),
+                    "Show/Refresh retain final geometry built before Create");
+                Check(new HashSet<TileUnit>(map.utilCtrl.GetVisionOverlap(unit.data))
+                    .SetEquals(map.updateCtrl.objectTileDic.Get(unit)), "generated visibility index matches final footprint");
+                Check(unit.data.isObstacle && unit.product.boundsCollision, "generation preserves collision configuration");
+            }
+            var masks = (Dictionary<ObjectUnit, (Bounds, int, int)>)typeof(GameMapController)
+                .GetField("objectWangTileMasks", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(appearance);
+            Check(masks[first].Item3 != 0 && masks[second].Item3 != 0,
+                "generation updates both adjacent WangTile masks after registration");
+        }
+        finally
+        {
+            DynamicGlobalSettings.playing = oldPlaying;
+            Z_EventHelper.Unregister(probe);
+            support.ins = oldInstance;
+        }
     }
 
     private static void CheckZeroToNonzeroDirection()

@@ -33,7 +33,9 @@ Move 系统和 Interact 系统共享同一套碰撞检测基础设施，区别�
 | **Move** | 角色移动、碰撞截断、贴墙滑行 | `CollideOnly` | `CharacterUnit.Move()` |
 | **Interact** | 单位 Trigger 事件，以及单位接触地面 Tile 的事件 | Unit 使用 `TriggerOnly`；Tile 接触使用 `CollideOnly` | `MapUpdateController.CheckCollideEvent()` |
 
-两者底层都调用 `CheckCollide` → `MeshIntersectMesh` → `Graph.SphereIntersectCube / CubeIntersectCube / SphereIntersectSphere`。
+移动通过 `CheckCollide` 计算距离和避障方向；事件通过 `CheckEventCollision/CheckCollisionState` 只合并相交状态。两条路径底层都使用 `MeshIntersectMesh` → `Graph.SphereIntersectCube / CubeIntersectCube / SphereIntersectSphere`。
+
+GameSample 的地图由 `Begin(data, useUnityPhysicsSimulation:false)` 启动，关闭 Unity 自动 PhysX 步进，移动、重力和接触事件继续使用上述自定义检测。地图初始化成功后保存原 `Physics.simulationMode` 并切到 `Script`，End/Destroy 恢复原模式；若其他模块显式切换了模式则保留其设置。通用 Map 默认行为及项目全局 Time/Physics 设置保持原样。Mod 点击前按需 `Physics.SyncTransforms()`，随后进行原有射线选择，保证移动/缩放/池复用后的 Collider 当帧可点选；不需要恢复自动模拟。Play 攻击点击移除了未消费结果的射线检测。
 
 ### 调用链路
 
@@ -488,7 +490,11 @@ ModScene 无笔刷点击 Object（普通编辑及 Event 编辑）以 `CameraInst
 - `CollideOnly`：`isTrigger=false` 的 Collider，用于物理碰撞
 - `TriggerOnly`：`isTrigger=true` 的 Collider，用于触发器事件
 
-预制、旋转或缩放变化时重建以原点为基准的几何缓存；仅位置变化时，从缓存偏移更新已有世界 Mesh 和顶点数组，不再扫描 Collider 或创建新 Mesh。不要累加平移差值，避免浮点误差累积。`UpdateSingleOne` 会显式失效缓存以支持同名预制编辑。返回的 Mesh 是实时缓存，不是可长期保存的快照。
+预制、缩放或首部件几何变化时重建以原点为基准、根旋转为零的几何缓存。仅根旋转变化时，从原始几何重新旋转到已有偏移数组，再更新已有世界 Mesh/顶点数组；仅位置变化时直接加当前坐标。两种变换都不重新扫描 Collider，也不累加差值，避免误差累积。朝向尺寸、贴图拟合及后边界贴合变化仍会重建；SAT 缓存继续逐顶点验证。`UpdateSingleOne` 会显式失效缓存以支持同名预制编辑。返回的 Mesh 是实时缓存，不是可长期保存的快照。
+
+`SetRotation` 的瞬时分支不创建逐目标动画记录；角度未变化时跳过空间刷新，但 Character 仍设置 `forceEuler`，已有实例仍同步角度。正时长旋转保持原等待时长。
+
+运行时 `GenerateObject` 经 `GameMapController.GenerateObject` 在 `MapManager.AddObject` 的可选配置回调中先绑定独立 Product、设置最终碰撞配置，再建立空间索引、发出 Create，最后处理显示。初始化作用域内初次外观/Show/Refresh 不重复刷新自己的索引，邻居 WangTile 刷新保留，作用域在 `finally` 清理；普通编辑刷新仍走原流程。
 
 MapObject 的 `boundsCollision` 默认关闭；开启后按贴图 alpha ≥ 0.3 的像素边界框收缩、偏移 Collider（8 位 alpha 为 77～255），忽略低透明度杂点。贴图横向对应 X，纵向对应 Object 的 Y/Z 对角线：归一化纵向跨度为 `h` 时，高度为 `Y*h`、深度为 `Z*h`，模型及 root 缩放后的 Y:Z 比例自然保留，不再额外乘一次 Y/Z 权重。纵向中心偏移也同时分配到 Y/Z；例如高度 10、深度 1、纵向占比 0.4 时，得到高度 4、深度 0.4。首个模型部件只使用**当前朝向**的动画贴图，四向之间不合并；多帧和 GIF/WebP 仅合并该朝向的所有帧边界。运行时用 `GetAnimDirection(data.euler.y)` 选择方向，外观预览通过 `previewDirection` 指定选中的方向；明确为空的方向不回退到模型的旧贴图。其他部件分别使用自己的贴图。尺寸与现有 `colliderScale` 叠加，中心偏移按未缩小的贴图空间计算，转换后的 Sphere 还需抵消 Collider 的 Y 缩放；自动 Trigger 保留三个轴的原有边缘余量。Sphere 开启后转换为 Box，三个轴都参与收缩，保留原有组件缩放；已禁用、等待销毁的 Collider 不参与 Mesh 提取。全透明或所有像素均低于阈值的贴图 XYZ 为零，空槽或缺失贴图保留原尺寸。预览、显示实例和屏幕外 Mesh 共用 `MapUtilController.GetTextureBoundsBox`；不会改变源预制、模型或 Renderer。物理碰撞、passType 竖直探测、导航读取同一套调整后的 Mesh；视觉覆盖和 WangTile 连接继续使用原始模型边界。旧存档缺字段时仍按关闭处理。
 
@@ -514,11 +520,12 @@ CheckCollideEvent(unit, dir):
   2. 对每个候选 Tile 使用 CollideOnly 检测实体接触，并交给 ManageTriggerEvent
   3. 遍历覆盖范围内的所有 Object/Item/Character（Character 查 overlap 索引）
   4. 对每个目标 tar:
-       CheckCollide(unit, tar, dir, TriggerOnly, onCast)
-       └─ onCast = (tar, res, dis) => ManageTriggerEvent(unit, tar, res)
+       CheckEventCollision(unit, tar, dir, TriggerOnly)
+       └─ 同一 Mesh 扫掠，只合并状态，再调用 ManageTriggerEvent
   5. Object 对未访问的既有接触 Unit 直接复查，保证离开候选格后仍可退出，不扩大扫掠 Tile 集合
 
 ManageTriggerEvent(a, b, type):
+  └─ None/Inner 直接返回，不创建延迟闭包
   └─ 在 LateUpdate 中执行:
        switch type:
          In:    b.OnEnter(a); a.OnEnter(b)      // 进入触发器
@@ -531,6 +538,8 @@ ManageTriggerEvent(a, b, type):
 - Trigger 检测使用 `TriggerOnly` 类型的 Mesh
 - 事件延迟到 `LateUpdate` 执行，避免移动过程中状态不一致
 - `teleport=true` 时跳过整段移动 Trigger 扫掠（传送不产生 Enter/Exit/Cross）
+- 事件查询按调用租用 Tile 集合、候选快照、去重集合和相交状态合并器，在 `finally` 清空归还；嵌套调用各用独立缓冲。保留旧接触标志和历史 Add/Merge/GetRes 规则，不生成移动避障列表。
+- `IsUnobstructed` 使用 `HasBlockingCast`，跳过人物和未开启碰撞的 Object，命中首个真实遮挡立即返回。`CaptureCast` 仍返回完整命中列表；诊断集合是独立快照。扫描完整线段覆盖的逻辑 X/Z 列及每列实际存在的全部 Tile 高度，复用球体顶点和工作缓冲，保留跨层碰撞体与小于一世界单位的格子。
 
 ### 4.3 OnEnter / OnExit / Cross
 

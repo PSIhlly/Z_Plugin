@@ -1,5 +1,68 @@
 # Map runtime regression
 
+For a real Play capture, leave Deep Profile off and expand `Play.SceneUpdate`
+(`Map.SimulateUnits`, `Map.UpdateView`, `Map.UpdateVision`, navigation),
+`Play.InfoUpdate`, `Play.EffectsUpdate` and `Play.Events`.
+The latter contains `Events.Interpret/Tasks/SceneMoves`; `ZCode.Program [uid] name`
+and `ZCode.Cmd name` identify authored programs and C# commands directly.
+These cached marker names are diagnostics, not an optimization claim; compare
+both Time ms and GC Alloc in equivalent warmed frames. Interpreter and timeout
+regressions run with these scopes installed, retaining asynchronous and error paths.
+
+`-Fixture ModSceneHistoryRuntimeRegression -QueryOnlyPhysics` exercises the actual
+map lifecycle in Script simulation mode, real Mod click selection without test-side
+transform sync, same-frame Collider movement, return to normal-map behavior and
+restoration of FixedUpdate/Update/Script modes. GameSample opts into this mode at
+logical scene load; generic Map callers and ProjectSettings retain their defaults.
+
+`-Fixture CodeInterpreterRuntimeRegression -InterpreterBenchmark` measures seven
+warmed Stopwatch samples for batches of 40 owners, with Profiler recording disabled.
+It uses real compiled scalar loops, nested stored programs, dictionary copy-in/out
+and Cmd dispatch, including root Reset. Compare min/median/max between revisions;
+these synthetic batches are not a measurement of the active Story or a Deep Profile
+frame. Benchmark output is `INTERPRETER_BENCHMARK` and the completion marker is
+`INTERPRETER_HOT_PATH_BENCHMARK_PASS`.
+
+Map hot-path checks: `ObjectCollisionTilesRegression` compares state-only event
+queries against the legacy distance/normal query across randomized geometry and
+old-contact states. It checks rotated vertex/list reuse against independently
+rebuilt Collider geometry, full/boolean cast equivalence, genuine early stopping,
+caller-owned diagnostic snapshots, pooled event buffers and deferred Cross/Exit.
+`ObjectDirectionGeometryRegression` also exercises final-Product-before-Create
+generation, visible placements, retained geometry/index correctness and both
+WangTile neighbours. `SceneProductCommandRegression` checks same-yaw instant
+rotation and Character forceEuler, while positive-duration same-yaw rotation
+still waits. Use `StoryTargetSelectionRegression -LineOfSight` for the real
+low-wall/cherry-tree sweep cases and `NavigationObjectStateRegression` for index
+and navigation-state refresh. These fixtures run in isolated temporary projects;
+real Play frame-time and GC improvements still require a fresh Profiler capture.
+
+`Run-MapRuntimeRegression.ps1 -Fixture CodeInterpreterRuntimeRegression` includes
+custom-program context reuse checks: container/Interpreter identity across calls,
+independent recursive and waiting frames, live program snapshots, copy-out and
+escaped dictionary returns, cancellation inside a child, reset of waiting calls,
+cached parameter-name identity and scalar command dictionaries created only on
+demand. The allocation comparison uses an explicit counter calibration; native
+Mono may report zero and then only behavioral/identity checks are asserted.
+The authored-program check copies the existing top-level Story `Core/ef` files
+into the isolated project, rather than requiring an obsolete fixed Story ID.
+Pair with `InterpreterTimeoutRegression` for shared budgets and cancellation.
+
+`pwsh -File Docs/Tests/Run-EventHelperRegression.ps1` compiles the actual
+Z_EventHelper source in a .NET host. Covers exact type/category routing, default
+and null categories, duplicate registration, channel-specific unregister,
+registration changes during publication, reentry, exception cleanup and zero
+warmed snapshot allocations. Success: `EVENT_HELPER_REGRESSION_PASS`.
+
+`Run-MapRuntimeRegression.ps1 -Fixture GlobalVariableSceneTriggerRegression`
+also checks selective Unit subscriptions with 2000 unbound owners, ordinary
+EverySecond scheduling, Any/exact deduplication and ordering, dynamic Product and
+extra changes (including publication inside a pre-assignment SetAction), Tile
+texture replacement, late Product registration, removal, UID reuse and reset.
+Unbound event-cache sentinels verify steady dispatch and unrelated Product adds
+do not revisit the entire map. The runner repairs stale Editor assembly/analyzer
+paths only in temporary MSBuild targets, without rewriting generated projects.
+
 `Run-MapRuntimeRegression.ps1 -Fixture UiTreeContainerRegression` runs native
 Play-mode UiHolder pooling and UGUI/TMP sizing in a disposable project. It covers
 deep dynamic trees, subtree removal, flattening before reuse, stale parameter

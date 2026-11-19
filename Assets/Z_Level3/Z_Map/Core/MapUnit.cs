@@ -45,6 +45,7 @@ namespace Z_Map
         private Vector3 lastScale;
         // Bake geometry around the origin; translation reuses the world arrays.
         private readonly List<MeshInfo> collisionOffsets = new List<MeshInfo>();
+        private readonly List<MeshInfo> canonicalCollisionOffsets = new List<MeshInfo>();
         private Rect? firstPartCollisionBounds;
         private float boundsColliderScale = 1f;
         private bool centerCollider = true;
@@ -78,6 +79,7 @@ namespace Z_Map
         {
             _zMeshes = null;
             collisionOffsets.Clear();
+            canonicalCollisionOffsets.Clear();
         }
 
         public List<MeshInfo> GetMeshes(CollideType type)
@@ -85,20 +87,20 @@ namespace Z_Map
             bool hasTransform = TryGetFirstPartTransform(out var partPosition, out var partScale);
             bool rebuild = _zMeshes == null
                 || lastPrefabName != data.prefabName
-                || lastEuler != data.euler
                 || lastScale != data.scale
                 || lastHasFirstPartTransform != hasTransform
                 || hasTransform && (lastFirstPartPosition != partPosition || lastFirstPartScale != partScale);
+            bool rotated = rebuild || lastEuler != data.euler;
             if (rebuild)
             {
                 lastPrefabName = data.prefabName;
-                lastEuler = data.euler;
                 lastScale = data.scale;
                 lastHasFirstPartTransform = hasTransform;
                 lastFirstPartPosition = partPosition;
                 lastFirstPartScale = partScale;
                 var sourcePrefab = prefab;
                 collisionOffsets.Clear();
+                canonicalCollisionOffsets.Clear();
                 _zMeshes = new Dictionary<CollideType, List<MeshInfo>>();
                 CacheCollisionGeometry(sourcePrefab, CollideType.CollideOnly);
                 CacheCollisionGeometry(sourcePrefab, CollideType.TriggerOnly);
@@ -106,7 +108,20 @@ namespace Z_Map
                 _zMeshes[CollideType.All].AddRange(_zMeshes[CollideType.CollideOnly]);
                 _zMeshes[CollideType.All].AddRange(_zMeshes[CollideType.TriggerOnly]);
             }
-            if (rebuild || lastPos != data.pos)
+            if (rotated)
+            {
+                lastEuler = data.euler;
+                var rotation = Quaternion.Euler(lastEuler);
+                for (int i = 0; i < collisionOffsets.Count; i++)
+                {
+                    var canonical = canonicalCollisionOffsets[i];
+                    var offset = collisionOffsets[i];
+                    offset.center = rotation * canonical.center;
+                    for (int j = 0; j < offset.positions.Length; j++)
+                        offset.positions[j] = rotation * canonical.positions[j];
+                }
+            }
+            if (rotated || lastPos != data.pos)
             {
                 lastPos = data.pos;
                 var meshes = _zMeshes[CollideType.All];
@@ -125,18 +140,17 @@ namespace Z_Map
         private void CacheCollisionGeometry(GameObject sourcePrefab, CollideType type)
         {
             var offsets = manager.utilCtrl.GetCollidersMesh(
-                sourcePrefab, Vector3.zero, lastEuler, lastScale, type,
+                sourcePrefab, Vector3.zero, Vector3.zero, lastScale, type,
                 firstPartCollisionBounds, boundsColliderScale, centerCollider,
                 lastHasFirstPartTransform ? lastFirstPartPosition : (Vector3?)null,
                 lastHasFirstPartTransform ? lastFirstPartScale : (Vector3?)null);
-            collisionOffsets.AddRange(offsets);
+            canonicalCollisionOffsets.AddRange(offsets);
             var meshes = new List<MeshInfo>(offsets.Count);
             foreach (var offset in offsets)
-                meshes.Add(new MeshInfo
-                {
-                    type = offset.type,
-                    positions = new Vector3[offset.positions.Length]
-                });
+            {
+                collisionOffsets.Add(new MeshInfo { type = offset.type, positions = new Vector3[offset.positions.Length] });
+                meshes.Add(new MeshInfo { type = offset.type, positions = new Vector3[offset.positions.Length] });
+            }
             _zMeshes[type] = meshes;
         }
         

@@ -26,7 +26,8 @@ namespace Z_Code
         public override CmdBase GetNew() => new GetCharactersInAreaCmd();
         protected override bool ExecuteInternal(BoxDataForm.Data[] prm, InterpretAsyncTask asyncTask)
         {
-            var pos = GameManager.PlayerPosToMapPos(new Vector3(prm[0].dic["x"].num, prm[0].dic["height"].num, prm[0].dic["y"].num));
+            var components0 = prm[0].GetOrCreateDictionary();
+            var pos = GameManager.PlayerPosToMapPos(new Vector3(components0["x"].num, components0["height"].num, components0["y"].num));
             var box = CodeHelper.CreateBox();
             int i = 0;
             foreach (var o in CharacterUnitForm.DataByUid.Values)

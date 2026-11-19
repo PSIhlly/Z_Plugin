@@ -22,6 +22,17 @@ namespace Z_Map
         public MapUpdateController(MapManager super) : base(super)
         {
         }
+        private sealed class CollisionEventWork
+        {
+            internal readonly HashSet<TileUnit> tiles = new HashSet<TileUnit>();
+            internal readonly HashSet<int> seen = new HashSet<int>();
+            internal readonly List<Unit> units = new List<Unit>();
+            internal readonly IntersectAssisant outer = new IntersectAssisant(false);
+            internal readonly IntersectAssisant inner = new IntersectAssisant(false);
+            internal void Clear() { tiles.Clear(); seen.Clear(); units.Clear(); }
+        }
+        private readonly Stack<CollisionEventWork> collisionEventWork = new Stack<CollisionEventWork>();
+
         public Vector3 curCenterPos;
         private Vector3 lastCenterPos;
         private Vector3Int viewCenter;
@@ -417,15 +428,16 @@ namespace Z_Map
             else if (unit is ObjectUnit ob)
             {
                 RefreshObjectOverlap(ob);
-                if (HasShowingTile(ob, objectTileDic))
-                    UpdateRelatedVisibility(ob, objectTileDic, curObjectLst, ob.data);
-                Z_EventHelper.Invoke(new ObjectEvent
-                {
-                    type = MapEventType.Refresh,
-                    unit = ob
-                });
+                RefreshObjectVisibility(ob);
             }
 
+        }
+
+        public void RefreshObjectVisibility(ObjectUnit unit)
+        {
+            if (HasShowingTile(unit, objectTileDic))
+                UpdateRelatedVisibility(unit, objectTileDic, curObjectLst, unit.data);
+            Z_EventHelper.Invoke(new ObjectEvent { type = MapEventType.Refresh, unit = unit });
         }
 
         public void UpdateTileNeighbours(Vector3Int mapPos)
@@ -1057,8 +1069,7 @@ namespace Z_Map
             // This query has no callbacks, so one controller-owned scratch set is
             // safe. Always query the complete footprint, including upper layers.
             characterOverlapBuffer.Clear();
-            characterOverlapBuffer.UnionWith(
-                _super.utilCtrl.GetCharacterCollisionTiles(unit, Vector3.zero, CollideType.All));
+            _super.utilCtrl.CollectCharacterCollisionTiles(unit, Vector3.zero, CollideType.All, characterOverlapBuffer);
             if (characterOverlapBuffer.Count == 0)
                 characterOverlapBuffer.Add(owner);
 
@@ -1140,10 +1151,15 @@ namespace Z_Map
         {
             UpdateInfo(true);
         }
+        private static readonly Unity.Profiling.ProfilerMarker SimulationMarker = new Unity.Profiling.ProfilerMarker("Map.SimulateUnits");
+        private static readonly Unity.Profiling.ProfilerMarker ViewMarker = new Unity.Profiling.ProfilerMarker("Map.UpdateView");
+        private static readonly Unity.Profiling.ProfilerMarker VisibleUnitsMarker = new Unity.Profiling.ProfilerMarker("Map.RefreshVisibleUnits");
+        private static readonly Unity.Profiling.ProfilerMarker VisionMarker = new Unity.Profiling.ProfilerMarker("Map.UpdateVision");
+
         public void UpdateInfo(bool forceFresh = false, bool simulateCharacters = true)
         {
-            UpdateMapInfo(simulateCharacters);
-            UpdateView(forceFresh);
+            using (SimulationMarker.Auto()) UpdateMapInfo(simulateCharacters);
+            using (ViewMarker.Auto()) UpdateView(forceFresh);
         }
 
         // History/load restoration must not move Characters through navigation or
@@ -1164,10 +1180,10 @@ namespace Z_Map
                 {
                     Z_Log.Log("pos:" + curCenterPos + " to now cam Pos:" + viewCenter);
                 }
-                RefreshMap(forceFresh);
+                using (VisibleUnitsMarker.Auto()) RefreshMap(forceFresh);
                 lastCenterPos = curCenterPos;
             }
-            UpdateVision();
+            using (VisionMarker.Auto()) UpdateVision();
 
 
         }
@@ -1297,64 +1313,77 @@ namespace Z_Map
         }
         public void CheckCollideEvent(Unit unit, Vector3 dir, IEnumerable<TileUnit> extraTiles = null)
         {
-            var candidateTiles = new HashSet<TileUnit>();
-            if (unit is CharacterUnit ch)
+            var work = collisionEventWork.Count > 0 ? collisionEventWork.Pop() : new CollisionEventWork();
+            try
             {
-                if (extraTiles != null)
-                    candidateTiles.UnionWith(extraTiles);
-                candidateTiles.UnionWith(characterOverlapTileDic.Get(ch));
-                candidateTiles.UnionWith(_super.utilCtrl.GetCharacterCollisionTiles(ch, dir, CollideType.All));
-            }
-            else if (unit is ObjectUnit obj)
-            {
-                candidateTiles.UnionWith(_super.utilCtrl.GetObjectCollisionTiles(obj, dir, CollideType.All));
-            }
-            else if (unit is ItemUnit item)
-            {
-                var cur = itemTileDic.GetFirst(item);
-                if (cur != null)
-                    candidateTiles.UnionWith(_super.utilCtrl.GetNineTile((cur.data.mapPos.x, cur.data.mapPos.y, cur.data.mapPos.z), dir.magnitude));
-            }
-
-            HashSet<int> exist = new HashSet<int>() { unit.data.uid };
-            foreach (var tile in candidateTiles)
-            {
-                exist.Add(tile.data.uid);
-                // TileTouch表示移动单位的实体Collider与地面Tile接触，沿用Unit.OnEnter/OnExit的状态链路。
-                CheckCollide((MapUnit)unit, tile, dir, CollideType.CollideOnly, out _, (target, res, dis) =>
+                if (unit is CharacterUnit ch)
                 {
-                    ManageTriggerEvent(unit, target, res);
-                });
-
-                var lst = new List<Unit>(objectTileDic.Get(tile));
-                lst.AddRange(itemTileDic.Get(tile));
-                lst.AddRange(characterOverlapTileDic.Get(tile));
-
-                foreach (var tar in lst)
-                {
-                    if (exist.Contains(tar.data.uid))
-                        continue;
-                    exist.Add(tar.data.uid);
-                    CheckCollide((MapUnit)unit, (MapUnit)tar, dir, CollideType.TriggerOnly, out _, (target, res, dis) =>
-                    {
-                        ManageTriggerEvent(unit, target, res);
-                    });
+                    if (extraTiles != null) work.tiles.UnionWith(extraTiles);
+                    if (characterOverlapTileDic.TryGet(ch, out var overlaps))
+                        foreach (var tile in overlaps) work.tiles.Add(tile);
+                    _super.utilCtrl.CollectCharacterCollisionTiles(ch, dir, CollideType.All, work.tiles);
                 }
+                else if (unit is ObjectUnit obj)
+                    _super.utilCtrl.CollectObjectCollisionTiles(obj, dir, CollideType.All, work.tiles);
+                else if (unit is ItemUnit item)
+                {
+                    var owner = itemTileDic.GetFirst(item);
+                    if (owner != null)
+                        _super.utilCtrl.CollectNineTiles((owner.data.mapPos.x, owner.data.mapPos.y, owner.data.mapPos.z), dir.magnitude, work.tiles);
+                }
+                work.seen.Add(unit.data.uid);
+                foreach (var tile in work.tiles)
+                {
+                    work.seen.Add(tile.data.uid);
+                    ManageTriggerEvent(unit, tile, CheckEventCollision((MapUnit)unit, tile, dir, CollideType.CollideOnly, work));
+                    // Keep a local snapshot without creating empty reverse-index entries
+                    // or boxing List<T> enumerators through covariant AddRange calls.
+                    work.units.Clear();
+                    if (objectTileDic.TryGet(tile, out var objects))
+                        foreach (var target in objects) work.units.Add(target);
+                    if (itemTileDic.TryGet(tile, out var items))
+                        foreach (var target in items) work.units.Add(target);
+                    if (characterOverlapTileDic.TryGet(tile, out var characters))
+                        foreach (var target in characters) work.units.Add(target);
+                    foreach (var target in work.units)
+                        if (work.seen.Add(target.data.uid))
+                            ManageTriggerEvent(unit, target, CheckEventCollision((MapUnit)unit, (MapUnit)target, dir, CollideType.TriggerOnly, work));
+                }
+                if (unit is ObjectUnit)
+                    foreach (int uid in unit.data.collidingUnitUid)
+                        if (work.seen.Add(uid) && UnitForm.DataByUid.TryGetValue(uid, out var row) && row.unit is MapUnit target)
+                            ManageTriggerEvent(unit, target, CheckEventCollision((MapUnit)unit, target, dir,
+                                target is TileUnit ? CollideType.CollideOnly : CollideType.TriggerOnly, work));
             }
-            if (unit is ObjectUnit)
-                foreach (int uid in unit.data.collidingUnitUid)
-                    if (exist.Add(uid) && UnitForm.DataByUid.TryGetValue(uid, out var row) && row.unit is MapUnit target)
-                    {
-                        // Tight sweep culling can exclude a former contact's Tile.
-                        // Recheck the known pair directly so it can still emit Exit.
-                        CheckCollide((MapUnit)unit, target, dir,
-                            target is TileUnit ? CollideType.CollideOnly : CollideType.TriggerOnly, out _, (other, res, dis) =>
-                            {
-                                ManageTriggerEvent(unit, other, res);
-                            });
-                    }
+            finally { work.Clear(); collisionEventWork.Push(work); }
+        }
+
+        private IntersectType CheckEventCollision(MapUnit source, MapUnit target, Vector3 step, CollideType type, CollisionEventWork work)
+        {
+            work.outer.Reset(source.data.collidingUnitUid.Contains(target.data.uid));
+            foreach (var mesh in source.GetMeshes(type))
+            {
+                CheckCollisionState(mesh, target, step, type, work.inner);
+                work.outer.Merge(work.inner);
+            }
+            return work.outer.GetRes();
+        }
+
+        // State-only queries deliberately omit avoidance lists and distance/normal merging.
+        // Keep Add/Merge/GetRes identical to the movement path's historical state machine.
+        internal IntersectType CheckCollisionState(MeshInfo source, MapUnit target, Vector3 step, CollideType type, IntersectAssisant state)
+        {
+            state.Reset(false);
+            foreach (var mesh in target.GetMeshes(type))
+                state.Add(Mesh.MeshIntersectMesh(source, mesh, step, out _, out _));
+            return state.GetRes();
         }
         private void ManageTriggerEvent(Unit a, Unit b, Graph.IntersectType type)
+        {
+            if (type != IntersectType.In && type != IntersectType.Out && type != IntersectType.Cross) return;
+            QueueTriggerEvent(a, b, type);
+        }
+        private void QueueTriggerEvent(Unit a, Unit b, Graph.IntersectType type)
         {
             TimeManager.instance.AddCurLateUpdateWithoutCheckAction(() =>
             {

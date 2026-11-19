@@ -1,0 +1,9 @@
+双击“批量缩放图片.bat”，依次输入宽度、高度（像素）。
+处理 BAT 所在目录的所有常见静态图片，递归扫描所有子目录。
+完整画布直接缩放到输入的宽高，含透明边距；不识别人物、不裁切、不平移、不对齐、不自动旋转。宽高比不同会直接拉伸。采用最近邻采样，适合像素素材。
+成功覆盖前自动将原图复制到 .resize-backups 下的独立时间目录，可直接复制回来恢复。已为目标尺寸的文件不改写。
+支持 PNG、JPG/JPEG、BMP、WebP、TIF/TIFF、GIF、ICO。多帧图跳过并报告；格式不支持目标尺寸则保留原图。PNG 保留透明通道；JPEG 为有损格式。
+依赖 Python 3 与 Pillow。缺少 Pillow 时执行：python -m pip install Pillow
+命令行：python resize_images.py --directory "图片目录" --width 128 --height 128
+
+递归扫描说明：三个 BAT 都处理自身所在目录及其所有子文件夹，跳过 .resize-backups、.tool-backups、__pycache__、符号链接及目录联接，不跟随链接到其他目录。对齐工具仍仅处理 PNG，并跳过标准图本身；缩放工具保持原有格式范围。缩放备份按相对目录保留，子文件夹中同名图片不会互相覆盖。日志显示相对路径。配套 image_files.py 须与三个 Python 脚本放在一起。

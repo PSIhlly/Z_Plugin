@@ -29,7 +29,7 @@ namespace Z_Code
 
 
             EntryItem items = new EntryItem();
-            List<BoxDataForm.Data> values = new List<BoxDataForm.Data>(prm[4].dic.Values);
+            List<BoxDataForm.Data> values = prm[4].dic == null ? new List<BoxDataForm.Data>() : new List<BoxDataForm.Data>(prm[4].dic.Values);
             for (int i = 0; i < values.Count; i++)
             {
                 items.Add(values[i].str, null, i);

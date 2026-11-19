@@ -269,6 +269,8 @@ public class ModSceneController : Z_Controller<ModManager>, InternalModSceneCont
         // 通过射线与地平面求交，确保不同相机视角下位置计算正确
         Ray ray = CameraInstance.instance.cam.ScreenPointToRay(pos);
         // 只检测trigger的collider，避免非trigger的物理碰撞体干扰射线检测
+        // Query-only maps do not receive a simulation step that flushes transforms.
+        Physics.SyncTransforms();
         var allHits = Physics.RaycastAll(ray, 100, Physics.DefaultRaycastLayers, QueryTriggerInteraction.Collide);
         var hits = new List<RaycastHit>(allHits.Length);
         foreach (var hit in allHits)

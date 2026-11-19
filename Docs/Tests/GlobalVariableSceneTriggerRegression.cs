@@ -103,6 +103,7 @@ public static class GlobalVariableSceneTriggerRegression
             GuardsAndAuthoring();
             PersistenceAndUidRetirement();
             UnitBindingsAndRetirement();
+            SelectiveSubscriptions();
             Debug.Log("GLOBAL_VARIABLE_SCENE_TRIGGER_REGRESSION_PASS checks=" + checks);
             EditorApplication.Exit(0);
         }
@@ -622,6 +623,103 @@ public static class GlobalVariableSceneTriggerRegression
             "A reused global UID cannot activate the deleted variable's previous exact trigger");
         Check(SaveAndLoad.GetRealPath(path) == Path.GetFullPath(path), "No scene persistence path escaped the explicit owned directory");
     }
+
+    private static void SelectiveSubscriptions()
+    {
+        FreshCase(); UnitForm.Clear();
+        var global = Global("selective", Num(0));
+        string key = Prefix + global.uid;
+        EventTriggerForm.Data Trigger(string name, int tag) => new EventTriggerForm.Data(-1, name,
+            new List<int> { Program("GlobalUnitTriggerProbe(" + tag + ",param1,param2,param3,param4);").uid }, TriggerType.NoLimit);
+        var product = ObjectProductForm.GetDataByJo(new JObject()); product.uid = 96001;
+        product.events = new Dictionary<string, EventTriggerForm.Data> { [key] = Trigger(key, 70),
+            ["onPerSecondEvent"] = Trigger("onPerSecondEvent", 71) };
+        ObjectProductForm.AddData(product);
+        var data = ObjectUnitForm.GetDataByJo(new JObject()); data.uid = 96002;
+        data.extra = new JObject { [MapUnit.productKey] = new JArray(product.uid, -1) }.ToString(); ObjectUnitForm.AddData(data);
+        var unbound = new List<ObjectUnitForm.Data>();
+        for (int i = 0; i < 2000; i++)
+        {
+            var row = ObjectUnitForm.GetDataByJo(new JObject()); row.uid = 97000 + i;
+            ObjectUnitForm.AddData(row); unbound.Add(row);
+        }
+        Set(global.name, Num(1)); Tick();
+        Check(captures.Count == 1 && captures[0].tag == 70, "only a matching Unit receives a global change among 2001 Units");
+        var subscriptionOwner = typeof(GameEventController).GetField("unitSubscriptions", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(events);
+        var subscribed = (System.Collections.IDictionary)subscriptionOwner.GetType().GetField("subscriptions", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(subscriptionOwner);
+        Check(subscribed.Count == 1, "Units without configured global/second events have no event subscriptions");
+        var localCache = typeof(MapUnit).GetField("_evtSet", BindingFlags.Instance | BindingFlags.NonPublic);
+        foreach (var row in unbound) localCache.SetValue(row.unit, null);
+        captures.Clear(); Set(global.name, Num(2)); Tick();
+        Check(unbound.All(row => localCache.GetValue(row.unit) == null), "steady global dispatch never revisits the 2000 unbound Unit event dictionaries");
+        captures.Clear();
+        events.sceneTriggerCtrl.OnEvent(new StoryLifeEvent { type = StoryLifeEventType.EverySecond });
+        events.sceneTriggerCtrl.evts?.Invoke(); events.sceneTriggerCtrl.evts = null; Tick();
+        Check(captures.Count == 1 && captures[0].tag == 71 && unbound.All(row => localCache.GetValue(row.unit) == null),
+            "EverySecond visits only subscribed Units and preserves deferred normal scheduling");
+
+        data.unit.evtDic = new Dictionary<string, EventTriggerForm.Data> { [Prefix] = Trigger(Prefix, 72) };
+        captures.Clear(); Set(global.name, Num(3)); Tick();
+        Check(captures.Select(c => c.tag).SequenceEqual(new[] { 72, 70 }), "Any plus exact subscriptions deduplicate the Unit and retain Any-before-exact order");
+        product.events = new Dictionary<string, EventTriggerForm.Data>();
+        captures.Clear(); Set(global.name, Num(4)); Tick();
+        Check(captures.Count == 1 && captures[0].tag == 72, "replacing Product events immediately updates inherited subscriptions");
+        data.unit.evtDic = new Dictionary<string, EventTriggerForm.Data>();
+        captures.Clear(); Set(global.name, Num(5)); Tick();
+        Check(captures.Count == 0 && subscribed.Count == 0, "removing local event bindings unregisters the last Unit channel");
+
+        var future = unbound[0];
+        future.unit.evtDic = new Dictionary<string, EventTriggerForm.Data> { [key] = Trigger(key, 73) };
+        captures.Clear(); Set(global.name, Num(6)); Tick();
+        Check(captures.Count == 1 && captures[0].tag == 73, "a previously unbound Unit can gain a subscription through extra replacement");
+        ObjectUnitForm.RemoveData(future.uid);
+        var replacement = ObjectUnitForm.GetDataByJo(new JObject()); replacement.uid = future.uid; ObjectUnitForm.AddData(replacement);
+        captures.Clear(); Set(global.name, Num(7)); Tick();
+        Check(captures.Count == 0 && subscribed.Count == 0, "removal immediately unregisters old subscriptions and UID reuse cannot inherit them");
+
+        // SetActions precede backing-field assignment. A publication inside one
+        // must not consume the dirty marker for the value about to be committed.
+        var reentrant = unbound[1];
+        Action<UnitForm.Data, string, string> during = (row, before, after) => {
+            if (ReferenceEquals(row, reentrant)) events.storyTriggerCtrl.OnEvent(new GlobalVariableChangedEvent { uid = global.uid, name = global.name, newValue = Num(8) });
+        };
+        UnitForm.changeExtraAction += during;
+        try { reentrant.unit.evtDic = new Dictionary<string, EventTriggerForm.Data> { [key] = Trigger(key, 74) }; }
+        finally { UnitForm.changeExtraAction -= during; }
+        captures.Clear(); Set(global.name, Num(8)); Tick();
+        Check(captures.Count == 1 && captures[0].tag == 74, "a nested notification before extra assignment cannot lose the incoming binding");
+
+        var watchedTexture = MapTextureForm.GetDataByJo(new JObject()); watchedTexture.id = 99000;
+        watchedTexture.events = new Dictionary<string, EventTriggerForm.Data> { [key] = new EventTriggerForm.Data(-1, key,
+            new List<int> { Program("GlobalUnitTriggerProbe(75,param1,param2,param3,param4);").uid }, default) };
+        MapTextureForm.AddData(watchedTexture);
+        var tile = TileUnitForm.GetDataByJo(new JObject()); tile.uid = 99001;
+        tile.texDic = new Dictionary<int, int> { [0] = watchedTexture.id }; TileUnitForm.AddData(tile);
+        captures.Clear(); Set(global.name, Num(9)); Tick();
+        Check(captures.Any(c => c.tag == 75), "Tiles subscribe to their main texture's global-variable bindings");
+        tile.texDic = new Dictionary<int, int>();
+        captures.Clear(); Set(global.name, Num(10)); Tick();
+        Check(captures.All(c => c.tag != 75), "changing a Tile's main texture removes the old channel immediately");
+
+        var awaiting = ObjectUnitForm.GetDataByJo(new JObject()); awaiting.uid = 99100;
+        awaiting.extra = new JObject { [MapUnit.productKey] = new JArray(99101, -1) }.ToString(); ObjectUnitForm.AddData(awaiting);
+        captures.Clear(); Set(global.name, Num(11)); Tick();
+        var lateProduct = ObjectProductForm.GetDataByJo(new JObject()); lateProduct.uid = 99101;
+        lateProduct.events = new Dictionary<string, EventTriggerForm.Data> { [key] = new EventTriggerForm.Data(-1, key,
+            new List<int> { Program("GlobalUnitTriggerProbe(76,param1,param2,param3,param4);").uid }, default) };
+        ObjectProductForm.AddData(lateProduct);
+        captures.Clear(); Set(global.name, Num(12)); Tick();
+        Check(captures.Any(c => c.tag == 76), "late Product registration refreshes Units awaiting that exact Product");
+        var sentinel = unbound[2].unit;
+        localCache.SetValue(sentinel, null);
+        var unrelated = ObjectProductForm.GetDataByJo(new JObject()); unrelated.uid = 99102; ObjectProductForm.AddData(unrelated);
+        Set(global.name, Num(13)); Tick();
+        Check(localCache.GetValue(sentinel) == null, "registering an unrelated Product does not force a whole-map subscription rebuild");
+        events.Reset();
+        Check(subscribed.Count == 0, "controller reset unregisters every owned channel");
+        UnitForm.Clear();
+    }
+
 
     private static BoxDataForm.Data Num(float value) => CodeHelper.CreateBoxByNum(value);
     private static BoxDataForm.Data Text(string value) => CodeHelper.CreateBoxByStr(value);

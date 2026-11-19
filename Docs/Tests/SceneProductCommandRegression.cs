@@ -85,6 +85,7 @@ public static class SceneProductCommandRegression
             CheckGroup("nonuniform Character", "$ch$97500$ch$", "$ch$97501$ch$", new MapUnit[] { characterA, characterB });
             CheckGroup("nonuniform Object", "$so$97601$so$", "$so$97602$so$", new MapUnit[] { objectA, objectB });
             CheckWorldUnits(characterA, characterB, objectA);
+            CheckUnchangedRotation(characterA, objectA);
             Debug.Log("SCENE_PRODUCT_COMMAND_REGRESSION_PASS checks=" + checks);
             EditorApplication.Exit(0);
         }
@@ -103,6 +104,9 @@ public static class SceneProductCommandRegression
 
     private static void SetUp()
     {
+        // EditMode does not run RuntimeInitializeOnLoadMethod table registration.
+        GameCmdDataForm.InitInternal();
+        EventInterpretDataForm.InitInternal();
         var game = CreateManager<GameManager>();
         var play = CreateManager<PlayManager>();
         map = CreateManager<MapManager>();
@@ -279,6 +283,26 @@ public static class SceneProductCommandRegression
         Equal(MissionGuide.GetTargetWorldPosition(mission), world, "mission target uses offset world coordinates");
         Check(Mathf.Abs(MissionGuide.GetDistance(mission, world + new Vector3(3, 4, 0)) - 5) < .0001f,
             "mission distance remains five world metres across nonuniform cells");
+    }
+
+    private static void CheckUnchangedRotation(CharacterUnit character, ObjectUnit obj)
+    {
+        var meshes = obj.GetMeshes(CollideType.All);
+        var tiles = map.updateCtrl.objectTileDic.Get(obj);
+        var instant = Invoke(new SetRotationCmd(), Text(GlobalEventHelper.GetSceneUnitReference(obj.data.uid)),
+            Number(obj.data.euler.y), Number(0));
+        Check(instant.IsComplete() && ReferenceEquals(meshes, obj.GetMeshes(CollideType.All))
+            && ReferenceEquals(tiles, map.updateCtrl.objectTileDic.Get(obj)),
+            "same-yaw instant rotation retains geometry and spatial association buffers");
+        character.forceEuler = null;
+        Invoke(new SetRotationCmd(), Text(GlobalEventHelper.GetSceneUnitReference(character.data.uid)),
+            Number(character.data.euler.y), Number(0));
+        Check(character.forceEuler.HasValue && character.forceEuler.Value == character.data.euler,
+            "same-yaw Character rotation still overrides navigation facing");
+        var timed = Invoke(new SetRotationCmd(), Text(GlobalEventHelper.GetSceneUnitReference(obj.data.uid)),
+            Number(obj.data.euler.y), Number(1));
+        Check(!timed.IsComplete(), "same-yaw timed rotation retains its authored duration");
+        Clear.Invoke(events, null);
     }
 
     private static void CheckCapturedRemoval(string label, InterpretAsyncTask task, MapUnit[] units)

@@ -241,6 +241,8 @@ AssetForm
 
 ## Offline texture split and join
 
+- `Z_OtherProjects/Z_Tool/CharacterImageManage/align_character.py` measures content rows at alpha >= 128 after proportional resizing, aligns the top row, and allows up to 1 pixel of error per boundary. If the initial size fails, try proportional sizes within 3 pixels of its resized height and prefer the smallest boundary error. Skip the file if no candidate fits without clipping visible content.
+
 - `Z_OtherProjects/Z_Tool/ImageSplit/切图.bat` launches `split_png.py` to grid-split all direct sibling PNGs. Prompt for positive row/column counts; optional positional CLI counts and `--directory` support automation. Boundaries use `i*size//count`, preserving every pixel and transparency without resizing; non-divisible cells differ by at most one pixel. Reject zero-area grids per image and continue the batch. Output is `output/<stem>_<rows>x<columns>/r01_c01.png` with versioned directories on repeats; never overwrite sources or scan output recursively. APNG uses its first frame.
 
 - `ExtraAssets/使用中/贴图/test/texture_tool.py` owns the numbered PNG workflow invoked by `拆分.bat` and `拼合.bat`; the adjacent `PNG用途说明.txt` documents each input/output. Split overwrites 1–29 and 50–51; avoid a full split when refreshing only one preview would preserve authored edits.

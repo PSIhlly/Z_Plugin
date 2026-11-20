@@ -12,7 +12,7 @@
           "name": "防御",
           "valueType": 0,
           "min": "",
-          "v": "{\r\n  \"uid\": -1,\r\n  \"str\": null,\r\n  \"valName\": null,\r\n  \"num\": 0.0,\r\n  \"dic\": []\r\n}",
+          "v": "{\r\n  \"uid\": -1,\r\n  \"str\": null,\r\n  \"valName\": null,\r\n  \"num\": 15.0,\r\n  \"dic\": null\r\n}",
           "max": "",
           "showType": 0
         }
@@ -24,7 +24,7 @@
           "name": "攻击",
           "valueType": 0,
           "min": "",
-          "v": "{\r\n  \"uid\": -1,\r\n  \"str\": null,\r\n  \"valName\": null,\r\n  \"num\": 5.0,\r\n  \"dic\": []\r\n}",
+          "v": "{\r\n  \"uid\": -1,\r\n  \"str\": null,\r\n  \"valName\": null,\r\n  \"num\": 50.0,\r\n  \"dic\": null\r\n}",
           "max": "",
           "showType": 0
         }
@@ -36,7 +36,7 @@
           "name": "射程",
           "valueType": 0,
           "min": "",
-          "v": "{\r\n  \"uid\": -1,\r\n  \"str\": null,\r\n  \"valName\": null,\r\n  \"num\": 0.0,\r\n  \"dic\": []\r\n}",
+          "v": "{\r\n  \"uid\": -1,\r\n  \"str\": null,\r\n  \"valName\": null,\r\n  \"num\": 7.0,\r\n  \"dic\": null\r\n}",
           "max": "",
           "showType": 5
         }
@@ -48,7 +48,7 @@
           "name": "Hp",
           "valueType": 0,
           "min": "",
-          "v": "{\r\n  \"uid\": -1,\r\n  \"str\": null,\r\n  \"valName\": null,\r\n  \"num\": 50.0,\r\n  \"dic\": []\r\n}",
+          "v": "{\r\n  \"uid\": -1,\r\n  \"str\": null,\r\n  \"valName\": null,\r\n  \"num\": 3000.0,\r\n  \"dic\": null\r\n}",
           "max": "HpMax",
           "showType": 3
         }
@@ -60,7 +60,7 @@
           "name": "Speed",
           "valueType": 0,
           "min": "",
-          "v": "{\r\n  \"uid\": -1,\r\n  \"str\": null,\r\n  \"valName\": null,\r\n  \"num\": 0.0,\r\n  \"dic\": []\r\n}",
+          "v": "{\r\n  \"uid\": -1,\r\n  \"str\": null,\r\n  \"valName\": null,\r\n  \"num\": 2.0,\r\n  \"dic\": null\r\n}",
           "max": "",
           "showType": 5
         }
@@ -72,7 +72,7 @@
           "name": "HpMax",
           "valueType": 0,
           "min": "",
-          "v": "{\r\n  \"uid\": -1,\r\n  \"str\": null,\r\n  \"valName\": null,\r\n  \"num\": 0.0,\r\n  \"dic\": []\r\n}",
+          "v": "{\r\n  \"uid\": -1,\r\n  \"str\": null,\r\n  \"valName\": null,\r\n  \"num\": 3000.0,\r\n  \"dic\": null\r\n}",
           "max": "",
           "showType": 0
         }
@@ -90,15 +90,15 @@
         }
       },
       {
-        "k": "自由行动",
+        "k": "触发参数",
         "v": {
-          "uid": 8,
-          "name": "自由行动",
+          "uid": -1,
+          "name": "触发参数",
           "valueType": 0,
           "min": "",
-          "v": "{\r\n  \"uid\": -1,\r\n  \"str\": null,\r\n  \"valName\": null,\r\n  \"num\": 0.0,\r\n  \"dic\": null\r\n}",
+          "v": "{\r\n  \"uid\": -1,\r\n  \"str\": \"\",\r\n  \"valName\": null,\r\n  \"num\": 0.0,\r\n  \"dic\": null\r\n}",
           "max": "",
-          "showType": 5
+          "showType": 0
         }
       }
     ],
@@ -1345,7 +1345,11 @@
         "v": {
           "uid": -1,
           "name": "onPerSecondEvent",
-          "evt": [],
+          "evt": [
+            {
+              "v": 14
+            }
+          ],
           "type": 0
         }
       }
@@ -1358,6 +1362,14 @@
       {
         "k": 0,
         "v": 15796
+      },
+      {
+        "k": 2,
+        "v": 97
+      },
+      {
+        "k": 3,
+        "v": 96
       }
     ],
     "recoveryTime": 0.0,
@@ -1457,13 +1469,13 @@
         }
       },
       {
-        "k": "自由行动",
+        "k": "触发参数",
         "v": {
           "uid": -1,
-          "name": "自由行动",
+          "name": "触发参数",
           "valueType": 0,
           "min": "",
-          "v": "{\r\n  \"uid\": -1,\r\n  \"str\": null,\r\n  \"valName\": null,\r\n  \"num\": 0.0,\r\n  \"dic\": []\r\n}",
+          "v": "{\r\n  \"uid\": -1,\r\n  \"str\": \"\",\r\n  \"valName\": null,\r\n  \"num\": 0.0,\r\n  \"dic\": null\r\n}",
           "max": "",
           "showType": 0
         }
@@ -2005,13 +2017,13 @@
         }
       },
       {
-        "k": "自由行动",
+        "k": "触发参数",
         "v": {
           "uid": -1,
-          "name": "自由行动",
+          "name": "触发参数",
           "valueType": 0,
           "min": "",
-          "v": "{\r\n  \"uid\": -1,\r\n  \"str\": null,\r\n  \"valName\": null,\r\n  \"num\": 0.0,\r\n  \"dic\": []\r\n}",
+          "v": "{\r\n  \"uid\": -1,\r\n  \"str\": \"\",\r\n  \"valName\": null,\r\n  \"num\": 0.0,\r\n  \"dic\": null\r\n}",
           "max": "",
           "showType": 0
         }
@@ -2553,13 +2565,13 @@
         }
       },
       {
-        "k": "自由行动",
+        "k": "触发参数",
         "v": {
           "uid": -1,
-          "name": "自由行动",
+          "name": "触发参数",
           "valueType": 0,
           "min": "",
-          "v": "{\r\n  \"uid\": -1,\r\n  \"str\": null,\r\n  \"valName\": null,\r\n  \"num\": 0.0,\r\n  \"dic\": []\r\n}",
+          "v": "{\r\n  \"uid\": -1,\r\n  \"str\": \"\",\r\n  \"valName\": null,\r\n  \"num\": 0.0,\r\n  \"dic\": null\r\n}",
           "max": "",
           "showType": 0
         }
@@ -3678,13 +3690,13 @@
         }
       },
       {
-        "k": "自由行动",
+        "k": "触发参数",
         "v": {
           "uid": -1,
-          "name": "自由行动",
+          "name": "触发参数",
           "valueType": 0,
           "min": "",
-          "v": "{\r\n  \"uid\": -1,\r\n  \"str\": null,\r\n  \"valName\": null,\r\n  \"num\": 0.0,\r\n  \"dic\": []\r\n}",
+          "v": "{\r\n  \"uid\": -1,\r\n  \"str\": \"\",\r\n  \"valName\": null,\r\n  \"num\": 0.0,\r\n  \"dic\": null\r\n}",
           "max": "",
           "showType": 0
         }
@@ -6194,13 +6206,13 @@
         }
       },
       {
-        "k": "自由行动",
+        "k": "触发参数",
         "v": {
           "uid": -1,
-          "name": "自由行动",
+          "name": "触发参数",
           "valueType": 0,
           "min": "",
-          "v": "{\r\n  \"uid\": -1,\r\n  \"str\": null,\r\n  \"valName\": null,\r\n  \"num\": 0.0,\r\n  \"dic\": []\r\n}",
+          "v": "{\r\n  \"uid\": -1,\r\n  \"str\": \"\",\r\n  \"valName\": null,\r\n  \"num\": 0.0,\r\n  \"dic\": null\r\n}",
           "max": "",
           "showType": 0
         }
@@ -7565,13 +7577,13 @@
         }
       },
       {
-        "k": "自由行动",
+        "k": "触发参数",
         "v": {
           "uid": -1,
-          "name": "自由行动",
+          "name": "触发参数",
           "valueType": 0,
           "min": "",
-          "v": "{\r\n  \"uid\": -1,\r\n  \"str\": null,\r\n  \"valName\": null,\r\n  \"num\": 0.0,\r\n  \"dic\": []\r\n}",
+          "v": "{\r\n  \"uid\": -1,\r\n  \"str\": \"\",\r\n  \"valName\": null,\r\n  \"num\": 0.0,\r\n  \"dic\": null\r\n}",
           "max": "",
           "showType": 0
         }
@@ -8127,13 +8139,13 @@
         }
       },
       {
-        "k": "自由行动",
+        "k": "触发参数",
         "v": {
           "uid": -1,
-          "name": "自由行动",
+          "name": "触发参数",
           "valueType": 0,
           "min": "",
-          "v": "{\r\n  \"uid\": -1,\r\n  \"str\": null,\r\n  \"valName\": null,\r\n  \"num\": 0.0,\r\n  \"dic\": []\r\n}",
+          "v": "{\r\n  \"uid\": -1,\r\n  \"str\": \"\",\r\n  \"valName\": null,\r\n  \"num\": 0.0,\r\n  \"dic\": null\r\n}",
           "max": "",
           "showType": 0
         }
@@ -9399,10 +9411,6 @@
       {
         "k": 0,
         "v": 1356
-      },
-      {
-        "k": 3,
-        "v": 96
       }
     ],
     "recoveryTime": 0.0,
@@ -9509,13 +9517,13 @@
         }
       },
       {
-        "k": "自由行动",
+        "k": "触发参数",
         "v": {
           "uid": -1,
-          "name": "自由行动",
+          "name": "触发参数",
           "valueType": 0,
           "min": "",
-          "v": "{\r\n  \"uid\": -1,\r\n  \"str\": null,\r\n  \"valName\": null,\r\n  \"num\": 0.0,\r\n  \"dic\": []\r\n}",
+          "v": "{\r\n  \"uid\": -1,\r\n  \"str\": \"\",\r\n  \"valName\": null,\r\n  \"num\": 0.0,\r\n  \"dic\": null\r\n}",
           "max": "",
           "showType": 0
         }
@@ -10746,13 +10754,13 @@
         }
       },
       {
-        "k": "自由行动",
+        "k": "触发参数",
         "v": {
           "uid": -1,
-          "name": "自由行动",
+          "name": "触发参数",
           "valueType": 0,
           "min": "",
-          "v": "{\r\n  \"uid\": -1,\r\n  \"str\": null,\r\n  \"valName\": null,\r\n  \"num\": 0.0,\r\n  \"dic\": []\r\n}",
+          "v": "{\r\n  \"uid\": -1,\r\n  \"str\": \"\",\r\n  \"valName\": null,\r\n  \"num\": 0.0,\r\n  \"dic\": null\r\n}",
           "max": "",
           "showType": 0
         }
@@ -13270,13 +13278,13 @@
         }
       },
       {
-        "k": "自由行动",
+        "k": "触发参数",
         "v": {
           "uid": -1,
-          "name": "自由行动",
+          "name": "触发参数",
           "valueType": 0,
           "min": "",
-          "v": "{\r\n  \"uid\": -1,\r\n  \"str\": null,\r\n  \"valName\": null,\r\n  \"num\": 0.0,\r\n  \"dic\": []\r\n}",
+          "v": "{\r\n  \"uid\": -1,\r\n  \"str\": \"\",\r\n  \"valName\": null,\r\n  \"num\": 0.0,\r\n  \"dic\": null\r\n}",
           "max": "",
           "showType": 0
         }
@@ -15786,13 +15794,13 @@
         }
       },
       {
-        "k": "自由行动",
+        "k": "触发参数",
         "v": {
           "uid": -1,
-          "name": "自由行动",
+          "name": "触发参数",
           "valueType": 0,
           "min": "",
-          "v": "{\r\n  \"uid\": -1,\r\n  \"str\": null,\r\n  \"valName\": null,\r\n  \"num\": 0.0,\r\n  \"dic\": []\r\n}",
+          "v": "{\r\n  \"uid\": -1,\r\n  \"str\": \"\",\r\n  \"valName\": null,\r\n  \"num\": 0.0,\r\n  \"dic\": null\r\n}",
           "max": "",
           "showType": 0
         }
@@ -18302,13 +18310,13 @@
         }
       },
       {
-        "k": "自由行动",
+        "k": "触发参数",
         "v": {
           "uid": -1,
-          "name": "自由行动",
+          "name": "触发参数",
           "valueType": 0,
           "min": "",
-          "v": "{\r\n  \"uid\": -1,\r\n  \"str\": null,\r\n  \"valName\": null,\r\n  \"num\": 0.0,\r\n  \"dic\": []\r\n}",
+          "v": "{\r\n  \"uid\": -1,\r\n  \"str\": \"\",\r\n  \"valName\": null,\r\n  \"num\": 0.0,\r\n  \"dic\": null\r\n}",
           "max": "",
           "showType": 0
         }
@@ -19651,13 +19659,13 @@
         }
       },
       {
-        "k": "自由行动",
+        "k": "触发参数",
         "v": {
           "uid": -1,
-          "name": "自由行动",
+          "name": "触发参数",
           "valueType": 0,
           "min": "",
-          "v": "{\r\n  \"uid\": -1,\r\n  \"str\": null,\r\n  \"valName\": null,\r\n  \"num\": 0.0,\r\n  \"dic\": []\r\n}",
+          "v": "{\r\n  \"uid\": -1,\r\n  \"str\": \"\",\r\n  \"valName\": null,\r\n  \"num\": 0.0,\r\n  \"dic\": null\r\n}",
           "max": "",
           "showType": 0
         }
@@ -20754,13 +20762,13 @@
         }
       },
       {
-        "k": "自由行动",
+        "k": "触发参数",
         "v": {
           "uid": -1,
-          "name": "自由行动",
+          "name": "触发参数",
           "valueType": 0,
           "min": "",
-          "v": "{\r\n  \"uid\": -1,\r\n  \"str\": null,\r\n  \"valName\": null,\r\n  \"num\": 0.0,\r\n  \"dic\": []\r\n}",
+          "v": "{\r\n  \"uid\": -1,\r\n  \"str\": \"\",\r\n  \"valName\": null,\r\n  \"num\": 0.0,\r\n  \"dic\": null\r\n}",
           "max": "",
           "showType": 0
         }
@@ -23274,13 +23282,13 @@
         }
       },
       {
-        "k": "自由行动",
+        "k": "触发参数",
         "v": {
           "uid": -1,
-          "name": "自由行动",
+          "name": "触发参数",
           "valueType": 0,
           "min": "",
-          "v": "{\r\n  \"uid\": -1,\r\n  \"str\": null,\r\n  \"valName\": null,\r\n  \"num\": 0.0,\r\n  \"dic\": []\r\n}",
+          "v": "{\r\n  \"uid\": -1,\r\n  \"str\": \"\",\r\n  \"valName\": null,\r\n  \"num\": 0.0,\r\n  \"dic\": null\r\n}",
           "max": "",
           "showType": 0
         }
@@ -24511,13 +24519,13 @@
         }
       },
       {
-        "k": "自由行动",
+        "k": "触发参数",
         "v": {
           "uid": -1,
-          "name": "自由行动",
+          "name": "触发参数",
           "valueType": 0,
           "min": "",
-          "v": "{\r\n  \"uid\": -1,\r\n  \"str\": null,\r\n  \"valName\": null,\r\n  \"num\": 0.0,\r\n  \"dic\": []\r\n}",
+          "v": "{\r\n  \"uid\": -1,\r\n  \"str\": \"\",\r\n  \"valName\": null,\r\n  \"num\": 0.0,\r\n  \"dic\": null\r\n}",
           "max": "",
           "showType": 0
         }

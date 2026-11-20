@@ -1,10 +1,10 @@
 [
   {
-    "uid": 8,
-    "name": "自由行动",
+    "uid": 9,
+    "name": "触发参数",
     "valueType": 0,
     "min": "",
-    "v": "{\r\n  \"uid\": -1,\r\n  \"str\": null,\r\n  \"valName\": null,\r\n  \"num\": 0.0,\r\n  \"dic\": null\r\n}",
+    "v": "{\r\n  \"uid\": -1,\r\n  \"str\": \"\",\r\n  \"valName\": null,\r\n  \"num\": 0.0,\r\n  \"dic\": null\r\n}",
     "max": "",
     "showType": 5
   },

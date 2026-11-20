@@ -25,9 +25,9 @@ using Z_UnitSystem;
 
 public class PlaySceneEffectController : Z_Controller<PlayManager>, IZ_Listener<CharacterEvent>
 {
-    private const float IsometricVerticalEffectHeightScale = 1.41421356f;
-    // 侧视(Isometric)下非地面特效的 X 轴倾角：相机俯角本身就是 45°，
-    // 0° 表示贴图平面竖直立在地面上，45° 表示正对相机。
+    // 侧视(Isometric)下非地面特效的 X 轴倾角回退值：贴图 Y 轴跨过 clip 的
+    // 高/深对角线（公式与 PerspectiveKeeper 的立方体一致），只有高和深都为 0
+    // 时才用它；此时 45° 也正好是正对相机。
     private const float IsometricVerticalEffectPitch = 45f;
     private GameObject effectPrefab => InstancePoolManager.instance.GetPrefab(MapInfo.GetPrefabName("img"));
     private GameObject canvasPrefab => InstancePoolManager.instance.GetPrefab(MapInfo.GetPrefabName("canvas"));
@@ -107,10 +107,12 @@ public class PlaySceneEffectController : Z_Controller<PlayManager>, IZ_Listener<
         foreach (var eft in clips)
         {
             var img = InstancePoolManager.instance.CreateInstance(effectPrefab).GetComponentInChildren<ImageHolder>();
-            bool isIsometricVerticalEffect = GameManager.instance.curProgress.cameraMode == CameraMode.Isometric && !data.ground;
+            // 不再区分 ground：贴图倾角由 clip 的高/深对角线决定，高=0 时 atan2 正好是
+            // 90°（平铺在地面上），这就是原来的地面特效。
+            bool isIsometric = GameManager.instance.curProgress.cameraMode == CameraMode.Isometric;
 
-            if (isIsometricVerticalEffect)
-                img.trs.eulerAngles = Vector3.right * IsometricVerticalEffectPitch;
+            if (isIsometric)
+                img.trs.rotation = GetIsometricRotation(GetIsometricPitch(Vector3.one), -rot);
             else
                 img.trs.eulerAngles = Vector3.right * 90;
 
@@ -124,8 +126,9 @@ public class PlaySceneEffectController : Z_Controller<PlayManager>, IZ_Listener<
             img.oriScale = Vector3.zero;
 
             img.trs.position = pos;
-            img.trs.localEulerAngles = img.trs.localEulerAngles.NewSetZ(-rot);
-            img.trs.localScale = GetEffectScale(Vector3.one, isIsometricVerticalEffect);
+            if (!isIsometric)
+                img.trs.localEulerAngles = img.trs.localEulerAngles.NewSetZ(-rot);
+            img.trs.localScale = GetEffectScale(Vector3.one, isIsometric);
             var propBlock = new MaterialPropertyBlock();
             Texture currentTexture = null;
             bool animatedTexture = false;
@@ -156,11 +159,12 @@ public class PlaySceneEffectController : Z_Controller<PlayManager>, IZ_Listener<
                     beforeUpdate?.Invoke(img);
                     img.trs.position = img.oriPos + clip.pos;
 
-                    if (GameManager.instance.curProgress.cameraMode == CameraMode.Overhead || data.ground)
-                        img.trs.eulerAngles = img.trs.localEulerAngles.NewSetY(img.oriRot + clip.rot);
+                    if (isIsometric)
+                        img.trs.rotation = GetIsometricRotation(
+                            GetIsometricPitch(clip.scale), -(img.oriRot + clip.rot));
                     else
-                        img.trs.localEulerAngles = img.trs.localEulerAngles.NewSetZ(-(img.oriRot + clip.rot));
-                    img.trs.localScale = GetEffectScale(clip.scale, isIsometricVerticalEffect);
+                        img.trs.eulerAngles = img.trs.localEulerAngles.NewSetY(img.oriRot + clip.rot);
+                    img.trs.localScale = GetEffectScale(clip.scale, isIsometric);
 
                 }
                 else if (clip.transition && eft.Count > cur + 1)
@@ -174,11 +178,15 @@ public class PlaySceneEffectController : Z_Controller<PlayManager>, IZ_Listener<
                     beforeUpdate?.Invoke(img);
                     img.trs.position = img.oriPos + Vector3.Lerp(clip.pos, clipNxt.pos, rate);
 
-                    if (GameManager.instance.curProgress.cameraMode == CameraMode.Overhead || data.ground) img.trs.eulerAngles = img.trs.localEulerAngles.NewSetY(img.oriRot + (clip.rot + (clipNxt.rot - clip.rot) * rate));
+                    var lerpScale = Vector3.Lerp(clip.scale, clipNxt.scale, rate);
+                    if (isIsometric)
+                        img.trs.rotation = GetIsometricRotation(
+                            GetIsometricPitch(lerpScale),
+                            -(img.oriRot + (clip.rot + (clipNxt.rot - clip.rot) * rate)));
                     else
-                        img.trs.localEulerAngles = img.trs.localEulerAngles.NewSetZ(-(img.oriRot + (clip.rot + (clipNxt.rot - clip.rot) * rate)));
+                        img.trs.eulerAngles = img.trs.localEulerAngles.NewSetY(img.oriRot + (clip.rot + (clipNxt.rot - clip.rot) * rate));
 
-                    img.trs.localScale = GetEffectScale(Vector3.Lerp(clip.scale, clipNxt.scale, rate), isIsometricVerticalEffect);
+                    img.trs.localScale = GetEffectScale(lerpScale, isIsometric);
 
                 }
 
@@ -207,15 +215,31 @@ public class PlaySceneEffectController : Z_Controller<PlayManager>, IZ_Listener<
             : opacity < 1f ? DisFadeRenderRouting.Route.Transparent : DisFadeRenderRouting.Route.Opaque;
     }
 
-    private static Vector3 GetEffectScale(Vector3 scale, bool isIsometricVerticalEffect)
+    private static Vector3 GetEffectScale(Vector3 scale, bool isIsometric)
     {
-        // √2 高度补偿只针对 X 轴 0°（竖直立在地面上）的贴图平面：
-        // 45° 俯视相机下它的纵向会被压缩 cos45。改成 45° 正对相机后不再压缩，
-        // 所以这里跟随 IsometricVerticalEffectPitch，避免出现 1.414 倍的纵向拉伸。
-        if (isIsometricVerticalEffect && Mathf.Approximately(IsometricVerticalEffectPitch, 0f))
-            scale.y *= IsometricVerticalEffectHeightScale;
+        // 与 PerspectiveKeeper 的立方体贴面对齐：clip 的 y 是高、z 是深。
+        // 侧视时贴图 Y 轴跨过 Y-Z 对角线；俯视时相机垂直向下，只跨深度。
+        // 高=0 时侧视长度退化成深度、倾角 90°，也就是原来的地面特效。
+        float height = Mathf.Abs(scale.y);
+        float depth = Mathf.Abs(scale.z);
+        float length = isIsometric ? Mathf.Sqrt(height * height + depth * depth) : depth;
+        return new Vector3(scale.x, length, 1f);
+    }
 
-        return scale;
+    private static float GetIsometricPitch(Vector3 scale)
+    {
+        float height = Mathf.Abs(scale.y);
+        float depth = Mathf.Abs(scale.z);
+        return height == 0f && depth == 0f
+            ? IsometricVerticalEffectPitch
+            : Mathf.Atan2(depth, height) * Mathf.Rad2Deg;
+    }
+
+    private static Quaternion GetIsometricRotation(float pitch, float roll)
+    {
+        // 先立起对角线倾角，再在贴图平面内做方向 roll；不要改局部欧拉 Z，
+        // 否则父级的 Y 旋转会混进平面法线。
+        return Quaternion.Euler(pitch, 0f, 0f) * Quaternion.AngleAxis(roll, Vector3.forward);
     }
 
     public void Update()

@@ -122,6 +122,7 @@ namespace Z_Code
             {
                 public int debugId;
                 protected Interpreter _interpreter;
+                internal Interpreter RuntimeInterpreter => _interpreter ??= new Interpreter(this);
                 public bool IsCancelled { get; private set; }
 
                 public void Cancel()
@@ -141,12 +142,7 @@ namespace Z_Code
 
                 internal RetInfo Interpret(InterpretBudget budget)
                 {
-                    if (_interpreter == null)
-                    {
-                        _interpreter = new Interpreter(this);
-                    }
-
-                    return _interpreter.Interpret(budget);
+                    return RuntimeInterpreter.Interpret(budget);
                 }
 
                 public void Reset()
@@ -298,6 +294,7 @@ namespace Z_Code
         public InterpretDataForm.Data data;
         private Op? opCode;
         private readonly InterpretAsyncTask asyncTask;
+        private BoxDataForm.Data[] queryArguments;
         private bool hasPendingCommand;
         private int pendingCommandPc, pendingParameterCount, pendingReturnCount;
         private string pendingCommandName;
@@ -450,6 +447,25 @@ namespace Z_Code
 
         internal RetInfo Interpret(InterpretBudget budget)
         {
+            var slice = RunSlice(budget, null, false);
+            return MakeRetInfo(slice.complete, slice.ret);
+        }
+
+        // Only the public result escapes an invocation. Nested callers consume
+        // this value and the child's errors before releasing its context.
+        private readonly struct SliceResult
+        {
+            internal readonly bool complete;
+            internal readonly BoxDataForm.Data ret;
+            internal SliceResult(bool complete, BoxDataForm.Data ret)
+            {
+                this.complete = complete;
+                this.ret = ret;
+            }
+        }
+
+        private SliceResult RunSlice(InterpretBudget budget, Interpreter caller, bool discardReturn)
+        {
             budget ??= new InterpretBudget(MaxInstructionsPerExecution);
             bool isRoot = !budget.IsTiming;
             if (isRoot)
@@ -472,7 +488,7 @@ namespace Z_Code
 #endif
             try
             {
-                return InterpretCore(budget);
+                return InterpretCore(budget, caller, discardReturn);
             }
             finally
             {
@@ -485,19 +501,19 @@ namespace Z_Code
             }
         }
 
-        private RetInfo InterpretCore(InterpretBudget budget)
+        private SliceResult InterpretCore(InterpretBudget budget, Interpreter caller, bool discardReturn)
         {
             errors.Clear();
             opCode = null;
 
             if (data == null || data.IsCancelled)
             {
-                return MakeRetInfo(true);
+                return FinishSlice(true);
             }
 
             if (!TryPrepare(out var zCode))
             {
-                return MakeRetInfo(true);
+                return FinishSlice(true);
             }
 
             int count = zCode.Count;
@@ -508,27 +524,29 @@ namespace Z_Code
 
             while (data.p < count)
             {
-                executionPc = data.p;
                 if (data.IsCancelled)
                 {
-                    return MakeRetInfo(true);
+                    return FinishSlice(true);
                 }
 
+                // One clock read between instructions. Keep the previous PC until this
+                // check so a slow command is reported at its own source location.
                 if (budget.HasTimedOut)
                 {
-                    return MakeRetInfo(true);
+                    return FinishSlice(true);
                 }
 
+                executionPc = data.p;
                 if (!budget.TryConsumeInstruction())
                 {
-                    return MakeRetInfo(false);
+                    return FinishSlice(false);
                 }
 
                 int instructionPc = data.p;
                 if (!TryReadOpcode(zCode, instructionPc, out var parsedOp, out var parseError))
                 {
                     AddError(instructionPc, parseError);
-                    return MakeRetInfo(true);
+                    return FinishSlice(true);
                 }
 
                 opCode = parsedOp;
@@ -578,9 +596,9 @@ namespace Z_Code
                             int operandIndex = GetOperandIndex(zCode, instructionPc, parsedOp);
                             var callResult = ExecuteCall(zCode[operandIndex], budget, instructionPc,
                                 parsedOp == Op.CallDiscard);
-                            if (callResult != null)
+                            if (callResult.HasValue)
                             {
-                                return callResult;
+                                return callResult.Value;
                             }
 
                             break;
@@ -799,7 +817,7 @@ namespace Z_Code
                             if (waitValue.num > 0f)
                             {
                                 Push(waitValue);
-                                return MakeRetInfo(false);
+                                return FinishSlice(false);
                             }
 
                             data.p++;
@@ -809,17 +827,26 @@ namespace Z_Code
                         {
                             var result = GetBox(Pop());
                             data.p++;
-                            return MakeRetInfo(true, result);
+                            var slice = FinishSlice(true, discardReturn ? null : result);
+                            if (slice.ret is TemporaryBox temporary)
+                            {
+                                // A command may return an already escaped Box. Transfer only
+                                // an exclusive operand owned by this child back to its caller.
+                                if (temporary.owner == this && temporary.stackReferences == 0)
+                                    temporary.owner = caller;
+                                else
+                                    ExportBox(temporary);
+                            }
+                            return slice;
                         }
                         default:
                             throw new InvalidOperationException($"不支持的操作码: {parsedOp}");
                     }
-                    if (budget.HasTimedOut) return MakeRetInfo(true);
                 }
                 catch (Exception ex)
                 {
                     AddError(instructionPc, $"执行 {parsedOp} 指令失败: {ex.Message}", ex);
-                    return MakeRetInfo(true);
+                    return FinishSlice(true);
                 }
                 finally
                 {
@@ -828,10 +855,10 @@ namespace Z_Code
                 }
             }
 
-            return MakeRetInfo(true);
+            return FinishSlice(true);
         }
 
-        private RetInfo ExecuteCall(string funcName, InterpretBudget budget, int instructionPc,
+        private SliceResult? ExecuteCall(string funcName, InterpretBudget budget, int instructionPc,
             bool discardReturn)
         {
 #if INTERPRETER_DEBUG
@@ -861,6 +888,9 @@ namespace Z_Code
                 {
                     throw new InvalidOperationException($"命令 {funcName} 最多接受 {expectedParameterCount} 个参数，实际为 {parameterCount} 个");
                 }
+
+                if (cmd is SynchronousQueryCmd query && parameterCount == expectedParameterCount && form.retNames?.Count == 1)
+                    return ExecuteQuery(query, funcName, instructionPc, parameterCount, discardReturn);
 
                 var parameters = new BoxDataForm.Data[expectedParameterCount];
                 int missingParameterCount = expectedParameterCount - parameterCount;
@@ -912,13 +942,14 @@ namespace Z_Code
             if (!budget.TryEnterSubProgram())
             {
                 AddError(instructionPc, $"程序调用层级超过限制: {funcName}");
-                return MakeRetInfo(true);
+                return FinishSlice(true);
             }
 
-            RetInfo subResult;
+            var child = data.subInterpret.RuntimeInterpreter;
+            SliceResult subResult;
             try
             {
-                subResult = data.subInterpret.Interpret(budget);
+                subResult = child.RunSlice(budget, this, discardReturn);
             }
             finally
             {
@@ -927,19 +958,19 @@ namespace Z_Code
 
             if (data.IsCancelled)
             {
-                return MakeRetInfo(true);
+                return FinishSlice(true);
             }
 
-            if (subResult.errors != null && subResult.errors.Count > 0)
+            if (child.errors.Count > 0)
             {
-                errors.AddRange(subResult.errors);
+                errors.AddRange(child.errors);
                 ReleaseSubProgram(false);
-                return MakeRetInfo(true);
+                return FinishSlice(true);
             }
 
             if (!subResult.complete)
             {
-                return MakeRetInfo(false);
+                return FinishSlice(false);
             }
 
             bool completed = false;
@@ -963,16 +994,53 @@ namespace Z_Code
             return null;
         }
 
-        private RetInfo ResumeCommand(int instructionPc)
+        private SliceResult? ExecuteQuery(SynchronousQueryCmd query, string funcName, int pc, int count, bool discardReturn)
         {
-            if (data.IsCancelled) return MakeRetInfo(true);
-            if (!asyncTask.IsComplete()) return MakeRetInfo(false);
+            var buffer = queryArguments;
+            if (buffer == null || buffer.Length < count) buffer = new BoxDataForm.Data[count];
+            // A query may indirectly invoke script code. Give a nested call its own arguments.
+            queryArguments = null;
+            try
+            {
+                int start = data.top - count;
+                for (int i = count - 1; i >= 0; i--)
+                    buffer[i] = GetBox(data.stack[start + i]);
+
+                BoxDataForm.Data result;
+                try { result = query.ExecuteQuery(buffer.AsSpan(0, count), data.heap); }
+                catch (Exception ex)
+                {
+                    AddError(pc, query.GetName() + " 执行失败: " + ex.Message);
+                    return FinishSlice(true);
+                }
+                if (data.IsCancelled) return FinishSlice(true);
+                if (result == null)
+                {
+                    AddError(pc, $"命令 {funcName} 的第 1 个返回值为空");
+                    return FinishSlice(true);
+                }
+                PopMany(count + 1);
+                if (!discardReturn) Push(result);
+                data.p += 2;
+                return null;
+            }
+            finally
+            {
+                Array.Clear(buffer, 0, count);
+                queryArguments = buffer;
+            }
+        }
+
+        private SliceResult? ResumeCommand(int instructionPc)
+        {
+            if (data.IsCancelled) return FinishSlice(true);
+            if (!asyncTask.IsComplete()) return FinishSlice(false);
             if (!string.IsNullOrEmpty(asyncTask.error))
             {
                 string commandError = asyncTask.error;
                 ResetCommand();
                 AddError(instructionPc, commandError);
-                return MakeRetInfo(true);
+                return FinishSlice(true);
             }
             int returnCount = pendingReturnCount;
             if (returnCount > 0 && (asyncTask.res == null || asyncTask.res.Length < returnCount))
@@ -980,7 +1048,7 @@ namespace Z_Code
                 string resultError = $"命令 {pendingCommandName} 声明 {returnCount} 个返回值，但实际未返回足够结果";
                 ResetCommand();
                 AddError(instructionPc, resultError);
-                return MakeRetInfo(true);
+                return FinishSlice(true);
             }
             for (int i = 0; i < returnCount; i++)
             {
@@ -988,7 +1056,7 @@ namespace Z_Code
                 string resultError = $"命令 {pendingCommandName} 的第 {i + 1} 个返回值为空";
                 ResetCommand();
                 AddError(instructionPc, resultError);
-                return MakeRetInfo(true);
+                return FinishSlice(true);
             }
             PopMany(pendingParameterCount + 1);
             if (!pendingDiscardReturn)
@@ -1611,7 +1679,7 @@ namespace Z_Code
             return (line, column, lineContent);
         }
 
-        private RetInfo MakeRetInfo(bool complete, BoxDataForm.Data ret = null)
+        private SliceResult FinishSlice(bool complete, BoxDataForm.Data ret = null)
         {
             // Also check return/yield boundaries: the last instruction or a Cmd
             // that starts asynchronous work can itself take longer than a second.
@@ -1630,7 +1698,12 @@ namespace Z_Code
                 ret = null;
             }
             if (complete && (data?.IsCancelled == true || errors.Count > 0)) ReleaseSubProgram(false);
-            var info = new RetInfo(complete, ExportBox(ret));
+            return new SliceResult(complete, ret);
+        }
+
+        private RetInfo MakeRetInfo(bool complete, BoxDataForm.Data ret)
+        {
+            var info = new RetInfo(complete, ret);
             info.errors.AddRange(errors);
             return info;
         }

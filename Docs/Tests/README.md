@@ -16,11 +16,13 @@ restoration of FixedUpdate/Update/Script modes. GameSample opts into this mode a
 logical scene load; generic Map callers and ProjectSettings retain their defaults.
 
 `-Fixture CodeInterpreterRuntimeRegression -InterpreterBenchmark` measures seven
-warmed Stopwatch samples for batches of 40 owners, with Profiler recording disabled.
-It uses real compiled scalar loops, nested stored programs, dictionary copy-in/out
-and Cmd dispatch, including root Reset. Compare min/median/max between revisions;
-these synthetic batches are not a measurement of the active Story or a Deep Profile
-frame. Benchmark output is `INTERPRETER_BENCHMARK` and the completion marker is
+warmed Stopwatch samples with Profiler recording disabled. The `story-hostility`
+workload compiles Story 1 program 26 and executes three team pairs for each of 37
+owners, checking the result of 111 calls per batch with the real character parameter
+command. The other workloads use 40 owners for scalar loops, nested programs,
+dictionary copy-in/out and command dispatch. All include root Reset. Compare
+min/median/max between revisions under the same Editor workload. Benchmark output
+is `INTERPRETER_BENCHMARK` and the completion marker is
 `INTERPRETER_HOT_PATH_BENCHMARK_PASS`.
 
 Map hot-path checks: `ObjectCollisionTilesRegression` compares state-only event

@@ -46,6 +46,8 @@ public static class SceneProductCommandRegression
             var invalidGeneration = Invoke((CmdBase)Activator.CreateInstance(generateType), Text("invalid"), Vector(Vector3.zero));
             Check(invalidGeneration.IsComplete() && invalidGeneration.res[0].num == 0,
                 "invalid character generation returns zero without placing a character");
+            Equal(Read(Invoke(new GetPositionCmd(), Text("$ch$ +97500 $ch$")).res[0]),
+                GameManager.MapPosToPlayerPos(characterA.data.pos), "scene getters accept the existing signed/padded Character UID");
             CheckGroup("Character", "$ch$97500$ch$", "$ch$97501$ch$", new MapUnit[] { characterA, characterB });
 
             var objectTemplate = MapObjectForm.defaultData;
@@ -185,6 +187,20 @@ public static class SceneProductCommandRegression
         Equal(Read(Invoke(new GetPositionCmd(), Text(template)).res[0]),
             GameManager.MapPosToPlayerPos(units[0].data.pos),
             family + " scalar/vector getter selects deterministic first target");
+        // Keep both typed placements and their warm index, but invalidate the root identity of the first.
+        var first = units[0].data;
+        UnitForm.DataByUid[first.uid] = units[1].data;
+        try
+        {
+            Equal(Read(Invoke(new GetPositionCmd(), Text(template)).res[0]),
+                GameManager.MapPosToPlayerPos(units[1].data.pos), family + " getter skips a stale lowest-UID placement");
+            Equal(Read(Invoke(new GetPositionCmd(), Text(exact)).res[0]), Vector3.zero,
+                family + " getter rejects a stale exact placement");
+        }
+        finally
+        {
+            UnitForm.DataByUid[first.uid] = first;
+        }
         var second = units[1].data.pos;
         Invoke(new SetPositionRelativeCmd(), Text(exact), Vector(Vector3.right));
         Equal(units[0].data.pos, initial[0] + Vector3.forward + Vector3.right, family + " exact Product moves its target");

@@ -5341,8 +5341,6 @@ namespace ModStoryEffectUnit
             public UiClipsCtrl sub_clips;
             public Ipt ipt_name;
             public Btn btn_label;
-            public Btn btn_ground;
-            public Sta sta_ground;
             public Txt txt_label;
         public UiModStoryEffectUnitView(UiHolder uiHolder):base(uiHolder)
         {
@@ -5354,9 +5352,7 @@ namespace ModStoryEffectUnit
             sub_clips = (UiClipsCtrl) uiHolder.elementTrsLst[4].GetComponent<UiHolder>().ctrl;
             ipt_name = uiHolder.elementTrsLst[5].GetComponent<Ipt>();
             btn_label = uiHolder.elementTrsLst[6].GetComponent<Btn>();
-            btn_ground = uiHolder.elementTrsLst[7].GetComponent<Btn>();
-            sta_ground = uiHolder.elementTrsLst[8].GetComponent<Sta>();
-            txt_label = uiHolder.elementTrsLst[9].GetComponent<Txt>();
+            txt_label = uiHolder.elementTrsLst[7].GetComponent<Txt>();
         }
 
     }

@@ -173,7 +173,7 @@ Rules:
 
 - Do not hand-edit `UiBase`; the generator deletes and rewrites its target file.
 - Do not restore a scene or `UiManager` preload list, and do not hand-write object references in the config asset.
-- `UiHolderEditor.Generate` saves dirty Prefab Mode contents or applies current Prefab-instance overrides before reading the persistent Prefab source.
+- `UiHolderEditor.Generate` first persists the current prefab modifications of the prefab that owns this `UiHolder` (the source Generate reads): it saves the dirty Prefab Mode contents when the open prefab is that same prefab asset, and otherwise applies that owning prefab's instance overrides (scene instance, or a nested instance inside another prefab stage). Never save the enclosing prefab just because the holder sits inside it; a failed save/apply aborts Generate instead of emitting stale bindings. Pure scene holders have nothing to save.
 - Do not add an implicit Resources/default-config fallback; missing Manager or Holder references are configuration errors.
 - Keep the registry free of null entries and duplicate `uiName` values; only top-level Panels are registered.
 - Put state in the partial Model, input in Param, rendering references in generated View, and behavior in the partial Controller.

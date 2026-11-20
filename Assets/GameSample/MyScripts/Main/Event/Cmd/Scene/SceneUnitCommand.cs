@@ -11,8 +11,13 @@ namespace Z_Code
     {
         public static MapUnit Resolve(string reference)
         {
-            var units = ResolveAll(reference);
-            return units.Count == 0 ? null : units[0];
+            if (string.IsNullOrEmpty(reference)) return null;
+            if (TryGetId(reference, GlobalEventHelper.CHARACTER, out int productUid))
+            {
+                var character = PlayManager.instance.sceneCtrl?.GetCharacterUnit(productUid);
+                return character?.unit;
+            }
+            return GlobalEventHelper.ResolveSceneObjectUnit(reference);
         }
 
         public static List<MapUnit> ResolveAll(string reference)
@@ -43,7 +48,7 @@ namespace Z_Code
             return reference.Length > mark.Length * 2
                 && reference.StartsWith(mark, StringComparison.Ordinal)
                 && reference.EndsWith(mark, StringComparison.Ordinal)
-                && int.TryParse(reference.Substring(mark.Length, reference.Length - mark.Length * 2), out uid)
+                && int.TryParse(reference.AsSpan(mark.Length, reference.Length - mark.Length * 2), out uid)
                 && uid > 0;
         }
 

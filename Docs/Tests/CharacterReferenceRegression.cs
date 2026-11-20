@@ -83,6 +83,19 @@ public static class CharacterReferenceRegression
                 && CharacterProductForm.ResolveReference(unrelated.uid) == unrelated,
                 "missing Play copy cannot mutate a template but read-only fallback remains available");
             CachedSceneLookup(scene, template, copyA, copyB, unrelated, unitA, unitB);
+            Check(CharacterProductForm.TryGetReferenceUid("$ch$0002147483647$ch$", out int maxUid)
+                && maxUid == int.MaxValue, "positive invariant UIDs retain leading zeros and the full int range");
+            var offline = Product(97110, 0, false);
+            var higher = Product(97112, offline.uid, false);
+            var lower = Product(97109, offline.uid, false);
+            Check(CharacterProductForm.ResolveReference(offline.uid) == lower,
+                "no-placement template chooses the lowest Product UID regardless of insertion order");
+            offline.unique = true;
+            CharacterProductForm.RemoveData(lower.uid);
+            Check(CharacterProductForm.ResolveReference(offline.uid) == offline
+                && CharacterProductForm.ResolveReference(higher.uid) == higher,
+                "no-placement unique template competes with copies by UID and exact references stay exact");
+            CheckParameterResultOwnership(copyB, template);
 
             foreach (string malformed in new[] { null, "", "$ch$$ch$", "$ch$x$ch$", "$ch$0$ch$",
                 "$ch$-1$ch$", "$ch$1$ch$extra", "$ch$999999999999999999$ch$", "$so$97102$so$" })
@@ -223,6 +236,30 @@ public static class CharacterReferenceRegression
     }
 
     private static string Handle(int uid) => "$ch$" + uid + "$ch$";
+
+    private static void CheckParameterResultOwnership(CharacterProductForm.Data live, CharacterProductForm.Data template)
+    {
+        var parameter = new CharacterParamForm.Data(-1, "Team", default, "", "", "", default);
+        live.paramDic["Team"] = parameter;
+        parameter.GetValue().dic["member"] = CodeHelper.CreateBoxByNum(1);
+        var query = new GetCharacterParameterCmd();
+        var task = new InterpretAsyncTask(null);
+        var heap = new Dictionary<string, BoxDataForm.Data>();
+        BoxDataForm.Data Read(string key)
+        {
+            query.Execute(new[] { CodeHelper.CreateBoxByStr(key), CodeHelper.CreateBoxByStr(Handle(template.uid)) },
+                heap, task);
+            Check(task.IsComplete() && task.error == null && task.res?.Length == 1, "getter returns one value");
+            return task.res[0];
+        }
+        var first = Read("Team");
+        first.dic["member"].num = 7;
+        var second = Read("Team");
+        Check(second.dic["member"].num == 1 && parameter.GetValue().dic["member"].num == 1,
+            "editing an earlier query result cannot mutate the live parameter or later query results");
+        Check(Read("missing").dic.Count == 0, "missing parameter retains an empty result dictionary");
+        live.paramDic.Remove("Team");
+    }
 
     private static void Execute(CmdBase command, string reference, float number = 0)
     {

@@ -1,10 +1,11 @@
+using System;
 using UnityEngine;
 using Z_Code.Form;
 using Z_Map;
 
 namespace Z_Code
 {
-    public class GetPositionCmd : CmdBase
+    public class GetPositionCmd : SynchronousQueryCmd
     {
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterAssembliesLoaded)]
         static void Init()
@@ -24,28 +25,24 @@ namespace Z_Code
         }
 
         public override string GetName() => "GetPosition";
-        public override CmdBase GetNew() => new GetPositionCmd();
-        protected override bool ExecuteInternal(BoxDataForm.Data[] prm, InterpretAsyncTask asyncTask)
+        protected override BoxDataForm.Data Query(ReadOnlySpan<BoxDataForm.Data> prm)
         {
             var unit = SceneUnitCommand.Resolve(prm[0].str);
             var position = unit == null ? Vector3.zero : GameManager.MapPosToPlayerPos(unit.data.pos);
-            asyncTask.res = new[] { SceneUnitCommand.BoxVector(position) };
-            return true;
+            return SceneUnitCommand.BoxVector(position);
         }
     }
 
-    public class GetPositionRelativeCmd : CmdBase
+    public class GetPositionRelativeCmd : SynchronousQueryCmd
     {
         public override string GetName() => "GetPositionRelative";
-        public override CmdBase GetNew() => new GetPositionRelativeCmd();
-        protected override bool ExecuteInternal(BoxDataForm.Data[] prm, InterpretAsyncTask asyncTask)
+        protected override BoxDataForm.Data Query(ReadOnlySpan<BoxDataForm.Data> prm)
         {
             var target = SceneUnitCommand.Resolve(prm[0].str);
             var origin = SceneUnitCommand.Resolve(prm[1].str);
             var offset = target == null || origin == null ? Vector3.zero :
                 target.data.pos - origin.data.pos;
-            asyncTask.res = new[] { SceneUnitCommand.BoxVector(offset) };
-            return true;
+            return SceneUnitCommand.BoxVector(offset);
         }
     }
 

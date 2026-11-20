@@ -16,7 +16,7 @@ namespace Z_Code
             new Dictionary<string, Unity.Profiling.ProfilerMarker>(StringComparer.Ordinal);
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
         private static void ResetProfilerMarkers() => profilerMarkers.Clear();
-        private Unity.Profiling.ProfilerMarker GetProfilerMarker()
+        internal Unity.Profiling.ProfilerMarker GetProfilerMarker()
         {
             string name = GetName();
             if (!profilerMarkers.TryGetValue(name, out var marker))
@@ -62,6 +62,17 @@ namespace Z_Code
 
         public abstract CmdBase GetNew();
         protected abstract bool ExecuteInternal(BoxDataForm.Data[] prm, InterpretAsyncTask asyncTask);
+        internal static BoxDataForm.Data ResolveParameter(BoxDataForm.Data parameter, int index,
+            Dictionary<string, BoxDataForm.Data> heap)
+        {
+            if (parameter == null)
+                throw new InvalidOperationException($"第 {index + 1} 个命令参数为空");
+            if (string.IsNullOrEmpty(parameter.valName)) return parameter;
+            if (!heap.TryGetValue(parameter.valName, out var value) || value == null)
+                throw new KeyNotFoundException($"找不到命令参数变量 {parameter.valName}");
+            return value;
+        }
+
         public void Execute(BoxDataForm.Data[] prm, Dictionary<string, BoxDataForm.Data> heap, InterpretAsyncTask asyncTask)
         {
 #if ENABLE_PROFILER
@@ -86,20 +97,7 @@ namespace Z_Code
 
                 for (int i = 0; i < prm.Length; i++)
                 {
-                    if (prm[i] == null)
-                    {
-                        throw new InvalidOperationException($"第 {i + 1} 个命令参数为空");
-                    }
-                    if (!string.IsNullOrEmpty(prm[i].valName))
-                    {
-                        if (!heap.TryGetValue(prm[i].valName, out var value) || value == null)
-                        {
-                            throw new KeyNotFoundException($"找不到命令参数变量 {prm[i].valName}");
-                        }
-                        prm[i] = value;
-                    }
-                    // Scalar arguments keep dic == null. Dictionary writers must
-                    // request storage explicitly at the point they need it.
+                    prm[i] = ResolveParameter(prm[i], i, heap);
                 }
 
                 Array.Reverse(prm);
@@ -119,6 +117,30 @@ namespace Z_Code
                 if (hasProfile) profile.Dispose();
 #endif
             }
+        }
+    }
+
+    // Stateless synchronous queries borrow their inputs only during Query.
+    // Return an independently owned Box, including any dictionary children.
+    public abstract class SynchronousQueryCmd : CmdBase
+    {
+        public sealed override CmdBase GetNew() => this;
+        protected abstract BoxDataForm.Data Query(ReadOnlySpan<BoxDataForm.Data> parameters);
+
+        protected sealed override bool ExecuteInternal(BoxDataForm.Data[] prm, InterpretAsyncTask asyncTask)
+        {
+            asyncTask.res = new[] { Query(prm) };
+            return true;
+        }
+
+        internal BoxDataForm.Data ExecuteQuery(Span<BoxDataForm.Data> parameters, Dictionary<string, BoxDataForm.Data> heap)
+        {
+#if ENABLE_PROFILER
+            using var scope = GetProfilerMarker().Auto();
+#endif
+            for (int i = parameters.Length - 1; i >= 0; i--)
+                parameters[i] = ResolveParameter(parameters[i], parameters.Length - i - 1, heap);
+            return Query(parameters);
         }
     }
 }

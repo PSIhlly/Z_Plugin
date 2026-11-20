@@ -492,50 +492,85 @@ using Z_Texture;
             GeneratePanelFile(persistentUi, preloadConfig);
         }
 
+        // Generate 读取的是这个 UiHolder 所在的预制源，所以先把它当前的修改保存下来。
+        // 只有当前编辑/所在的预制就是这个预制时才保存整个预制；如果它只是当前预制里的嵌套实例，
+        // 就只把这个实例的修改应用回它自己的预制，绝不写入当前打开的那个无关预制。
         private bool SaveCurrentPrefabChanges()
         {
             var sourceUi = uiHolder.gameObject;
             var prefabStage = PrefabStageUtility.GetPrefabStage(sourceUi);
+            var owningPrefabPath = GetOwningPrefabPath(sourceUi, prefabStage);
+
             if (prefabStage != null && prefabStage.prefabContentsRoot != null)
             {
-                if (!prefabStage.scene.isDirty)
-                    return true;
+                if (string.Equals(owningPrefabPath, prefabStage.assetPath, StringComparison.OrdinalIgnoreCase))
+                    return SavePrefabStage(prefabStage);
 
-                PrefabUtility.SaveAsPrefabAsset(
-                    prefabStage.prefabContentsRoot,
-                    prefabStage.assetPath,
-                    out var savedSuccessfully);
-                if (!savedSuccessfully)
-                {
-                    Debug.LogError($"Failed to save Prefab '{prefabStage.assetPath}' before Generate.");
-                    return false;
-                }
-
-                prefabStage.ClearDirtiness();
-                AssetDatabase.SaveAssets();
-                return true;
+                return ApplyOwningPrefabInstance(sourceUi, owningPrefabPath);
             }
 
             if (EditorUtility.IsPersistent(sourceUi))
-            {
-                var prefabRoot = sourceUi.transform.root.gameObject;
-                var assetPath = AssetDatabase.GetAssetPath(prefabRoot);
-                if (!assetPath.EndsWith(".prefab", StringComparison.OrdinalIgnoreCase))
-                    return true;
+                return SavePrefabAsset(sourceUi.transform.root.gameObject);
 
-                PrefabUtility.SavePrefabAsset(prefabRoot, out var savedSuccessfully);
-                if (!savedSuccessfully)
-                {
-                    Debug.LogError($"Failed to save Prefab '{assetPath}' before Generate.");
-                    return false;
-                }
+            return ApplyOwningPrefabInstance(sourceUi, owningPrefabPath);
+        }
 
-                AssetDatabase.SaveAssets();
+        // 返回 UiHolder 所在的持久预制路径；纯场景对象或无法解析时返回 null。
+        private static string GetOwningPrefabPath(GameObject sourceUi, PrefabStage prefabStage)
+        {
+            var inPrefabStage = prefabStage != null && prefabStage.prefabContentsRoot != null;
+            if (inPrefabStage && sourceUi == prefabStage.prefabContentsRoot)
+                return prefabStage.assetPath;
+
+            var sourceObject = PrefabUtility.GetCorrespondingObjectFromSource(sourceUi);
+            if (sourceObject != null)
+                return AssetDatabase.GetAssetPath(sourceObject);
+
+            // 预制模式里的对象没有对应的预制源时，它属于当前打开的这个预制。
+            return inPrefabStage ? prefabStage.assetPath : null;
+        }
+
+        private static bool SavePrefabStage(PrefabStage prefabStage)
+        {
+            if (!prefabStage.scene.isDirty)
                 return true;
+
+            PrefabUtility.SaveAsPrefabAsset(
+                prefabStage.prefabContentsRoot,
+                prefabStage.assetPath,
+                out var savedSuccessfully);
+            if (!savedSuccessfully)
+            {
+                Debug.LogError($"Failed to save Prefab '{prefabStage.assetPath}' before Generate.");
+                return false;
             }
 
-            var instanceRoot = PrefabUtility.GetOutermostPrefabInstanceRoot(sourceUi);
-            if (instanceRoot == null || !PrefabUtility.HasPrefabInstanceAnyOverrides(instanceRoot, false))
+            prefabStage.ClearDirtiness();
+            AssetDatabase.SaveAssets();
+            return true;
+        }
+
+        private static bool SavePrefabAsset(GameObject prefabRoot)
+        {
+            var assetPath = AssetDatabase.GetAssetPath(prefabRoot);
+            if (!assetPath.EndsWith(".prefab", StringComparison.OrdinalIgnoreCase))
+                return true;
+
+            PrefabUtility.SavePrefabAsset(prefabRoot, out var savedSuccessfully);
+            if (!savedSuccessfully)
+            {
+                Debug.LogError($"Failed to save Prefab '{assetPath}' before Generate.");
+                return false;
+            }
+
+            AssetDatabase.SaveAssets();
+            return true;
+        }
+
+        private static bool ApplyOwningPrefabInstance(GameObject sourceUi, string owningPrefabPath)
+        {
+            var instanceRoot = FindOwningPrefabInstanceRoot(sourceUi, owningPrefabPath);
+            if (instanceRoot == null || !HasPrefabInstanceChanges(instanceRoot))
                 return true;
 
             try
@@ -546,9 +581,47 @@ using Z_Texture;
             }
             catch (Exception exception)
             {
-                Debug.LogError($"Failed to apply Prefab instance changes before Generate: {exception.Message}");
+                Debug.LogError($"Failed to apply the instance changes of '{owningPrefabPath}' before Generate, so the generated code would be stale: {exception.Message}");
                 return false;
             }
+        }
+
+        // 只有新增/删除的子物体与组件也算修改：它们会被记成默认覆盖，所以不能直接传
+        // includeDefaultOverrides = true，否则会把实例的根节点变换一起应用进预制。
+        private static bool HasPrefabInstanceChanges(GameObject instanceRoot)
+        {
+            if (PrefabUtility.HasPrefabInstanceAnyOverrides(instanceRoot, false))
+                return true;
+
+            return PrefabUtility.GetAddedGameObjects(instanceRoot).Count > 0 ||
+                   PrefabUtility.GetAddedComponents(instanceRoot).Count > 0 ||
+                   PrefabUtility.GetRemovedComponents(instanceRoot).Count > 0;
+        }
+
+        // 找到“这个脚本所在的预制”对应的实例根，而不是无条件的嵌套最外层实例。
+        private static GameObject FindOwningPrefabInstanceRoot(GameObject sourceUi, string owningPrefabPath)
+        {
+            if (string.IsNullOrEmpty(owningPrefabPath))
+                return null;
+
+            for (var currentTransform = sourceUi.transform; currentTransform != null; currentTransform = currentTransform.parent)
+            {
+                var current = currentTransform.gameObject;
+                if (PrefabUtility.GetNearestPrefabInstanceRoot(current) != current)
+                    continue;
+
+                var sourceRoot = PrefabUtility.GetCorrespondingObjectFromSource(current);
+                if (sourceRoot == null)
+                    continue;
+
+                if (string.Equals(
+                        AssetDatabase.GetAssetPath(sourceRoot),
+                        owningPrefabPath,
+                        StringComparison.OrdinalIgnoreCase))
+                    return current;
+            }
+
+            return null;
         }
 
         private void GeneratePanelFile(GameObject persistentUi, UiPreloadConfig preloadConfig)

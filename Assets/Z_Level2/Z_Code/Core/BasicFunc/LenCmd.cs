@@ -6,7 +6,7 @@ using Z_Code.Form;
 
 namespace Z_Code
 {
-    public class LenCmd : CmdBase
+    public class LenCmd : SynchronousQueryCmd
     {
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterAssembliesLoaded)]
         static void Init()
@@ -14,12 +14,9 @@ namespace Z_Code
             Register(new LenCmd());
         }
         public override string GetName() => "Len";
-        public override CmdBase GetNew() => new LenCmd();
-        protected override bool ExecuteInternal(BoxDataForm.Data[] prm, InterpretAsyncTask asyncTask)
+        protected override BoxDataForm.Data Query(ReadOnlySpan<BoxDataForm.Data> prm)
         {
-            int length = GetLength(prm[0].dic);
-            asyncTask.res = new BoxDataForm.Data[] { CodeHelper.CreateBoxByNum(length) };
-            return true;
+            return CodeHelper.CreateBoxByNum(GetLength(prm[0].dic));
         }
 
         // This is scratch space, not a cache of a dictionary's length: same-count

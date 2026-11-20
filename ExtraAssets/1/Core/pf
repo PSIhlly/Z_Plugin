@@ -40,7 +40,7 @@
     "curMissionId": 0,
     "targetScene": {
       "item1": 3,
-      "item2": "-2|0|-30"
+      "item2": "-48|0|170"
     },
     "banSceneChange": false,
     "eventState": 0,

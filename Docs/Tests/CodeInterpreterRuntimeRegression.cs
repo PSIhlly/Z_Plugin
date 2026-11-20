@@ -1,7 +1,10 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Reflection;
+using Form;
+using Newtonsoft.Json.Linq;
 using NUnit.Framework;
 using UnityEditor;
 using UnityEngine;
@@ -25,6 +28,7 @@ public static class CodeInterpreterRuntimeRegression
             UnityEngine.Profiling.Profiler.enabled = false;
             fixture.RegisterCommandsForEditMode();
             ProgramDataForm.InitInternal();
+            BenchmarkHostility();
             var child = BenchmarkProgram("BenchScalarChild", "Return param1*param2+1;");
             ProgramDataForm.DataByName[child.name] = child;
             var middle = BenchmarkProgram("BenchScalarMiddle", "Return BenchScalarChild(param1,param2)+BenchScalarChild(param2,param1);");
@@ -58,9 +62,32 @@ public static class CodeInterpreterRuntimeRegression
         return new ProgramDataForm.Data(-1, name, source, code, sourceMap, parameters, returns);
     }
 
-    private static void Benchmark(string name, string source)
+    private static void BenchmarkHostility()
     {
-        const int owners = 40, frames = 100, samples = 7;
+        GameCmdDataForm.InitInternal();
+        CharacterProductForm.InitInternal();
+        for (int team = 0; team <= 1; team++)
+        {
+            var product = CharacterProductForm.defaultData;
+            product.uid = 97101 + team;
+            product.protoUid = 97100;
+            var parameter = CharacterParamForm.defaultData;
+            parameter.SetValue(team);
+            product.paramDic = new Dictionary<string, CharacterParamForm.Data> { ["Team"] = parameter };
+            CharacterProductForm.AddData(product);
+        }
+        string file = Path.Combine(Path.GetDirectoryName(Application.dataPath), "ExtraAssets/1/Core/ef");
+        var row = JArray.Parse(File.ReadAllText(file)).Single(value => (int)value["uid"] == 26);
+        var hostility = BenchmarkProgram((string)row["name"], (string)row["code"]);
+        ProgramDataForm.DataByName[hostility.name] = hostility;
+        string setup = "a=\"$ch$97101$ch$\";b=\"$ch$97102$ch$\";";
+        Benchmark("story-hostility", setup + $"Return {hostility.name}(a,b)+{hostility.name}(b,a)+{hostility.name}(b,b);",
+            owners: 37, expected: 2);
+    }
+
+    private static void Benchmark(string name, string source, int owners = 40, float? expected = null)
+    {
+        const int frames = 100, samples = 7;
         var program = BenchmarkProgram("Benchmark_" + name, source);
         var calls = new InterpretDataForm.Data[owners];
         for (int i = 0; i < owners; i++)
@@ -75,6 +102,8 @@ public static class CodeInterpreterRuntimeRegression
                 var result = call.Interpret();
                 if (!result.complete || result.errors.Count != 0)
                     throw new InvalidOperationException(name + " did not complete: " + string.Join(";", result.errors));
+                if (expected.HasValue && result.ret.num != expected.Value)
+                    throw new InvalidOperationException(name + " produced " + result.ret.num);
             }
         }
         for (int i = 0; i < 20; i++) Frame();

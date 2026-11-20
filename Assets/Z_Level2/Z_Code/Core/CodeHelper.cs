@@ -33,15 +33,17 @@ namespace Z_Code.Form
 
             public Data DeepCopy(bool sameId = true)
             {
+                // Only a Box with children can introduce an edge into the active copy path.
+                var children = dic;
+                if (children == null || children.Count == 0)
+                    return new Data(sameId ? uid : uidChain.GetId(), str, valName, num,
+                        children == null ? null : new Dictionary<string, Data>());
+
                 using (DataCopyGuard.Enter(this))
                 {
-                    Dictionary<string, BoxDataForm.Data> tmpDic = null;
-                    if (dic != null)
-                    {
-                        tmpDic = new Dictionary<string, BoxDataForm.Data>(dic.Count);
-                        foreach (var pair in dic)
-                            tmpDic[pair.Key] = pair.Value?.DeepCopy();
-                    }
+                    var tmpDic = new Dictionary<string, BoxDataForm.Data>(children.Count);
+                    foreach (var pair in children)
+                        tmpDic[pair.Key] = pair.Value?.DeepCopy();
                     return new Data(sameId ? uid : uidChain.GetId(), str, valName, num, tmpDic);
                 }
             }

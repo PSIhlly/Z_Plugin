@@ -14,7 +14,7 @@ namespace Form
             return !string.IsNullOrEmpty(reference) && reference.Length > mark.Length * 2
                 && reference.StartsWith(mark, StringComparison.Ordinal)
                 && reference.EndsWith(mark, StringComparison.Ordinal)
-                && int.TryParse(reference.Substring(mark.Length, reference.Length - mark.Length * 2),
+                && int.TryParse(reference.AsSpan(mark.Length, reference.Length - mark.Length * 2),
                     NumberStyles.None, CultureInfo.InvariantCulture, out uid) && uid > 0;
         }
 
@@ -55,13 +55,16 @@ namespace Form
                 return null;
             if (source.protoUid != 0)
                 return source;
-            var scene = PlayManager.instance.sceneCtrl;
-            var units = scene?.GetCharacterUnits(uid);
-            if (units != null && units.Count > 0
-                && DataByUid.TryGetValue(units[0].unit.productInfo.Item1, out var live))
+            var unit = PlayManager.instance.sceneCtrl?.GetCharacterUnit(uid);
+            if (unit != null && DataByUid.TryGetValue(unit.unit.productInfo.Item1, out var live))
                 return live;
-            var copies = ResolveReferences(uid);
-            return copies.Count > 0 ? copies[0] : source;
+            Data first = source.unique ? source : null;
+            if (DatasByProtouid.TryGetValue(uid, out var copies))
+                foreach (var copy in copies)
+                    if (copy != null && (first == null || copy.uid < first.uid)
+                        && DataByUid.TryGetValue(copy.uid, out var current) && ReferenceEquals(copy, current))
+                        first = copy;
+            return first ?? source;
         }
     }
 }

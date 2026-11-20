@@ -1313,6 +1313,56 @@ Return owner.value+items[""key""];";
         }
 
         [Test]
+        public void SubprogramScalarReturn_TransfersToParentStackUntilPublicReturn()
+        {
+            string name = "ScalarReturn_" + Guid.NewGuid().ToString("N");
+            var function = CompileProgram(name, "Return 7;", "scalar child");
+            using (new RegistryEntry<ProgramDataForm.Data>(ProgramDataForm.DataByName, name, function))
+            {
+                var program = CompileProgram("ScalarReturnParent", $"Return {name}();", "scalar parent");
+                var data = CreateInterpret(program);
+                var interpreter = new Interpreter(data);
+                // Push arity, Call, child PushNum and Ret. Stop before the parent's Ret.
+                var paused = InterpretWithBudget(interpreter, 4);
+                Assert.That(paused.complete, Is.False);
+                Assert.That(paused.errors, Is.Empty);
+                Assert.That(data.subInterpret, Is.Null);
+                var operand = data.stack.Single();
+                var owner = operand.GetType().GetField("owner", BindingFlags.Instance | BindingFlags.NonPublic);
+                Assert.That(owner.GetValue(operand), Is.SameAs(interpreter));
+                var result = interpreter.Interpret();
+                Assert.That(result.ret, Is.SameAs(operand));
+                Assert.That(owner.GetValue(operand), Is.Null);
+                Execute("for(i=0;i<100;i++){2+3;}Return 1;");
+                Assert.That(result.ret.num, Is.EqualTo(7));
+            }
+        }
+
+        [Test]
+        public void SubprogramScalarReturn_DoesNotRecycleAnArgumentRetainedByACommand()
+        {
+            string alias = "EscapedScalar_" + Guid.NewGuid().ToString("N");
+            string name = "EscapedReturn_" + Guid.NewGuid().ToString("N");
+            var state = new DelayedProbeState();
+            using (new RegistryEntry<CmdBase>(BaseData.cmdDic, alias, new DelayedProbeCmd(state)))
+            {
+                var function = CompileProgram(name, $"Return {alias}(7);", "child returning escaped Box");
+                using (new RegistryEntry<ProgramDataForm.Data>(ProgramDataForm.DataByName, name, function))
+                {
+                    var program = CompileProgram("EscapedScalarParent",
+                        $"a={name}()+1;for(i=0;i<100;i++){{1+2;}}Return a;", "consume child's command result");
+                    var data = CreateInterpret(program);
+                    Assert.That(data.Interpret().complete, Is.False);
+                    var retained = state.Parameters[0];
+                    state.Task.res = state.Parameters;
+                    state.Task.Complete();
+                    Assert.That(RunToCompletion(data, program.code).ret.num, Is.EqualTo(8));
+                    Assert.That(retained.num, Is.EqualTo(7));
+                }
+            }
+        }
+
+        [Test]
         public void TemporarySubprogramArgument_CopyOutDoesNotClearTheReturnedDictionary()
         {
             string name = $"DictionaryCopyOut_{Guid.NewGuid():N}";
@@ -1828,6 +1878,38 @@ Return i;", out var data);
         {
             var zCode = Compile(source, out var zCodeMap, out var paramCount, out var returnValue, context);
             return new ProgramDataForm.Data(-1, name, source, zCode, zCodeMap, paramCount, returnValue);
+        }
+
+        private sealed class OrderedQuery : SynchronousQueryCmd
+        {
+            public override string GetName() => "Len";
+            protected override BoxDataForm.Data Query(ReadOnlySpan<BoxDataForm.Data> parameters)
+            {
+                if (parameters[0].num < 0) throw new InvalidOperationException("invalid first argument");
+                float last = parameters[1].str == string.Empty ? -1 : parameters[1].num;
+                return CodeHelper.CreateBoxByNum(10 * parameters[0].num + last);
+            }
+        }
+
+        [Test]
+        public void SynchronousQueries_PreserveArgumentOrderMemberLookupOmissionsAndErrorLocation()
+        {
+            const string alias = "QueryOrderProbe";
+            var metadata = CmdDataForm.DataByName["Len"].Copy();
+            metadata.prmNames = new List<string> { "a", "b" };
+            metadata.prmTypes = new List<string> { "num", "num" };
+            using (new RegistryEntry<CmdDataForm.Data>(CmdDataForm.DataByName, "Len", metadata))
+            using (new RegistryEntry<CmdBase>(BaseData.cmdDic, alias, new OrderedQuery()))
+            {
+                var ok = Execute($"v.x=3;{alias}(1,2);Return {alias}(v.x,2)+{alias}(2);", out var data);
+                Assert.That(ok.ret.num, Is.EqualTo(51f));
+                Assert.That(data.stack, Is.Empty);
+                var invalid = CompileProgram("FailingQuery", $"v=1;\nReturn {alias}(-1,v);", "query error");
+                var failed = CreateInterpret(invalid).Interpret();
+                Assert.That(failed.complete, Is.True);
+                Assert.That(failed.errors.Single().Message, Does.Contain("invalid first argument"));
+                Assert.That(failed.errors[0].LineNumber, Is.EqualTo(2));
+            }
         }
 
         private static List<string> Compile(

@@ -1,21 +1,11 @@
 using Form;
 using System;
-using System.Collections;
-using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEngine;
-using UnityEngine.Rendering;
 using Z_Code.Form;
-using Z_DesignStyle;
-using Z_Map;
-using Z_Text;
-using Z_Ui.Dialog;
-using Z_Ui.Notify;
-using Z_UnitSystem.Form;
 
 namespace Z_Code
 {
-    public class GetCharacterParameterCmd : CmdBase
+    public class GetCharacterParameterCmd : SynchronousQueryCmd
     {
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterAssembliesLoaded)]
         static void Init()
@@ -23,19 +13,12 @@ namespace Z_Code
             Register(new GetCharacterParameterCmd());
         }
         public override string GetName() => "GetCharacterParameter";
-        public override CmdBase GetNew() => new GetCharacterParameterCmd();
-        protected override bool ExecuteInternal(BoxDataForm.Data[] prm, InterpretAsyncTask asyncTask)
+        protected override BoxDataForm.Data Query(ReadOnlySpan<BoxDataForm.Data> prm)
         {
-            var data = CharacterProductForm.ResolveReference(prm[0].str);
-            if (data?.paramDic != null && data.paramDic.TryGetValue(prm[1].str, out var parameter) && parameter != null)
-            {
-                asyncTask.res = new BoxDataForm.Data[] { parameter.GetValue().DeepCopy() };
-            }
-            else
-            {
-                asyncTask.res = new BoxDataForm.Data[] { CodeHelper.CreateBox() };
-            }
-            return true;
+            var parameters = CharacterProductForm.ResolveReference(prm[0].str)?.paramDic;
+            return parameters != null && parameters.TryGetValue(prm[1].str, out var parameter) && parameter != null
+                ? parameter.GetValue().DeepCopy()
+                : CodeHelper.CreateBox();
         }
     }
 }
